@@ -1,0 +1,504 @@
+{
+  "commands": {
+    "file.new": {
+      "name": "New File",
+      "description": "Creates a new file",
+      "category": "File",
+      "icon": "document-new",
+      "enabled": true
+    },
+    "file.open": {
+      "name": "Open File",
+      "description": "Opens an existing file",
+      "category": "File",
+      "icon": "document-open",
+      "enabled": true
+    },
+    "file.save": {
+      "name": "Save File",
+      "description": "Saves the current file",
+      "category": "File",
+      "icon": "document-save",
+      "enabled": true
+    },
+    "edit.undo": {
+      "name": "Undo",
+      "description": "Undoes the last operation",
+      "category": "Edit",
+      "icon": "edit-undo",
+      "enabled": true
+    },
+    "edit.redo": {
+      "name": "Redo",
+      "description": "Redoes the last undone operation",
+      "category": "Edit",
+      "icon": "edit-redo",
+      "enabled": true
+    }
+  },
+  "shortcuts": {
+    "Ctrl+N": {
+      "command": "file.new",
+      "context": {}
+    },
+    "Ctrl+O": {
+      "command": "file.open",
+      "context": {}
+    },
+    "Ctrl+S": {
+      "command": "file.save",
+      "context": {}
+    },
+    "Ctrl+Z": {
+      "command": "edit.undo",
+      "context": {}
+    },
+    "Ctrl+Y": {
+      "command": "edit.redo",
+      "context": {}
+    },
+    "Ctrl+C": {
+      "command": "clipboard.copy",
+      "context": {}
+    },
+    "Ctrl+V": {
+      "command": "clipboard.paste",
+      "context": {}
+    }
+  },
+  "menus": [
+    {
+      "id": "file_menu",
+      "title": "File",
+      "items": [
+        {
+          "type": "action",
+          "text": "New",
+          "command": "file.new",
+          "shortcut": "Ctrl+N",
+          "icon": "document-new",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Open...",
+          "command": "file.open",
+          "shortcut": "Ctrl+O",
+          "icon": "document-open",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "action",
+          "text": "Save",
+          "command": "file.save",
+          "shortcut": "Ctrl+S",
+          "icon": "document-save",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Save As...",
+          "command": "file.saveAs",
+          "shortcut": "Ctrl+Shift+S",
+          "icon": "document-save-as",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "submenu",
+          "title": "Recent Files",
+          "items": [
+            {
+              "type": "action",
+              "text": "file1.txt",
+              "command": "file.openRecent",
+              "context": {
+                "filename": "file1.txt"
+              }
+            },
+            {
+              "type": "action",
+              "text": "file2.txt",
+              "command": "file.openRecent",
+              "context": {
+                "filename": "file2.txt"
+              }
+            }
+          ]
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "action",
+          "text": "Exit",
+          "command": "app.exit",
+          "shortcut": "Ctrl+Q",
+          "context": {}
+        }
+      ]
+    },
+    {
+      "id": "edit_menu",
+      "title": "Edit",
+      "items": [
+        {
+          "type": "action",
+          "text": "Undo",
+          "command": "edit.undo",
+          "shortcut": "Ctrl+Z",
+          "icon": "edit-undo",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Redo",
+          "command": "edit.redo",
+          "shortcut": "Ctrl+Y",
+          "icon": "edit-redo",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "action",
+          "text": "Cut",
+          "command": "clipboard.cut",
+          "shortcut": "Ctrl+X",
+          "icon": "edit-cut",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Copy",
+          "command": "clipboard.copy",
+          "shortcut": "Ctrl+C",
+          "icon": "edit-copy",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Paste",
+          "command": "clipboard.paste",
+          "shortcut": "Ctrl+V",
+          "icon": "edit-paste",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "action",
+          "text": "Find...",
+          "command": "edit.find",
+          "shortcut": "Ctrl+F",
+          "icon": "edit-find",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Replace...",
+          "command": "edit.replace",
+          "shortcut": "Ctrl+H",
+          "icon": "edit-find-replace",
+          "context": {}
+        }
+      ]
+    },
+    {
+      "id": "view_menu",
+      "title": "View",
+      "items": [
+        {
+          "type": "action",
+          "text": "Zoom In",
+          "command": "view.zoomIn",
+          "shortcut": "Ctrl++",
+          "icon": "zoom-in",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Zoom Out",
+          "command": "view.zoomOut",
+          "shortcut": "Ctrl+-",
+          "icon": "zoom-out",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Reset Zoom",
+          "command": "view.resetZoom",
+          "shortcut": "Ctrl+0",
+          "icon": "zoom-original",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "action",
+          "text": "Full Screen",
+          "command": "view.fullScreen",
+          "shortcut": "F11",
+          "icon": "view-fullscreen",
+          "context": {}
+        }
+      ]
+    },
+    {
+      "id": "tools_menu",
+      "title": "Tools",
+      "items": [
+        {
+          "type": "action",
+          "text": "Preferences...",
+          "command": "tools.preferences",
+          "shortcut": "Ctrl+,",
+          "icon": "preferences-system",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "action",
+          "text": "Run Command...",
+          "command": "tools.runCommand",
+          "shortcut": "Ctrl+Shift+P",
+          "icon": "system-run",
+          "context": {}
+        }
+      ]
+    },
+    {
+      "id": "help_menu",
+      "title": "Help",
+      "items": [
+        {
+          "type": "action",
+          "text": "About",
+          "command": "help.about",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Documentation",
+          "command": "help.documentation",
+          "shortcut": "F1",
+          "context": {}
+        }
+      ]
+    }
+  ],
+  "toolbars": [
+    {
+      "id": "main_toolbar",
+      "title": "Main Toolbar",
+      "position": "top",
+      "items": [
+        {
+          "type": "button",
+          "text": "New",
+          "command": "file.new",
+          "icon": "document-new",
+          "tooltip": "Create a new file",
+          "context": {}
+        },
+        {
+          "type": "button",
+          "text": "Open",
+          "command": "file.open",
+          "icon": "document-open",
+          "tooltip": "Open an existing file",
+          "context": {}
+        },
+        {
+          "type": "button",
+          "text": "Save",
+          "command": "file.save",
+          "icon": "document-save",
+          "tooltip": "Save the current file",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "button",
+          "text": "Undo",
+          "command": "edit.undo",
+          "icon": "edit-undo",
+          "tooltip": "Undo the last operation",
+          "context": {}
+        },
+        {
+          "type": "button",
+          "text": "Redo",
+          "command": "edit.redo",
+          "icon": "edit-redo",
+          "tooltip": "Redo the last undone operation",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "button",
+          "text": "Cut",
+          "command": "clipboard.cut",
+          "icon": "edit-cut",
+          "tooltip": "Cut selected text",
+          "context": {}
+        },
+        {
+          "type": "button",
+          "text": "Copy",
+          "command": "clipboard.copy",
+          "icon": "edit-copy",
+          "tooltip": "Copy selected text",
+          "context": {}
+        },
+        {
+          "type": "button",
+          "text": "Paste",
+          "command": "clipboard.paste",
+          "icon": "edit-paste",
+          "tooltip": "Paste text from clipboard",
+          "context": {}
+        }
+      ]
+    },
+    {
+      "id": "view_toolbar",
+      "title": "View Toolbar",
+      "position": "top",
+      "items": [
+        {
+          "type": "button",
+          "text": "Zoom In",
+          "command": "view.zoomIn",
+          "icon": "zoom-in",
+          "tooltip": "Zoom in",
+          "context": {}
+        },
+        {
+          "type": "button",
+          "text": "Zoom Out",
+          "command": "view.zoomOut",
+          "icon": "zoom-out",
+          "tooltip": "Zoom out",
+          "context": {}
+        },
+        {
+          "type": "button",
+          "text": "Reset",
+          "command": "view.resetZoom",
+          "icon": "zoom-original",
+          "tooltip": "Reset zoom level",
+          "context": {}
+        }
+      ]
+    }
+  ],
+  "context_menus": {
+    "text_editor": {
+      "items": [
+        {
+          "type": "action",
+          "text": "Cut",
+          "command": "clipboard.cut",
+          "icon": "edit-cut",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Copy",
+          "command": "clipboard.copy",
+          "icon": "edit-copy",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Paste",
+          "command": "clipboard.paste",
+          "icon": "edit-paste",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "action",
+          "text": "Select All",
+          "command": "edit.selectAll",
+          "shortcut": "Ctrl+A",
+          "context": {}
+        }
+      ]
+    },
+    "file_browser": {
+      "items": [
+        {
+          "type": "action",
+          "text": "Open",
+          "command": "file.open",
+          "icon": "document-open",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Rename",
+          "command": "file.rename",
+          "shortcut": "F2",
+          "context": {}
+        },
+        {
+          "type": "action",
+          "text": "Delete",
+          "command": "file.delete",
+          "shortcut": "Delete",
+          "icon": "edit-delete",
+          "context": {}
+        },
+        {
+          "type": "separator"
+        },
+        {
+          "type": "action",
+          "text": "Properties",
+          "command": "file.properties",
+          "context": {}
+        }
+      ]
+    }
+  },
+  "command_palette": {
+    "enabled": true,
+    "shortcut": "Ctrl+Shift+P",
+    "placeholder": "Type a command...",
+    "max_results": 20,
+    "fuzzy_search": true,
+    "categories": [
+      "File",
+      "Edit",
+      "View",
+      "Tools",
+      "Help"
+    ]
+  },
+  "settings": {
+    "auto_save": true,
+    "auto_save_interval": 30000,
+    "command_history_size": 100,
+    "enable_command_logging": true,
+    "enable_performance_monitoring": false,
+    "theme": "default"
+  }
+}

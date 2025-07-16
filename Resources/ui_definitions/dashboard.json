@@ -1,0 +1,328 @@
+{
+  "type": "QWidget",
+  "id": "dashboard_window",
+  "properties": {
+    "windowTitle": "📊 System Dashboard - Hot Reload",
+    "minimumSize": [900, 700],
+    "styleSheet": "QWidget { background-color: #f8f9fa; }"
+  },
+  "layout": {
+    "type": "VBoxLayout",
+    "spacing": 20,
+    "margins": [20, 20, 20, 20]
+  },
+  "children": [
+    {
+      "type": "QWidget",
+      "id": "header",
+      "properties": {
+        "styleSheet": "QWidget { background-color: #343a40; border-radius: 10px; padding: 15px; }"
+      },
+      "layout": {
+        "type": "HBoxLayout",
+        "spacing": 15
+      },
+      "children": [
+        {
+          "type": "QLabel",
+          "properties": {
+            "text": "📊 System Dashboard",
+            "styleSheet": "QLabel { color: white; font-size: 24px; font-weight: bold; }"
+          }
+        },
+        {
+          "type": "QWidget",
+          "properties": {
+            "styleSheet": "QWidget { background-color: transparent; }"
+          },
+          "layout": {
+            "type": "HBoxLayout",
+            "spacing": 10
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "system_status"
+              },
+              "properties": {
+                "styleSheet": "QLabel { color: white; font-size: 16px; font-weight: bold; }"
+              }
+            },
+            {
+              "type": "QPushButton",
+              "id": "refresh_button",
+              "properties": {
+                "text": "🔄 Refresh",
+                "minimumSize": [100, 35],
+                "styleSheet": "QPushButton { background-color: #007bff; color: white; font-size: 14px; font-weight: bold; border: none; border-radius: 5px; padding: 8px; } QPushButton:hover { background-color: #0056b3; } QPushButton:pressed { background-color: #004085; }"
+              },
+              "events": {
+                "clicked": "onRefreshClicked"
+              }
+            },
+            {
+              "type": "QPushButton",
+              "id": "export_button",
+              "properties": {
+                "text": "📤 Export",
+                "minimumSize": [100, 35],
+                "styleSheet": "QPushButton { background-color: #28a745; color: white; font-size: 14px; font-weight: bold; border: none; border-radius: 5px; padding: 8px; } QPushButton:hover { background-color: #1e7e34; } QPushButton:pressed { background-color: #155724; }"
+              },
+              "events": {
+                "clicked": "onExportClicked"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "QWidget",
+      "id": "metrics_grid",
+      "layout": {
+        "type": "GridLayout",
+        "spacing": 15
+      },
+      "children": [
+        {
+          "type": "QWidget",
+          "id": "cpu_card",
+          "properties": {
+            "styleSheet": "QWidget { background-color: white; border: 2px solid #dee2e6; border-radius: 10px; padding: 20px; } QWidget:hover { border-color: #007bff; }",
+            "minimumSize": [200, 150]
+          },
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 10
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "cpu_text"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 18px; font-weight: bold; color: #495057; }",
+                "alignment": 4
+              }
+            },
+            {
+              "type": "QProgressBar",
+              "bindings": {
+                "value": "cpu_usage"
+              },
+              "properties": {
+                "minimum": 0,
+                "maximum": 100,
+                "styleSheet": "QProgressBar { border: 2px solid #dee2e6; border-radius: 5px; text-align: center; font-weight: bold; color: #495057; } QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #007bff, stop:1 #0056b3); border-radius: 3px; }"
+              }
+            }
+          ]
+        },
+        {
+          "type": "QWidget",
+          "id": "memory_card",
+          "properties": {
+            "styleSheet": "QWidget { background-color: white; border: 2px solid #dee2e6; border-radius: 10px; padding: 20px; } QWidget:hover { border-color: #28a745; }",
+            "minimumSize": [200, 150]
+          },
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 10
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "memory_text"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 18px; font-weight: bold; color: #495057; }",
+                "alignment": 4
+              }
+            },
+            {
+              "type": "QProgressBar",
+              "bindings": {
+                "value": "memory_usage"
+              },
+              "properties": {
+                "minimum": 0,
+                "maximum": 100,
+                "styleSheet": "QProgressBar { border: 2px solid #dee2e6; border-radius: 5px; text-align: center; font-weight: bold; color: #495057; } QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #28a745, stop:1 #1e7e34); border-radius: 3px; }"
+              }
+            }
+          ]
+        },
+        {
+          "type": "QWidget",
+          "id": "network_card",
+          "properties": {
+            "styleSheet": "QWidget { background-color: white; border: 2px solid #dee2e6; border-radius: 10px; padding: 20px; } QWidget:hover { border-color: #ffc107; }",
+            "minimumSize": [200, 150]
+          },
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 10
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "network_text"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 18px; font-weight: bold; color: #495057; }",
+                "alignment": 4
+              }
+            },
+            {
+              "type": "QProgressBar",
+              "bindings": {
+                "value": "network_speed"
+              },
+              "properties": {
+                "minimum": 0,
+                "maximum": 1000,
+                "styleSheet": "QProgressBar { border: 2px solid #dee2e6; border-radius: 5px; text-align: center; font-weight: bold; color: #495057; } QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #ffc107, stop:1 #e0a800); border-radius: 3px; }"
+              }
+            }
+          ]
+        },
+        {
+          "type": "QWidget",
+          "id": "disk_card",
+          "properties": {
+            "styleSheet": "QWidget { background-color: white; border: 2px solid #dee2e6; border-radius: 10px; padding: 20px; } QWidget:hover { border-color: #dc3545; }",
+            "minimumSize": [200, 150]
+          },
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 10
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "disk_text"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 18px; font-weight: bold; color: #495057; }",
+                "alignment": 4
+              }
+            },
+            {
+              "type": "QProgressBar",
+              "bindings": {
+                "value": "disk_usage"
+              },
+              "properties": {
+                "minimum": 0,
+                "maximum": 100,
+                "styleSheet": "QProgressBar { border: 2px solid #dee2e6; border-radius: 5px; text-align: center; font-weight: bold; color: #495057; } QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #dc3545, stop:1 #c82333); border-radius: 3px; }"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "QWidget",
+      "id": "info_panel",
+      "properties": {
+        "styleSheet": "QWidget { background-color: white; border: 2px solid #dee2e6; border-radius: 10px; padding: 20px; }"
+      },
+      "layout": {
+        "type": "HBoxLayout",
+        "spacing": 30
+      },
+      "children": [
+        {
+          "type": "QWidget",
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 15
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "📈 System Information",
+                "styleSheet": "QLabel { font-size: 20px; font-weight: bold; color: #495057; margin-bottom: 10px; }"
+              }
+            },
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "users_text"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 16px; color: #6c757d; margin: 5px 0; }"
+              }
+            },
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "uptime_text"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 16px; color: #6c757d; margin: 5px 0; }"
+              }
+            },
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "🔄 Auto-refresh: Every 2 seconds",
+                "styleSheet": "QLabel { font-size: 14px; color: #6c757d; font-style: italic; margin: 5px 0; }"
+              }
+            }
+          ]
+        },
+        {
+          "type": "QWidget",
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 15
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "🎛️ Quick Stats",
+                "styleSheet": "QLabel { font-size: 20px; font-weight: bold; color: #495057; margin-bottom: 10px; }"
+              }
+            },
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "refresh_count"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 16px; color: #6c757d; margin: 5px 0; }"
+              }
+            },
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "📊 Real-time monitoring",
+                "styleSheet": "QLabel { font-size: 14px; color: #6c757d; font-style: italic; margin: 5px 0; }"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "QLabel",
+      "id": "status_label",
+      "bindings": {
+        "text": "status"
+      },
+      "properties": {
+        "alignment": 4,
+        "styleSheet": "QLabel { font-size: 14px; color: #6c757d; font-style: italic; margin-top: 10px; }"
+      }
+    }
+  ]
+}

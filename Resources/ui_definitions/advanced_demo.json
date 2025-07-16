@@ -1,0 +1,327 @@
+{
+  "type": "QWidget",
+  "id": "advanced_demo",
+  "properties": {
+    "windowTitle": "🔥 Advanced Components Hot Reload Demo",
+    "minimumSize": [800, 600],
+    "styleSheet": "QWidget { background-color: #f8f9fa; }"
+  },
+  "layout": {
+    "type": "VBoxLayout",
+    "spacing": 15,
+    "margins": [20, 20, 20, 20]
+  },
+  "children": [
+    {
+      "type": "QLabel",
+      "id": "title",
+      "properties": {
+        "text": "🚀 Advanced Components Showcase",
+        "alignment": 4,
+        "styleSheet": "QLabel { font-size: 28px; font-weight: bold; color: #2c3e50; margin-bottom: 20px; }"
+      }
+    },
+    {
+      "type": "QTabWidget",
+      "id": "main_tabs",
+      "properties": {
+        "styleSheet": "QTabWidget::pane { border: 1px solid #bdc3c7; } QTabBar::tab { padding: 10px; margin: 2px; } QTabBar::tab:selected { background-color: #3498db; color: white; }"
+      },
+      "children": [
+        {
+          "type": "QWidget",
+          "id": "input_tab",
+          "properties": {
+            "tabTitle": "📝 Input Controls"
+          },
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 15,
+            "margins": [15, 15, 15, 15]
+          },
+          "children": [
+            {
+              "type": "QGroupBox",
+              "id": "text_input_group",
+              "properties": {
+                "title": "Text Input Controls",
+                "styleSheet": "QGroupBox { font-weight: bold; }"
+              },
+              "layout": {
+                "type": "VBoxLayout",
+                "spacing": 10
+              },
+              "children": [
+                {
+                  "type": "QLineEdit",
+                  "id": "sample_line_edit",
+                  "properties": {
+                    "placeholderText": "Enter your text here...",
+                    "styleSheet": "QLineEdit { padding: 8px; border: 2px solid #bdc3c7; border-radius: 4px; } QLineEdit:focus { border-color: #3498db; }"
+                  }
+                },
+                {
+                  "type": "QTextEdit",
+                  "id": "sample_text_edit",
+                  "properties": {
+                    "html": "<h3>Rich Text Editor</h3><p>This is a <b>bold</b> text with <i>italic</i> and <u>underlined</u> content.</p><p>You can edit this text and see the changes in real-time!</p>",
+                    "styleSheet": "QTextEdit { border: 2px solid #bdc3c7; border-radius: 4px; padding: 10px; }"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "QGroupBox",
+              "id": "selection_group",
+              "properties": {
+                "title": "Selection Controls",
+                "styleSheet": "QGroupBox { font-weight: bold; }"
+              },
+              "layout": {
+                "type": "HBoxLayout",
+                "spacing": 15
+              },
+              "children": [
+                {
+                  "type": "QComboBox",
+                  "id": "demo_combo",
+                  "properties": {
+                    "styleSheet": "QComboBox { padding: 8px; border: 2px solid #bdc3c7; border-radius: 4px; min-width: 150px; }"
+                  },
+                  "items": ["🍎 Apple", "🍌 Banana", "🍊 Orange", "🥝 Kiwi", "🍇 Grapes"]
+                },
+                {
+                  "type": "QSpinBox",
+                  "id": "demo_spinbox",
+                  "properties": {
+                    "minimum": 0,
+                    "maximum": 100,
+                    "value": 50,
+                    "suffix": "%",
+                    "styleSheet": "QSpinBox { padding: 8px; border: 2px solid #bdc3c7; border-radius: 4px; }"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "QWidget",
+          "id": "display_tab",
+          "properties": {
+            "tabTitle": "📊 Display Controls"
+          },
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 15,
+            "margins": [15, 15, 15, 15]
+          },
+          "children": [
+            {
+              "type": "QGroupBox",
+              "id": "progress_group",
+              "properties": {
+                "title": "Progress Indicators",
+                "styleSheet": "QGroupBox { font-weight: bold; }"
+              },
+              "layout": {
+                "type": "VBoxLayout",
+                "spacing": 10
+              },
+              "children": [
+                {
+                  "type": "QProgressBar",
+                  "id": "demo_progress",
+                  "properties": {
+                    "value": 65,
+                    "styleSheet": "QProgressBar { border: 2px solid #bdc3c7; border-radius: 5px; text-align: center; } QProgressBar::chunk { background-color: #2ecc71; border-radius: 3px; }"
+                  }
+                },
+                {
+                  "type": "QSlider",
+                  "id": "demo_slider",
+                  "properties": {
+                    "orientation": 1,
+                    "minimum": 0,
+                    "maximum": 100,
+                    "value": 65,
+                    "styleSheet": "QSlider::groove:horizontal { border: 1px solid #bdc3c7; height: 8px; background: #ecf0f1; border-radius: 4px; } QSlider::handle:horizontal { background: #3498db; border: 1px solid #2980b9; width: 18px; margin: -2px 0; border-radius: 9px; }"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "QGroupBox",
+              "id": "data_display_group",
+              "properties": {
+                "title": "Data Display",
+                "styleSheet": "QGroupBox { font-weight: bold; }"
+              },
+              "layout": {
+                "type": "VBoxLayout",
+                "spacing": 10
+              },
+              "children": [
+                {
+                  "type": "QTableView",
+                  "id": "demo_table",
+                  "properties": {
+                    "alternatingRowColors": true,
+                    "selectionBehavior": 1,
+                    "styleSheet": "QTableView { gridline-color: #bdc3c7; background-color: white; } QTableView::item:selected { background-color: #3498db; }"
+                  },
+                  "data": [
+                    ["Name", "Age", "City", "Country"],
+                    ["Alice Johnson", "28", "New York", "USA"],
+                    ["Bob Smith", "35", "London", "UK"],
+                    ["Charlie Brown", "42", "Paris", "France"],
+                    ["Diana Prince", "30", "Tokyo", "Japan"]
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "QWidget",
+          "id": "interaction_tab",
+          "properties": {
+            "tabTitle": "🎯 Interactive Elements"
+          },
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 15,
+            "margins": [15, 15, 15, 15]
+          },
+          "children": [
+            {
+              "type": "QGroupBox",
+              "id": "button_group",
+              "properties": {
+                "title": "Action Buttons",
+                "styleSheet": "QGroupBox { font-weight: bold; }"
+              },
+              "layout": {
+                "type": "HBoxLayout",
+                "spacing": 10
+              },
+              "children": [
+                {
+                  "type": "QPushButton",
+                  "id": "primary_button",
+                  "properties": {
+                    "text": "🚀 Primary Action",
+                    "styleSheet": "QPushButton { background-color: #3498db; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; } QPushButton:hover { background-color: #2980b9; } QPushButton:pressed { background-color: #1f639a; }"
+                  },
+                  "events": {
+                    "clicked": "showPrimaryAction"
+                  }
+                },
+                {
+                  "type": "QPushButton",
+                  "id": "secondary_button",
+                  "properties": {
+                    "text": "⚡ Secondary Action",
+                    "styleSheet": "QPushButton { background-color: #95a5a6; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; } QPushButton:hover { background-color: #7f8c8d; } QPushButton:pressed { background-color: #6c7b7c; }"
+                  },
+                  "events": {
+                    "clicked": "showSecondaryAction"
+                  }
+                },
+                {
+                  "type": "QPushButton",
+                  "id": "danger_button",
+                  "properties": {
+                    "text": "🔥 Danger Action",
+                    "styleSheet": "QPushButton { background-color: #e74c3c; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-weight: bold; } QPushButton:hover { background-color: #c0392b; } QPushButton:pressed { background-color: #a93226; }"
+                  },
+                  "events": {
+                    "clicked": "showDangerAction"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "QGroupBox",
+              "id": "checkbox_group",
+              "properties": {
+                "title": "Options",
+                "styleSheet": "QGroupBox { font-weight: bold; }"
+              },
+              "layout": {
+                "type": "VBoxLayout",
+                "spacing": 8
+              },
+              "children": [
+                {
+                  "type": "QCheckBox",
+                  "id": "option1",
+                  "properties": {
+                    "text": "✨ Enable animations",
+                    "checked": true,
+                    "styleSheet": "QCheckBox { font-size: 14px; } QCheckBox::indicator { width: 18px; height: 18px; } QCheckBox::indicator:checked { background-color: #2ecc71; border: 2px solid #27ae60; } QCheckBox::indicator:unchecked { background-color: white; border: 2px solid #bdc3c7; }"
+                  }
+                },
+                {
+                  "type": "QCheckBox",
+                  "id": "option2",
+                  "properties": {
+                    "text": "🔔 Enable notifications",
+                    "checked": false,
+                    "styleSheet": "QCheckBox { font-size: 14px; } QCheckBox::indicator { width: 18px; height: 18px; } QCheckBox::indicator:checked { background-color: #2ecc71; border: 2px solid #27ae60; } QCheckBox::indicator:unchecked { background-color: white; border: 2px solid #bdc3c7; }"
+                  }
+                },
+                {
+                  "type": "QCheckBox",
+                  "id": "option3",
+                  "properties": {
+                    "text": "🎨 Dark theme",
+                    "checked": false,
+                    "styleSheet": "QCheckBox { font-size: 14px; } QCheckBox::indicator { width: 18px; height: 18px; } QCheckBox::indicator:checked { background-color: #2ecc71; border: 2px solid #27ae60; } QCheckBox::indicator:unchecked { background-color: white; border: 2px solid #bdc3c7; }"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "QWidget",
+      "id": "status_bar",
+      "layout": {
+        "type": "HBoxLayout",
+        "spacing": 10
+      },
+      "children": [
+        {
+          "type": "QLabel",
+          "id": "status_label",
+          "properties": {
+            "text": "🔥 Hot reload is active - Try editing this file!",
+            "styleSheet": "QLabel { color: #27ae60; font-weight: bold; padding: 10px; background-color: #d5f4e6; border-radius: 4px; }"
+          }
+        },
+        {
+          "type": "QLabel",
+          "id": "timestamp",
+          "properties": {
+            "text": "Last updated: Now",
+            "styleSheet": "QLabel { color: #7f8c8d; font-size: 12px; padding: 10px; }"
+          }
+        }
+      ]
+    }
+  ],
+  "bindings": {
+    "demo_slider": {
+      "value": "progress_value"
+    },
+    "demo_progress": {
+      "value": "progress_value"
+    }
+  },
+  "state": {
+    "progress_value": 65
+  }
+}

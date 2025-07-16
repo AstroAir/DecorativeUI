@@ -1,0 +1,91 @@
+{
+  "type": "QWidget",
+  "id": "main_window",
+  "properties": {
+    "windowTitle": "Counter App - Hot Reload Demo",
+    "minimumSize": [350, 200],
+    "styleSheet": "QWidget { background-color: #f5f5f5; }"
+  },
+  "layout": {
+    "type": "VBoxLayout",
+    "spacing": 20,
+    "margins": [20, 20, 20, 20]
+  },
+  "children": [
+    {
+      "type": "QLabel",
+      "id": "title_label",
+      "properties": {
+        "text": "🔥 Hot Reload Counter",
+        "alignment": 4,
+        "styleSheet": "QLabel { font-size: 24px; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }"
+      }
+    },
+    {
+      "type": "QLabel",
+      "id": "counter_display",
+      "bindings": {
+        "text": "counter_text"
+      },
+      "properties": {
+        "alignment": 4,
+        "styleSheet": "QLabel { font-size: 36px; font-weight: bold; color: #e74c3c; background-color: white; border: 2px solid #bdc3c7; border-radius: 10px; padding: 20px; }"
+      }
+    },
+    {
+      "type": "QWidget",
+      "id": "button_container",
+      "layout": {
+        "type": "HBoxLayout",
+        "spacing": 15
+      },
+      "children": [
+        {
+          "type": "QPushButton",
+          "id": "decrement_btn",
+          "properties": {
+            "text": "➖ Decrease",
+            "minimumSize": [120, 50],
+            "styleSheet": "QPushButton { background-color: #e67e22; color: white; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; } QPushButton:hover { background-color: #d35400; } QPushButton:pressed { background-color: #a0522d; }"
+          },
+          "events": {
+            "clicked": "decrementCounter"
+          }
+        },
+        {
+          "type": "QPushButton",
+          "id": "reset_btn",
+          "properties": {
+            "text": "🔄 Reset",
+            "minimumSize": [100, 50],
+            "styleSheet": "QPushButton { background-color: #95a5a6; color: white; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; } QPushButton:hover { background-color: #7f8c8d; } QPushButton:pressed { background-color: #5d6d7e; }"
+          },
+          "events": {
+            "clicked": "resetCounter"
+          }
+        },
+        {
+          "type": "QPushButton",
+          "id": "increment_btn",
+          "properties": {
+            "text": "➕ Increase",
+            "minimumSize": [120, 50],
+            "styleSheet": "QPushButton { background-color: #27ae60; color: white; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; } QPushButton:hover { background-color: #229954; } QPushButton:pressed { background-color: #1e8449; }"
+          },
+          "events": {
+            "clicked": "incrementCounter"
+          }
+        }
+      ]
+    },
+    {
+      "type": "QLabel",
+      "id": "status_label",
+      "properties": {
+        "text": "🚀 Hot Reload Active - Edit this JSON file!",
+        "alignment": 4,
+        "styleSheet": "QLabel { font-size: 12px; color: #7f8c8d; font-style: italic; margin-top: 10px; }"
+      }
+    }
+  ]
+}

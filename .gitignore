@@ -1,0 +1,70 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Build artifacts
+build/
+cmake-build-debug/
+.xmake/
+.cache/
+
+# IDE and editor specific
+.idea/ # Added for IntelliJ based IDEs
+
+# Language specific
+node_modules/
+src/pyutils/__pycache__/
+.venv/
+.mypy_cache/
+
+# Test files and outputs
+src/pyutils/test.jpg
+test.cpp
+module_test/
+test/
+
+# Configuration files
+libexample.json
+
+# Log and report files
+*.log
+*.xml
+
+# Temporary or cache files
+.roo/
+.vscode/
+
+# Python bytecode
+*.pyc
+*.pyd
+__pycache__/
+atom.egg-info/

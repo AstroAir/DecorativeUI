@@ -1,0 +1,471 @@
+{
+  "type": "QWidget",
+  "id": "settings_dialog",
+  "properties": {
+    "windowTitle": "⚙️ Settings - Hot Reload Demo",
+    "minimumSize": [550, 650],
+    "styleSheet": "QWidget { background-color: #f8f9fa; }"
+  },
+  "layout": {
+    "type": "VBoxLayout",
+    "spacing": 20,
+    "margins": [25, 25, 25, 25]
+  },
+  "children": [
+    {
+      "type": "QLabel",
+      "properties": {
+        "text": "⚙️ Application Settings",
+        "alignment": 4,
+        "styleSheet": "QLabel { font-size: 28px; font-weight: bold; color: #2c3e50; margin-bottom: 20px; }"
+      }
+    },
+    {
+      "type": "QWidget",
+      "id": "general_group",
+      "properties": {
+        "styleSheet": "QWidget { background-color: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; }"
+      },
+      "layout": {
+        "type": "VBoxLayout",
+        "spacing": 15
+      },
+      "children": [
+        {
+          "type": "QLabel",
+          "properties": {
+            "text": "🌐 General Settings",
+            "styleSheet": "QLabel { font-size: 18px; font-weight: bold; color: #495057; margin-bottom: 10px; }"
+          }
+        },
+        {
+          "type": "QWidget",
+          "layout": {
+            "type": "HBoxLayout",
+            "spacing": 15
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "Language:",
+                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #6c757d; min-width: 80px; }"
+              }
+            },
+            {
+              "type": "QComboBox",
+              "id": "language_combo",
+              "properties": {
+                "items": ["English", "中文", "Español", "Français", "Deutsch", "日本語"],
+                "styleSheet": "QComboBox { padding: 8px; font-size: 14px; border: 2px solid #e9ecef; border-radius: 4px; } QComboBox:focus { border-color: #0d6efd; }"
+              },
+              "events": {
+                "currentIndexChanged": "onLanguageChanged"
+              }
+            }
+          ]
+        },
+        {
+          "type": "QCheckBox",
+          "id": "notifications_checkbox",
+          "properties": {
+            "text": "🔔 Enable notifications",
+            "styleSheet": "QCheckBox { font-size: 14px; color: #495057; } QCheckBox::indicator { width: 18px; height: 18px; } QCheckBox::indicator:checked { background-color: #0d6efd; }"
+          },
+          "bindings": {
+            "checked": "notifications"
+          },
+          "events": {
+            "toggled": "onNotificationsToggled"
+          }
+        },
+        {
+          "type": "QCheckBox",
+          "id": "auto_save_checkbox",
+          "properties": {
+            "text": "💾 Auto-save changes",
+            "styleSheet": "QCheckBox { font-size: 14px; color: #495057; } QCheckBox::indicator { width: 18px; height: 18px; } QCheckBox::indicator:checked { background-color: #0d6efd; }"
+          },
+          "bindings": {
+            "checked": "auto_save"
+          },
+          "events": {
+            "toggled": "onAutoSaveToggled"
+          }
+        },
+        {
+          "type": "QLabel",
+          "bindings": {
+            "text": "general_summary"
+          },
+          "properties": {
+            "styleSheet": "QLabel { font-size: 12px; color: #6c757d; font-style: italic; margin-top: 10px; }"
+          }
+        }
+      ]
+    },
+    {
+      "type": "QWidget",
+      "id": "appearance_group",
+      "properties": {
+        "styleSheet": "QWidget { background-color: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; }"
+      },
+      "layout": {
+        "type": "VBoxLayout",
+        "spacing": 15
+      },
+      "children": [
+        {
+          "type": "QLabel",
+          "properties": {
+            "text": "🎨 Appearance Settings",
+            "styleSheet": "QLabel { font-size: 18px; font-weight: bold; color: #495057; margin-bottom: 10px; }"
+          }
+        },
+        {
+          "type": "QWidget",
+          "layout": {
+            "type": "HBoxLayout",
+            "spacing": 15
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "Theme:",
+                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #6c757d; min-width: 80px; }"
+              }
+            },
+            {
+              "type": "QComboBox",
+              "id": "theme_combo",
+              "properties": {
+                "items": ["Light", "Dark", "Auto"],
+                "styleSheet": "QComboBox { padding: 8px; font-size: 14px; border: 2px solid #e9ecef; border-radius: 4px; } QComboBox:focus { border-color: #0d6efd; }"
+              },
+              "events": {
+                "currentIndexChanged": "onThemeChanged"
+              }
+            }
+          ]
+        },
+        {
+          "type": "QWidget",
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 8
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "Font Size:",
+                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #6c757d; }"
+              }
+            },
+            {
+              "type": "QSlider",
+              "id": "font_size_slider",
+              "properties": {
+                "orientation": 1,
+                "minimum": 8,
+                "maximum": 24,
+                "value": 12,
+                "styleSheet": "QSlider::groove:horizontal { background: #e9ecef; height: 8px; border-radius: 4px; } QSlider::handle:horizontal { background: #0d6efd; width: 20px; height: 20px; border-radius: 10px; margin: -6px 0; }"
+              },
+              "bindings": {
+                "value": "font_size"
+              },
+              "events": {
+                "valueChanged": "onFontSizeChanged"
+              }
+            },
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "font_size"
+              },
+              "properties": {
+                "alignment": 4,
+                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #0d6efd; }"
+              }
+            }
+          ]
+        },
+        {
+          "type": "QLabel",
+          "bindings": {
+            "text": "appearance_summary"
+          },
+          "properties": {
+            "styleSheet": "QLabel { font-size: 12px; color: #6c757d; font-style: italic; margin-top: 10px; }"
+          }
+        }
+      ]
+    },
+    {
+      "type": "QWidget",
+      "id": "advanced_group",
+      "properties": {
+        "styleSheet": "QWidget { background-color: white; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; }"
+      },
+      "layout": {
+        "type": "VBoxLayout",
+        "spacing": 15
+      },
+      "children": [
+        {
+          "type": "QLabel",
+          "properties": {
+            "text": "🔧 Advanced Settings",
+            "styleSheet": "QLabel { font-size: 18px; font-weight: bold; color: #495057; margin-bottom: 10px; }"
+          }
+        },
+        {
+          "type": "QCheckBox",
+          "id": "auto_backup_checkbox",
+          "properties": {
+            "text": "🗄️ Enable auto-backup",
+            "styleSheet": "QCheckBox { font-size: 14px; color: #495057; } QCheckBox::indicator { width: 18px; height: 18px; } QCheckBox::indicator:checked { background-color: #0d6efd; }"
+          },
+          "bindings": {
+            "checked": "auto_backup"
+          },
+          "events": {
+            "toggled": "onAutoBackupToggled"
+          }
+        },
+        {
+          "type": "QWidget",
+          "layout": {
+            "type": "HBoxLayout",
+            "spacing": 15
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "Cache Interval:",
+                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #6c757d; min-width: 100px; }"
+              }
+            },
+            {
+              "type": "QSlider",
+              "id": "cache_interval_slider",
+              "properties": {
+                "orientation": 1,
+                "minimum": 10,
+                "maximum": 300,
+                "value": 60,
+                "styleSheet": "QSlider::groove:horizontal { background: #e9ecef; height: 8px; border-radius: 4px; } QSlider::handle:horizontal { background: #28a745; width: 20px; height: 20px; border-radius: 10px; margin: -6px 0; }"
+              },
+              "bindings": {
+                "value": "cache_interval"
+              },
+              "events": {
+                "valueChanged": "onCacheIntervalChanged"
+              }
+            },
+            {
+              "type": "QLabel",
+              "bindings": {
+                "text": "cache_interval"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #28a745; min-width: 40px; }"
+              }
+            }
+          ]
+        },
+        {
+          "type": "QWidget",
+          "layout": {
+            "type": "HBoxLayout",
+            "spacing": 15
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "Log Level:",
+                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #6c757d; min-width: 80px; }"
+              }
+            },
+            {
+              "type": "QComboBox",
+              "id": "log_level_combo",
+              "properties": {
+                "items": ["Debug", "Info", "Warning", "Error"],
+                "styleSheet": "QComboBox { padding: 8px; font-size: 14px; border: 2px solid #e9ecef; border-radius: 4px; } QComboBox:focus { border-color: #0d6efd; }"
+              },
+              "events": {
+                "currentIndexChanged": "onLogLevelChanged"
+              }
+            }
+          ]
+        },
+        {
+          "type": "QLabel",
+          "bindings": {
+            "text": "advanced_summary"
+          },
+          "properties": {
+            "styleSheet": "QLabel { font-size: 12px; color: #6c757d; font-style: italic; margin-top: 10px; }"
+          }
+        }
+      ]
+    },
+    {
+      "type": "QWidget",
+      "id": "button_container",
+      "layout": {
+        "type": "HBoxLayout",
+        "spacing": 15
+      },
+      "children": [
+        {
+          "type": "QPushButton",
+          "id": "import_button",
+          "properties": {
+            "text": "📥 Import",
+            "minimumSize": [100, 40],
+            "styleSheet": "QPushButton { background-color: #6c757d; color: white; font-size: 14px; font-weight: bold; border: none; border-radius: 6px; padding: 10px; } QPushButton:hover { background-color: #5a6268; }"
+          },
+          "events": {
+            "clicked": "onImportSettings"
+          }
+        },
+        {
+          "type": "QPushButton",
+          "id": "export_button",
+          "properties": {
+            "text": "📤 Export",
+            "minimumSize": [100, 40],
+            "styleSheet": "QPushButton { background-color: #6c757d; color: white; font-size: 14px; font-weight: bold; border: none; border-radius: 6px; padding: 10px; } QPushButton:hover { background-color: #5a6268; }"
+          },
+          "events": {
+            "clicked": "onExportSettings"
+          }
+        },
+        {
+          "type": "QPushButton",
+          "id": "reset_button",
+          "properties": {
+            "text": "🔄 Reset",
+            "minimumSize": [100, 40],
+            "styleSheet": "QPushButton { background-color: #ffc107; color: white; font-size: 14px; font-weight: bold; border: none; border-radius: 6px; padding: 10px; } QPushButton:hover { background-color: #e0a800; }"
+          },
+          "events": {
+            "clicked": "onResetToDefaults"
+          }
+        },
+        {
+          "type": "QPushButton",
+          "id": "apply_button",
+          "properties": {
+            "text": "✅ Apply",
+            "minimumSize": [120, 40],
+            "styleSheet": "QPushButton { background-color: #0d6efd; color: white; font-size: 14px; font-weight: bold; border: none; border-radius: 6px; padding: 10px; } QPushButton:hover { background-color: #0b5ed7; }"
+          },
+          "events": {
+            "clicked": "onApplySettings"
+          }
+        }
+      ]
+    },
+    {
+      "type": "QLabel",
+      "id": "status_label",
+      "bindings": {
+        "text": "status"
+      },
+      "properties": {
+        "alignment": 4,
+        "styleSheet": "QLabel { font-size: 12px; color: #6c757d; font-style: italic; margin-top: 15px; }"
+      }
+    }
+  ]
+}
+        {
+          "type": "QSpinBox",
+          "properties": {
+            "value": 12,
+            "minimum": 8,
+            "maximum": 24,
+            "suffix": " pt"
+          }
+        }
+      ]
+    },
+    {
+      "type": "QGroupBox",
+      "properties": {
+        "title": "Hot Reload Settings"
+      },
+      "layout": {
+        "type": "VBoxLayout"
+      },
+      "children": [
+        {
+          "type": "QCheckBox",
+          "properties": {
+            "text": "Enable hot reload",
+            "checked": true
+          }
+        },
+        {
+          "type": "QWidget",
+          "layout": {
+            "type": "HBoxLayout"
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "Reload delay:"
+              }
+            },
+            {
+              "type": "QSpinBox",
+              "properties": {
+                "value": 200,
+                "minimum": 50,
+                "maximum": 2000,
+                "suffix": " ms"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "QWidget",
+      "layout": {
+        "type": "HBoxLayout"
+      },
+      "children": [
+        {
+          "type": "QPushButton",
+          "properties": {
+            "text": "Reset to Defaults",
+            "styleSheet": "QPushButton { background-color: #95a5a6; color: white; padding: 8px 16px; border: none; border-radius: 4px; }"
+          }
+        },
+        {
+          "type": "QPushButton",
+          "properties": {
+            "text": "Apply",
+            "styleSheet": "QPushButton { background-color: #3498db; color: white; padding: 8px 16px; border: none; border-radius: 4px; }"
+          }
+        },
+        {
+          "type": "QPushButton",
+          "properties": {
+            "text": "OK",
+            "styleSheet": "QPushButton { background-color: #27ae60; color: white; padding: 8px 16px; border: none; border-radius: 4px; }"
+          }
+        }
+      ]
+    }
+  ]
+}
