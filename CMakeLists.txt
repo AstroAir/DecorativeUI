@@ -4,9 +4,15 @@ project(DeclarativeUI VERSION 1.0.0 LANGUAGES CXX)
 # **Modern C++ standard**
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # **Find Qt6 with required components**
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Test)
+
+# **Build options**
+option(BUILD_EXAMPLES "Build example applications" ON)
+option(BUILD_TESTS "Build test applications" ON)
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # **Compiler-specific optimizations**
 if(MSVC)
@@ -21,57 +27,53 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(DECLARATIVE_UI_DEBUG)
 endif()
 
-# **Create main library**
+# **Create main library first**
 add_library(DeclarativeUI STATIC
     # Core
     src/Core/UIElement.cpp
     src/Core/DeclarativeBuilder.cpp
-    
+    src/Core/CacheManager.cpp
+    src/Core/MemoryManager.cpp
+    src/Core/ParallelProcessor.cpp
+    src/Animation/AnimationEngine.cpp
+    src/Debug/ProfilerDashboard.cpp
+
     # JSON Support
     src/JSON/JSONUILoader.cpp
+    src/JSON/JSONParser.cpp
+    src/JSON/JSONValidator.cpp
     src/JSON/ComponentRegistry.cpp
-    
+
     # Hot Reload
     src/HotReload/FileWatcher.cpp
     src/HotReload/HotReloadManager.cpp
     src/HotReload/PerformanceMonitor.cpp
-    
+
     # Binding
     src/Binding/StateManager.cpp
-    
+    src/Binding/PropertyBinding.cpp
+
     # Command System
     src/Command/CommandSystem.cpp
     src/Command/BuiltinCommands.cpp
     src/Command/CommandIntegration.cpp
 )
 
-target_link_libraries(DeclarativeUI 
-    Components
-    Qt6::Core 
+target_link_libraries(DeclarativeUI
+    Qt6::Core
     Qt6::Widgets
     Qt6::Network
 )
+
+# **Add subdirectories after main library**
+add_subdirectory(src/Components)
 
 target_include_directories(DeclarativeUI PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# **Example applications**
-add_executable(CounterApp src/Examples/main.cpp)
-target_link_libraries(CounterApp DeclarativeUI Qt6::Core Qt6::Widgets)
-
-add_executable(HotReloadDemo src/Examples/hot_reload_example.cpp)
-target_link_libraries(HotReloadDemo DeclarativeUI Qt6::Core Qt6::Widgets)
-
-add_executable(CommandDemo src/Examples/advanced_command_demo.cpp)
-target_link_libraries(CommandDemo DeclarativeUI Qt6::Core Qt6::Widgets)
-
-# **Test applications**
-add_executable(CommandSystemTest src/Tests/test_command_system.cpp)
-target_link_libraries(CommandSystemTest DeclarativeUI Qt6::Core Qt6::Widgets Qt6::Test)
-
-# **Enable Qt MOC**
-set_target_properties(DeclarativeUI CounterApp HotReloadDemo CommandDemo CommandSystemTest PROPERTIES
+# **Enable Qt MOC for main library**
+set_target_properties(DeclarativeUI PROPERTIES
     AUTOMOC ON
     AUTORCC ON
 )
@@ -83,19 +85,13 @@ add_custom_target(CopyResources ALL
     ${CMAKE_BINARY_DIR}/Resources
 )
 
-add_dependencies(HotReloadDemo CopyResources)
+# **Conditionally build examples**
+if(BUILD_EXAMPLES)
+    add_subdirectory(src/Examples)
+endif()
 
-# **Add Components subdirectory**
-add_subdirectory(src/Components)
+# **Conditionally build tests**
+if(BUILD_TESTS)
+    add_subdirectory(src/Tests)
+endif()
 
-# **Add Examples subdirectory**
-add_subdirectory(src/Examples)
-
-# **Install targets**
-install(TARGETS DeclarativeUI CounterApp HotReloadDemo CommandDemo CommandSystemTest
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-
-install(DIRECTORY Resources/ DESTINATION share/DeclarativeUI/Resources)

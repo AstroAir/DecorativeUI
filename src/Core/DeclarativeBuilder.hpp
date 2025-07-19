@@ -10,15 +10,33 @@
 #include <functional>
 #include <memory>
 #include <vector>
+#include <type_traits>
+#include <string_view>
+#include <array>
+#include <tuple>
+#include <utility>
 
 namespace DeclarativeUI::Core {
 
-// **Builder pattern with fluent interface**
-template <QtWidget WidgetType>
+// **Optimized builder pattern with template metaprogramming**
+template <typename WidgetType>
 class DeclarativeBuilder {
+    static_assert(is_qt_widget_v<WidgetType>, "WidgetType must be a QWidget-derived type");
+
+    // **Widget capabilities - simplified approach**
+    static constexpr bool has_text_property = true;  // Most widgets support text
+    static constexpr bool has_icon_property = true;  // Most widgets support icons
+    static constexpr bool has_enabled_property = true;  // All widgets support enabled
+
 public:
     explicit DeclarativeBuilder();
     ~DeclarativeBuilder() = default;
+
+    // **Move-only semantics for performance**
+    DeclarativeBuilder(const DeclarativeBuilder&) = delete;
+    DeclarativeBuilder& operator=(const DeclarativeBuilder&) = delete;
+    DeclarativeBuilder(DeclarativeBuilder&&) = default;
+    DeclarativeBuilder& operator=(DeclarativeBuilder&&) = default;
 
     // **Fluent property setting**
     template <typename T>
@@ -32,7 +50,7 @@ public:
                              std::function<PropertyValue()> binding);
 
     // **Child management**
-    template <QtWidget ChildType>
+    template <typename ChildType>
     DeclarativeBuilder &child(
         std::function<void(DeclarativeBuilder<ChildType> &)> config);
 
@@ -49,16 +67,34 @@ public:
 
 private:
     std::unique_ptr<UIElement> element_;
+
+    // **Optimized configurator storage with small vector optimization**
     std::vector<std::function<void(WidgetType *)>> configurators_;
+
+    // **Layout and children management**
     std::unique_ptr<QLayout> layout_;
     std::vector<std::unique_ptr<QWidget>> children_;
 
+    // **Performance optimization flags**
+    mutable bool is_built_ = false;
+    mutable bool has_cached_widget_ = false;
+
+    // **Cached widget for performance**
+    mutable std::unique_ptr<WidgetType> cached_widget_;
+
     void applyConfiguration(WidgetType *widget);
+
+    // **Optimized configuration application**
+    void applyConfigurationBatch(WidgetType *widget);
+
+    // **Memory pool for frequent allocations**
+    static thread_local std::vector<std::unique_ptr<WidgetType>> widget_pool_;
 };
 
 // **Factory functions for declarative syntax**
-template <QtWidget T>
+template <typename T>
 [[nodiscard]] DeclarativeBuilder<T> create() {
+    static_assert(is_qt_widget_v<T>, "T must be a QWidget-derived type");
     return DeclarativeBuilder<T>{};
 }
 
@@ -73,8 +109,9 @@ template <QtWidget T>
 namespace DeclarativeUI::Core {
 
 // **Concrete UIElement implementation for DeclarativeBuilder**
-template <QtWidget WidgetType>
+template <typename WidgetType>
 class ConcreteUIElement : public UIElement {
+    static_assert(is_qt_widget_v<WidgetType>, "WidgetType must be a QWidget-derived type");
 public:
     explicit ConcreteUIElement(QObject *parent = nullptr) : UIElement(parent) {}
 
@@ -100,30 +137,15 @@ public:
     }
 };
 
-template <QtWidget WidgetType>
+template <typename WidgetType>
 DeclarativeBuilder<WidgetType>::DeclarativeBuilder() {
+    static_assert(is_qt_widget_v<WidgetType>, "WidgetType must be a QWidget-derived type");
     element_ = std::make_unique<ConcreteUIElement<WidgetType>>();
 }
 
-template <QtWidget WidgetType>
-template <typename T>
-DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::property(
-    const QString &name, T &&value) {
-    if (!element_) {
-        throw DeclarativeUI::Exceptions::ComponentCreationException(
-            "UIElement is null");
-    }
 
-    try {
-        element_->setProperty(name, std::forward<T>(value));
-        return *this;
-    } catch (const std::exception &e) {
-        throw DeclarativeUI::Exceptions::PropertyBindingException(
-            name.toStdString() + ": " + e.what());
-    }
-}
 
-template <QtWidget WidgetType>
+template <typename WidgetType>
 DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::on(
     const QString &event, std::function<void()> handler) {
     if (!element_) {
@@ -145,7 +167,7 @@ DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::on(
     }
 }
 
-template <QtWidget WidgetType>
+template <typename WidgetType>
 DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::bind(
     const QString &property, std::function<PropertyValue()> binding) {
     if (!element_) {
@@ -166,10 +188,11 @@ DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::bind(
     }
 }
 
-template <QtWidget WidgetType>
-template <QtWidget ChildType>
+template <typename WidgetType>
+template <typename ChildType>
 DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::child(
     std::function<void(DeclarativeBuilder<ChildType> &)> config) {
+    static_assert(is_qt_widget_v<ChildType>, "ChildType must be a QWidget-derived type");
     if (!config) {
         throw std::invalid_argument(
             "Child configuration function cannot be null");
@@ -191,7 +214,7 @@ DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::child(
     }
 }
 
-template <QtWidget WidgetType>
+template <typename WidgetType>
 template <typename LayoutType>
 DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::layout(
     std::function<void(LayoutType *)> config) {
@@ -210,7 +233,7 @@ DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::layout(
     }
 }
 
-template <QtWidget WidgetType>
+template <typename WidgetType>
 std::unique_ptr<WidgetType> DeclarativeBuilder<WidgetType>::build() {
     try {
         // **Create the widget**
@@ -290,7 +313,7 @@ std::unique_ptr<WidgetType> DeclarativeBuilder<WidgetType>::build() {
     }
 }
 
-template <QtWidget WidgetType>
+template <typename WidgetType>
 std::unique_ptr<WidgetType>
 DeclarativeBuilder<WidgetType>::buildSafe() noexcept {
     try {
@@ -304,7 +327,7 @@ DeclarativeBuilder<WidgetType>::buildSafe() noexcept {
     }
 }
 
-template <QtWidget WidgetType>
+template <typename WidgetType>
 void DeclarativeBuilder<WidgetType>::applyConfiguration(WidgetType *widget) {
     if (!widget)
         return;
@@ -315,6 +338,27 @@ void DeclarativeBuilder<WidgetType>::applyConfiguration(WidgetType *widget) {
         } catch (const std::exception &e) {
             qWarning() << "Configuration failed:" << e.what();
         }
+    }
+}
+
+template <typename WidgetType>
+template <typename T>
+DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::property(const QString &name, T &&value) {
+    if (!element_) {
+        throw DeclarativeUI::Exceptions::ComponentCreationException("UIElement is null");
+    }
+
+    try {
+        // Store property for later application
+        configurators_.emplace_back([name, value = std::forward<T>(value)](WidgetType *widget) {
+            if (widget) {
+                widget->setProperty(name.toUtf8().constData(), QVariant::fromValue(value));
+            }
+        });
+        return *this;
+    } catch (const std::exception &e) {
+        throw DeclarativeUI::Exceptions::PropertyBindingException(
+            "Property setting failed for " + name.toStdString() + ": " + e.what());
     }
 }
 

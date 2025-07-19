@@ -63,8 +63,4 @@ libexample.json
 .roo/
 .vscode/
 
-# Python bytecode
-*.pyc
-*.pyd
-__pycache__/
-atom.egg-info/
+build-debug/

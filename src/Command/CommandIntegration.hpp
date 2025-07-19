@@ -182,45 +182,13 @@ signals:
 namespace Utils {
 
 // **Create command context from widget properties**
-inline CommandContext createContextFromWidget(QWidget *widget) {
-    CommandContext context;
-
-    // Extract relevant properties
-    context.setParameter("widget_name", widget->objectName());
-    context.setParameter("widget_class", widget->metaObject()->className());
-    context.setParameter("enabled", widget->isEnabled());
-    context.setParameter("visible", widget->isVisible());
-
-    return context;
-}
+CommandContext createContextFromWidget(QWidget *widget);
 
 // **Create command context from JSON**
-inline CommandContext createContextFromJson(const QString &json_string) {
-    QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(json_string.toUtf8(), &error);
-
-    if (error.error != QJsonParseError::NoError) {
-        return CommandContext{};
-    }
-
-    return CommandContext(doc.object());
-}
+CommandContext createContextFromJson(const QString &json_string);
 
 // **Initialize command system with built-in commands**
-inline void initializeCommandSystem() {
-    // Register built-in commands
-    Commands::registerBuiltinCommands();
-
-    // Add UI interceptor
-    auto interceptor = std::make_unique<UICommandInterceptor>();
-    CommandManager::instance().addInterceptor(std::move(interceptor));
-
-    // Enable command history
-    CommandManager::instance().enableCommandHistory(true);
-
-    // Enable audit trail
-    CommandManager::instance().enableAuditTrail(true);
-}
+void initializeCommandSystem();
 
 }  // namespace Utils
 

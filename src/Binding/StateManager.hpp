@@ -121,6 +121,16 @@ public:
 
     void clearState() noexcept;
 
+    // **Convenience methods for testing and simpler usage**
+    template <typename T>
+    void setState(const QString& key, const T& value);
+    
+    bool hasState(const QString& key) const;
+    void removeState(const QString& key);
+    
+    template <typename T>
+    void setStateValidator(const QString& key, std::function<bool(const T&)> validator);
+
 signals:
     void stateChanged(const QString& key, const QVariant& value);
     void stateAdded(const QString& key);
@@ -194,6 +204,22 @@ std::shared_ptr<ReactiveProperty<T>> StateManager::createComputed(
 
     // TODO: Implement dependency tracking and automatic recomputation
     return computed;
+}
+
+// **Convenience template implementations**
+template <typename T>
+void StateManager::setState(const QString& key, const T& value) {
+    auto existing = getState<T>(key);
+    if (existing) {
+        existing->set(value);
+    } else {
+        createState<T>(key, value);
+    }
+}
+
+template <typename T>
+void StateManager::setStateValidator(const QString& key, std::function<bool(const T&)> validator) {
+    setValidator<T>(key, validator);
 }
 
 }  // namespace DeclarativeUI::Binding

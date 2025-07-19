@@ -1,22 +1,22 @@
-# Enable Qt MOC processing
+# **Examples Build Configuration**
+# This file contains all example applications
+# Examples are built conditionally based on BUILD_EXAMPLES option
+
+# **Enable Qt MOC processing for all examples**
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
-add_executable(main main.cpp)
-target_link_libraries(main DeclarativeUI Qt6::Core Qt6::Widgets)
+# **Include organized example subdirectories**
+add_subdirectory(01_basic)
+add_subdirectory(02_components)
+add_subdirectory(03_state_management)
+add_subdirectory(04_hot_reload)
+add_subdirectory(05_advanced)
+add_subdirectory(06_applications)
 
-add_executable(hot_reload_example hot_reload_example.cpp)
-target_link_libraries(hot_reload_example DeclarativeUI Qt6::Core Qt6::Widgets)
-
-# **New examples with enhanced component support**
-add_executable(form_example form_example.cpp)
-target_link_libraries(form_example DeclarativeUI Qt6::Core Qt6::Widgets)
-
-add_executable(dashboard_example dashboard_example.cpp)
-target_link_libraries(dashboard_example DeclarativeUI Qt6::Core Qt6::Widgets)
-
-add_executable(settings_example settings_example.cpp)
-target_link_libraries(settings_example DeclarativeUI Qt6::Core Qt6::Widgets)
-
-# **Comprehensive example showcasing all new components**
-add_executable(comprehensive_example comprehensive_example.cpp)
-target_link_libraries(comprehensive_example DeclarativeUI Components Qt6::Core Qt6::Widgets)
+# **Copy resources for examples**
+add_custom_target(CopyExampleResources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/Resources
+    ${CMAKE_BINARY_DIR}/examples/Resources
+)

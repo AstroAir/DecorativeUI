@@ -392,4 +392,50 @@ void UICommandInterceptor::onError(ICommand *command,
     emit commandError(command->getMetadata().name, error.getMessage());
 }
 
+// **Utility functions implementations**
+namespace Utils {
+
+// **Create command context from widget properties**
+CommandContext createContextFromWidget(QWidget *widget) {
+    CommandContext context;
+
+    // Extract relevant properties
+    context.setParameter("widget_name", widget->objectName());
+    context.setParameter("widget_class", widget->metaObject()->className());
+    context.setParameter("enabled", widget->isEnabled());
+    context.setParameter("visible", widget->isVisible());
+
+    return context;
+}
+
+// **Create command context from JSON**
+CommandContext createContextFromJson(const QString &json_string) {
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(json_string.toUtf8(), &error);
+
+    if (error.error != QJsonParseError::NoError) {
+        return CommandContext{};
+    }
+
+    return CommandContext(doc.object());
+}
+
+// **Initialize command system with built-in commands**
+void initializeCommandSystem() {
+    // Register built-in commands
+    Commands::registerBuiltinCommands();
+
+    // Add UI interceptor
+    auto interceptor = std::make_unique<UICommandInterceptor>();
+    CommandManager::instance().addInterceptor(std::move(interceptor));
+
+    // Enable command history
+    CommandManager::instance().enableCommandHistory(true);
+
+    // Enable audit trail
+    CommandManager::instance().enableAuditTrail(true);
+}
+
+}  // namespace Utils
+
 }  // namespace DeclarativeUI::Command::Integration

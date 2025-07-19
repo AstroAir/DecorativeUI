@@ -408,5 +408,3 @@ void CommandManager::enableAuditTrail(bool enabled) { audit_enabled_ = enabled; 
 QJsonArray CommandManager::getAuditTrail() const { return audit_trail_; }
 
 }  // namespace DeclarativeUI::Command
-
-#include "CommandSystem.moc"

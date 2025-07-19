@@ -1,0 +1,277 @@
+{
+    "type": "QMainWindow",
+    "properties": {
+        "windowTitle": "DeclarativeUI Dashboard",
+        "minimumSize": [800, 600],
+        "styleSheet": "QMainWindow { background-color: #2c3e50; }"
+    },
+    "centralWidget": {
+        "type": "QWidget",
+        "properties": {
+            "styleSheet": "QWidget { background-color: #ecf0f1; }"
+        },
+        "layout": {
+            "type": "VBoxLayout",
+            "spacing": 0,
+            "margins": [0, 0, 0, 0]
+        },
+        "children": [
+            {
+                "type": "QWidget",
+                "properties": {
+                    "minimumHeight": 80,
+                    "maximumHeight": 80,
+                    "styleSheet": "QWidget { background-color: #34495e; border-bottom: 3px solid #3498db; }"
+                },
+                "layout": {
+                    "type": "HBoxLayout",
+                    "spacing": 20,
+                    "margins": [30, 20, 30, 20]
+                },
+                "children": [
+                    {
+                        "type": "QLabel",
+                        "properties": {
+                            "text": "📊 DeclarativeUI Dashboard",
+                            "styleSheet": "QLabel { font-size: 24px; font-weight: bold; color: white; }"
+                        }
+                    },
+                    {
+                        "type": "QWidget",
+                        "properties": {
+                            "styleSheet": "QWidget { background-color: transparent; }"
+                        }
+                    },
+                    {
+                        "type": "QLabel",
+                        "id": "current_time",
+                        "bindings": {
+                            "text": "current_time"
+                        },
+                        "properties": {
+                            "styleSheet": "QLabel { font-size: 14px; color: #bdc3c7; }"
+                        }
+                    }
+                ]
+            },
+            {
+                "type": "QWidget",
+                "layout": {
+                    "type": "HBoxLayout",
+                    "spacing": 20,
+                    "margins": [20, 20, 20, 20]
+                },
+                "children": [
+                    {
+                        "type": "QWidget",
+                        "properties": {
+                            "minimumWidth": 250,
+                            "maximumWidth": 250,
+                            "styleSheet": "QWidget { background-color: white; border-radius: 10px; }"
+                        },
+                        "layout": {
+                            "type": "VBoxLayout",
+                            "spacing": 15,
+                            "margins": [20, 20, 20, 20]
+                        },
+                        "children": [
+                            {
+                                "type": "QLabel",
+                                "properties": {
+                                    "text": "📈 Statistics",
+                                    "styleSheet": "QLabel { font-size: 18px; font-weight: bold; color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }"
+                                }
+                            },
+                            {
+                                "type": "QWidget",
+                                "properties": {
+                                    "styleSheet": "QWidget { background-color: #3498db; border-radius: 8px; padding: 15px; }"
+                                },
+                                "layout": {
+                                    "type": "VBoxLayout",
+                                    "spacing": 5,
+                                    "margins": [15, 15, 15, 15]
+                                },
+                                "children": [
+                                    {
+                                        "type": "QLabel",
+                                        "properties": {
+                                            "text": "👥 Active Users",
+                                            "styleSheet": "QLabel { font-size: 12px; color: white; font-weight: bold; }"
+                                        }
+                                    },
+                                    {
+                                        "type": "QLabel",
+                                        "id": "active_users",
+                                        "bindings": {
+                                            "text": "active_users_count"
+                                        },
+                                        "properties": {
+                                            "styleSheet": "QLabel { font-size: 28px; color: white; font-weight: bold; }"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "QWidget",
+                                "properties": {
+                                    "styleSheet": "QWidget { background-color: #27ae60; border-radius: 8px; padding: 15px; }"
+                                },
+                                "layout": {
+                                    "type": "VBoxLayout",
+                                    "spacing": 5,
+                                    "margins": [15, 15, 15, 15]
+                                },
+                                "children": [
+                                    {
+                                        "type": "QLabel",
+                                        "properties": {
+                                            "text": "💰 Revenue",
+                                            "styleSheet": "QLabel { font-size: 12px; color: white; font-weight: bold; }"
+                                        }
+                                    },
+                                    {
+                                        "type": "QLabel",
+                                        "id": "revenue",
+                                        "bindings": {
+                                            "text": "revenue_amount"
+                                        },
+                                        "properties": {
+                                            "styleSheet": "QLabel { font-size: 28px; color: white; font-weight: bold; }"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "QWidget",
+                                "properties": {
+                                    "styleSheet": "QWidget { background-color: #e74c3c; border-radius: 8px; padding: 15px; }"
+                                },
+                                "layout": {
+                                    "type": "VBoxLayout",
+                                    "spacing": 5,
+                                    "margins": [15, 15, 15, 15]
+                                },
+                                "children": [
+                                    {
+                                        "type": "QLabel",
+                                        "properties": {
+                                            "text": "⚠️ Issues",
+                                            "styleSheet": "QLabel { font-size: 12px; color: white; font-weight: bold; }"
+                                        }
+                                    },
+                                    {
+                                        "type": "QLabel",
+                                        "id": "issues",
+                                        "bindings": {
+                                            "text": "issues_count"
+                                        },
+                                        "properties": {
+                                            "styleSheet": "QLabel { font-size: 28px; color: white; font-weight: bold; }"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "type": "QWidget",
+                        "properties": {
+                            "styleSheet": "QWidget { background-color: white; border-radius: 10px; }"
+                        },
+                        "layout": {
+                            "type": "VBoxLayout",
+                            "spacing": 15,
+                            "margins": [20, 20, 20, 20]
+                        },
+                        "children": [
+                            {
+                                "type": "QLabel",
+                                "properties": {
+                                    "text": "🎛️ Quick Actions",
+                                    "styleSheet": "QLabel { font-size: 18px; font-weight: bold; color: #2c3e50; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }"
+                                }
+                            },
+                            {
+                                "type": "QPushButton",
+                                "properties": {
+                                    "text": "📊 Generate Report",
+                                    "minimumHeight": 50,
+                                    "styleSheet": "QPushButton { background-color: #3498db; color: white; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; text-align: left; padding-left: 20px; } QPushButton:hover { background-color: #2980b9; } QPushButton:pressed { background-color: #21618c; }"
+                                },
+                                "events": {
+                                    "clicked": "generateReport"
+                                }
+                            },
+                            {
+                                "type": "QPushButton",
+                                "properties": {
+                                    "text": "🔄 Refresh Data",
+                                    "minimumHeight": 50,
+                                    "styleSheet": "QPushButton { background-color: #2ecc71; color: white; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; text-align: left; padding-left: 20px; } QPushButton:hover { background-color: #27ae60; } QPushButton:pressed { background-color: #229954; }"
+                                },
+                                "events": {
+                                    "clicked": "refreshData"
+                                }
+                            },
+                            {
+                                "type": "QPushButton",
+                                "properties": {
+                                    "text": "⚙️ Settings",
+                                    "minimumHeight": 50,
+                                    "styleSheet": "QPushButton { background-color: #95a5a6; color: white; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; text-align: left; padding-left: 20px; } QPushButton:hover { background-color: #7f8c8d; } QPushButton:pressed { background-color: #6c7b7d; }"
+                                },
+                                "events": {
+                                    "clicked": "openSettings"
+                                }
+                            },
+                            {
+                                "type": "QPushButton",
+                                "properties": {
+                                    "text": "📤 Export Data",
+                                    "minimumHeight": 50,
+                                    "styleSheet": "QPushButton { background-color: #f39c12; color: white; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; text-align: left; padding-left: 20px; } QPushButton:hover { background-color: #e67e22; } QPushButton:pressed { background-color: #d35400; }"
+                                },
+                                "events": {
+                                    "clicked": "exportData"
+                                }
+                            },
+                            {
+                                "type": "QWidget",
+                                "properties": {
+                                    "styleSheet": "QWidget { background-color: transparent; }"
+                                }
+                            },
+                            {
+                                "type": "QLabel",
+                                "id": "status_message",
+                                "bindings": {
+                                    "text": "status_message"
+                                },
+                                "properties": {
+                                    "alignment": 4,
+                                    "styleSheet": "QLabel { font-size: 12px; color: #7f8c8d; font-style: italic; }"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "statusBar": {
+        "type": "QStatusBar",
+        "properties": {
+            "styleSheet": "QStatusBar { background-color: #34495e; color: white; border-top: 1px solid #2c3e50; }"
+        },
+        "children": [
+            {
+                "type": "QLabel",
+                "properties": {
+                    "text": "Ready | DeclarativeUI Framework v1.0.0",
+                    "styleSheet": "QLabel { color: white; padding: 5px; }"
+                }
+            }
+        ]
+    }
+}

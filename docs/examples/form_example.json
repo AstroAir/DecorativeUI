@@ -1,0 +1,251 @@
+{
+    "type": "QWidget",
+    "properties": {
+        "windowTitle": "User Registration Form",
+        "minimumSize": [450, 600],
+        "styleSheet": "QWidget { background-color: #ecf0f1; font-family: 'Segoe UI', Arial, sans-serif; }"
+    },
+    "layout": {
+        "type": "VBoxLayout",
+        "spacing": 20,
+        "margins": [40, 40, 40, 40]
+    },
+    "children": [
+        {
+            "type": "QLabel",
+            "properties": {
+                "text": "👤 User Registration",
+                "alignment": 4,
+                "styleSheet": "QLabel { font-size: 28px; font-weight: bold; color: #2c3e50; margin-bottom: 20px; }"
+            }
+        },
+        {
+            "type": "QGroupBox",
+            "properties": {
+                "title": "Personal Information",
+                "styleSheet": "QGroupBox { font-size: 16px; font-weight: bold; color: #34495e; border: 2px solid #bdc3c7; border-radius: 8px; margin-top: 10px; padding-top: 10px; } QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px 0 5px; }"
+            },
+            "layout": {
+                "type": "VBoxLayout",
+                "spacing": 15,
+                "margins": [20, 20, 20, 20]
+            },
+            "children": [
+                {
+                    "type": "QWidget",
+                    "layout": {
+                        "type": "HBoxLayout",
+                        "spacing": 10
+                    },
+                    "children": [
+                        {
+                            "type": "QLabel",
+                            "properties": {
+                                "text": "First Name:",
+                                "minimumWidth": 100,
+                                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #2c3e50; }"
+                            }
+                        },
+                        {
+                            "type": "QLineEdit",
+                            "id": "first_name_input",
+                            "properties": {
+                                "placeholderText": "Enter your first name",
+                                "styleSheet": "QLineEdit { padding: 8px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 14px; } QLineEdit:focus { border-color: #3498db; }"
+                            },
+                            "events": {
+                                "textChanged": "validateForm"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "QWidget",
+                    "layout": {
+                        "type": "HBoxLayout",
+                        "spacing": 10
+                    },
+                    "children": [
+                        {
+                            "type": "QLabel",
+                            "properties": {
+                                "text": "Last Name:",
+                                "minimumWidth": 100,
+                                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #2c3e50; }"
+                            }
+                        },
+                        {
+                            "type": "QLineEdit",
+                            "id": "last_name_input",
+                            "properties": {
+                                "placeholderText": "Enter your last name",
+                                "styleSheet": "QLineEdit { padding: 8px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 14px; } QLineEdit:focus { border-color: #3498db; }"
+                            },
+                            "events": {
+                                "textChanged": "validateForm"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "QWidget",
+                    "layout": {
+                        "type": "HBoxLayout",
+                        "spacing": 10
+                    },
+                    "children": [
+                        {
+                            "type": "QLabel",
+                            "properties": {
+                                "text": "Email:",
+                                "minimumWidth": 100,
+                                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #2c3e50; }"
+                            }
+                        },
+                        {
+                            "type": "QLineEdit",
+                            "id": "email_input",
+                            "properties": {
+                                "placeholderText": "Enter your email address",
+                                "styleSheet": "QLineEdit { padding: 8px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 14px; } QLineEdit:focus { border-color: #3498db; }"
+                            },
+                            "events": {
+                                "textChanged": "validateEmail"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "QWidget",
+                    "layout": {
+                        "type": "HBoxLayout",
+                        "spacing": 10
+                    },
+                    "children": [
+                        {
+                            "type": "QLabel",
+                            "properties": {
+                                "text": "Age:",
+                                "minimumWidth": 100,
+                                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #2c3e50; }"
+                            }
+                        },
+                        {
+                            "type": "QSpinBox",
+                            "id": "age_input",
+                            "properties": {
+                                "minimum": 13,
+                                "maximum": 120,
+                                "value": 18,
+                                "suffix": " years",
+                                "styleSheet": "QSpinBox { padding: 8px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 14px; } QSpinBox:focus { border-color: #3498db; }"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "QGroupBox",
+            "properties": {
+                "title": "Preferences",
+                "styleSheet": "QGroupBox { font-size: 16px; font-weight: bold; color: #34495e; border: 2px solid #bdc3c7; border-radius: 8px; margin-top: 10px; padding-top: 10px; } QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 5px 0 5px; }"
+            },
+            "layout": {
+                "type": "VBoxLayout",
+                "spacing": 15,
+                "margins": [20, 20, 20, 20]
+            },
+            "children": [
+                {
+                    "type": "QWidget",
+                    "layout": {
+                        "type": "HBoxLayout",
+                        "spacing": 10
+                    },
+                    "children": [
+                        {
+                            "type": "QLabel",
+                            "properties": {
+                                "text": "Country:",
+                                "minimumWidth": 100,
+                                "styleSheet": "QLabel { font-size: 14px; font-weight: bold; color: #2c3e50; }"
+                            }
+                        },
+                        {
+                            "type": "QComboBox",
+                            "id": "country_combo",
+                            "properties": {
+                                "styleSheet": "QComboBox { padding: 8px; border: 2px solid #bdc3c7; border-radius: 6px; font-size: 14px; } QComboBox:focus { border-color: #3498db; } QComboBox::drop-down { border: none; } QComboBox::down-arrow { image: url(down_arrow.png); width: 12px; height: 12px; }"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "QCheckBox",
+                    "id": "newsletter_checkbox",
+                    "properties": {
+                        "text": "📧 Subscribe to newsletter",
+                        "checked": true,
+                        "styleSheet": "QCheckBox { font-size: 14px; color: #2c3e50; } QCheckBox::indicator { width: 18px; height: 18px; } QCheckBox::indicator:unchecked { border: 2px solid #bdc3c7; border-radius: 3px; background-color: white; } QCheckBox::indicator:checked { border: 2px solid #3498db; border-radius: 3px; background-color: #3498db; }"
+                    }
+                },
+                {
+                    "type": "QCheckBox",
+                    "id": "terms_checkbox",
+                    "properties": {
+                        "text": "📋 I agree to the Terms and Conditions",
+                        "styleSheet": "QCheckBox { font-size: 14px; color: #2c3e50; } QCheckBox::indicator { width: 18px; height: 18px; } QCheckBox::indicator:unchecked { border: 2px solid #bdc3c7; border-radius: 3px; background-color: white; } QCheckBox::indicator:checked { border: 2px solid #27ae60; border-radius: 3px; background-color: #27ae60; }"
+                    },
+                    "events": {
+                        "toggled": "validateForm"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "QLabel",
+            "id": "validation_message",
+            "bindings": {
+                "text": "form_validation_message"
+            },
+            "properties": {
+                "alignment": 4,
+                "styleSheet": "QLabel { font-size: 12px; color: #e74c3c; font-weight: bold; }"
+            }
+        },
+        {
+            "type": "QWidget",
+            "layout": {
+                "type": "HBoxLayout",
+                "spacing": 15
+            },
+            "children": [
+                {
+                    "type": "QPushButton",
+                    "properties": {
+                        "text": "❌ Cancel",
+                        "minimumHeight": 45,
+                        "styleSheet": "QPushButton { background-color: #95a5a6; color: white; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; padding: 10px 20px; } QPushButton:hover { background-color: #7f8c8d; } QPushButton:pressed { background-color: #6c7b7d; }"
+                    },
+                    "events": {
+                        "clicked": "cancelForm"
+                    }
+                },
+                {
+                    "type": "QPushButton",
+                    "id": "submit_button",
+                    "properties": {
+                        "text": "✅ Register",
+                        "minimumHeight": 45,
+                        "enabled": false,
+                        "styleSheet": "QPushButton { background-color: #27ae60; color: white; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; padding: 10px 20px; } QPushButton:hover { background-color: #229954; } QPushButton:pressed { background-color: #1e8449; } QPushButton:disabled { background-color: #bdc3c7; color: #7f8c8d; }"
+                    },
+                    "events": {
+                        "clicked": "submitForm"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -12,19 +12,28 @@
 #include <QPropertyAnimation>
 #include <QTimer>
 #include <QWidget>
+#include <QJsonObject>
+#include <QVariant>
+#include <QColor>
+#include <QFont>
+#include <QSize>
+#include <QRect>
 
-
+#include <atomic>
 #include <chrono>
-#include <concepts>
-#include <coroutine>
 #include <functional>
 #include <future>
 #include <memory>
-#include <ranges>
-#include <span>
+#include <memory_resource>
 #include <unordered_map>
+#include <unordered_set>
 #include <variant>
-
+#include <shared_mutex>
+#include <thread>
+#include <array>
+#include <bitset>
+#include <vector>
+#include <type_traits>
 
 #include "../Exceptions/UIExceptions.hpp"
 
@@ -32,16 +41,34 @@ Q_DECLARE_METATYPE(std::function<void()>)
 
 namespace DeclarativeUI::Core {
 
-// **Modern C++ concepts for type safety**
+// **Forward declarations**
+class UIElement;
+
+// **Type traits for compile-time type checking**
 template <typename T>
-concept QtWidget = std::derived_from<T, QWidget>;
+struct is_qt_widget : std::is_base_of<QWidget, T> {};
 
 template <typename T>
-concept HasMetaObject = requires(T t) {
-    t.metaObject();
-    t.setProperty("", QVariant{});
-    t.property("");
+constexpr bool is_qt_widget_v = is_qt_widget<T>::value;
+
+template <typename T>
+struct has_meta_object {
+    template <typename U>
+    static auto test(int) -> decltype(
+        std::declval<U>().metaObject(),
+        std::declval<U>().setProperty("", QVariant{}),
+        std::declval<U>().property(""),
+        std::true_type{});
+
+    template <typename>
+    static std::false_type test(...);
+
+    using type = decltype(test<T>(0));
+    static constexpr bool value = type::value;
 };
+
+template <typename T>
+constexpr bool has_meta_object_v = has_meta_object<T>::value;
 
 // **Property value variant for flexible property system**
 using PropertyValue =
@@ -97,7 +124,7 @@ public:
     template <typename T>
     UIElement &setProperty(const QString &name, T &&value);
 
-    template <QtWidget T>
+    template <typename T>
     std::unique_ptr<T> createWidget();
 
     UIElement &bindProperty(const QString &property,
@@ -287,8 +314,9 @@ UIElement &UIElement::setProperty(const QString &name, T &&value) {
     }
 }
 
-template <QtWidget T>
+template <typename T>
 std::unique_ptr<T> UIElement::createWidget() {
+    static_assert(is_qt_widget_v<T>, "T must be a QWidget-derived type");
     try {
         auto widget = std::make_unique<T>();
 

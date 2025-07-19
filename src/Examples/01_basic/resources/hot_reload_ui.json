@@ -1,0 +1,139 @@
+{
+  "type": "QWidget",
+  "properties": {
+    "windowTitle": "04 - Basic Hot Reload | DeclarativeUI",
+    "minimumSize": [500, 450]
+  },
+  "layout": {
+    "type": "QVBoxLayout",
+    "properties": {
+      "spacing": 20,
+      "contentsMargins": [20, 20, 20, 20]
+    },
+    "children": [
+      {
+        "type": "QLabel",
+        "properties": {
+          "text": "🔥 Basic Hot Reload Example",
+          "alignment": "AlignCenter",
+          "styleSheet": "font-size: 20px; font-weight: bold; color: #2c3e50;"
+        }
+      },
+      {
+        "type": "QLabel",
+        "properties": {
+          "objectName": "statusLabel",
+          "text": "👀 Watching for file changes...",
+          "alignment": "AlignCenter",
+          "styleSheet": "color: #3498db; font-style: italic;"
+        }
+      },
+      {
+        "type": "QGroupBox",
+        "properties": {
+          "title": "🎯 Hot Reload Demo"
+        },
+        "layout": {
+          "type": "QVBoxLayout",
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "This UI is loaded from JSON and supports hot reload!\n\nTry editing this JSON file while the application is running:",
+                "wordWrap": true,
+                "alignment": "AlignCenter"
+              }
+            },
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "• Change this text\n• Modify button colors\n• Add new components\n• Rearrange the layout",
+                "styleSheet": "color: #7f8c8d; font-family: monospace; background-color: #ecf0f1; padding: 10px; border-radius: 4px;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "QGroupBox",
+        "properties": {
+          "title": "🧪 Interactive Elements"
+        },
+        "layout": {
+          "type": "QVBoxLayout",
+          "children": [
+            {
+              "type": "layout",
+              "layoutType": "QHBoxLayout",
+              "children": [
+                {
+                  "type": "QPushButton",
+                  "properties": {
+                    "text": "🧪 Test Button",
+                    "styleSheet": "QPushButton { background-color: #3498db; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-size: 14px; font-weight: bold; } QPushButton:hover { background-color: #2980b9; } QPushButton:pressed { background-color: #21618c; }"
+                  },
+                  "events": {
+                    "clicked": "testButton"
+                  }
+                },
+                {
+                  "type": "QPushButton",
+                  "properties": {
+                    "text": "⏸️ Toggle Hot Reload",
+                    "styleSheet": "QPushButton { background-color: #e67e22; color: white; padding: 12px 24px; border: none; border-radius: 6px; font-size: 14px; } QPushButton:hover { background-color: #d35400; }"
+                  },
+                  "events": {
+                    "clicked": "toggleHotReload"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "QPushButton",
+              "properties": {
+                "text": "🔄 Manual Reload",
+                "styleSheet": "QPushButton { background-color: #27ae60; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 14px; } QPushButton:hover { background-color: #229954; }"
+              },
+              "events": {
+                "clicked": "manualReload"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "spacer",
+        "properties": {
+          "orientation": "vertical"
+        }
+      },
+      {
+        "type": "QGroupBox",
+        "properties": {
+          "title": "💡 Hot Reload Tips"
+        },
+        "layout": {
+          "type": "QVBoxLayout",
+          "children": [
+            {
+              "type": "QLabel",
+              "properties": {
+                "text": "🔥 <b>Hot Reload is Active!</b><br><br>• Save this JSON file to see instant updates<br>• Changes are applied automatically<br>• No need to restart the application<br>• Perfect for rapid UI development",
+                "wordWrap": true,
+                "styleSheet": "color: #2c3e50; background-color: #d5f4e6; padding: 15px; border-radius: 8px; border-left: 4px solid #27ae60;"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "type": "QLabel",
+        "properties": {
+          "text": "🚀 Edit this file and watch the magic happen!",
+          "alignment": "AlignCenter",
+          "styleSheet": "font-size: 12px; color: #7f8c8d; font-style: italic; margin-top: 10px;"
+        }
+      }
+    ]
+  }
+}

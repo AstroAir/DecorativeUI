@@ -1,0 +1,84 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Default build configuration",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug Config",
+      "description": "Debug build with all features",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "ON",
+        "DECLARATIVE_UI_DEBUG": "ON"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release Config",
+      "description": "Optimized release build",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "minimal",
+      "displayName": "Minimal Config",
+      "description": "Library only, no examples or tests",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-minimal",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_EXAMPLES": "OFF",
+        "BUILD_TESTS": "OFF"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "minimal",
+      "configurePreset": "minimal"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "output": {"outputOnFailure": true}
+    }
+  ]
+}
