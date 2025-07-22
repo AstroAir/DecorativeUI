@@ -3,9 +3,9 @@
 #include <QTimer>
 #include <memory>
 
-#include "../CommandEvents.hpp"
-#include "../UICommand.hpp"
-#include "../CoreCommands.hpp"
+#include "../../src/Command/CommandEvents.hpp"
+#include "../../src/Command/UICommand.hpp"
+#include "../../src/Command/CoreCommands.hpp"
 
 using namespace DeclarativeUI::Command::UI;
 using namespace DeclarativeUI::Command::UI::Events;

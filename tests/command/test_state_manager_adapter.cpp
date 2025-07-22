@@ -2,10 +2,10 @@
 #include <QSignalSpy>
 #include <memory>
 
-#include "../Adapters/StateManagerAdapter.hpp"
-#include "../UICommand.hpp"
-#include "../CoreCommands.hpp"
-#include "../../Binding/StateManager.hpp"
+#include "../../src/Command/Adapters/StateManagerAdapter.hpp"
+#include "../../src/Command/UICommand.hpp"
+#include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Binding/StateManager.hpp"
 
 using namespace DeclarativeUI::Command::Adapters;
 using namespace DeclarativeUI::Command::UI;

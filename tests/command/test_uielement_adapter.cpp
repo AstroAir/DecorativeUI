@@ -2,10 +2,10 @@
 #include <QSignalSpy>
 #include <memory>
 
-#include "../Adapters/UIElementAdapter.hpp"
-#include "../UICommand.hpp"
-#include "../CoreCommands.hpp"
-#include "../../Core/UIElement.hpp"
+#include "../../src/Command/Adapters/UIElementAdapter.hpp"
+#include "../../src/Command/UICommand.hpp"
+#include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Core/UIElement.hpp"
 
 using namespace DeclarativeUI::Command::Adapters;
 using namespace DeclarativeUI;

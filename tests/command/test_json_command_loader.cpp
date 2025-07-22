@@ -4,9 +4,9 @@
 #include <QJsonArray>
 #include <memory>
 
-#include "../Adapters/JSONCommandLoader.hpp"
-#include "../UICommand.hpp"
-#include "../CoreCommands.hpp"
+#include "../../src/Command/Adapters/JSONCommandLoader.hpp"
+#include "../../src/Command/UICommand.hpp"
+#include "../../src/Command/CoreCommands.hpp"
 
 using namespace DeclarativeUI::Command::Adapters;
 using namespace DeclarativeUI::Command::UI;

@@ -64,3 +64,4 @@ libexample.json
 .vscode/
 
 build-debug/
+test/

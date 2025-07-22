@@ -6,10 +6,10 @@
 #include <QCheckBox>
 #include <memory>
 
-#include "../WidgetMapper.hpp"
-#include "../UICommand.hpp"
-#include "../CoreCommands.hpp"
-#include "../UICommandFactory.hpp"
+#include "../../src/Command/WidgetMapper.hpp"
+#include "../../src/Command/UICommand.hpp"
+#include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/UICommandFactory.hpp"
 
 using namespace DeclarativeUI::Command::UI;
 

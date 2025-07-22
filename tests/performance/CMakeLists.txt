@@ -9,6 +9,7 @@ target_link_libraries(ComponentPerformanceTest
     Qt6::Core
     Qt6::Widgets
     Qt6::Test
+    Qt6::Concurrent
 )
 
 # **Set output directory for performance tests**

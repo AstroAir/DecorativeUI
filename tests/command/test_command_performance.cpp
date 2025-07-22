@@ -8,16 +8,16 @@
 #include <vector>
 #include <atomic>
 
-#include "../Command/CommandSystem.hpp"
-#include "../Command/BuiltinCommands.hpp"
-#include "../Command/CommandIntegration.hpp"
-#include "../Command/Adapters/IntegrationManager.hpp"
-#include "../Command/Adapters/ComponentSystemAdapter.hpp"
-#include "../Command/Adapters/StateManagerAdapter.hpp"
-#include "../Command/Adapters/UIElementAdapter.hpp"
-#include "../Command/Adapters/JSONCommandLoader.hpp"
-#include "../Components/Button.hpp"
-#include "../Binding/StateManager.hpp"
+#include "../../src/Command/CommandSystem.hpp"
+#include "../../src/Command/BuiltinCommands.hpp"
+#include "../../src/Command/CommandIntegration.hpp"
+#include "../../src/Command/Adapters/IntegrationManager.hpp"
+#include "../../src/Command/Adapters/ComponentSystemAdapter.hpp"
+#include "../../src/Command/Adapters/StateManagerAdapter.hpp"
+#include "../../src/Command/Adapters/UIElementAdapter.hpp"
+#include "../../src/Command/Adapters/JSONCommandLoader.hpp"
+#include "../../src/Components/Button.hpp"
+#include "../../src/Binding/StateManager.hpp"
 
 using namespace DeclarativeUI::Command;
 using namespace DeclarativeUI::Command::Commands;

@@ -2,13 +2,13 @@
 #include <QSignalSpy>
 #include <memory>
 
-#include "../MVCIntegration.hpp"
-#include "../UICommand.hpp"
-#include "../CoreCommands.hpp"
-#include "../UICommandFactory.hpp"
-#include "../../Core/UIElement.hpp"
-#include "../../Components/Button.hpp"
-#include "../../Binding/StateManager.hpp"
+#include "../../src/Command/MVCIntegration.hpp"
+#include "../../src/Command/UICommand.hpp"
+#include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/UICommandFactory.hpp"
+#include "../../src/Core/UIElement.hpp"
+#include "../../src/Components/Button.hpp"
+#include "../../src/Binding/StateManager.hpp"
 
 using namespace DeclarativeUI::Command::UI;
 using namespace DeclarativeUI;

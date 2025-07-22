@@ -359,4 +359,149 @@ private:
     mutable std::shared_mutex bindings_mutex_;
 };
 
+// **Template method implementations**
+
+template<typename F, typename... Args>
+auto ThreadPool::enqueue(TaskPriority priority, F&& f, Args&&... args)
+    -> std::future<typename std::result_of<F(Args...)>::type> {
+
+    using return_type = typename std::result_of<F(Args...)>::type;
+
+    auto task = std::make_shared<std::packaged_task<return_type()>>(
+        std::bind(std::forward<F>(f), std::forward<Args>(args)...)
+    );
+
+    std::future<return_type> result = task->get_future();
+
+    {
+        std::unique_lock<std::mutex> lock(queue_mutex_);
+
+        if (!running_.load()) {
+            throw std::runtime_error("ThreadPool is not running");
+        }
+
+        TaskWrapper wrapper;
+        wrapper.task = [task]() { (*task)(); };
+        wrapper.priority = priority;
+        wrapper.enqueue_time = std::chrono::steady_clock::now();
+
+        task_queue_.push(wrapper);
+    }
+
+    condition_.notify_one();
+    return result;
+}
+
+template<typename F, typename... Args>
+QString ParallelProcessor::submitTask(const QString& task_id, TaskPriority priority,
+                                     ExecutionContext context, F&& func, Args&&... args) {
+    QString actual_task_id = task_id.isEmpty() ? generateTaskId() : task_id;
+
+    // Check queue overflow
+    checkQueueOverflow();
+
+    auto task_func = std::bind(std::forward<F>(func), std::forward<Args>(args)...);
+
+    switch (context) {
+        case ExecutionContext::MainThread: {
+            // Execute on main thread using Qt's event system
+            QMetaObject::invokeMethod(this, [this, actual_task_id, task_func]() {
+                auto start_time = std::chrono::steady_clock::now();
+                bool success = true;
+
+                try {
+                    task_func();
+                } catch (const std::exception& e) {
+                    success = false;
+                    emit taskFailed(actual_task_id, QString::fromStdString(e.what()));
+                } catch (...) {
+                    success = false;
+                    emit taskFailed(actual_task_id, "Unknown error");
+                }
+
+                auto end_time = std::chrono::steady_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+
+                updatePerformanceMetrics(actual_task_id, duration, success);
+
+                if (success) {
+                    emit taskCompleted(actual_task_id, true);
+                }
+            }, Qt::QueuedConnection);
+            break;
+        }
+
+        case ExecutionContext::ThreadPool:
+        case ExecutionContext::WorkerThread:
+        case ExecutionContext::Background: {
+            // Execute on thread pool
+            auto future = thread_pool_->enqueue(priority, [this, actual_task_id, task_func]() {
+                auto start_time = std::chrono::steady_clock::now();
+                bool success = true;
+
+                try {
+                    task_func();
+                } catch (const std::exception& e) {
+                    success = false;
+                    QMetaObject::invokeMethod(this, [this, actual_task_id, e]() {
+                        emit taskFailed(actual_task_id, QString::fromStdString(e.what()));
+                    }, Qt::QueuedConnection);
+                } catch (...) {
+                    success = false;
+                    QMetaObject::invokeMethod(this, [this, actual_task_id]() {
+                        emit taskFailed(actual_task_id, "Unknown error");
+                    }, Qt::QueuedConnection);
+                }
+
+                auto end_time = std::chrono::steady_clock::now();
+                auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+
+                updatePerformanceMetrics(actual_task_id, duration, success);
+
+                if (success) {
+                    QMetaObject::invokeMethod(this, [this, actual_task_id]() {
+                        emit taskCompleted(actual_task_id, true);
+                    }, Qt::QueuedConnection);
+                }
+            });
+            break;
+        }
+    }
+
+    return actual_task_id;
+}
+
+template<typename Container, typename F>
+std::vector<QString> ParallelProcessor::submitBatchTasks(const QString& batch_id,
+                                                        const Container& items, F&& func) {
+    std::vector<QString> task_ids;
+    task_ids.reserve(items.size());
+
+    {
+        std::unique_lock<std::shared_mutex> lock(tasks_mutex_);
+        batch_tasks_[batch_id] = std::vector<QString>();
+        batch_tasks_[batch_id].reserve(items.size());
+    }
+
+    int index = 0;
+    for (const auto& item : items) {
+        QString task_id = QString("%1_task_%2").arg(batch_id).arg(index++);
+
+        auto task_func = [func, item]() {
+            return func(item);
+        };
+
+        submitTask(task_id, TaskPriority::Normal, ExecutionContext::ThreadPool, task_func);
+
+        task_ids.push_back(task_id);
+
+        {
+            std::unique_lock<std::shared_mutex> lock(tasks_mutex_);
+            batch_tasks_[batch_id].push_back(task_id);
+        }
+    }
+
+    return task_ids;
+}
+
 }  // namespace DeclarativeUI::Core

@@ -3,14 +3,14 @@
 #include <QSignalSpy>
 #include <memory>
 
-#include "../UICommand.hpp"
-#include "../UICommandFactory.hpp"
-#include "../CoreCommands.hpp"
-#include "../SpecializedCommands.hpp"
-#include "../CommandBuilder.hpp"
-#include "../WidgetMapper.hpp"
-#include "../MVCIntegration.hpp"
-#include "../CommandEvents.hpp"
+#include "../../src/Command/UICommand.hpp"
+#include "../../src/Command/UICommandFactory.hpp"
+#include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/SpecializedCommands.hpp"
+#include "../../src/Command/CommandBuilder.hpp"
+#include "../../src/Command/WidgetMapper.hpp"
+#include "../../src/Command/MVCIntegration.hpp"
+#include "../../src/Command/CommandEvents.hpp"
 
 using namespace DeclarativeUI::Command::UI;
 

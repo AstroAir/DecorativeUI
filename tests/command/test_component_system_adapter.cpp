@@ -2,11 +2,11 @@
 #include <QSignalSpy>
 #include <memory>
 
-#include "../Adapters/ComponentSystemAdapter.hpp"
-#include "../UICommand.hpp"
-#include "../CoreCommands.hpp"
-#include "../../Components/Button.hpp"
-#include "../../Components/Widget.hpp"
+#include "../../src/Command/Adapters/ComponentSystemAdapter.hpp"
+#include "../../src/Command/UICommand.hpp"
+#include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Components/Button.hpp"
+#include "../../src/Components/Widget.hpp"
 
 using namespace DeclarativeUI::Command::Adapters;
 using namespace DeclarativeUI::Command::UI;
@@ -56,6 +56,12 @@ private slots:
     void testInvalidComponentHandling();
     void testNullPointerHandling();
     void testConversionErrorRecovery();
+
+    // **Additional tests**
+    void testAdapterPerformance();
+    void testAdapterBidirectionalConversion();
+    void testAdapterConcurrency();
+    void testAdapterMemoryManagement();
 
 private:
     std::unique_ptr<ComponentSystemAdapter> adapter_;
@@ -513,7 +519,7 @@ void ComponentSystemAdapterTest::testAdapterConcurrency() {
 void ComponentSystemAdapterTest::testAdapterMemoryManagement() {
     qDebug() << "🧪 Testing adapter memory management...";
 
-    std::vector<std::shared_ptr<ButtonCommand>> commands;
+    std::vector<std::shared_ptr<DeclarativeUI::Command::UI::BaseUICommand>> commands;
 
     // Create many commands to test memory management
     for (int i = 0; i < 1000; ++i) {
