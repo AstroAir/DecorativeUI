@@ -2,6 +2,11 @@
 
 Welcome to the DeclarativeUI documentation! This comprehensive guide will help you understand, use, and contribute to the DeclarativeUI framework.
 
+DeclarativeUI provides two complementary approaches for building user interfaces:
+
+- **🏗️ Legacy Component System**: Traditional widget-based components with fluent API
+- **⚡ Command System (Recommended)**: Modern command-based architecture with automatic state management and widget independence
+
 ## 📚 Documentation Structure
 
 ### [Project Overview](overview.md)
@@ -14,7 +19,7 @@ Detailed reference documentation for all DeclarativeUI modules and classes:
 - **[JSON Support](api/json.md)** - JSON UI loading, parsing, validation, and component registry
 - **[Hot Reload](api/hot-reload.md)** - File watching, reload management, and performance monitoring
 - **[Binding System](api/binding.md)** - State management and property binding
-- **[Command System](api/command.md)** - Command execution, built-in commands, and UI integration
+- **[Command System](api/command.md)** - Modern command-based UI architecture with state binding and event handling
 - **[Components Library](api/components.md)** - Complete UI component reference
 
 ### [User Guide](user-guide/)

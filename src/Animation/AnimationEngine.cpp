@@ -244,14 +244,14 @@ QVariant Animation::interpolateValue(double progress) const {
     const QVariant& end = target_.end_value;
     
     // Handle different QVariant types
-    if (start.type() == QVariant::Double || start.type() == QVariant::Int) {
+    if (start.typeId() == QMetaType::Double || start.typeId() == QMetaType::Int) {
         double start_val = start.toDouble();
         double end_val = end.toDouble();
         double result = start_val + (end_val - start_val) * progress;
-        return start.type() == QVariant::Int ? QVariant(static_cast<int>(result)) : QVariant(result);
+        return start.typeId() == QMetaType::Int ? QVariant(static_cast<int>(result)) : QVariant(result);
     }
-    
-    if (start.type() == QVariant::Color) {
+
+    if (start.typeId() == QMetaType::QColor) {
         QColor start_color = start.value<QColor>();
         QColor end_color = end.value<QColor>();
         
@@ -611,5 +611,3 @@ template class AnimationTimeline<int>;
 template class AnimationTimeline<QColor>;
 
 }  // namespace DeclarativeUI::Animation
-
-#include "AnimationEngine.moc"

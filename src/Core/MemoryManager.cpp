@@ -478,5 +478,3 @@ void MemoryManager::cleanup_expired_objects() {
 }
 
 }  // namespace DeclarativeUI::Core
-
-#include "MemoryManager.moc"

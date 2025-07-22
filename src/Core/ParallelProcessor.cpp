@@ -230,15 +230,7 @@ QString ParallelProcessor::submitTask(const QString& task_id, TaskPriority prior
     return actual_task_id;
 }
 
-template<typename F>
-QString ParallelProcessor::submitBackgroundTask(const QString& task_id, F&& func) {
-    return submitTask(task_id, TaskPriority::Low, ExecutionContext::Background, std::forward<F>(func));
-}
 
-template<typename F>
-QString ParallelProcessor::submitHighPriorityTask(const QString& task_id, F&& func) {
-    return submitTask(task_id, TaskPriority::High, ExecutionContext::ThreadPool, std::forward<F>(func));
-}
 
 template<typename Container, typename F>
 std::vector<QString> ParallelProcessor::submitBatchTasks(const QString& batch_id, 
@@ -428,11 +420,7 @@ void ParallelProcessor::cleanupCompletedTasks() {
 template QString ParallelProcessor::submitTask<std::function<void()>>(
     const QString&, TaskPriority, ExecutionContext, std::function<void()>&&);
 
-template QString ParallelProcessor::submitBackgroundTask<std::function<void()>>(
-    const QString&, std::function<void()>&&);
 
-template QString ParallelProcessor::submitHighPriorityTask<std::function<void()>>(
-    const QString&, std::function<void()>&&);
 
 // **Missing class constructors**
 ParallelFileProcessor::ParallelFileProcessor(QObject* parent) 
@@ -451,5 +439,3 @@ ParallelPropertyBinder::ParallelPropertyBinder(QObject* parent)
 }
 
 }  // namespace DeclarativeUI::Core
-
-#include "ParallelProcessor.moc"

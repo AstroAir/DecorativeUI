@@ -10,7 +10,11 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_EXAMPLES": "ON",
-        "BUILD_TESTS": "ON"
+        "BUILD_TESTS": "ON",
+        "BUILD_COMMAND_SYSTEM": "ON",
+        "BUILD_ADAPTERS": "ON",
+        "BUILD_COMMAND_EXAMPLES": "ON",
+        "BUILD_COMMAND_TESTS": "ON"
       }
     },
     {
@@ -23,6 +27,11 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "BUILD_EXAMPLES": "ON",
         "BUILD_TESTS": "ON",
+        "BUILD_COMMAND_SYSTEM": "ON",
+        "BUILD_ADAPTERS": "ON",
+        "BUILD_COMMAND_EXAMPLES": "ON",
+        "BUILD_COMMAND_TESTS": "ON",
+        "ENABLE_COMMAND_DEBUG": "ON",
         "DECLARATIVE_UI_DEBUG": "ON"
       }
     },
@@ -47,7 +56,45 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
         "BUILD_EXAMPLES": "OFF",
-        "BUILD_TESTS": "OFF"
+        "BUILD_TESTS": "OFF",
+        "BUILD_COMMAND_SYSTEM": "OFF",
+        "BUILD_ADAPTERS": "OFF",
+        "BUILD_COMMAND_EXAMPLES": "OFF",
+        "BUILD_COMMAND_TESTS": "OFF"
+      }
+    },
+    {
+      "name": "command-dev",
+      "displayName": "Command Development",
+      "description": "Command system development with debug features",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-command",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "ON",
+        "BUILD_COMMAND_SYSTEM": "ON",
+        "BUILD_ADAPTERS": "ON",
+        "BUILD_COMMAND_EXAMPLES": "ON",
+        "BUILD_COMMAND_TESTS": "ON",
+        "ENABLE_COMMAND_DEBUG": "ON",
+        "DECLARATIVE_UI_DEBUG": "ON"
+      }
+    },
+    {
+      "name": "legacy-only",
+      "displayName": "Legacy Components Only",
+      "description": "Build only legacy component system",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-legacy",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "ON",
+        "BUILD_COMMAND_SYSTEM": "OFF",
+        "BUILD_ADAPTERS": "OFF",
+        "BUILD_COMMAND_EXAMPLES": "OFF",
+        "BUILD_COMMAND_TESTS": "OFF"
       }
     }
   ],
@@ -67,6 +114,14 @@
     {
       "name": "minimal",
       "configurePreset": "minimal"
+    },
+    {
+      "name": "command-dev",
+      "configurePreset": "command-dev"
+    },
+    {
+      "name": "legacy-only",
+      "configurePreset": "legacy-only"
     }
   ],
   "testPresets": [
@@ -78,6 +133,16 @@
     {
       "name": "debug",
       "configurePreset": "debug",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "command-dev",
+      "configurePreset": "command-dev",
+      "output": {"outputOnFailure": true}
+    },
+    {
+      "name": "legacy-only",
+      "configurePreset": "legacy-only",
       "output": {"outputOnFailure": true}
     }
   ]

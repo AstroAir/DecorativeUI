@@ -7,11 +7,11 @@ This guide will help you get up and running with DeclarativeUI, a modern C++/Qt6
 Before you begin, ensure you have the following installed:
 
 ### Required Software
-- **Qt6** (6.0 or higher) with development packages
+- **Qt6** (6.2 or higher) with Core, Widgets, Network, and Test modules
 - **CMake** (3.20 or higher)
 - **C++20 compatible compiler**:
   - GCC 10+ (Linux)
-  - Clang 10+ (macOS)
+  - Clang 12+ (macOS/Linux)
   - MSVC 2019+ (Windows)
 
 ### Platform-Specific Requirements
@@ -51,7 +51,7 @@ build.bat
 3. **Or build manually:**
 ```bash
 mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DBUILD_COMMAND_SYSTEM=ON -DBUILD_ADAPTERS=ON
 cmake --build . --config Release
 ```
 
@@ -460,20 +460,47 @@ Now that you have the basics, explore these advanced topics:
 
 The DeclarativeUI build system supports several configuration options:
 
-- `BUILD_EXAMPLES` (ON/OFF) - Build example applications
-- `BUILD_TESTS` (ON/OFF) - Build test applications
+#### Core Build Options
+- `BUILD_EXAMPLES` (ON/OFF) - Build example applications (25+ examples)
+- `BUILD_TESTS` (ON/OFF) - Build test applications (24+ test executables)
 - `BUILD_SHARED_LIBS` (ON/OFF) - Build shared libraries instead of static
-- `CMAKE_BUILD_TYPE` (Debug/Release) - Build configuration
+- `CMAKE_BUILD_TYPE` (Debug/Release/RelWithDebInfo) - Build configuration
+
+#### Command System Options
+- `BUILD_COMMAND_SYSTEM` (ON/OFF) - Enable modern Command-based UI system
+- `BUILD_ADAPTERS` (ON/OFF) - Enable integration adapters for legacy code
+- `ENABLE_COMMAND_DEBUG` (ON/OFF) - Enable detailed Command system debug output
 
 ### Example Build Commands
 
 ```bash
-# Release build with examples and tests
-cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON
+# Full release build with all features (recommended)
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DBUILD_COMMAND_SYSTEM=ON -DBUILD_ADAPTERS=ON
 
 # Debug build for development
-cmake .. -DCMAKE_BUILD_TYPE=Debug -DDECLARATIVE_UI_DEBUG=ON
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DDECLARATIVE_UI_DEBUG=ON -DENABLE_COMMAND_DEBUG=ON
 
-# Minimal build without examples
+# Minimal build without examples (for integration)
 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=OFF -DBUILD_TESTS=OFF
+
+# Command system development build
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_COMMAND_SYSTEM=ON -DBUILD_ADAPTERS=ON -DENABLE_COMMAND_DEBUG=ON
+
+# Legacy components only (no Command system)
+cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_COMMAND_SYSTEM=OFF -DBUILD_ADAPTERS=OFF
+```
+
+### Available CMake Presets
+
+If CMakePresets.json is available, you can use predefined configurations:
+
+```bash
+# Use default preset (all features enabled)
+cmake --preset=default
+
+# Use debug preset for development
+cmake --preset=debug
+
+# Use minimal preset for integration
+cmake --preset=minimal
 ```

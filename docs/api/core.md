@@ -1,10 +1,10 @@
 # Core API Reference
 
-The Core module provides the fundamental building blocks for the DeclarativeUI framework, including the base `UIElement` class and the `DeclarativeBuilder` template for fluent UI construction.
+The Core module provides the fundamental building blocks for the DeclarativeUI framework, including the base `UIElement` class, the `DeclarativeBuilder` template for fluent UI construction, and essential utilities for performance optimization and memory management.
 
 ## UIElement Class
 
-The `UIElement` class is the foundation of all UI components in the DeclarativeUI framework. It provides property management, event handling, animation support, and lifecycle management.
+The `UIElement` class is the foundation of all UI components in the DeclarativeUI framework. It provides comprehensive property management, event handling, animation support, styling capabilities, lifecycle management, and performance optimization with modern C++20 features.
 
 ### Header
 ```cpp
@@ -16,51 +16,137 @@ The `UIElement` class is the foundation of all UI components in the DeclarativeU
 namespace DeclarativeUI::Core {
     class UIElement : public QObject {
         Q_OBJECT
+
     public:
-        // Constructor and destructor
+        explicit UIElement(QObject* parent = nullptr);
+        virtual ~UIElement() = default;
+
+        // Core functionality
+        virtual void initialize();
+        virtual void cleanup();
+
+        // Property management
+        template<typename T>
+        UIElement& property(const QString& name, const T& value);
+
+        template<typename T>
+        T getProperty(const QString& name, const T& defaultValue = T{}) const;
+
+        // Event handling
+        template<typename Func>
+        UIElement& onEvent(const QString& eventName, Func&& handler);
+
+        // Styling and appearance
+        UIElement& style(const QString& styleSheet);
+        UIElement& addClass(const QString& className);
+        UIElement& removeClass(const QString& className);
+
+        // Performance and optimization
+        PerformanceMetrics getPerformanceMetrics() const;
+        void enableCaching(bool enabled = true);
+
+    protected:
+        virtual void onInitialize() {}
+        virtual void onCleanup() {}
+
+    private:
+        class Impl;
+        std::unique_ptr<Impl> d;
+    };
+}
+```
+
+### Class Declaration
+```cpp
+namespace DeclarativeUI::Core {
+    class UIElement : public QObject {
+        Q_OBJECT
+    public:
+        // Constructor and destructor with RAII
         explicit UIElement(QObject *parent = nullptr);
         virtual ~UIElement() = default;
-        
-        // Move semantics (copy disabled)
+
+        // Modern C++ move semantics (copy disabled for safety)
         UIElement(const UIElement &) = delete;
         UIElement &operator=(const UIElement &) = delete;
         UIElement(UIElement &&) = default;
         UIElement &operator=(UIElement &&) = default;
-        
+
         // Core API methods...
     };
 }
 ```
 
+### Key Features
+
+- **RAII Resource Management**: Automatic cleanup of widgets and resources
+- **Type-Safe Properties**: Template-based property system with perfect forwarding
+- **Fluent Interface**: Method chaining for declarative syntax
+- **Exception Safety**: Strong exception safety guarantees throughout
+- **Performance Optimized**: Batched property updates and efficient binding system
+- **Modern C++20**: Concepts, perfect forwarding, and move semantics
+
 ### Public Methods
 
 #### Property Management
 
+The property system provides type-safe, efficient property management with automatic Qt widget synchronization.
+
 ##### `setProperty<T>(const QString &name, T &&value) -> UIElement &`
-Sets a property value with perfect forwarding for optimal performance.
+Sets a property value with perfect forwarding and automatic type conversion.
+
+**Template Parameters:**
+- `T`: Property value type (automatically deduced)
 
 **Parameters:**
-- `name`: Property name
-- `value`: Property value (forwarded)
+- `name`: Property name (Qt property name or custom property)
+- `value`: Property value (perfect forwarded for optimal performance)
 
 **Returns:** Reference to this UIElement for method chaining
 
+**Features:**
+- Perfect forwarding for optimal performance
+- Automatic const char* to QString conversion
+- Immediate Qt widget property synchronization
+- Exception safety with detailed error messages
+
 **Example:**
 ```cpp
-element.setProperty("text", "Hello World")
-       .setProperty("enabled", true)
-       .setProperty("minimumSize", QSize(200, 100));
+element.setProperty("text", "Hello World")           // QString conversion
+       .setProperty("enabled", true)                 // bool property
+       .setProperty("minimumSize", QSize(200, 100))  // Complex type
+       .setProperty("styleSheet", "color: blue;");   // CSS styling
 ```
 
 ##### `getProperty(const QString &name) const -> PropertyValue`
-Retrieves a property value safely.
+Retrieves a property value safely with exception handling.
 
 **Parameters:**
-- `name`: Property name
+- `name`: Property name to retrieve
 
 **Returns:** PropertyValue containing the property value
 
-**Throws:** May throw if property doesn't exist
+**Throws:** `PropertyBindingException` if property doesn't exist
+
+**Example:**
+```cpp
+try {
+    auto text = element.getProperty("text");
+    // Use PropertyValue variant
+} catch (const PropertyBindingException& e) {
+    qWarning() << "Property not found:" << e.what();
+}
+```
+
+##### `getProperties() const -> const std::unordered_map<QString, PropertyValue> &`
+Returns all stored properties for inspection.
+
+**Returns:** Const reference to the properties map
+
+**Use Cases:**
+- Debugging property states
+- Serialization/deserialization
+- Property validation
 
 #### Widget Creation
 
@@ -216,7 +302,7 @@ The UIElement class provides several protected members for derived classes:
 
 ## DeclarativeBuilder Template
 
-The `DeclarativeBuilder` is a template class that provides a fluent interface for building UI widgets declaratively.
+The `DeclarativeBuilder` is a template class that provides a fluent interface for building UI widgets declaratively with modern C++20 features, move semantics, and performance optimizations.
 
 ### Header
 ```cpp
@@ -225,14 +311,78 @@ The `DeclarativeBuilder` is a template class that provides a fluent interface fo
 
 ### Class Declaration
 ```cpp
+namespace DeclarativeUI::Core {
+
 template <QtWidget WidgetType>
 class DeclarativeBuilder {
 public:
     explicit DeclarativeBuilder();
     ~DeclarativeBuilder() = default;
-    
-    // Fluent interface methods...
+
+    // Move-only semantics for performance
+    DeclarativeBuilder(const DeclarativeBuilder&) = delete;
+    DeclarativeBuilder& operator=(const DeclarativeBuilder&) = delete;
+    DeclarativeBuilder(DeclarativeBuilder&&) = default;
+    DeclarativeBuilder& operator=(DeclarativeBuilder&&) = default;
+
+    // Fluent property setting
+    template <typename T>
+    DeclarativeBuilder& property(const QString& name, T&& value);
+
+    // Event handling
+    DeclarativeBuilder& on(const QString& event, std::function<void()> handler);
+
+    // Property binding
+    DeclarativeBuilder& bind(const QString& property,
+                             std::function<PropertyValue()> binding);
+
+    // Child management
+    template <typename ChildType>
+    DeclarativeBuilder& child(
+        std::function<void(DeclarativeBuilder<ChildType>&)> config);
+
+    // Layout management
+    template <typename LayoutType>
+    DeclarativeBuilder& layout(
+        std::function<void(LayoutType*)> config = nullptr);
+
+    // Build final widget with RAII
+    [[nodiscard]] std::unique_ptr<WidgetType> build();
+
+    // Exception-safe building
+    [[nodiscard]] std::unique_ptr<WidgetType> buildSafe() noexcept;
+
+private:
+    std::unique_ptr<UIElement> element_;
+    std::vector<std::function<void(WidgetType*)>> configurators_;
+    std::unique_ptr<QLayout> layout_;
+    std::vector<std::unique_ptr<QWidget>> children_;
+
+    // Performance optimization
+    mutable bool is_built_ = false;
+    mutable bool has_cached_widget_ = false;
+    mutable std::unique_ptr<WidgetType> cached_widget_;
+
+    void applyConfiguration(WidgetType* widget);
+    void applyConfigurationBatch(WidgetType* widget);
+
+    // Memory pool for frequent allocations
+    static thread_local std::vector<std::unique_ptr<WidgetType>> widget_pool_;
 };
+
+// Factory functions for declarative syntax
+template <typename T>
+[[nodiscard]] DeclarativeBuilder<T> create() {
+    static_assert(is_qt_widget_v<T>, "T must be a QWidget-derived type");
+    return DeclarativeBuilder<T>{};
+}
+
+// Specialized builders for common widgets
+[[nodiscard]] inline auto button() { return create<QPushButton>(); }
+[[nodiscard]] inline auto label() { return create<QLabel>(); }
+[[nodiscard]] inline auto widget() { return create<QWidget>(); }
+
+}
 ```
 
 ### Public Methods
@@ -396,3 +546,76 @@ All Core classes provide strong exception safety guarantees:
 - UIElement instances are not thread-safe and should be used from the main thread
 - Property updates are batched for performance
 - Signal emissions are queued for thread safety
+- DeclarativeBuilder uses thread-local memory pools for optimization
+
+## Performance Optimizations
+
+The Core module implements several performance optimizations:
+
+### Memory Management
+- **Move semantics**: Efficient transfer of resources without copying
+- **RAII**: Automatic resource management with exception safety
+- **Memory pooling**: Thread-local widget pools reduce allocation overhead
+- **Small vector optimization**: Configurators use optimized storage
+
+### Compilation Optimizations
+- **Template specialization**: Compile-time optimizations for common widget types
+- **Concept constraints**: Compile-time type checking with `QtWidget` concept
+- **Perfect forwarding**: Zero-overhead property value forwarding
+
+### Runtime Optimizations
+- **Batch configuration**: Multiple properties applied in single pass
+- **Cached widgets**: Optional widget caching for repeated builds
+- **Lazy evaluation**: Configuration applied only during build phase
+
+## Best Practices
+
+### Design Patterns
+1. **Use move semantics** when passing builders around to avoid copies
+2. **Prefer `buildSafe()`** in production code for robust error handling
+3. **Cache frequently used widgets** when building similar UIs repeatedly
+4. **Use property binding** for reactive UIs that respond to state changes
+5. **Leverage factory functions** (`button()`, `label()`, etc.) for common widget types
+
+### Error Handling
+```cpp
+// Robust error handling
+auto widget = create<QWidget>()
+    .property("windowTitle", "My App")
+    .buildSafe();
+
+if (!widget) {
+    qCritical() << "Failed to create main widget";
+    return -1;
+}
+```
+
+### Memory Efficiency
+```cpp
+// Efficient resource usage
+{
+    auto builder = create<QWidget>()
+        .property("windowTitle", "Temporary");
+
+    auto widget = std::move(builder).build();  // Move builder
+    // builder is now in moved-from state
+} // Automatic cleanup
+```
+
+### State Integration
+```cpp
+// Integrate with state management
+#include "Binding/StateManager.hpp"
+
+auto& state = StateManager::instance();
+state.setState("theme", QString("dark"));
+
+auto themedWidget = create<QWidget>()
+    .bind("styleSheet", [&state]() {
+        auto theme = state.getState<QString>("theme");
+        return theme->get() == "dark" ?
+            PropertyValue("background: #2b2b2b; color: white;") :
+            PropertyValue("background: white; color: black;");
+    })
+    .build();
+```

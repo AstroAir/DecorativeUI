@@ -83,7 +83,7 @@ add_library(Components
 )
 
 target_link_libraries(Components
-    DeclarativeUI
+    Core
     Qt6::Core
     Qt6::Widgets
 )

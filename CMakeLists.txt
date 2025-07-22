@@ -7,12 +7,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # **Find Qt6 with required components**
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Test)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Test Concurrent)
 
 # **Build options**
 option(BUILD_EXAMPLES "Build example applications" ON)
 option(BUILD_TESTS "Build test applications" ON)
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+option(BUILD_COMMAND_SYSTEM "Build Command-based UI system" ON)
+option(BUILD_ADAPTERS "Build integration adapters" ON)
+option(ENABLE_COMMAND_DEBUG "Enable Command system debug output" OFF)
 
 # **Compiler-specific optimizations**
 if(MSVC)
@@ -29,9 +32,7 @@ endif()
 
 # **Create main library first**
 add_library(DeclarativeUI STATIC
-    # Core
-    src/Core/UIElement.cpp
-    src/Core/DeclarativeBuilder.cpp
+    # Core (excluding UIElement.cpp which is now in Core library)
     src/Core/CacheManager.cpp
     src/Core/MemoryManager.cpp
     src/Core/ParallelProcessor.cpp
@@ -53,20 +54,47 @@ add_library(DeclarativeUI STATIC
     src/Binding/StateManager.cpp
     src/Binding/PropertyBinding.cpp
 
-    # Command System
+    # Command System - Core
     src/Command/CommandSystem.cpp
     src/Command/BuiltinCommands.cpp
     src/Command/CommandIntegration.cpp
+    src/Command/UICommand.cpp
+    src/Command/UICommandFactory.cpp
+    src/Command/WidgetMapper.cpp
+
+    # Command System - Core Commands
+    src/Command/CoreCommands.cpp
+    src/Command/SpecializedCommands.cpp
+
+    # Command System - Builders and Binding
+    src/Command/CommandBuilder.cpp
+    src/Command/CommandBinding.cpp
+
+    # Command System - Events
+    src/Command/CommandEvents.cpp
+
+    # Command System - MVC Integration
+    src/Command/MVCIntegration.cpp
+
+    # Command System - Adapters (conditional)
+    $<$<BOOL:${BUILD_ADAPTERS}>:src/Command/Adapters/UIElementAdapter.cpp>
+    $<$<BOOL:${BUILD_ADAPTERS}>:src/Command/Adapters/JSONCommandLoader.cpp>
+    $<$<BOOL:${BUILD_ADAPTERS}>:src/Command/Adapters/StateManagerAdapter.cpp>
+    $<$<BOOL:${BUILD_ADAPTERS}>:src/Command/Adapters/ComponentSystemAdapter.cpp>
+    $<$<BOOL:${BUILD_ADAPTERS}>:src/Command/Adapters/IntegrationManager.cpp>
 )
 
+# **Add subdirectories before main library linking**
+add_subdirectory(src/Core)
+add_subdirectory(src/Components)
+
 target_link_libraries(DeclarativeUI
+    Core
+    Components
     Qt6::Core
     Qt6::Widgets
     Qt6::Network
 )
-
-# **Add subdirectories after main library**
-add_subdirectory(src/Components)
 
 target_include_directories(DeclarativeUI PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
@@ -78,6 +106,22 @@ set_target_properties(DeclarativeUI PROPERTIES
     AUTORCC ON
 )
 
+# **Command System Configuration**
+if(BUILD_COMMAND_SYSTEM)
+    target_compile_definitions(DeclarativeUI PUBLIC DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED)
+    message(STATUS "Command-based UI system enabled")
+endif()
+
+if(BUILD_ADAPTERS)
+    target_compile_definitions(DeclarativeUI PUBLIC DECLARATIVE_UI_ADAPTERS_ENABLED)
+    message(STATUS "Integration adapters enabled")
+endif()
+
+if(ENABLE_COMMAND_DEBUG)
+    target_compile_definitions(DeclarativeUI PUBLIC DECLARATIVE_UI_COMMAND_DEBUG)
+    message(STATUS "Command system debug output enabled")
+endif()
+
 # **Copy resources to build directory**
 add_custom_target(CopyResources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -87,11 +131,11 @@ add_custom_target(CopyResources ALL
 
 # **Conditionally build examples**
 if(BUILD_EXAMPLES)
-    add_subdirectory(src/Examples)
+    add_subdirectory(examples)
 endif()
 
 # **Conditionally build tests**
 if(BUILD_TESTS)
-    add_subdirectory(src/Tests)
+    add_subdirectory(tests)
 endif()
 

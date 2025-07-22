@@ -401,6 +401,63 @@ void CacheManager::evictFromLargestCache() {
     }
 }
 
+QJsonObject CacheManager::getCacheStatistics() const {
+    QJsonObject stats;
+
+    // Overall statistics
+    stats["total_memory_usage"] = static_cast<qint64>(calculateTotalMemoryUsage());
+    stats["global_memory_limit"] = static_cast<qint64>(global_memory_limit_bytes_.load());
+
+    // Individual cache statistics
+    QJsonObject cache_stats;
+
+    if (widget_cache_) {
+        QJsonObject widget_stats;
+        widget_stats["size"] = static_cast<qint64>(widget_cache_->size());
+        widget_stats["memory_usage"] = static_cast<qint64>(widget_cache_->memoryUsage());
+        cache_stats["widget_cache"] = widget_stats;
+    }
+
+    if (stylesheet_cache_) {
+        QJsonObject stylesheet_stats;
+        stylesheet_stats["size"] = static_cast<qint64>(stylesheet_cache_->size());
+        stylesheet_stats["memory_usage"] = static_cast<qint64>(stylesheet_cache_->memoryUsage());
+        cache_stats["stylesheet_cache"] = stylesheet_stats;
+    }
+
+    if (property_cache_) {
+        QJsonObject property_stats;
+        property_stats["size"] = static_cast<qint64>(property_cache_->size());
+        property_stats["memory_usage"] = static_cast<qint64>(property_cache_->memoryUsage());
+        cache_stats["property_cache"] = property_stats;
+    }
+
+    stats["caches"] = cache_stats;
+    return stats;
+}
+
+QJsonObject CacheManager::getCacheStatistics(const QString& cache_name) const {
+    QJsonObject stats;
+
+    if (cache_name == "widgets" && widget_cache_) {
+        stats["size"] = static_cast<qint64>(widget_cache_->size());
+        stats["memory_usage"] = static_cast<qint64>(widget_cache_->memoryUsage());
+    } else if (cache_name == "stylesheets" && stylesheet_cache_) {
+        stats["size"] = static_cast<qint64>(stylesheet_cache_->size());
+        stats["memory_usage"] = static_cast<qint64>(stylesheet_cache_->memoryUsage());
+    } else if (cache_name == "properties" && property_cache_) {
+        stats["size"] = static_cast<qint64>(property_cache_->size());
+        stats["memory_usage"] = static_cast<qint64>(property_cache_->memoryUsage());
+    }
+
+    return stats;
+}
+
+void CacheManager::setGlobalMemoryLimit(size_t limit_mb) {
+    global_memory_limit_bytes_.store(limit_mb * 1024 * 1024);
+    qDebug() << "🔧 Global cache memory limit set to" << limit_mb << "MB";
+}
+
 // **Template instantiations for common types**
 template class LRUCache<QString, std::shared_ptr<QWidget>>;
 template class LRUCache<QString, QString>;
@@ -472,5 +529,3 @@ template void LRUCache<QString, QByteArray>::evictLFU();
 template void LRUCache<QString, QJsonObject>::evictLFU();
 
 }  // namespace DeclarativeUI::Core
-
-#include "CacheManager.moc"

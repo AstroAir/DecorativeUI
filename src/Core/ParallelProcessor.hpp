@@ -187,10 +187,14 @@ public:
                       ExecutionContext context, F&& func, Args&&... args);
 
     template<typename F>
-    QString submitBackgroundTask(const QString& task_id, F&& func);
+    QString submitBackgroundTask(const QString& task_id, F&& func) {
+        return submitTask(task_id, TaskPriority::Low, ExecutionContext::Background, std::forward<F>(func));
+    }
 
     template<typename F>
-    QString submitHighPriorityTask(const QString& task_id, F&& func);
+    QString submitHighPriorityTask(const QString& task_id, F&& func) {
+        return submitTask(task_id, TaskPriority::High, ExecutionContext::ThreadPool, std::forward<F>(func));
+    }
 
     // **Batch processing**
     template<typename Container, typename F>

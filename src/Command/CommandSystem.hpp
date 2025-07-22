@@ -573,6 +573,25 @@ private:
 
 }  // namespace DeclarativeUI::Command
 
+// **Forward declarations for UI Command system**
+namespace DeclarativeUI::Command::UI {
+    class BaseUICommand;
+    class UICommandMetadata;
+    class UICommandState;
+    class WidgetMapper;
+    class UICommandFactory;
+}
+
+#include "UICommand.hpp"
+#include "UICommandFactory.hpp"
+#include "WidgetMapper.hpp"
+#include "CoreCommands.hpp"
+#include "SpecializedCommands.hpp"
+#include "CommandBuilder.hpp"
+#include "CommandBinding.hpp"
+#include "MVCIntegration.hpp"
+#include "CommandEvents.hpp"
+
 Q_DECLARE_METATYPE(DeclarativeUI::Command::CommandState)
 Q_DECLARE_METATYPE(DeclarativeUI::Command::CommandPriority)
 Q_DECLARE_METATYPE(DeclarativeUI::Command::ExecutionMode)

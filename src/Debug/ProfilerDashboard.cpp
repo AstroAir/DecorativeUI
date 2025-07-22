@@ -243,7 +243,7 @@ void ProfilerDashboard::setupUI() {
 
 void ProfilerDashboard::setupPerformanceTab() {
     performance_tab_ = new QWidget();
-    auto layout = new QGridLayout(performance_tab_);
+    [[maybe_unused]] auto layout = new QGridLayout(performance_tab_);
     
     // Create performance charts - commented out due to missing Qt Charts dependency
     /*
@@ -786,5 +786,3 @@ void ProfilerDashboard::hide() {
 }
 
 }  // namespace DeclarativeUI::Debug
-
-#include "ProfilerDashboard.moc"

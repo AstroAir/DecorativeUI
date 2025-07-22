@@ -30,6 +30,14 @@
 #include "../../JSON/JSONUILoader.hpp"
 #include "../../JSON/ComponentRegistry.hpp"
 
+#ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
+#ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
+#include "../../Command/Adapters/JSONCommandLoader.hpp"
+#include "../../Command/WidgetMapper.hpp"
+#include "../../Binding/StateManager.hpp"
+#endif
+#endif
+
 using namespace DeclarativeUI;
 
 /**
@@ -122,9 +130,69 @@ private slots:
         }
     }
 
+#ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
+#ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
+    // Command system event handlers
+    void onCommandGreetClicked() {
+        auto& stateManager = Binding::StateManager::instance();
+        auto nameState = stateManager.getState<QString>("user.name");
+        QString name = nameState ? nameState->get() : "World";
+
+        QString message = QString("🎉 Hello, %1!\n\nThis button was created using the Command system!").arg(name);
+        stateManager.setState("app.message", message);
+
+        QMessageBox::information(
+            main_widget_.get(),
+            "Command System Event",
+            message
+        );
+
+        qDebug() << "⚡ Command greet button clicked for:" << name;
+    }
+
+    void onCommandClearClicked() {
+        auto& stateManager = Binding::StateManager::instance();
+        stateManager.setState("user.name", QString(""));
+        stateManager.setState("app.message", QString("All fields cleared via Command system"));
+
+        QMessageBox::information(
+            main_widget_.get(),
+            "Command System",
+            "🧹 Fields cleared using Command system state management!"
+        );
+
+        qDebug() << "⚡ Command clear button clicked";
+    }
+
+    void onCommandShowInfoClicked() {
+        QMessageBox::information(
+            main_widget_.get(),
+            "Command System Info",
+            "ℹ️ <b>Command System Features:</b><br><br>"
+            "<ul>"
+            "<li>Declarative UI construction</li>"
+            "<li>State management integration</li>"
+            "<li>Event handling system</li>"
+            "<li>Widget mapping</li>"
+            "<li>JSON loading with Commands</li>"
+            "<li>Legacy component integration</li>"
+            "</ul>"
+        );
+
+        qDebug() << "⚡ Command info button clicked";
+    }
+#endif
+#endif
+
 private:
     std::unique_ptr<JSON::JSONUILoader> ui_loader_;
     std::unique_ptr<QWidget> main_widget_;
+
+#ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
+#ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
+    std::unique_ptr<Command::Adapters::JSONCommandLoader> command_loader_;
+#endif
+#endif
 
     void setupUILoader() {
         ui_loader_ = std::make_unique<JSON::JSONUILoader>();
@@ -145,6 +213,37 @@ private:
         ui_loader_->registerEventHandler("reloadUI", [this]() {
             onReloadUIClicked();
         });
+
+#ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
+#ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
+        // Set up Command system JSON loader
+        command_loader_ = std::make_unique<Command::Adapters::JSONCommandLoader>();
+        command_loader_->setAutoMVCIntegration(true);
+        command_loader_->setAutoStateBinding(true);
+        command_loader_->setAutoEventHandling(true);
+
+        // Register Command system event handlers
+        command_loader_->registerEventHandler("greetUserCommand", [this](const QVariant&) {
+            onCommandGreetClicked();
+        });
+
+        command_loader_->registerEventHandler("clearFieldsCommand", [this](const QVariant&) {
+            onCommandClearClicked();
+        });
+
+        command_loader_->registerEventHandler("showInfoCommand", [this](const QVariant&) {
+            onCommandShowInfoClicked();
+        });
+
+        // Initialize state manager
+        auto& stateManager = Binding::StateManager::instance();
+        stateManager.setState("app.title", QString("JSON UI Loading with Commands"));
+        stateManager.setState("user.name", QString(""));
+        stateManager.setState("app.message", QString("Welcome to enhanced JSON loading!"));
+
+        qDebug() << "⚡ Command system JSON loader configured";
+#endif
+#endif
 
         qDebug() << "✅ Event handlers registered";
     }
@@ -271,6 +370,18 @@ int main(int argc, char* argv[]) {
         qDebug() << "   - Loading UI from JSON files";
         qDebug() << "   - Event handler registration";
         qDebug() << "   - Error handling with fallback UI";
+
+#ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
+#ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
+        qDebug() << "   - Command system JSON loading (enabled)";
+        qDebug() << "   - State management integration";
+        qDebug() << "   - Mixed legacy/command components";
+#else
+        qDebug() << "   - Command system JSON loading (build with BUILD_ADAPTERS=ON)";
+#endif
+#else
+        qDebug() << "   - Command system JSON loading (build with BUILD_COMMAND_SYSTEM=ON)";
+#endif
 
         return app.exec();
 

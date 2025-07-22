@@ -20,3 +20,13 @@ add_custom_target(CopyExampleResources ALL
     ${CMAKE_SOURCE_DIR}/Resources
     ${CMAKE_BINARY_DIR}/examples/Resources
 )
+
+# **Copy Command system example resources**
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/resources)
+    add_custom_target(CopyCommandExampleResources ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources
+        ${CMAKE_BINARY_DIR}/examples/resources
+    )
+    message(STATUS "Command example resources will be copied")
+endif()

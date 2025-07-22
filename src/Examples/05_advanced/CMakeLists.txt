@@ -17,13 +17,38 @@ target_link_libraries(28_advanced_example DeclarativeUI Components Qt6::Core Qt6
 add_executable(29_comprehensive_example 29_comprehensive_example.cpp)
 target_link_libraries(29_comprehensive_example DeclarativeUI Components Qt6::Core Qt6::Widgets)
 
+# **30 - Command UI Builder (Conditional)**
+if(BUILD_COMMAND_SYSTEM)
+    add_executable(30_command_ui_builder 30_command_ui_builder.cpp)
+    target_link_libraries(30_command_ui_builder DeclarativeUI Components Qt6::Core Qt6::Widgets)
+    target_compile_definitions(30_command_ui_builder PRIVATE DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED)
+
+    if(BUILD_ADAPTERS)
+        target_compile_definitions(30_command_ui_builder PRIVATE DECLARATIVE_UI_ADAPTERS_ENABLED)
+    endif()
+
+    message(STATUS "Command UI Builder example will be built")
+endif()
+
+# **31 - Integration Example (Conditional)**
+if(BUILD_COMMAND_SYSTEM AND BUILD_ADAPTERS)
+    add_executable(31_integration_example 31_integration_example.cpp)
+    target_link_libraries(31_integration_example DeclarativeUI Components Qt6::Core Qt6::Widgets)
+    target_compile_definitions(31_integration_example PRIVATE
+        DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
+        DECLARATIVE_UI_ADAPTERS_ENABLED
+    )
+
+    message(STATUS "Integration example will be built")
+endif()
+
 # **TODO: Additional advanced examples to be implemented**
-# 30 - Form Validation (Complex form validation)
-# 31 - Async Operations (Asynchronous operations and loading states)
-# 32 - Error Handling (Comprehensive error handling strategies)
-# 33 - Testing Integration (Testing DeclarativeUI applications)
-# 34 - Performance Optimization (Performance best practices)
-# 35 - Accessibility (Accessibility features and compliance)
+# 32 - Form Validation (Complex form validation)
+# 33 - Async Operations (Asynchronous operations and loading states)
+# 34 - Error Handling (Comprehensive error handling strategies)
+# 35 - Testing Integration (Testing DeclarativeUI applications)
+# 36 - Performance Optimization (Performance best practices)
+# 37 - Accessibility (Accessibility features and compliance)
 
 # **Set output directory**
 set_target_properties(
@@ -34,6 +59,21 @@ set_target_properties(
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/examples/05_advanced
 )
+
+# **Set output directory for Command examples (conditional)**
+if(BUILD_COMMAND_SYSTEM)
+    set_target_properties(30_command_ui_builder
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/examples/05_advanced
+    )
+endif()
+
+if(BUILD_COMMAND_SYSTEM AND BUILD_ADAPTERS)
+    set_target_properties(31_integration_example
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/examples/05_advanced
+    )
+endif()
 
 # **Copy resources (only if directory exists)**
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/resources)
@@ -48,4 +88,13 @@ if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/resources)
     add_dependencies(27_command_example CopyAdvancedExampleResources)
     add_dependencies(28_advanced_example CopyAdvancedExampleResources)
     add_dependencies(29_comprehensive_example CopyAdvancedExampleResources)
+
+    # **Command example dependencies (conditional)**
+    if(BUILD_COMMAND_SYSTEM)
+        add_dependencies(30_command_ui_builder CopyAdvancedExampleResources)
+    endif()
+
+    if(BUILD_COMMAND_SYSTEM AND BUILD_ADAPTERS)
+        add_dependencies(31_integration_example CopyAdvancedExampleResources)
+    endif()
 endif()
