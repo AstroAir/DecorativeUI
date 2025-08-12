@@ -1,30 +1,17 @@
 // Components/Widget.cpp
 #include "Widget.hpp"
+#include <algorithm>
+#include <ranges>
 
 namespace DeclarativeUI::Components {
+
+using namespace Core::Concepts;
 
 // **Implementation**
 Widget::Widget(QObject* parent)
     : UIElement(parent), widget_(nullptr) {}
 
-Widget& Widget::size(const QSize& size) {
-    return static_cast<Widget&>(setProperty("size", size));
-}
-
-Widget& Widget::minimumSize(const QSize& size) {
-    return static_cast<Widget&>(setProperty("minimumSize", size));
-}
-
-Widget& Widget::maximumSize(const QSize& size) {
-    return static_cast<Widget&>(setProperty("maximumSize", size));
-}
-
-Widget& Widget::fixedSize(const QSize& size) {
-    if (widget_) {
-        widget_->setFixedSize(size);
-    }
-    return *this;
-}
+// Template methods are implemented in the header file
 
 Widget& Widget::sizePolicy(QSizePolicy::Policy horizontal, QSizePolicy::Policy vertical) {
     if (widget_) {
@@ -40,58 +27,35 @@ Widget& Widget::sizePolicy(const QSizePolicy& policy) {
     return *this;
 }
 
-Widget& Widget::geometry(const QRect& rect) {
-    return static_cast<Widget&>(setProperty("geometry", rect));
-}
+// Template methods for geometry and position are implemented in header
 
-Widget& Widget::position(const QPoint& pos) {
-    if (widget_) {
-        widget_->move(pos);
-    }
-    return *this;
-}
-
-Widget& Widget::visible(bool visible) {
+Widget& Widget::visible(bool visible) noexcept {
     return static_cast<Widget&>(setProperty("visible", visible));
 }
 
-Widget& Widget::enabled(bool enabled) {
+Widget& Widget::enabled(bool enabled) noexcept {
     return static_cast<Widget&>(setProperty("enabled", enabled));
 }
 
-Widget& Widget::toolTip(const QString& tooltip) {
-    return static_cast<Widget&>(setProperty("toolTip", tooltip));
-}
-
-Widget& Widget::statusTip(const QString& statusTip) {
-    return static_cast<Widget&>(setProperty("statusTip", statusTip));
-}
-
-Widget& Widget::whatsThis(const QString& whatsThis) {
-    return static_cast<Widget&>(setProperty("whatsThis", whatsThis));
-}
-
-Widget& Widget::windowTitle(const QString& title) {
-    return static_cast<Widget&>(setProperty("windowTitle", title));
-}
+// Template methods for string-like parameters are implemented in header
 
 Widget& Widget::windowIcon(const QIcon& icon) {
     return static_cast<Widget&>(setProperty("windowIcon", icon));
 }
 
-Widget& Widget::windowFlags(Qt::WindowFlags flags) {
+Widget& Widget::windowFlags(Qt::WindowFlags flags) noexcept {
     return static_cast<Widget&>(setProperty("windowFlags", static_cast<int>(flags)));
 }
 
-Widget& Widget::windowState(Qt::WindowStates state) {
+Widget& Widget::windowState(Qt::WindowStates state) noexcept {
     return static_cast<Widget&>(setProperty("windowState", static_cast<int>(state)));
 }
 
-Widget& Widget::focusPolicy(Qt::FocusPolicy policy) {
+Widget& Widget::focusPolicy(Qt::FocusPolicy policy) noexcept {
     return static_cast<Widget&>(setProperty("focusPolicy", static_cast<int>(policy)));
 }
 
-Widget& Widget::contextMenuPolicy(Qt::ContextMenuPolicy policy) {
+Widget& Widget::contextMenuPolicy(Qt::ContextMenuPolicy policy) noexcept {
     return static_cast<Widget&>(setProperty("contextMenuPolicy", static_cast<int>(policy)));
 }
 
@@ -99,28 +63,21 @@ Widget& Widget::cursor(const QCursor& cursor) {
     return static_cast<Widget&>(setProperty("cursor", cursor));
 }
 
-Widget& Widget::font(const QFont& font) {
-    return static_cast<Widget&>(setProperty("font", font));
-}
+// Template method for font is implemented in header
 
 Widget& Widget::palette(const QPalette& palette) {
     return static_cast<Widget&>(setProperty("palette", palette));
 }
 
-Widget& Widget::autoFillBackground(bool enabled) {
+Widget& Widget::autoFillBackground(bool enabled) noexcept {
     return static_cast<Widget&>(setProperty("autoFillBackground", enabled));
 }
 
-Widget& Widget::updatesEnabled(bool enabled) {
+Widget& Widget::updatesEnabled(bool enabled) noexcept {
     return static_cast<Widget&>(setProperty("updatesEnabled", enabled));
 }
 
-Widget& Widget::layout(QLayout* layout) {
-    if (widget_ && layout) {
-        widget_->setLayout(layout);
-    }
-    return *this;
-}
+// Template methods for layout and widget management are implemented in header
 
 Widget& Widget::vBoxLayout() {
     if (widget_) {
@@ -154,56 +111,9 @@ Widget& Widget::formLayout() {
     return *this;
 }
 
-Widget& Widget::addWidget(QWidget* widget) {
-    if (widget_ && widget) {
-        if (!widget_->layout()) {
-            vBoxLayout(); // Create default layout
-        }
-        widget_->layout()->addWidget(widget);
-    }
-    return *this;
-}
-
-Widget& Widget::addWidget(QWidget* widget, int row, int column, Qt::Alignment alignment) {
-    if (widget_ && widget) {
-        auto* gridLayout = qobject_cast<QGridLayout*>(widget_->layout());
-        if (gridLayout) {
-            gridLayout->addWidget(widget, row, column, alignment);
-        }
-    }
-    return *this;
-}
-
-Widget& Widget::addWidget(QWidget* widget, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment) {
-    if (widget_ && widget) {
-        auto* gridLayout = qobject_cast<QGridLayout*>(widget_->layout());
-        if (gridLayout) {
-            gridLayout->addWidget(widget, row, column, rowSpan, columnSpan, alignment);
-        }
-    }
-    return *this;
-}
-
-Widget& Widget::addLayout(QLayout* layout) {
-    if (widget_ && layout) {
-        if (!widget_->layout()) {
-            vBoxLayout(); // Create default layout
-        }
-        widget_->layout()->addItem(layout);
-    }
-    return *this;
-}
-
-Widget& Widget::spacing(int spacing) {
+Widget& Widget::spacing(int spacing) noexcept {
     if (widget_ && widget_->layout()) {
         widget_->layout()->setSpacing(spacing);
-    }
-    return *this;
-}
-
-Widget& Widget::margins(int left, int top, int right, int bottom) {
-    if (widget_ && widget_->layout()) {
-        widget_->layout()->setContentsMargins(left, top, right, bottom);
     }
     return *this;
 }
@@ -215,10 +125,6 @@ Widget& Widget::margins(const QMargins& margins) {
     return *this;
 }
 
-Widget& Widget::style(const QString& stylesheet) {
-    return static_cast<Widget&>(setProperty("styleSheet", stylesheet));
-}
-
 void Widget::initialize() {
     if (!widget_) {
         widget_ = new QWidget();
@@ -226,31 +132,31 @@ void Widget::initialize() {
     }
 }
 
-QSize Widget::getSize() const {
+QSize Widget::getSize() const noexcept {
     return widget_ ? widget_->size() : QSize();
 }
 
-QSize Widget::getMinimumSize() const {
+QSize Widget::getMinimumSize() const noexcept {
     return widget_ ? widget_->minimumSize() : QSize();
 }
 
-QSize Widget::getMaximumSize() const {
+QSize Widget::getMaximumSize() const noexcept {
     return widget_ ? widget_->maximumSize() : QSize();
 }
 
-QRect Widget::getGeometry() const {
+QRect Widget::getGeometry() const noexcept {
     return widget_ ? widget_->geometry() : QRect();
 }
 
-QPoint Widget::getPosition() const {
+QPoint Widget::getPosition() const noexcept {
     return widget_ ? widget_->pos() : QPoint();
 }
 
-bool Widget::isVisible() const {
+bool Widget::isVisible() const noexcept {
     return widget_ ? widget_->isVisible() : false;
 }
 
-bool Widget::isEnabled() const {
+bool Widget::isEnabled() const noexcept {
     return widget_ ? widget_->isEnabled() : true;
 }
 
@@ -258,7 +164,7 @@ QString Widget::getToolTip() const {
     return widget_ ? widget_->toolTip() : QString();
 }
 
-QLayout* Widget::getLayout() const {
+QLayout* Widget::getLayout() const noexcept {
     return widget_ ? widget_->layout() : nullptr;
 }
 

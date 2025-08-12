@@ -1,0 +1,119 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  clang-format:
+    name: Code Formatting Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format-14
+
+    - name: Check formatting
+      run: |
+        find src/ -name "*.cpp" -o -name "*.hpp" | xargs clang-format-14 --dry-run --Werror
+
+  clang-tidy:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: 6.5.0
+        cache: true
+
+    - name: Setup dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-tidy-14 ninja-build
+
+    - name: Configure CMake
+      run: |
+        cmake --preset default -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+    - name: Run clang-tidy
+      run: |
+        clang-tidy-14 -p build src/**/*.cpp --warnings-as-errors=*
+
+  cppcheck:
+    name: Static Analysis (cppcheck)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install cppcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cppcheck
+
+    - name: Run cppcheck
+      run: |
+        cppcheck --enable=all --error-exitcode=1 --suppress=missingIncludeSystem \
+          --suppress=unusedFunction --suppress=unmatchedSuppression \
+          --inline-suppr src/
+
+  documentation-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install documentation dependencies
+      run: |
+        pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
+
+    - name: Check documentation build
+      run: |
+        mkdocs build --strict
+
+    - name: Check for broken links
+      run: |
+        # Install linkchecker
+        pip install linkchecker
+        
+        # Build docs and check links
+        mkdocs build
+        linkchecker site/ --check-extern
+
+  license-check:
+    name: License Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check license headers
+      run: |
+        # Check that all source files have appropriate license headers
+        find src/ -name "*.cpp" -o -name "*.hpp" | while read file; do
+          if ! grep -q "Copyright" "$file"; then
+            echo "Missing license header in $file"
+            exit 1
+          fi
+        done

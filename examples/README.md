@@ -117,13 +117,15 @@ Showcasing UI components:
 
 Demonstrating the command architecture:
 
-- **CommandUIExample**: Command-based UI construction
-- **IntegrationExample**: Legacy-Command integration
-- **CommandBuilderExample**: Command Builder patterns
-- **JSONCommandExample**: Loading UI from JSON with Commands
-- **StateIntegrationExample**: State management with Commands
-- **CommandMainExample**: Main Command system demo
-- **IntegrationMainExample**: Integration scenarios
+Note: Several command examples are currently disabled in CMake due to API mismatches. Sources are available for reference and will be re-enabled after alignment.
+
+- **CommandUIExample**: Command-based UI construction (disabled)
+- **IntegrationExample**: Legacy-Command integration (disabled)
+- **CommandBuilderExample**: Command Builder patterns (disabled)
+- **JSONCommandExample**: Loading UI from JSON with Commands (disabled)
+- **StateIntegrationExample**: State management with Commands (disabled)
+- **CommandMainExample**: Main Command system demo (disabled)
+- **IntegrationMainExample**: Integration scenarios (disabled)
 
 ### Advanced Examples (`advanced/`)
 
@@ -243,12 +245,12 @@ int main(int argc, char *argv[])
     // Your example code here
     auto widget = std::make_unique<QWidget>();
     auto layout = std::make_unique<QVBoxLayout>(widget.get());
-    
+
     auto label = std::make_unique<QLabel>("Hello, DeclarativeUI!");
     layout->addWidget(label.get());
-    
+
     widget->show();
-    
+
     return app.exec();
 }
 ```
@@ -256,6 +258,7 @@ int main(int argc, char *argv[])
 ## Dependencies
 
 Examples depend on:
+
 - DeclarativeUI library
 - Components library
 - Qt6::Core
@@ -265,6 +268,7 @@ Examples depend on:
 ## Resources
 
 Examples may use resources from:
+
 - `Resources/` (main project resources)
 - `examples/resources/` (example-specific resources)
 

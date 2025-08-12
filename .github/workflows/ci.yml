@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  QT_VERSION: 6.5.0
+  CMAKE_VERSION: 3.20
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }} with ${{ matrix.compiler }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Windows builds
+          - os: windows-latest
+            compiler: msvc
+            qt_arch: win64_msvc2019_64
+            cmake_preset: default
+          
+          # Linux builds
+          - os: ubuntu-latest
+            compiler: gcc
+            qt_arch: gcc_64
+            cmake_preset: default
+          
+          # macOS builds
+          - os: macos-latest
+            compiler: clang
+            qt_arch: clang_64
+            cmake_preset: default
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ env.QT_VERSION }}
+        arch: ${{ matrix.qt_arch }}
+        cache: true
+        modules: 'qtbase qttools'
+
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: ${{ env.CMAKE_VERSION }}
+
+    - name: Setup Ninja (Windows)
+      if: runner.os == 'Windows'
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Setup Ninja (Linux/macOS)
+      if: runner.os != 'Windows'
+      run: |
+        if [[ "$RUNNER_OS" == "Linux" ]]; then
+          sudo apt-get update
+          sudo apt-get install -y ninja-build
+        elif [[ "$RUNNER_OS" == "macOS" ]]; then
+          brew install ninja
+        fi
+
+    - name: Configure CMake
+      run: |
+        cmake --preset ${{ matrix.cmake_preset }}
+
+    - name: Build
+      run: |
+        cmake --build --preset ${{ matrix.cmake_preset }}
+
+    - name: Run Tests
+      run: |
+        cd build
+        ctest --config Release --output-on-failure --parallel 4
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.compiler }}
+        path: |
+          build/Testing/
+          build/tests/
+        retention-days: 7
+
+  build-examples:
+    name: Build Examples on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ env.QT_VERSION }}
+        cache: true
+
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: ${{ env.CMAKE_VERSION }}
+
+    - name: Setup Ninja
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Configure and Build Examples
+      run: |
+        cmake --preset default
+        cmake --build --preset default --target examples
+
+    - name: Upload example binaries
+      uses: actions/upload-artifact@v3
+      with:
+        name: examples-${{ matrix.os }}
+        path: |
+          build/examples/
+        retention-days: 7

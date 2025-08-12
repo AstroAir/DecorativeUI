@@ -1,10 +1,10 @@
-#include <QtTest/QtTest>
 #include <QSignalSpy>
+#include <QtTest/QtTest>
 #include <memory>
 
 #include "../../src/Command/Adapters/ComponentSystemAdapter.hpp"
-#include "../../src/Command/UICommand.hpp"
 #include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/UICommand.hpp"
 #include "../../src/Components/Button.hpp"
 #include "../../src/Components/Widget.hpp"
 
@@ -96,7 +96,7 @@ void ComponentSystemAdapterTest::testAdapterInitialization() {
     qDebug() << "🧪 Testing adapter initialization...";
 
     QVERIFY(adapter_ != nullptr);
-    
+
     // Test singleton access
     auto& instance = ComponentSystemAdapter::instance();
     QVERIFY(&instance != nullptr);
@@ -113,11 +113,12 @@ void ComponentSystemAdapterTest::testComponentToCommandConversion() {
 
     // Convert to Command
     auto command = adapter_->convertToCommand(button_.get());
-    
+
     QVERIFY(command != nullptr);
-    
+
     // Verify properties were transferred
-    QCOMPARE(command->getState()->getProperty<QString>("text"), QString("Test Button"));
+    QCOMPARE(command->getState()->getProperty<QString>("text"),
+             QString("Test Button"));
     QCOMPARE(command->getState()->getProperty<bool>("enabled"), true);
 
     qDebug() << "✅ Component to Command conversion test passed";
@@ -132,9 +133,9 @@ void ComponentSystemAdapterTest::testCommandToComponentConversion() {
 
     // Convert to Component
     auto component = adapter_->convertToButton(buttonCommand_);
-    
+
     QVERIFY(component != nullptr);
-    
+
     // Verify component was created
     QVERIFY(component != nullptr);
     qDebug() << "✅ Component created successfully";
@@ -152,15 +153,15 @@ void ComponentSystemAdapterTest::testBidirectionalConversion() {
     // Convert to Command
     auto command = adapter_->convertToCommand(button_.get());
     QVERIFY(command != nullptr);
-    
+
     // Modify Command
     command->getState()->setProperty("text", "Modified Text");
     command->getState()->setProperty("enabled", false);
-    
+
     // Convert back to Component
     auto newComponent = adapter_->convertToButton(command);
     QVERIFY(newComponent != nullptr);
-    
+
     // Verify component was created
     QVERIFY(newComponent != nullptr);
     qDebug() << "✅ Component conversion successful";
@@ -179,7 +180,8 @@ void ComponentSystemAdapterTest::testButtonComponentConversion() {
     QCOMPARE(command->getCommandType(), QString("Button"));
 
     // Verify button-specific properties
-    QCOMPARE(command->getState()->getProperty<QString>("text"), QString("Button Text"));
+    QCOMPARE(command->getState()->getProperty<QString>("text"),
+             QString("Button Text"));
     QCOMPARE(command->getState()->getProperty<bool>("enabled"), true);
     QCOMPARE(command->getState()->getProperty<bool>("checkable"), true);
     QCOMPARE(command->getState()->getProperty<bool>("checked"), false);
@@ -208,7 +210,7 @@ void ComponentSystemAdapterTest::testCustomComponentConversion() {
     qDebug() << "🧪 Testing custom component conversion...";
 
     // Test conversion of custom component types
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Custom component conversion test passed";
 }
@@ -220,17 +222,18 @@ void ComponentSystemAdapterTest::testComponentHierarchyConversion() {
     auto parent = std::make_unique<Widget>();
     auto child1 = std::make_unique<Button>();
     auto child2 = std::make_unique<Button>();
-    
+
     child1->text("Child 1");
     child2->text("Child 2");
-    
+
     // Set up hierarchy (assuming Widget supports children)
     // parent->addChild(child1.get());
     // parent->addChild(child2.get());
-    
-    // Convert hierarchy (skip this test as it requires QWidget, not Components::Widget)
-    // auto commandHierarchy = adapter_->convertComponentHierarchy(parent.get());
-    
+
+    // Convert hierarchy (skip this test as it requires QWidget, not
+    // Components::Widget) auto commandHierarchy =
+    // adapter_->convertComponentHierarchy(parent.get());
+
     // QVERIFY(commandHierarchy.size() >= 1); // Should have at least the parent
 
     qDebug() << "✅ Component hierarchy conversion test passed";
@@ -240,7 +243,7 @@ void ComponentSystemAdapterTest::testNestedComponentConversion() {
     qDebug() << "🧪 Testing nested component conversion...";
 
     // Test deeply nested component conversion
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Nested component conversion test passed";
 }
@@ -249,7 +252,7 @@ void ComponentSystemAdapterTest::testMixedHierarchyConversion() {
     qDebug() << "🧪 Testing mixed hierarchy conversion...";
 
     // Test conversion of hierarchies with mixed component types
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Mixed hierarchy conversion test passed";
 }
@@ -266,7 +269,8 @@ void ComponentSystemAdapterTest::testPropertyMapping() {
     QVERIFY(command != nullptr);
 
     // Verify all property types are correctly mapped
-    QCOMPARE(command->getState()->getProperty<QString>("text"), QString("String Property"));
+    QCOMPARE(command->getState()->getProperty<QString>("text"),
+             QString("String Property"));
     QCOMPARE(command->getState()->getProperty<bool>("enabled"), true);
 
     qDebug() << "✅ Property mapping test passed";
@@ -278,15 +282,15 @@ void ComponentSystemAdapterTest::testPropertySynchronization() {
     // Set up synchronization between Component and Command
     button_->text("Initial Text");
     auto command = adapter_->convertToCommand(button_.get());
-    
+
     // Establish synchronization
     adapter_->establishSync(button_.get(), command);
-    
+
     // Change Component property
     button_->text("Updated Text");
-    
+
     // Command should be synchronized (if synchronization is implemented)
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Property synchronization test passed";
 }
@@ -295,7 +299,7 @@ void ComponentSystemAdapterTest::testPropertyValidation() {
     qDebug() << "🧪 Testing property validation...";
 
     // Test validation during conversion
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Property validation test passed";
 }
@@ -304,7 +308,7 @@ void ComponentSystemAdapterTest::testEventAdaptation() {
     qDebug() << "🧪 Testing event adaptation...";
 
     // Test event adaptation between Component and Command systems
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event adaptation test passed";
 }
@@ -313,7 +317,7 @@ void ComponentSystemAdapterTest::testEventPropagation() {
     qDebug() << "🧪 Testing event propagation...";
 
     // Test event propagation across adapter boundaries
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event propagation test passed";
 }
@@ -322,7 +326,7 @@ void ComponentSystemAdapterTest::testCustomEventHandling() {
     qDebug() << "🧪 Testing custom event handling...";
 
     // Test custom event handling in adapter
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Custom event handling test passed";
 }
@@ -337,7 +341,7 @@ void ComponentSystemAdapterTest::testConversionPerformance() {
     for (int i = 0; i < 100; ++i) {
         auto button = std::make_unique<Button>();
         button->text(QString("Button %1").arg(i));
-        
+
         auto command = adapter_->convertToCommand(button.get());
         QVERIFY(command != nullptr);
     }
@@ -345,7 +349,7 @@ void ComponentSystemAdapterTest::testConversionPerformance() {
     qint64 elapsed = timer.elapsed();
     qDebug() << "100 Component->Command conversions in" << elapsed << "ms";
 
-    QVERIFY(elapsed < 1000); // Should be reasonably fast
+    QVERIFY(elapsed < 1000);  // Should be reasonably fast
 
     qDebug() << "✅ Conversion performance test passed";
 }
@@ -377,7 +381,7 @@ void ComponentSystemAdapterTest::testMassConversionPerformance() {
     qDebug() << "1000 mass conversions in" << elapsed << "ms";
 
     QCOMPARE(commands.size(), 1000);
-    QVERIFY(elapsed < 5000); // Should handle mass conversion
+    QVERIFY(elapsed < 5000);  // Should handle mass conversion
 
     qDebug() << "✅ Mass conversion performance test passed";
 }
@@ -386,7 +390,7 @@ void ComponentSystemAdapterTest::testHierarchyConversionPerformance() {
     qDebug() << "🧪 Testing hierarchy conversion performance...";
 
     // Test performance of hierarchy conversion
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Hierarchy conversion performance test passed";
 }
@@ -397,10 +401,10 @@ void ComponentSystemAdapterTest::testInvalidComponentHandling() {
     // Test conversion of invalid Component
     auto invalidButton = std::make_unique<Button>();
     // Don't set any properties - component is "invalid"
-    
+
     auto command = adapter_->convertToCommand(invalidButton.get());
     // Should either return valid command with defaults or handle gracefully
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Invalid component handling test passed";
 }
@@ -409,7 +413,8 @@ void ComponentSystemAdapterTest::testNullPointerHandling() {
     qDebug() << "🧪 Testing null pointer handling...";
 
     // Test conversion with null pointers
-    auto command = adapter_->convertToCommand(static_cast<DeclarativeUI::Components::Button*>(nullptr));
+    auto command = adapter_->convertToCommand(
+        static_cast<DeclarativeUI::Components::Button*>(nullptr));
     QVERIFY(command == nullptr);
 
     auto component = adapter_->convertToButton(nullptr);
@@ -422,7 +427,7 @@ void ComponentSystemAdapterTest::testConversionErrorRecovery() {
     qDebug() << "🧪 Testing conversion error recovery...";
 
     // Test recovery from conversion errors
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Conversion error recovery test passed";
 }
@@ -446,7 +451,7 @@ void ComponentSystemAdapterTest::testAdapterPerformance() {
     qint64 elapsed = timer.elapsed();
     qDebug() << "Converted 100 components in" << elapsed << "ms";
 
-    QVERIFY(elapsed < 2000); // Should be reasonably fast
+    QVERIFY(elapsed < 2000);  // Should be reasonably fast
 
     qDebug() << "✅ Adapter performance test passed";
 }
@@ -457,8 +462,8 @@ void ComponentSystemAdapterTest::testAdapterBidirectionalConversion() {
     // Create a complex component
     auto original_button = std::make_unique<Button>();
     original_button->text("Original Button")
-                  .enabled(false)
-                  .style("QPushButton { color: red; }");
+        .enabled(false)
+        .style("QPushButton { color: red; }");
     original_button->initialize();
 
     // Convert to command
@@ -519,7 +524,8 @@ void ComponentSystemAdapterTest::testAdapterConcurrency() {
 void ComponentSystemAdapterTest::testAdapterMemoryManagement() {
     qDebug() << "🧪 Testing adapter memory management...";
 
-    std::vector<std::shared_ptr<DeclarativeUI::Command::UI::BaseUICommand>> commands;
+    std::vector<std::shared_ptr<DeclarativeUI::Command::UI::BaseUICommand>>
+        commands;
 
     // Create many commands to test memory management
     for (int i = 0; i < 1000; ++i) {

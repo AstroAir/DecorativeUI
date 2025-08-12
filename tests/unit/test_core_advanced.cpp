@@ -1,9 +1,9 @@
 #include <QApplication>
-#include <QTest>
-#include <QSignalSpy>
 #include <QElapsedTimer>
-#include <QThread>
 #include <QFuture>
+#include <QSignalSpy>
+#include <QTest>
+#include <QThread>
 #include <QtConcurrent>
 #include <memory>
 #include <vector>
@@ -112,12 +112,12 @@ private slots:
         auto cache_manager = std::make_unique<CacheManager>();
 
         // Set a small memory limit for testing
-        cache_manager->setGlobalMemoryLimit(1); // 1MB
+        cache_manager->setGlobalMemoryLimit(1);  // 1MB
 
         // Fill cache with data
         for (int i = 0; i < 10; ++i) {
             QString key = QString("large_data_%1").arg(i);
-            QString large_data(1000, 'A'); // 1KB per entry
+            QString large_data(1000, 'A');  // 1KB per entry
             cache_manager->cacheProperty(key, QVariant(large_data));
         }
 
@@ -125,7 +125,7 @@ private slots:
         QVERIFY(stats.contains("total_memory_usage"));
 
         // Reset to default
-        cache_manager->setGlobalMemoryLimit(100); // 100MB
+        cache_manager->setGlobalMemoryLimit(100);  // 100MB
     }
 
     void testCacheManagerConcurrency() {
@@ -154,23 +154,25 @@ private slots:
 
         // Test memory statistics
         auto stats = memory_manager.get_statistics();
-        QVERIFY(stats.total_allocated_bytes >= 0);
-        QVERIFY(stats.deallocation_count >= 0);
-        QVERIFY(stats.current_allocated_bytes >= 0);
+        // Invariants for unsigned stats instead of tautologies
+        QVERIFY(stats.current_allocated_bytes <= stats.peak_allocated_bytes);
+        QVERIFY(stats.peak_allocated_bytes <= stats.total_allocated_bytes);
+        QVERIFY(stats.deallocation_count <= stats.allocation_count);
     }
 
     void testMemoryManagerConfiguration() {
         auto& memory_manager = MemoryManager::instance();
 
         // Test configuration methods
-        memory_manager.set_memory_limit(100 * 1024 * 1024); // 100MB
+        memory_manager.set_memory_limit(100 * 1024 * 1024);  // 100MB
         memory_manager.enable_auto_gc(true);
         memory_manager.enable_leak_detection(true);
 
         // Verify statistics are accessible
         auto stats = memory_manager.get_statistics();
-        QVERIFY(stats.allocation_count >= 0);
-        QVERIFY(stats.deallocation_count >= 0);
+        // Basic consistency checks
+        QVERIFY(stats.current_allocated_bytes <= stats.peak_allocated_bytes);
+        QVERIFY(stats.deallocation_count <= stats.allocation_count);
     }
 
     void testMemoryManagerLeakDetection() {
@@ -181,7 +183,8 @@ private slots:
 
         // Check for leaks (should be empty initially)
         auto leaks = memory_manager.get_memory_leaks();
-        QVERIFY(leaks.size() >= 0);
+        // Initially should have no leaks recorded
+        QVERIFY(leaks.empty());
 
         // Disable leak detection
         memory_manager.enable_leak_detection(false);
@@ -191,9 +194,10 @@ private slots:
         auto& memory_manager = MemoryManager::instance();
 
         // Set a low memory limit for testing
-        memory_manager.set_memory_limit(1024 * 1024); // 1MB
+        memory_manager.set_memory_limit(1024 * 1024);  // 1MB
 
-        QSignalSpy pressure_spy(&memory_manager, &MemoryManager::memory_pressure_detected);
+        QSignalSpy pressure_spy(&memory_manager,
+                                &MemoryManager::memory_pressure_detected);
 
         // Trigger garbage collection to test memory management
         memory_manager.trigger_gc();
@@ -205,7 +209,7 @@ private slots:
         QVERIFY(true);
 
         // Reset to default limit
-        memory_manager.set_memory_limit(100 * 1024 * 1024); // 100MB
+        memory_manager.set_memory_limit(100 * 1024 * 1024);  // 100MB
     }
 
     void testMemoryManagerOptimization() {
@@ -219,7 +223,8 @@ private slots:
 
         // Verify optimization completed without errors
         auto optimized_stats = memory_manager.get_statistics();
-        QVERIFY(optimized_stats.total_allocated_bytes >= initial_stats.total_allocated_bytes);
+        QVERIFY(optimized_stats.total_allocated_bytes >=
+                initial_stats.total_allocated_bytes);
     }
 
     // **ParallelProcessor Tests**
@@ -247,31 +252,35 @@ private slots:
 
         QVERIFY(!task_id.isEmpty());
 
-        // Test task management
-        QVERIFY(processor->getActiveTaskCount() >= 0);
-        QVERIFY(processor->getQueuedTaskCount() >= 0);
+        // After submission, either active or queued task count should reflect
+        // the task
+        auto active = processor->getActiveTaskCount();
+        auto queued = processor->getQueuedTaskCount();
+        QVERIFY(active + queued >= 1);
     }
 
     void testParallelProcessorTaskPriority() {
         auto processor = std::make_unique<ParallelProcessor>();
 
         // Submit high priority task using the correct API
-        QString high_priority_task = processor->submitHighPriorityTask("high_priority", []() {
-            // High priority work
-            volatile int sum = 0;
-            for (int i = 0; i < 100; ++i) {
-                sum += i;
-            }
-        });
+        QString high_priority_task =
+            processor->submitHighPriorityTask("high_priority", []() {
+                // High priority work
+                volatile int sum = 0;
+                for (int i = 0; i < 100; ++i) {
+                    sum += i;
+                }
+            });
 
         // Submit background task
-        QString background_task = processor->submitBackgroundTask("background", []() {
-            // Background work
-            volatile int sum = 0;
-            for (int i = 0; i < 100; ++i) {
-                sum += i;
-            }
-        });
+        QString background_task =
+            processor->submitBackgroundTask("background", []() {
+                // Background work
+                volatile int sum = 0;
+                for (int i = 0; i < 100; ++i) {
+                    sum += i;
+                }
+            });
 
         QVERIFY(!high_priority_task.isEmpty());
         QVERIFY(!background_task.isEmpty());
@@ -291,13 +300,14 @@ private slots:
 
         // Submit CPU-intensive tasks using the correct API
         for (int i = 0; i < num_tasks; ++i) {
-            QString task_id = processor->submitBackgroundTask(QString("perf_task_%1").arg(i), []() {
-                // Simulate work
-                volatile int sum = 0;
-                for (int j = 0; j < 1000; ++j) {
-                    sum += j;
-                }
-            });
+            QString task_id = processor->submitBackgroundTask(
+                QString("perf_task_%1").arg(i), []() {
+                    // Simulate work
+                    volatile int sum = 0;
+                    for (int j = 0; j < 1000; ++j) {
+                        sum += j;
+                    }
+                });
             QVERIFY(!task_id.isEmpty());
         }
 
@@ -307,7 +317,7 @@ private slots:
         // Test performance metrics
         auto metrics = processor->getPerformanceMetrics();
         QVERIFY(metrics.contains("active_tasks"));
-        QVERIFY(elapsed < 1000); // Should submit quickly
+        QVERIFY(elapsed < 1000);  // Should submit quickly
     }
 };
 

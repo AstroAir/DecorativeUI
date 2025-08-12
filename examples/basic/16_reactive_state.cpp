@@ -1,14 +1,14 @@
 /**
  * @file 16_reactive_state.cpp
  * @brief Advanced reactive state management patterns
- * 
+ *
  * This example demonstrates:
  * - Complex reactive state patterns
  * - State dependencies and computed properties
  * - Batch state updates
  * - State change notifications and observers
  * - Performance optimization techniques
- * 
+ *
  * Learning objectives:
  * - Master advanced reactive programming patterns
  * - Understand state dependency management
@@ -17,26 +17,26 @@
  */
 
 #include <QApplication>
-#include <QObject>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QCheckBox>
+#include <QDateTime>
+#include <QDebug>
+#include <QEasingCurve>
+#include <QFileInfo>
 #include <QGridLayout>
-#include <QWidget>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QObject>
+#include <QProgressBar>
+#include <QPropertyAnimation>
 #include <QPushButton>
+#include <QRandomGenerator>
 #include <QSlider>
 #include <QSpinBox>
-#include <QProgressBar>
 #include <QTextEdit>
-#include <QCheckBox>
 #include <QTimer>
-#include <QDebug>
-#include <QDateTime>
-#include <QRandomGenerator>
-#include <QFileInfo>
-#include <QPropertyAnimation>
-#include <QEasingCurve>
+#include <QVBoxLayout>
+#include <QWidget>
 
 // Include DeclarativeUI state management
 #include "Binding/StateManager.hpp"
@@ -84,7 +84,7 @@ private slots:
     void onAutoModeToggled(bool enabled) {
         auto_mode_state_->set(enabled);
         logStateChange("Auto Mode", enabled ? "Enabled" : "Disabled");
-        
+
         if (enabled) {
             simulation_timer_->start();
         } else {
@@ -95,11 +95,13 @@ private slots:
     void onBatchUpdateClicked() {
         // Demonstrate batch state updates for performance
         state_manager_->batchUpdate([this]() {
-            temperature_state_->set(QRandomGenerator::global()->bounded(15, 35));
+            temperature_state_->set(
+                QRandomGenerator::global()->bounded(15, 35));
             humidity_state_->set(QRandomGenerator::global()->bounded(30, 80));
-            pressure_state_->set(QRandomGenerator::global()->bounded(980, 1030));
+            pressure_state_->set(
+                QRandomGenerator::global()->bounded(980, 1030));
         });
-        
+
         logStateChange("System", "Batch update completed");
     }
 
@@ -110,7 +112,7 @@ private slots:
             pressure_state_->set(1013);
             auto_mode_state_->set(false);
         });
-        
+
         logStateChange("System", "All values reset to defaults");
     }
 
@@ -123,36 +125,39 @@ private slots:
     }
 
     void simulateEnvironmentChanges() {
-        if (!auto_mode_state_->get()) return;
-        
+        if (!auto_mode_state_->get())
+            return;
+
         // Simulate realistic environmental changes
         int current_temp = temperature_state_->get();
         int current_humidity = humidity_state_->get();
         int current_pressure = pressure_state_->get();
-        
+
         // Small random changes
         int temp_change = QRandomGenerator::global()->bounded(-2, 3);
         int humidity_change = QRandomGenerator::global()->bounded(-5, 6);
         int pressure_change = QRandomGenerator::global()->bounded(-3, 4);
-        
+
         // Apply constraints
         int new_temp = qBound(10, current_temp + temp_change, 40);
         int new_humidity = qBound(20, current_humidity + humidity_change, 90);
-        int new_pressure = qBound(950, current_pressure + pressure_change, 1050);
-        
+        int new_pressure =
+            qBound(950, current_pressure + pressure_change, 1050);
+
         // Batch update for performance
-        state_manager_->batchUpdate([=]() {
-            temperature_state_->set(new_temp);
-            humidity_state_->set(new_humidity);
-            pressure_state_->set(new_pressure);
-        });
+        state_manager_->batchUpdate(
+            [this, new_temp, new_humidity, new_pressure]() {
+                temperature_state_->set(new_temp);
+                humidity_state_->set(new_humidity);
+                pressure_state_->set(new_pressure);
+            });
     }
 
 private:
     std::unique_ptr<QWidget> main_widget_;
     std::unique_ptr<JSON::JSONUILoader> ui_loader_;
     QTimer* simulation_timer_;
-    
+
     // State management
     std::shared_ptr<Binding::StateManager> state_manager_;
     std::shared_ptr<Binding::ReactiveProperty<int>> temperature_state_;
@@ -175,34 +180,38 @@ private:
         state_manager_->enableDebugMode(true);
 
         // Create base states
-        temperature_state_ = state_manager_->createState<int>("temperature", 20);
+        temperature_state_ =
+            state_manager_->createState<int>("temperature", 20);
         humidity_state_ = state_manager_->createState<int>("humidity", 50);
         pressure_state_ = state_manager_->createState<int>("pressure", 1013);
-        auto_mode_state_ = state_manager_->createState<bool>("auto_mode", false);
+        auto_mode_state_ =
+            state_manager_->createState<bool>("auto_mode", false);
 
         // Create computed states with complex dependencies
-        comfort_level_state_ = state_manager_->createComputed<QString>(
-            "comfort_level", [=]() {
+        comfort_level_state_ =
+            state_manager_->createComputed<QString>("comfort_level", [this]() {
                 int temp = temperature_state_->get();
                 int humidity = humidity_state_->get();
-                
-                if (temp >= 18 && temp <= 24 && humidity >= 40 && humidity <= 60) {
+
+                if (temp >= 18 && temp <= 24 && humidity >= 40 &&
+                    humidity <= 60) {
                     return QString("😊 Comfortable");
                 } else if (temp < 15 || temp > 30) {
                     return QString("🥶 Too %1").arg(temp < 15 ? "Cold" : "Hot");
                 } else if (humidity < 30 || humidity > 70) {
-                    return QString("💧 Too %1").arg(humidity < 30 ? "Dry" : "Humid");
+                    return QString("💧 Too %1")
+                        .arg(humidity < 30 ? "Dry" : "Humid");
                 } else {
                     return QString("😐 Acceptable");
                 }
             });
 
-        weather_status_state_ = state_manager_->createComputed<QString>(
-            "weather_status", [=]() {
+        weather_status_state_ =
+            state_manager_->createComputed<QString>("weather_status", [this]() {
                 int pressure = pressure_state_->get();
                 int temp = temperature_state_->get();
                 int humidity = humidity_state_->get();
-                
+
                 if (pressure < 1000 && humidity > 70) {
                     return QString("🌧️ Rainy");
                 } else if (pressure > 1020 && temp > 25) {
@@ -216,36 +225,44 @@ private:
                 }
             });
 
-        comfort_score_state_ = state_manager_->createComputed<int>(
-            "comfort_score", [=]() {
+        comfort_score_state_ =
+            state_manager_->createComputed<int>("comfort_score", [this]() {
                 int temp = temperature_state_->get();
                 int humidity = humidity_state_->get();
                 int pressure = pressure_state_->get();
-                
+
                 // Calculate comfort score (0-100)
                 int temp_score = 100 - qAbs(temp - 22) * 5;
                 int humidity_score = 100 - qAbs(humidity - 50) * 2;
                 int pressure_score = 100 - qAbs(pressure - 1013) / 2;
-                
-                return qBound(0, (temp_score + humidity_score + pressure_score) / 3, 100);
+
+                return qBound(
+                    0, (temp_score + humidity_score + pressure_score) / 3, 100);
             });
 
-        alert_message_state_ = state_manager_->createComputed<QString>(
-            "alert_message", [=]() {
+        alert_message_state_ =
+            state_manager_->createComputed<QString>("alert_message", [this]() {
                 int temp = temperature_state_->get();
                 int humidity = humidity_state_->get();
                 int pressure = pressure_state_->get();
-                
+
                 QStringList alerts;
-                
-                if (temp < 10) alerts << "⚠️ Freezing temperature";
-                if (temp > 35) alerts << "🔥 Extreme heat";
-                if (humidity < 20) alerts << "🏜️ Very dry air";
-                if (humidity > 85) alerts << "💦 Very humid";
-                if (pressure < 980) alerts << "📉 Low pressure system";
-                if (pressure > 1040) alerts << "📈 High pressure system";
-                
-                return alerts.isEmpty() ? "✅ All systems normal" : alerts.join(" | ");
+
+                if (temp < 10)
+                    alerts << "⚠️ Freezing temperature";
+                if (temp > 35)
+                    alerts << "🔥 Extreme heat";
+                if (humidity < 20)
+                    alerts << "🏜️ Very dry air";
+                if (humidity > 85)
+                    alerts << "💦 Very humid";
+                if (pressure < 980)
+                    alerts << "📉 Low pressure system";
+                if (pressure > 1040)
+                    alerts << "📈 High pressure system";
+
+                return alerts.isEmpty() ? "✅ All systems normal"
+                                        : alerts.join(" | ");
             });
 
         // Set up state dependencies for optimization
@@ -256,14 +273,17 @@ private:
         state_manager_->addDependency("weather_status", "humidity");
 
         // Connect state change notifications
-        connect(temperature_state_.get(), &Binding::ReactivePropertyBase::valueChanged,
-                this, [this]() { updateTemperatureUI(temperature_state_->get()); });
+        connect(temperature_state_.get(),
+                &Binding::ReactivePropertyBase::valueChanged, this,
+                [this]() { updateTemperatureUI(temperature_state_->get()); });
 
-        connect(humidity_state_.get(), &Binding::ReactivePropertyBase::valueChanged,
-                this, [this]() { updateHumidityUI(humidity_state_->get()); });
+        connect(humidity_state_.get(),
+                &Binding::ReactivePropertyBase::valueChanged, this,
+                [this]() { updateHumidityUI(humidity_state_->get()); });
 
-        connect(pressure_state_.get(), &Binding::ReactivePropertyBase::valueChanged,
-                this, [this]() { updatePressureUI(pressure_state_->get()); });
+        connect(pressure_state_.get(),
+                &Binding::ReactivePropertyBase::valueChanged, this,
+                [this]() { updatePressureUI(pressure_state_->get()); });
 
         qDebug() << "✅ Advanced reactive state system initialized";
     }
@@ -272,17 +292,14 @@ private:
         ui_loader_ = std::make_unique<JSON::JSONUILoader>();
 
         // Register event handlers
-        ui_loader_->registerEventHandler("batchUpdate", [this]() {
-            onBatchUpdateClicked();
-        });
+        ui_loader_->registerEventHandler("batchUpdate",
+                                         [this]() { onBatchUpdateClicked(); });
 
-        ui_loader_->registerEventHandler("resetValues", [this]() {
-            onResetClicked();
-        });
+        ui_loader_->registerEventHandler("resetValues",
+                                         [this]() { onResetClicked(); });
 
-        ui_loader_->registerEventHandler("clearLog", [this]() {
-            onClearLogClicked();
-        });
+        ui_loader_->registerEventHandler("clearLog",
+                                         [this]() { onClearLogClicked(); });
 
         qDebug() << "✅ Event handlers registered";
     }
@@ -290,21 +307,22 @@ private:
     void createUI() {
         try {
             QString ui_file = "resources/reactive_state_ui.json";
-            
+
             if (QFileInfo::exists(ui_file)) {
                 main_widget_ = ui_loader_->loadFromFile(ui_file);
                 if (main_widget_) {
-                    main_widget_->setWindowTitle("16 - Reactive State | DeclarativeUI");
+                    main_widget_->setWindowTitle(
+                        "16 - Reactive State | DeclarativeUI");
                     connectUIEvents();
                     updateAllDisplays();
                     qDebug() << "✅ UI loaded from JSON";
                     return;
                 }
             }
-            
+
             // Fallback to programmatic UI
             main_widget_ = createProgrammaticUI();
-            
+
         } catch (const std::exception& e) {
             qCritical() << "UI creation failed:" << e.what();
             main_widget_ = createProgrammaticUI();
@@ -315,23 +333,29 @@ private:
         // Connect sliders
         auto temp_slider = main_widget_->findChild<QSlider*>("tempSlider");
         if (temp_slider) {
-            connect(temp_slider, &QSlider::valueChanged, this, &ReactiveStateApp::onTemperatureChanged);
+            connect(temp_slider, &QSlider::valueChanged, this,
+                    &ReactiveStateApp::onTemperatureChanged);
         }
 
-        auto humidity_slider = main_widget_->findChild<QSlider*>("humiditySlider");
+        auto humidity_slider =
+            main_widget_->findChild<QSlider*>("humiditySlider");
         if (humidity_slider) {
-            connect(humidity_slider, &QSlider::valueChanged, this, &ReactiveStateApp::onHumidityChanged);
+            connect(humidity_slider, &QSlider::valueChanged, this,
+                    &ReactiveStateApp::onHumidityChanged);
         }
 
-        auto pressure_slider = main_widget_->findChild<QSlider*>("pressureSlider");
+        auto pressure_slider =
+            main_widget_->findChild<QSlider*>("pressureSlider");
         if (pressure_slider) {
-            connect(pressure_slider, &QSlider::valueChanged, this, &ReactiveStateApp::onPressureChanged);
+            connect(pressure_slider, &QSlider::valueChanged, this,
+                    &ReactiveStateApp::onPressureChanged);
         }
 
         // Connect auto mode checkbox
         auto auto_checkbox = main_widget_->findChild<QCheckBox*>("autoMode");
         if (auto_checkbox) {
-            connect(auto_checkbox, &QCheckBox::toggled, this, &ReactiveStateApp::onAutoModeToggled);
+            connect(auto_checkbox, &QCheckBox::toggled, this,
+                    &ReactiveStateApp::onAutoModeToggled);
         }
 
         qDebug() << "✅ UI events connected";
@@ -339,7 +363,8 @@ private:
 
     std::unique_ptr<QWidget> createProgrammaticUI() {
         auto widget = std::make_unique<QWidget>();
-        widget->setWindowTitle("16 - Reactive State (Fallback) | DeclarativeUI");
+        widget->setWindowTitle(
+            "16 - Reactive State (Fallback) | DeclarativeUI");
         widget->setMinimumSize(800, 700);
 
         auto layout = new QVBoxLayout(widget.get());
@@ -348,7 +373,8 @@ private:
 
         // Header
         auto header = new QLabel("🔄 Advanced Reactive State Management");
-        header->setStyleSheet("font-size: 20px; font-weight: bold; color: #2c3e50;");
+        header->setStyleSheet(
+            "font-size: 20px; font-weight: bold; color: #2c3e50;");
         header->setAlignment(Qt::AlignCenter);
         layout->addWidget(header);
 
@@ -366,8 +392,9 @@ private:
 
     void startSimulation() {
         simulation_timer_ = new QTimer(this);
-        connect(simulation_timer_, &QTimer::timeout, this, &ReactiveStateApp::simulateEnvironmentChanges);
-        simulation_timer_->setInterval(2000); // Update every 2 seconds
+        connect(simulation_timer_, &QTimer::timeout, this,
+                &ReactiveStateApp::simulateEnvironmentChanges);
+        simulation_timer_->setInterval(2000);  // Update every 2 seconds
     }
 
     void updateTemperatureUI(int value) {
@@ -379,7 +406,8 @@ private:
     }
 
     void updateHumidityUI(int value) {
-        auto humidity_display = main_widget_->findChild<QLabel*>("humidityDisplay");
+        auto humidity_display =
+            main_widget_->findChild<QLabel*>("humidityDisplay");
         if (humidity_display) {
             humidity_display->setText(QString("%1%").arg(value));
         }
@@ -387,7 +415,8 @@ private:
     }
 
     void updatePressureUI(int value) {
-        auto pressure_display = main_widget_->findChild<QLabel*>("pressureDisplay");
+        auto pressure_display =
+            main_widget_->findChild<QLabel*>("pressureDisplay");
         if (pressure_display) {
             pressure_display->setText(QString("%1 hPa").arg(value));
         }
@@ -396,17 +425,20 @@ private:
 
     void updateComputedDisplays() {
         // Update computed state displays
-        auto comfort_display = main_widget_->findChild<QLabel*>("comfortDisplay");
+        auto comfort_display =
+            main_widget_->findChild<QLabel*>("comfortDisplay");
         if (comfort_display) {
             comfort_display->setText(comfort_level_state_->get());
         }
 
-        auto weather_display = main_widget_->findChild<QLabel*>("weatherDisplay");
+        auto weather_display =
+            main_widget_->findChild<QLabel*>("weatherDisplay");
         if (weather_display) {
             weather_display->setText(weather_status_state_->get());
         }
 
-        auto score_progress = main_widget_->findChild<QProgressBar*>("comfortProgress");
+        auto score_progress =
+            main_widget_->findChild<QProgressBar*>("comfortProgress");
         if (score_progress) {
             score_progress->setValue(comfort_score_state_->get());
         }
@@ -427,16 +459,18 @@ private:
     void logStateChange(const QString& component, const QString& details) {
         auto log_display = main_widget_->findChild<QTextEdit*>("stateLog");
         if (log_display) {
-            QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
-            QString log_entry = QString("[%1] %2: %3").arg(timestamp, component, details);
+            QString timestamp =
+                QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
+            QString log_entry =
+                QString("[%1] %2: %3").arg(timestamp, component, details);
             log_display->append(log_entry);
-            
+
             // Auto-scroll to bottom
             auto cursor = log_display->textCursor();
             cursor.movePosition(QTextCursor::End);
             log_display->setTextCursor(cursor);
         }
-        
+
         qDebug() << "State Change:" << component << details;
     }
 };
@@ -450,7 +484,7 @@ int main(int argc, char* argv[]) {
 
     try {
         qDebug() << "🚀 Starting Reactive State example...";
-        
+
         ReactiveStateApp reactive_app;
         reactive_app.show();
 

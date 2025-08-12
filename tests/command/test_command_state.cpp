@@ -1,11 +1,10 @@
-#include <QtTest/QtTest>
-#include <QSignalSpy>
 #include <QJsonObject>
+#include <QSignalSpy>
+#include <QtTest/QtTest>
 #include <memory>
 
-#include "../UICommand.hpp"
-#include "../UICommand.hpp"
 #include "../CoreCommands.hpp"
+#include "../UICommand.hpp"
 
 using namespace DeclarativeUI::Command::UI;
 
@@ -81,7 +80,8 @@ void CommandStateTest::testPropertySetAndGet() {
     QCOMPARE(state_->getProperty<int>("count"), 42);
 
     // Test default values
-    QCOMPARE(state_->getProperty<QString>("nonexistent", "default"), QString("default"));
+    QCOMPARE(state_->getProperty<QString>("nonexistent", "default"),
+             QString("default"));
     QCOMPARE(state_->getProperty<int>("nonexistent", 100), 100);
 
     qDebug() << "✅ Property set and get test passed";
@@ -160,7 +160,8 @@ void CommandStateTest::testInvalidPropertyHandling() {
     QCOMPARE(state_->getProperty<QString>("nonexistent"), QString());
 
     // Test with default value
-    QCOMPARE(state_->getProperty<QString>("nonexistent", "default"), QString("default"));
+    QCOMPARE(state_->getProperty<QString>("nonexistent", "default"),
+             QString("default"));
 
     qDebug() << "✅ Invalid property handling test passed";
 }
@@ -235,7 +236,8 @@ void CommandStateTest::testValidatorRegistration() {
 
     // Test email validator
     state_->setProperty("email", "test@example.com");
-    QCOMPARE(state_->getProperty<QString>("email"), QString("test@example.com"));
+    QCOMPARE(state_->getProperty<QString>("email"),
+             QString("test@example.com"));
 
     // Test range validator
     state_->setProperty("range", 50);
@@ -270,7 +272,7 @@ void CommandStateTest::testValidationFailureHandling() {
     QSignalSpy validationSpy(state_.get(), &UICommandState::validationFailed);
 
     state_->setValidator("strict", [](const QVariant&) {
-        return false; // Always fail
+        return false;  // Always fail
     });
 
     QString originalValue = "original";
@@ -291,7 +293,7 @@ void CommandStateTest::testStateBinding() {
 
     // This would test binding between command state and external state
     // Implementation depends on the binding system
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ State binding test passed";
 }
@@ -301,7 +303,7 @@ void CommandStateTest::testStateSynchronization() {
 
     // This would test synchronization between multiple state instances
     // Implementation depends on the synchronization system
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ State synchronization test passed";
 }
@@ -349,8 +351,8 @@ void CommandStateTest::testLargeStatePerformance() {
     qDebug() << "Get 1000 properties in" << getTime << "ms";
 
     // Performance should be reasonable
-    QVERIFY(setTime < 1000); // Less than 1 second
-    QVERIFY(getTime < 100);  // Less than 100ms
+    QVERIFY(setTime < 1000);  // Less than 1 second
+    QVERIFY(getTime < 100);   // Less than 100ms
 
     qDebug() << "✅ Large state performance test passed";
 }
@@ -370,7 +372,7 @@ void CommandStateTest::testFrequentUpdatesPerformance() {
     qDebug() << "10000 property updates in" << elapsed << "ms";
 
     // Should handle frequent updates efficiently
-    QVERIFY(elapsed < 2000); // Less than 2 seconds
+    QVERIFY(elapsed < 2000);  // Less than 2 seconds
 
     qDebug() << "✅ Frequent updates performance test passed";
 }

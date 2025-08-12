@@ -1,3 +1,11 @@
+# =============================================================================
+# DeclarativeUI - C++/Qt6/CMake Project .gitignore
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# C++ Build Artifacts
+# -----------------------------------------------------------------------------
+
 # Prerequisites
 *.d
 
@@ -16,10 +24,6 @@
 *.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
-
 # Compiled Static libraries
 *.lai
 *.la
@@ -31,37 +35,172 @@
 *.out
 *.app
 
-# Build artifacts
+# -----------------------------------------------------------------------------
+# CMake Build System
+# -----------------------------------------------------------------------------
+
+# Build directories
 build/
-cmake-build-debug/
-.xmake/
-.cache/
+build-*/
+cmake-build-*/
+out/
 
-# IDE and editor specific
-.idea/ # Added for IntelliJ based IDEs
+# CMake cache and generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+Testing/
 
-# Language specific
-node_modules/
-src/pyutils/__pycache__/
-.venv/
-.mypy_cache/
+# CMake presets (keep CMakePresets.json but ignore user presets)
+CMakeUserPresets.json
 
-# Test files and outputs
-src/pyutils/test.jpg
-test.cpp
-module_test/
-test/
+# -----------------------------------------------------------------------------
+# Qt6 Specific
+# -----------------------------------------------------------------------------
 
-# Configuration files
-libexample.json
+# Qt MOC files
+moc_*.cpp
+moc_*.h
+*.moc
 
-# Log and report files
-*.log
-*.xml
+# Qt RCC files
+qrc_*.cpp
 
-# Temporary or cache files
-.roo/
+# Qt UI files (compiled)
+ui_*.h
+
+# Qt translation files
+*.qm
+
+# Qt Creator files
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+*.moc
+*.moc.cpp
+*.qrc.cpp
+
+# -----------------------------------------------------------------------------
+# IDE and Editor Files
+# -----------------------------------------------------------------------------
+
+# Visual Studio Code
 .vscode/
+*.code-workspace
 
-build-debug/
-test/
+# Visual Studio
+.vs/
+*.vcxproj.user
+*.vcxproj.filters
+*.sln.docstates
+
+# JetBrains IDEs (CLion, Qt Creator)
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+
+# -----------------------------------------------------------------------------
+# Platform Specific
+# -----------------------------------------------------------------------------
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# Linux
+*~
+.nfs*
+
+# -----------------------------------------------------------------------------
+# Documentation and Tools
+# -----------------------------------------------------------------------------
+
+# MkDocs
+site/
+.mkdocs_cache/
+
+# Doxygen
+html/
+latex/
+Doxyfile.bak
+
+# -----------------------------------------------------------------------------
+# Package Managers and Dependencies
+# -----------------------------------------------------------------------------
+
+# Conan
+conandata.yml
+conanfile.txt
+conaninfo.txt
+conanbuildinfo.*
+conan.lock
+
+# vcpkg
+vcpkg_installed/
+.vcpkg-root
+
+# -----------------------------------------------------------------------------
+# Testing and Coverage
+# -----------------------------------------------------------------------------
+
+# Test outputs
+test_results/
+coverage/
+*.gcov
+*.gcda
+*.gcno
+
+# Valgrind
+*.memcheck
+*.helgrind
+*.drd
+
+# -----------------------------------------------------------------------------
+# Temporary and Cache Files
+# -----------------------------------------------------------------------------
+
+# General temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Log files
+*.log
+
+# Cache directories
+.cache/
+cache/
+
+# -----------------------------------------------------------------------------
+# Project Specific
+# -----------------------------------------------------------------------------
+
+# Example outputs and test files
+examples/output/
+test_output/
+
+# Resource compilation outputs
+*.rcc
+
+# Custom configuration files (keep templates)
+config.local.*
+settings.local.*

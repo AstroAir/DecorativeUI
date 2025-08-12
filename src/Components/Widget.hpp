@@ -6,8 +6,11 @@
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include <QFormLayout>
+#include <concepts>
+#include <span>
 
 #include "../Core/UIElement.hpp"
+#include "../Core/Concepts.hpp"
 
 namespace DeclarativeUI::Components {
 
@@ -17,61 +20,123 @@ class Widget : public Core::UIElement {
 public:
     explicit Widget(QObject* parent = nullptr);
 
-    // **Fluent interface for generic widget**
-    Widget& size(const QSize& size);
-    Widget& minimumSize(const QSize& size);
-    Widget& maximumSize(const QSize& size);
-    Widget& fixedSize(const QSize& size);
+    // **Modern C++20 Fluent interface with concepts**
+    template<Core::Concepts::SizeLike T>
+    constexpr Widget& size(T&& size_value);
+
+    template<Core::Concepts::SizeLike T>
+    constexpr Widget& minimumSize(T&& size_value);
+
+    template<Core::Concepts::SizeLike T>
+    constexpr Widget& maximumSize(T&& size_value);
+
+    template<Core::Concepts::SizeLike T>
+    constexpr Widget& fixedSize(T&& size_value);
+
     Widget& sizePolicy(QSizePolicy::Policy horizontal, QSizePolicy::Policy vertical);
     Widget& sizePolicy(const QSizePolicy& policy);
-    Widget& geometry(const QRect& rect);
-    Widget& position(const QPoint& pos);
-    Widget& visible(bool visible);
-    Widget& enabled(bool enabled);
-    Widget& toolTip(const QString& tooltip);
-    Widget& statusTip(const QString& statusTip);
-    Widget& whatsThis(const QString& whatsThis);
-    Widget& windowTitle(const QString& title);
+
+    template<Core::Concepts::RectLike T>
+    constexpr Widget& geometry(T&& rect_value);
+
+    template<Core::Concepts::PointLike T>
+    constexpr Widget& position(T&& pos_value);
+
+    Widget& visible(bool visible) noexcept;
+    Widget& enabled(bool enabled) noexcept;
+
+    template<Core::Concepts::StringLike T>
+    Widget& toolTip(T&& tooltip);
+
+    template<Core::Concepts::StringLike T>
+    Widget& statusTip(T&& statusTip);
+
+    template<Core::Concepts::StringLike T>
+    Widget& whatsThis(T&& whatsThis);
+
+    template<Core::Concepts::StringLike T>
+    Widget& windowTitle(T&& title);
+
     Widget& windowIcon(const QIcon& icon);
-    Widget& windowFlags(Qt::WindowFlags flags);
-    Widget& windowState(Qt::WindowStates state);
-    Widget& focusPolicy(Qt::FocusPolicy policy);
-    Widget& contextMenuPolicy(Qt::ContextMenuPolicy policy);
+    Widget& windowFlags(Qt::WindowFlags flags) noexcept;
+    Widget& windowState(Qt::WindowStates state) noexcept;
+    Widget& focusPolicy(Qt::FocusPolicy policy) noexcept;
+    Widget& contextMenuPolicy(Qt::ContextMenuPolicy policy) noexcept;
     Widget& cursor(const QCursor& cursor);
-    Widget& font(const QFont& font);
+
+    template<Core::Concepts::FontLike T>
+    Widget& font(T&& font_value);
+
     Widget& palette(const QPalette& palette);
-    Widget& autoFillBackground(bool enabled);
-    Widget& updatesEnabled(bool enabled);
-    Widget& layout(QLayout* layout);
+    Widget& autoFillBackground(bool enabled) noexcept;
+    Widget& updatesEnabled(bool enabled) noexcept;
+
+    // **Layout management with concepts**
+    template<Core::Concepts::LayoutType T>
+    Widget& layout(T* layout_ptr);
+
     Widget& vBoxLayout();
     Widget& hBoxLayout();
     Widget& gridLayout(int rows = 0, int columns = 0);
     Widget& formLayout();
-    Widget& addWidget(QWidget* widget);
-    Widget& addWidget(QWidget* widget, int row, int column, Qt::Alignment alignment = Qt::Alignment());
-    Widget& addWidget(QWidget* widget, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment = Qt::Alignment());
-    Widget& addLayout(QLayout* layout);
-    Widget& spacing(int spacing);
-    Widget& margins(int left, int top, int right, int bottom);
+
+    // **Widget management with concepts**
+    template<Core::Concepts::QtWidget T>
+    Widget& addWidget(T* widget);
+
+    template<Core::Concepts::QtWidget T>
+    Widget& addWidget(T* widget, int row, int column, Qt::Alignment alignment = Qt::Alignment{});
+
+    template<Core::Concepts::QtWidget T>
+    Widget& addWidget(T* widget, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment = Qt::Alignment{});
+
+    template<Core::Concepts::LayoutType T>
+    Widget& addLayout(T* layout_ptr);
+
+    Widget& spacing(int spacing) noexcept;
+    constexpr Widget& margins(int left, int top, int right, int bottom) noexcept;
     Widget& margins(const QMargins& margins);
-    Widget& style(const QString& stylesheet);
+
+    template<Core::Concepts::StringLike T>
+    Widget& style(T&& stylesheet);
 
     void initialize() override;
-    QSize getSize() const;
-    QSize getMinimumSize() const;
-    QSize getMaximumSize() const;
-    QRect getGeometry() const;
-    QPoint getPosition() const;
-    bool isVisible() const;
-    bool isEnabled() const;
-    QString getToolTip() const;
-    QLayout* getLayout() const;
+
+    // **Modern C++20 getters with [[nodiscard]]**
+    [[nodiscard]] QSize getSize() const noexcept;
+    [[nodiscard]] QSize getMinimumSize() const noexcept;
+    [[nodiscard]] QSize getMaximumSize() const noexcept;
+    [[nodiscard]] QRect getGeometry() const noexcept;
+    [[nodiscard]] QPoint getPosition() const noexcept;
+    [[nodiscard]] bool isVisible() const noexcept;
+    [[nodiscard]] bool isEnabled() const noexcept;
+    [[nodiscard]] QString getToolTip() const;
+    [[nodiscard]] QLayout* getLayout() const noexcept;
+
+    // **Widget operations**
     void show();
     void hide();
     void setFocus();
     void clearFocus();
     void update();
     void repaint();
+
+    // **Modern C++20 utility methods**
+    template<typename T>
+    requires Core::Concepts::Container<T>
+    Widget& addWidgets(T&& widget_container);
+
+    template<typename F>
+    requires Core::Concepts::VoidCallback<F>
+    Widget& onResize(F&& resize_handler);
+
+    template<typename F>
+    requires Core::Concepts::VoidCallback<F>
+    Widget& onShow(F&& show_handler);
+
+    template<typename F>
+    requires Core::Concepts::VoidCallback<F>
+    Widget& onHide(F&& hide_handler);
 
 private:
     QWidget* widget_;
@@ -80,5 +145,45 @@ private:
 
 
 
+
+// **Template method implementations**
+template<Core::Concepts::SizeLike T>
+constexpr Widget& Widget::size(T&& size_value) {
+    if constexpr (std::same_as<std::decay_t<T>, QSize>) {
+        return static_cast<Widget&>(setProperty("size", std::forward<T>(size_value)));
+    } else {
+        return static_cast<Widget&>(setProperty("size", QSize{size_value}));
+    }
+}
+
+template<Core::Concepts::SizeLike T>
+constexpr Widget& Widget::minimumSize(T&& size_value) {
+    if constexpr (std::same_as<std::decay_t<T>, QSize>) {
+        return static_cast<Widget&>(setProperty("minimumSize", std::forward<T>(size_value)));
+    } else {
+        return static_cast<Widget&>(setProperty("minimumSize", QSize{size_value}));
+    }
+}
+
+template<Core::Concepts::SizeLike T>
+constexpr Widget& Widget::maximumSize(T&& size_value) {
+    if constexpr (std::same_as<std::decay_t<T>, QSize>) {
+        return static_cast<Widget&>(setProperty("maximumSize", std::forward<T>(size_value)));
+    } else {
+        return static_cast<Widget&>(setProperty("maximumSize", QSize{size_value}));
+    }
+}
+
+template<Core::Concepts::SizeLike T>
+constexpr Widget& Widget::fixedSize(T&& size_value) {
+    if (widget_) {
+        if constexpr (std::same_as<std::decay_t<T>, QSize>) {
+            widget_->setFixedSize(std::forward<T>(size_value));
+        } else {
+            widget_->setFixedSize(QSize{size_value});
+        }
+    }
+    return *this;
+}
 
 }  // namespace DeclarativeUI::Components

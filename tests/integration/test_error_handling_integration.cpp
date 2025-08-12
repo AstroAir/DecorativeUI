@@ -1,24 +1,24 @@
 #include <QApplication>
-#include <QTest>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTemporaryFile>
+#include <QTest>
 #include <memory>
 
 #include "../Binding/StateManager.hpp"
-#include "../Command/CommandSystem.hpp"
-#include "../Command/BuiltinCommands.hpp"
-#include "../Command/Adapters/IntegrationManager.hpp"
 #include "../Command/Adapters/ComponentSystemAdapter.hpp"
-#include "../Command/Adapters/StateManagerAdapter.hpp"
+#include "../Command/Adapters/IntegrationManager.hpp"
 #include "../Command/Adapters/JSONCommandLoader.hpp"
+#include "../Command/Adapters/StateManagerAdapter.hpp"
+#include "../Command/BuiltinCommands.hpp"
+#include "../Command/CommandSystem.hpp"
 #include "../Components/Button.hpp"
 #include "../Components/LineEdit.hpp"
 #include "../Core/DeclarativeBuilder.hpp"
+#include "../Exceptions/UIExceptions.hpp"
 #include "../HotReload/HotReloadManager.hpp"
 #include "../JSON/JSONUILoader.hpp"
 #include "../JSON/JSONValidator.hpp"
-#include "../Exceptions/UIExceptions.hpp"
 
 using namespace DeclarativeUI::Binding;
 using namespace DeclarativeUI::Command;
@@ -41,7 +41,7 @@ private slots:
             char* argv[] = {nullptr};
             new QApplication(argc, argv);
         }
-        
+
         // Register builtin commands
         registerBuiltinCommands();
     }
@@ -158,7 +158,7 @@ private slots:
 
         // Test 1: Component initialization with invalid properties
         auto button = std::make_unique<Button>();
-        button->text(""); // Empty text should be handled gracefully
+        button->text("");  // Empty text should be handled gracefully
         button->initialize();
 
         auto* widget = button->getWidget();
@@ -174,13 +174,14 @@ private slots:
         // Don't call initialize()
         auto command = adapter->convertToCommand(uninitialized_button.get());
         // Should either work or return nullptr, but not crash
-        QVERIFY(true); // Test passes if no crash occurs
+        QVERIFY(true);  // Test passes if no crash occurs
 
         // Test 4: DeclarativeBuilder with invalid properties
-        auto safe_widget = create<QLabel>()
-            .property("text", QString("Valid"))
-            .property("nonexistent_property", QString("Invalid"))
-            .buildSafe();
+        auto safe_widget =
+            create<QLabel>()
+                .property("text", QString("Valid"))
+                .property("nonexistent_property", QString("Invalid"))
+                .buildSafe();
 
         QVERIFY(safe_widget != nullptr);
         QCOMPARE(safe_widget->text(), QString("Valid"));
@@ -225,7 +226,7 @@ private slots:
 
         auto circular_result = state_manager.getState<QString>("circular.a");
         // Should detect and handle circular dependency
-        QVERIFY(true); // Test passes if no infinite loop occurs
+        QVERIFY(true);  // Test passes if no infinite loop occurs
 
         qDebug() << "✅ State management error handling test passed";
     }
@@ -237,7 +238,8 @@ private slots:
         auto hot_reload_manager = std::make_unique<HotReloadManager>();
 
         // Test 1: Watch non-existent file
-        bool watch_result1 = hot_reload_manager->watchFile("non_existent_file.json");
+        bool watch_result1 =
+            hot_reload_manager->watchFile("non_existent_file.json");
         QVERIFY(!watch_result1);
 
         // Test 2: Watch directory instead of file
@@ -252,9 +254,11 @@ private slots:
         temp_file.write(invalid_content.toUtf8());
         temp_file.close();
 
-        QSignalSpy error_spy(hot_reload_manager.get(), &HotReloadManager::reloadError);
-        
-        bool watch_result3 = hot_reload_manager->watchFile(temp_file.fileName());
+        QSignalSpy error_spy(hot_reload_manager.get(),
+                             &HotReloadManager::reloadError);
+
+        bool watch_result3 =
+            hot_reload_manager->watchFile(temp_file.fileName());
         QVERIFY(watch_result3);
 
         // Modify file with more invalid content
@@ -267,7 +271,8 @@ private slots:
         QTest::qWait(100);
 
         // Should have emitted error signal or handled gracefully
-        QVERIFY(error_spy.count() >= 0); // May or may not emit depending on implementation
+        QVERIFY(error_spy.count() >=
+                0);  // May or may not emit depending on implementation
 
         qDebug() << "✅ Hot reload error handling test passed";
     }
@@ -283,23 +288,27 @@ private slots:
 
         // Test 2: Register adapter with empty name
         auto adapter1 = std::make_unique<ComponentSystemAdapter>();
-        bool register_result1 = manager->registerAdapter("", std::move(adapter1));
+        bool register_result1 =
+            manager->registerAdapter("", std::move(adapter1));
         QVERIFY(!register_result1);
 
         // Test 3: Register null adapter
-        bool register_result2 = manager->registerAdapter("null_adapter", nullptr);
+        bool register_result2 =
+            manager->registerAdapter("null_adapter", nullptr);
         QVERIFY(!register_result2);
 
         // Test 4: Double registration of same adapter name
         auto adapter2 = std::make_unique<ComponentSystemAdapter>();
         auto adapter3 = std::make_unique<ComponentSystemAdapter>();
-        
-        bool register_result3 = manager->registerAdapter("test_adapter", std::move(adapter2));
+
+        bool register_result3 =
+            manager->registerAdapter("test_adapter", std::move(adapter2));
         QVERIFY(register_result3);
-        
-        bool register_result4 = manager->registerAdapter("test_adapter", std::move(adapter3));
+
+        bool register_result4 =
+            manager->registerAdapter("test_adapter", std::move(adapter3));
         // Should either replace or reject, but not crash
-        QVERIFY(true); // Test passes if no crash occurs
+        QVERIFY(true);  // Test passes if no crash occurs
 
         qDebug() << "✅ Integration manager error handling test passed";
     }
@@ -310,7 +319,7 @@ private slots:
 
         // Test 1: Create many components to test memory limits
         std::vector<std::unique_ptr<Button>> buttons;
-        
+
         try {
             for (int i = 0; i < 10000; ++i) {
                 auto button = std::make_unique<Button>();
@@ -328,14 +337,14 @@ private slots:
         // Test 2: Rapid creation and destruction
         for (int cycle = 0; cycle < 100; ++cycle) {
             std::vector<std::unique_ptr<LineEdit>> temp_edits;
-            
+
             for (int i = 0; i < 50; ++i) {
                 auto edit = std::make_unique<LineEdit>();
                 edit->text(QString("Temp %1").arg(i));
                 edit->initialize();
                 temp_edits.push_back(std::move(edit));
             }
-            
+
             // temp_edits will be destroyed at end of loop
         }
 
@@ -344,16 +353,15 @@ private slots:
 
         // Test 3: File handle exhaustion protection
         std::vector<std::unique_ptr<QTemporaryFile>> files;
-        
+
         try {
             for (int i = 0; i < 1000; ++i) {
                 auto file = std::make_unique<QTemporaryFile>(
-                    temp_dir_->path() + QString("/test_%1_XXXXXX.tmp").arg(i)
-                );
+                    temp_dir_->path() + QString("/test_%1_XXXXXX.tmp").arg(i));
                 if (file->open()) {
                     files.push_back(std::move(file));
                 } else {
-                    break; // Stop if we can't open more files
+                    break;  // Stop if we can't open more files
                 }
             }
         } catch (const std::exception& e) {
@@ -361,7 +369,7 @@ private slots:
         }
 
         qDebug() << "Created" << files.size() << "temporary files";
-        QVERIFY(true); // Test passes if no crash occurs
+        QVERIFY(true);  // Test passes if no crash occurs
 
         qDebug() << "✅ Memory and resource error handling test passed";
     }
@@ -372,15 +380,15 @@ private slots:
 
         // Test 1: Exception during UI creation
         try {
-            auto widget = create<QLabel>()
-                .property("text", QString("Exception Test"))
-                .on("clicked", []() { 
-                    throw std::runtime_error("Test exception"); 
-                })
-                .build();
-            
+            auto widget =
+                create<QLabel>()
+                    .property("text", QString("Exception Test"))
+                    .on("clicked",
+                        []() { throw std::runtime_error("Test exception"); })
+                    .build();
+
             QVERIFY(widget != nullptr);
-            
+
             // Simulate event that throws
             try {
                 // widget->click(); // Would trigger exception
@@ -393,10 +401,10 @@ private slots:
 
         // Test 2: Exception during command execution
         auto& invoker = CommandManager::instance().getInvoker();
-        
+
         CommandContext context;
         context.setParameter("throw_exception", true);
-        
+
         try {
             auto result = invoker.execute("test_exception_command", context);
             // Command might not exist, which is fine for this test
@@ -407,12 +415,12 @@ private slots:
 
         // Test 3: Exception during state management
         auto& state_manager = StateManager::instance();
-        
+
         try {
             state_manager.setComputedState("exception.test", []() -> QVariant {
                 throw std::runtime_error("State computation error");
             });
-            
+
             auto result = state_manager.getState<QString>("exception.test");
             // Should handle exception gracefully
             QVERIFY(result == nullptr);

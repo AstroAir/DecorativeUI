@@ -5,6 +5,7 @@ This directory contains comprehensive tests for the DeclarativeUI framework with
 ## Test Structure
 
 ### Unit Tests (`unit/`)
+
 - **Core Tests** (`test_core.cpp`): Tests for UIElement and DeclarativeBuilder classes
 - **Advanced Core Tests** (`test_core_advanced.cpp`): Tests for CacheManager, MemoryManager, and ParallelProcessor
 - **Component Tests** (`test_components.cpp`): Tests for basic UI components (Button, LineEdit, etc.)
@@ -15,11 +16,13 @@ This directory contains comprehensive tests for the DeclarativeUI framework with
 - **Thread Safety Tests** (`test_thread_safety.cpp`): Comprehensive thread safety and concurrency tests
 
 ### Integration Tests (`integration/`)
+
 - **Integration Tests** (`test_integration.cpp`): Basic cross-component functionality tests
 - **End-to-End Workflow Tests** (`test_end_to_end_workflows.cpp`): Complete UI creation and migration workflows
 - **Error Handling Integration Tests** (`test_error_handling_integration.cpp`): Integration-level error handling and recovery
 
 ### Command Tests (`command/`)
+
 - **Command System Tests** (`test_command_system.cpp`): Core command system functionality
 - **Command Performance Tests** (`test_command_performance.cpp`): Performance and stress testing for command system
 - **Adapter Tests**: Comprehensive tests for all 5 integration adapters
@@ -31,12 +34,14 @@ This directory contains comprehensive tests for the DeclarativeUI framework with
 - **Command Integration Tests** (`test_command_integration.cpp`): Integration between commands and other systems
 
 ### Performance Tests (`performance/`)
+
 - **Component Performance Tests** (`test_component_performance.cpp`): Benchmarking and performance regression tests
 - Memory usage scaling tests
 - Concurrent operation performance tests
 - Stress testing with large datasets
 
 ### Test Utilities (`utils/`)
+
 - **TestUtilities.hpp**: Comprehensive test utilities, mock objects, and assertion helpers
 - **TestRunner.hpp**: Advanced test runner with reporting and benchmarking capabilities
 - Data generators for various test scenarios
@@ -190,6 +195,7 @@ QTEST_MAIN(YourComponentTest)
 ## Dependencies
 
 Tests depend on:
+
 - Qt6::Test
 - DeclarativeUI library
 - Components library

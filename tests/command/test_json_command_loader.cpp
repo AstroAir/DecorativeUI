@@ -1,12 +1,12 @@
-#include <QtTest/QtTest>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
+#include <QtTest/QtTest>
 #include <memory>
 
 #include "../../src/Command/Adapters/JSONCommandLoader.hpp"
-#include "../../src/Command/UICommand.hpp"
 #include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/UICommand.hpp"
 
 using namespace DeclarativeUI::Command::Adapters;
 using namespace DeclarativeUI::Command::UI;
@@ -71,7 +71,7 @@ private slots:
 
 private:
     std::unique_ptr<JSONCommandLoader> loader_;
-    
+
     QString createSimpleButtonJSON();
     QString createComplexHierarchyJSON();
     QString createInvalidJSON();
@@ -89,9 +89,7 @@ void JSONCommandLoaderTest::init() {
     loader_ = std::make_unique<JSONCommandLoader>();
 }
 
-void JSONCommandLoaderTest::cleanup() {
-    loader_.reset();
-}
+void JSONCommandLoaderTest::cleanup() { loader_.reset(); }
 
 QString JSONCommandLoaderTest::createSimpleButtonJSON() {
     return R"({
@@ -170,13 +168,13 @@ void JSONCommandLoaderTest::testLoaderInitialization() {
     qDebug() << "🧪 Testing loader initialization...";
 
     QVERIFY(loader_ != nullptr);
-    
+
     // Test configuration options
     loader_->setAutoMVCIntegration(true);
     loader_->setAutoStateBinding(true);
     loader_->setAutoEventHandling(true);
-    
-    QVERIFY(true); // Configuration should not crash
+
+    QVERIFY(true);  // Configuration should not crash
 
     qDebug() << "✅ Loader initialization test passed";
 }
@@ -186,7 +184,7 @@ void JSONCommandLoaderTest::testSimpleCommandLoading() {
 
     QString json = createSimpleButtonJSON();
     auto command = loader_->loadCommandFromString(json);
-    
+
     QVERIFY(command != nullptr);
     QCOMPARE(command->getCommandType(), QString("Button"));
 
@@ -198,11 +196,12 @@ void JSONCommandLoaderTest::testCommandWithProperties() {
 
     QString json = createSimpleButtonJSON();
     auto command = loader_->loadCommandFromString(json);
-    
+
     QVERIFY(command != nullptr);
-    
+
     // Verify properties were loaded
-    QCOMPARE(command->getState()->getProperty<QString>("text"), QString("Click Me"));
+    QCOMPARE(command->getState()->getProperty<QString>("text"),
+             QString("Click Me"));
     QCOMPARE(command->getState()->getProperty<bool>("enabled"), true);
     QCOMPARE(command->getState()->getProperty<int>("width"), 100);
     QCOMPARE(command->getState()->getProperty<int>("height"), 30);
@@ -215,13 +214,13 @@ void JSONCommandLoaderTest::testCommandWithChildren() {
 
     QString json = createComplexHierarchyJSON();
     auto command = loader_->loadCommandFromString(json);
-    
+
     QVERIFY(command != nullptr);
     QCOMPARE(command->getCommandType(), QString("Container"));
-    
+
     // Verify children were loaded
     auto children = command->getChildren();
-    QVERIFY(children.size() >= 2); // Should have at least label and container
+    QVERIFY(children.size() >= 2);  // Should have at least label and container
 
     qDebug() << "✅ Command with children test passed";
 }
@@ -230,7 +229,7 @@ void JSONCommandLoaderTest::testValidJSONParsing() {
     qDebug() << "🧪 Testing valid JSON parsing...";
 
     QString json = createSimpleButtonJSON();
-    
+
     // Should parse without errors
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
@@ -242,7 +241,7 @@ void JSONCommandLoaderTest::testInvalidJSONHandling() {
     qDebug() << "🧪 Testing invalid JSON handling...";
 
     QString invalidJson = "{ invalid json syntax }";
-    
+
     // Should handle gracefully
     auto command = loader_->loadCommandFromString(invalidJson);
     QVERIFY(command == nullptr);
@@ -259,7 +258,7 @@ void JSONCommandLoaderTest::testMalformedJSONHandling() {
             "text": "Unclosed string
         }
     })";
-    
+
     // Should handle gracefully
     auto command = loader_->loadCommandFromString(malformedJson);
     QVERIFY(command == nullptr);
@@ -271,10 +270,10 @@ void JSONCommandLoaderTest::testEmptyJSONHandling() {
     qDebug() << "🧪 Testing empty JSON handling...";
 
     QString emptyJson = "{}";
-    
+
     // Should handle gracefully
     auto command = loader_->loadCommandFromString(emptyJson);
-    QVERIFY(command == nullptr); // No type specified
+    QVERIFY(command == nullptr);  // No type specified
 
     qDebug() << "✅ Empty JSON handling test passed";
 }
@@ -289,11 +288,12 @@ void JSONCommandLoaderTest::testButtonCommandCreation() {
             "enabled": false
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
     QCOMPARE(command->getCommandType(), QString("Button"));
-    QCOMPARE(command->getState()->getProperty<QString>("text"), QString("Test Button"));
+    QCOMPARE(command->getState()->getProperty<QString>("text"),
+             QString("Test Button"));
     QCOMPARE(command->getState()->getProperty<bool>("enabled"), false);
 
     qDebug() << "✅ Button command creation test passed";
@@ -309,11 +309,12 @@ void JSONCommandLoaderTest::testLabelCommandCreation() {
             "alignment": "center"
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
     QCOMPARE(command->getCommandType(), QString("Label"));
-    QCOMPARE(command->getState()->getProperty<QString>("text"), QString("Test Label"));
+    QCOMPARE(command->getState()->getProperty<QString>("text"),
+             QString("Test Label"));
 
     qDebug() << "✅ Label command creation test passed";
 }
@@ -329,7 +330,7 @@ void JSONCommandLoaderTest::testContainerCommandCreation() {
         },
         "children": []
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
     QCOMPARE(command->getCommandType(), QString("Container"));
@@ -341,7 +342,7 @@ void JSONCommandLoaderTest::testCustomCommandCreation() {
     qDebug() << "🧪 Testing custom command creation...";
 
     // Test creation of custom command types
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Custom command creation test passed";
 }
@@ -356,11 +357,13 @@ void JSONCommandLoaderTest::testStringProperties() {
             "tooltip": "This is a tooltip"
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
-    QCOMPARE(command->getState()->getProperty<QString>("text"), QString("String Property"));
-    QCOMPARE(command->getState()->getProperty<QString>("tooltip"), QString("This is a tooltip"));
+    QCOMPARE(command->getState()->getProperty<QString>("text"),
+             QString("String Property"));
+    QCOMPARE(command->getState()->getProperty<QString>("tooltip"),
+             QString("This is a tooltip"));
 
     qDebug() << "✅ String properties test passed";
 }
@@ -376,7 +379,7 @@ void JSONCommandLoaderTest::testNumericProperties() {
             "opacity": 0.8
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
     QCOMPARE(command->getState()->getProperty<int>("width"), 200);
@@ -397,7 +400,7 @@ void JSONCommandLoaderTest::testBooleanProperties() {
             "checkable": true
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
     QCOMPARE(command->getState()->getProperty<bool>("enabled"), true);
@@ -417,12 +420,12 @@ void JSONCommandLoaderTest::testArrayProperties() {
             "colors": ["red", "green", "blue"]
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
-    
+
     // Test array property handling
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Array properties test passed";
 }
@@ -440,12 +443,12 @@ void JSONCommandLoaderTest::testObjectProperties() {
             }
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
-    
+
     // Test object property handling
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Object properties test passed";
 }
@@ -457,7 +460,7 @@ void JSONCommandLoaderTest::testEventHandlerRegistration() {
     loader_->registerEventHandler("testHandler", [](const QVariant&) {
         qDebug() << "Test handler called";
     });
-    
+
     QString json = R"({
         "type": "Button",
         "properties": {
@@ -467,12 +470,12 @@ void JSONCommandLoaderTest::testEventHandlerRegistration() {
             "clicked": "testHandler"
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
-    
+
     // Event handler should be registered
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event handler registration test passed";
 }
@@ -481,12 +484,12 @@ void JSONCommandLoaderTest::testEventHandlerExecution() {
     qDebug() << "🧪 Testing event handler execution...";
 
     bool handlerCalled = false;
-    loader_->registerEventHandler("executionTest", [&handlerCalled](const QVariant&) {
-        handlerCalled = true;
-    });
-    
+    loader_->registerEventHandler(
+        "executionTest",
+        [&handlerCalled](const QVariant&) { handlerCalled = true; });
+
     // Test would trigger event and verify handler execution
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event handler execution test passed";
 }
@@ -495,7 +498,7 @@ void JSONCommandLoaderTest::testCustomEventHandlers() {
     qDebug() << "🧪 Testing custom event handlers...";
 
     // Test custom event handler functionality
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Custom event handlers test passed";
 }
@@ -513,12 +516,12 @@ void JSONCommandLoaderTest::testStateBindingFromJSON() {
             "enabled": "form.enabled"
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
     QVERIFY(command != nullptr);
-    
+
     // Verify bindings were established
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ State binding from JSON test passed";
 }
@@ -527,9 +530,9 @@ void JSONCommandLoaderTest::testAutoStateBinding() {
     qDebug() << "🧪 Testing auto state binding...";
 
     loader_->setAutoStateBinding(true);
-    
+
     // Test automatic state binding functionality
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Auto state binding test passed";
 }
@@ -538,7 +541,7 @@ void JSONCommandLoaderTest::testStateBindingValidation() {
     qDebug() << "🧪 Testing state binding validation...";
 
     // Test validation of state binding configurations
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ State binding validation test passed";
 }
@@ -548,18 +551,18 @@ void JSONCommandLoaderTest::testNestedCommandLoading() {
 
     QString json = createComplexHierarchyJSON();
     auto command = loader_->loadCommandFromString(json);
-    
+
     QVERIFY(command != nullptr);
-    
+
     // Verify nested structure
     auto children = command->getChildren();
     QVERIFY(children.size() >= 2);
-    
+
     // Check nested container
     if (children.size() >= 2) {
         auto nestedContainer = children[1];
         auto nestedChildren = nestedContainer->getChildren();
-        QVERIFY(nestedChildren.size() >= 2); // TextInput and Button
+        QVERIFY(nestedChildren.size() >= 2);  // TextInput and Button
     }
 
     qDebug() << "✅ Nested command loading test passed";
@@ -570,7 +573,7 @@ void JSONCommandLoaderTest::testComplexHierarchyLoading() {
 
     QString json = createComplexHierarchyJSON();
     auto command = loader_->loadCommandFromString(json);
-    
+
     QVERIFY(command != nullptr);
     QCOMPARE(command->getCommandType(), QString("Container"));
 
@@ -581,7 +584,7 @@ void JSONCommandLoaderTest::testHierarchyValidation() {
     qDebug() << "🧪 Testing hierarchy validation...";
 
     // Test validation of command hierarchies
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Hierarchy validation test passed";
 }
@@ -592,7 +595,7 @@ void JSONCommandLoaderTest::testLargeJSONPerformance() {
     // Create large JSON with many commands
     QJsonObject root;
     root["type"] = "Container";
-    
+
     QJsonArray children;
     for (int i = 0; i < 100; ++i) {
         QJsonObject child;
@@ -603,20 +606,20 @@ void JSONCommandLoaderTest::testLargeJSONPerformance() {
         children.append(child);
     }
     root["children"] = children;
-    
+
     QJsonDocument doc(root);
     QString largeJson = doc.toJson();
-    
+
     QElapsedTimer timer;
     timer.start();
-    
+
     auto command = loader_->loadCommandFromString(largeJson);
-    
+
     qint64 elapsed = timer.elapsed();
     qDebug() << "Loaded large JSON (100 buttons) in" << elapsed << "ms";
-    
+
     QVERIFY(command != nullptr);
-    QVERIFY(elapsed < 2000); // Should be reasonably fast
+    QVERIFY(elapsed < 2000);  // Should be reasonably fast
 
     qDebug() << "✅ Large JSON performance test passed";
 }
@@ -625,7 +628,7 @@ void JSONCommandLoaderTest::testComplexHierarchyPerformance() {
     qDebug() << "🧪 Testing complex hierarchy performance...";
 
     // Test performance with deeply nested hierarchies
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Complex hierarchy performance test passed";
 }
@@ -638,9 +641,9 @@ void JSONCommandLoaderTest::testMissingCommandTypeHandling() {
             "text": "No Type Specified"
         }
     })";
-    
+
     auto command = loader_->loadCommandFromString(json);
-    QVERIFY(command == nullptr); // Should fail gracefully
+    QVERIFY(command == nullptr);  // Should fail gracefully
 
     qDebug() << "✅ Missing command type handling test passed";
 }
@@ -649,11 +652,11 @@ void JSONCommandLoaderTest::testInvalidPropertyHandling() {
     qDebug() << "🧪 Testing invalid property handling...";
 
     QString json = createInvalidJSON();
-    
+
     // Should handle invalid properties gracefully
     auto command = loader_->loadCommandFromString(json);
     // May return null or valid command with defaults
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Invalid property handling test passed";
 }
@@ -662,7 +665,7 @@ void JSONCommandLoaderTest::testCircularReferenceHandling() {
     qDebug() << "🧪 Testing circular reference handling...";
 
     // Test handling of circular references in JSON
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Circular reference handling test passed";
 }

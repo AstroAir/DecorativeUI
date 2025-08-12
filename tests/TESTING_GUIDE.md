@@ -20,12 +20,14 @@ The DeclarativeUI test suite follows these principles:
 **Purpose**: Test individual components, classes, and functions in isolation.
 
 **When to use**:
+
 - Testing a single component's functionality
 - Validating property setters and getters
 - Testing event handling and signals
 - Verifying error conditions and edge cases
 
 **Example Structure**:
+
 ```cpp
 #include <QTest>
 #include "../utils/TestUtilities.hpp"
@@ -44,10 +46,10 @@ private slots:
         button->text("Test Button")
               .enabled(true);
         button->initialize();
-        
+
         auto* widget = button->getWidget();
         DeclarativeUI::Testing::AssertUtils::assertWidgetValid(widget, "Button widget");
-        
+
         auto* qt_button = qobject_cast<QPushButton*>(widget);
         QVERIFY(qt_button != nullptr);
         QCOMPARE(qt_button->text(), QString("Test Button"));
@@ -56,14 +58,14 @@ private slots:
 
     void testButtonClickEvent() {
         auto button = std::make_unique<Button>();
-        
+
         bool clicked = false;
         button->onClick([&clicked]() { clicked = true; });
         button->initialize();
-        
+
         auto* widget = button->getWidget();
         auto* qt_button = qobject_cast<QPushButton*>(widget);
-        
+
         // Simulate click
         qt_button->click();
         QVERIFY(clicked);
@@ -79,12 +81,14 @@ QTEST_MAIN(ButtonTest)
 **Purpose**: Test interactions between multiple components and systems.
 
 **When to use**:
+
 - Testing complete workflows
 - Validating system integration points
 - Testing migration scenarios
 - End-to-end functionality testing
 
 **Example Structure**:
+
 ```cpp
 #include <QTest>
 #include "../utils/TestUtilities.hpp"
@@ -98,20 +102,20 @@ class StateIntegrationTest : public QObject {
 private slots:
     void testStateComponentIntegration() {
         auto& state_manager = StateManager::instance();
-        
+
         // Set up state
         state_manager.setState("ui.button_text", QString("Dynamic Button"));
-        
+
         // Create component bound to state
         auto button = std::make_unique<Button>();
         button->bindText("ui.button_text");
         button->initialize();
-        
+
         // Verify initial binding
         auto* widget = button->getWidget();
         auto* qt_button = qobject_cast<QPushButton*>(widget);
         QCOMPARE(qt_button->text(), QString("Dynamic Button"));
-        
+
         // Update state and verify propagation
         state_manager.setState("ui.button_text", QString("Updated Button"));
         QCOMPARE(qt_button->text(), QString("Updated Button"));
@@ -124,12 +128,14 @@ private slots:
 **Purpose**: Benchmark performance and detect regressions.
 
 **When to use**:
+
 - Measuring component creation time
 - Testing memory usage scaling
 - Benchmarking concurrent operations
 - Stress testing with large datasets
 
 **Example Structure**:
+
 ```cpp
 #include <QTest>
 #include "../utils/TestUtilities.hpp"
@@ -148,20 +154,20 @@ private slots:
 
     void testMemoryScaling() {
         auto initial_memory = DeclarativeUI::Testing::PerformanceUtils::getCurrentMemoryUsage();
-        
+
         std::vector<std::unique_ptr<Button>> buttons;
         const int num_buttons = 1000;
-        
+
         for (int i = 0; i < num_buttons; ++i) {
             auto button = std::make_unique<Button>();
             button->text(QString("Button %1").arg(i));
             button->initialize();
             buttons.push_back(std::move(button));
         }
-        
+
         auto final_memory = DeclarativeUI::Testing::PerformanceUtils::getCurrentMemoryUsage();
         size_t memory_per_button = (final_memory - initial_memory) / num_buttons;
-        
+
         DeclarativeUI::Testing::AssertUtils::assertMemoryUsage(
             memory_per_button, 10000, "Button memory usage");
     }
@@ -171,23 +177,27 @@ private slots:
 ## Test Naming Conventions
 
 ### File Naming
+
 - **Unit tests**: `test_<component_name>.cpp`
 - **Integration tests**: `test_<workflow_name>_integration.cpp`
 - **Performance tests**: `test_<component_name>_performance.cpp`
 - **Error handling tests**: `test_<component_name>_error_handling.cpp`
 
 ### Class Naming
+
 - **Test classes**: `<ComponentName>Test`
 - **Performance test classes**: `<ComponentName>PerformanceTest`
 - **Integration test classes**: `<WorkflowName>IntegrationTest`
 
 ### Method Naming
+
 - **Functionality tests**: `test<FunctionName>()`
 - **Error condition tests**: `test<FunctionName>ErrorHandling()`
 - **Performance tests**: `benchmark<FunctionName>()`
 - **Integration tests**: `test<WorkflowName>Integration()`
 
 ### Examples
+
 ```cpp
 // Good naming examples
 void testButtonCreation();
@@ -267,11 +277,11 @@ DeclarativeUI::Testing::AssertUtils::assertNoExceptions([&]() {
 ```cpp
 void testInvalidInput() {
     auto component = std::make_unique<LineEdit>();
-    
+
     // Test with null input
     component->text(QString());
     component->initialize();
-    
+
     // Should handle gracefully
     auto* widget = component->getWidget();
     QVERIFY(widget != nullptr);
@@ -291,15 +301,15 @@ void testExceptionHandling() {
 ```cpp
 void testErrorRecovery() {
     auto& state_manager = StateManager::instance();
-    
+
     // Set invalid state
     state_manager.setState("invalid.key", QVariant());
-    
+
     // Component should handle gracefully
     auto button = std::make_unique<Button>();
     button->bindText("invalid.key");
     button->initialize();
-    
+
     // Should have fallback behavior
     auto* widget = button->getWidget();
     auto* qt_button = qobject_cast<QPushButton*>(widget);
@@ -314,22 +324,22 @@ void testErrorRecovery() {
 ```cpp
 void testConcurrentAccess() {
     auto& state_manager = StateManager::instance();
-    
+
     const int num_threads = 4;
     const int operations_per_thread = 100;
     std::atomic<int> success_count{0};
-    
+
     QVector<QFuture<void>> futures;
-    
+
     for (int t = 0; t < num_threads; ++t) {
         auto future = QtConcurrent::run([&, t]() {
             for (int i = 0; i < operations_per_thread; ++i) {
                 QString key = QString("thread_%1_key_%2").arg(t).arg(i);
                 QString value = QString("value_%1_%2").arg(t).arg(i);
-                
+
                 state_manager.setState(key, value);
                 auto retrieved = state_manager.getState<QString>(key);
-                
+
                 if (retrieved && retrieved->get() == value) {
                     success_count.fetch_add(1);
                 }
@@ -337,12 +347,12 @@ void testConcurrentAccess() {
         });
         futures.append(future);
     }
-    
+
     // Wait for completion
     for (auto& future : futures) {
         future.waitForFinished();
     }
-    
+
     QCOMPARE(success_count.load(), num_threads * operations_per_thread);
 }
 ```
@@ -352,42 +362,46 @@ void testConcurrentAccess() {
 ### Step-by-Step Process
 
 1. **Identify Test Category**
+
    - Unit test for individual component
    - Integration test for workflow
    - Performance test for benchmarking
 
 2. **Create Test File**
+
    ```bash
    # For unit test
    touch tests/unit/test_new_component.cpp
-   
+
    # For integration test
    touch tests/integration/test_new_workflow_integration.cpp
    ```
 
 3. **Implement Test Class**
+
    ```cpp
    #include <QTest>
    #include "../utils/TestUtilities.hpp"
-   
+
    class NewComponentTest : public QObject {
        Q_OBJECT
-   
+
    private slots:
        void initTestCase() {
            DeclarativeUI::Testing::TestUtilities::initializeQtApplication();
        }
-   
+
        void testBasicFunctionality() {
            // Test implementation
        }
    };
-   
+
    QTEST_MAIN(NewComponentTest)
    #include "test_new_component.moc"
    ```
 
 4. **Update CMakeLists.txt**
+
    ```cmake
    add_executable(NewComponentTest test_new_component.cpp)
    target_link_libraries(NewComponentTest

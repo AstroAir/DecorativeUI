@@ -15,12 +15,10 @@
 #include <QWidget>
 #include <memory>
 
-
 #include "Binding/StateManager.hpp"
 #include "HotReload/HotReloadManager.hpp"
 #include "JSON/ComponentRegistry.hpp"
 #include "JSON/JSONUILoader.hpp"
-
 
 using namespace DeclarativeUI;
 

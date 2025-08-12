@@ -1,11 +1,11 @@
-#include <QtTest/QtTest>
 #include <QSignalSpy>
+#include <QtTest/QtTest>
 #include <memory>
 
-#include "../../src/Command/Adapters/StateManagerAdapter.hpp"
-#include "../../src/Command/UICommand.hpp"
-#include "../../src/Command/CoreCommands.hpp"
 #include "../../src/Binding/StateManager.hpp"
+#include "../../src/Command/Adapters/StateManagerAdapter.hpp"
+#include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/UICommand.hpp"
 
 using namespace DeclarativeUI::Command::Adapters;
 using namespace DeclarativeUI::Command::UI;
@@ -83,10 +83,10 @@ void StateManagerAdapterTest::testAdapterInitialization() {
     qDebug() << "🧪 Testing adapter initialization...";
 
     QVERIFY(adapter_ != nullptr);
-    
+
     // Test singleton access
     auto& instance = CommandStateManagerAdapter::instance();
-    QVERIFY(&instance != nullptr);
+    QVERIFY(std::addressof(instance) != nullptr);
 
     qDebug() << "✅ Adapter initialization test passed";
 }
@@ -95,15 +95,16 @@ void StateManagerAdapterTest::testCommandBinding() {
     qDebug() << "🧪 Testing command binding...";
 
     auto& stateManager = StateManager::instance();
-    
+
     // Set initial state
     stateManager.setState("test.button.text", QString("Initial Text"));
-    
+
     // Bind command to state
     adapter_->bindCommand(button_, "test.button.text", "text");
-    
+
     // Command should reflect state
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("Initial Text"));
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("Initial Text"));
 
     qDebug() << "✅ Command binding test passed";
 }
@@ -112,19 +113,21 @@ void StateManagerAdapterTest::testCommandUnbinding() {
     qDebug() << "🧪 Testing command unbinding...";
 
     auto& stateManager = StateManager::instance();
-    
+
     // Bind and then unbind
     adapter_->bindCommand(button_, "test.unbind", "text");
     stateManager.setState("test.unbind", QString("Bound Text"));
-    
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("Bound Text"));
-    
+
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("Bound Text"));
+
     // Unbind
     adapter_->unbindCommand(button_, "test.unbind", "text");
-    
+
     // Change state - command should not update
     stateManager.setState("test.unbind", QString("New Text"));
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("Bound Text"));
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("Bound Text"));
 
     qDebug() << "✅ Command unbinding test passed";
 }
@@ -133,12 +136,13 @@ void StateManagerAdapterTest::testStateRetrieval() {
     qDebug() << "🧪 Testing state retrieval...";
 
     auto& stateManager = StateManager::instance();
-    
+
     // Set state
     stateManager.setState("test.retrieve", QString("Retrieved Value"));
-    
+
     // Retrieve through adapter
-    auto value = adapter_->getCommandState<QString>(button_, "test.retrieve", QString());
+    auto value =
+        adapter_->getCommandState<QString>(button_, "test.retrieve", QString());
     QCOMPARE(value, QString("Retrieved Value"));
 
     qDebug() << "✅ State retrieval test passed";
@@ -148,15 +152,17 @@ void StateManagerAdapterTest::testStateToCommandSync() {
     qDebug() << "🧪 Testing state to command sync...";
 
     auto& stateManager = StateManager::instance();
-    
+
     adapter_->bindCommand(button_, "test.sync.state_to_command", "text");
-    
+
     // Change state multiple times
     stateManager.setState("test.sync.state_to_command", QString("Value 1"));
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("Value 1"));
-    
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("Value 1"));
+
     stateManager.setState("test.sync.state_to_command", QString("Value 2"));
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("Value 2"));
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("Value 2"));
 
     qDebug() << "✅ State to command sync test passed";
 }
@@ -165,14 +171,15 @@ void StateManagerAdapterTest::testCommandToStateSync() {
     qDebug() << "🧪 Testing command to state sync...";
 
     auto& stateManager = StateManager::instance();
-    
+
     adapter_->bindCommand(button_, "test.sync.command_to_state", "text");
-    
+
     // Change command property
     adapter_->setCommandState(button_, "text", QString("From Command"));
-    
+
     // State should be updated
-    auto stateValue = stateManager.getState<QString>("test.sync.command_to_state");
+    auto stateValue =
+        stateManager.getState<QString>("test.sync.command_to_state");
     if (stateValue) {
         QCOMPARE(stateValue->get(), QString("From Command"));
     }
@@ -184,13 +191,14 @@ void StateManagerAdapterTest::testBidirectionalSync() {
     qDebug() << "🧪 Testing bidirectional sync...";
 
     auto& stateManager = StateManager::instance();
-    
+
     adapter_->bindCommand(button_, "test.bidirectional", "text");
-    
+
     // Change state
     stateManager.setState("test.bidirectional", QString("From State"));
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("From State"));
-    
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("From State"));
+
     // Change command
     adapter_->setCommandState(button_, "text", QString("From Command"));
     auto stateValue = stateManager.getState<QString>("test.bidirectional");
@@ -205,17 +213,19 @@ void StateManagerAdapterTest::testMultipleCommandSync() {
     qDebug() << "🧪 Testing multiple command sync...";
 
     auto& stateManager = StateManager::instance();
-    
+
     // Bind multiple commands to same state
     adapter_->bindCommand(button_, "test.multiple.shared", "text");
     adapter_->bindCommand(label_, "test.multiple.shared", "text");
-    
+
     // Change state
     stateManager.setState("test.multiple.shared", QString("Shared Value"));
-    
+
     // Both commands should update
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("Shared Value"));
-    QCOMPARE(label_->getState()->getProperty<QString>("text"), QString("Shared Value"));
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("Shared Value"));
+    QCOMPARE(label_->getState()->getProperty<QString>("text"),
+             QString("Shared Value"));
 
     qDebug() << "✅ Multiple command sync test passed";
 }
@@ -224,23 +234,25 @@ void StateManagerAdapterTest::testBatchStateUpdates() {
     qDebug() << "🧪 Testing batch state updates...";
 
     auto& stateManager = StateManager::instance();
-    
+
     adapter_->bindCommand(button_, "test.batch.button", "text");
     adapter_->bindCommand(label_, "test.batch.label", "text");
-    
+
     // Begin batch update
     adapter_->beginBatchUpdate();
-    
+
     // Update multiple states
     stateManager.setState("test.batch.button", QString("Batch Button"));
     stateManager.setState("test.batch.label", QString("Batch Label"));
-    
+
     // Commit batch
     adapter_->commitBatchUpdate();
-    
+
     // Verify updates
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("Batch Button"));
-    QCOMPARE(label_->getState()->getProperty<QString>("text"), QString("Batch Label"));
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("Batch Button"));
+    QCOMPARE(label_->getState()->getProperty<QString>("text"),
+             QString("Batch Label"));
 
     qDebug() << "✅ Batch state updates test passed";
 }
@@ -250,24 +262,26 @@ void StateManagerAdapterTest::testBatchCommandBinding() {
 
     // Begin batch
     adapter_->beginBatchUpdate();
-    
+
     // Create multiple bindings
     adapter_->bindCommand(button_, "test.batch.bind1", "text");
     adapter_->bindCommand(button_, "test.batch.bind2", "enabled");
     adapter_->bindCommand(label_, "test.batch.bind3", "text");
-    
+
     // Commit batch
     adapter_->commitBatchUpdate();
-    
+
     // Test bindings work
     auto& stateManager = StateManager::instance();
     stateManager.setState("test.batch.bind1", QString("Batch Text"));
     stateManager.setState("test.batch.bind2", false);
     stateManager.setState("test.batch.bind3", QString("Label Text"));
-    
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("Batch Text"));
+
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("Batch Text"));
     QCOMPARE(button_->getState()->getProperty<bool>("enabled"), false);
-    QCOMPARE(label_->getState()->getProperty<QString>("text"), QString("Label Text"));
+    QCOMPARE(label_->getState()->getProperty<QString>("text"),
+             QString("Label Text"));
 
     qDebug() << "✅ Batch command binding test passed";
 }
@@ -277,19 +291,20 @@ void StateManagerAdapterTest::testBatchTransactionHandling() {
 
     // Test transaction rollback
     adapter_->beginBatchUpdate();
-    
+
     auto& stateManager = StateManager::instance();
     adapter_->bindCommand(button_, "test.transaction", "text");
     stateManager.setState("test.transaction", QString("Original"));
-    
+
     // Start transaction
     stateManager.setState("test.transaction", QString("Modified"));
-    
+
     // Rollback
     adapter_->rollbackBatchUpdate();
-    
+
     // Should revert to original
-    QCOMPARE(button_->getState()->getProperty<QString>("text"), QString("Original"));
+    QCOMPARE(button_->getState()->getProperty<QString>("text"),
+             QString("Original"));
 
     qDebug() << "✅ Batch transaction handling test passed";
 }
@@ -299,7 +314,7 @@ void StateManagerAdapterTest::testStateCreation() {
 
     // Create new state through adapter
     adapter_->createState("test.new_state", QString("New Value"));
-    
+
     auto& stateManager = StateManager::instance();
     auto state = stateManager.getState<QString>("test.new_state");
     QVERIFY(state != nullptr);
@@ -313,10 +328,10 @@ void StateManagerAdapterTest::testStateModification() {
 
     auto& stateManager = StateManager::instance();
     stateManager.setState("test.modify", QString("Original"));
-    
+
     // Modify through adapter
     adapter_->setCommandState(button_, "test.modify", QString("Modified"));
-    
+
     auto state = stateManager.getState<QString>("test.modify");
     QVERIFY(state != nullptr);
     QCOMPARE(state->get(), QString("Modified"));
@@ -329,10 +344,10 @@ void StateManagerAdapterTest::testStateDeletion() {
 
     auto& stateManager = StateManager::instance();
     stateManager.setState("test.delete", QString("To Delete"));
-    
+
     // Delete through adapter
     adapter_->deleteState("test.delete");
-    
+
     auto state = stateManager.getState<QString>("test.delete");
     QVERIFY(state == nullptr);
 
@@ -343,7 +358,7 @@ void StateManagerAdapterTest::testStateValidation() {
     qDebug() << "🧪 Testing state validation...";
 
     // Test state validation functionality
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ State validation test passed";
 }
@@ -352,7 +367,7 @@ void StateManagerAdapterTest::testMassBindingPerformance() {
     qDebug() << "🧪 Testing mass binding performance...";
 
     auto& stateManager = StateManager::instance();
-    
+
     QElapsedTimer timer;
     timer.start();
 
@@ -361,7 +376,8 @@ void StateManagerAdapterTest::testMassBindingPerformance() {
     for (int i = 0; i < 100; ++i) {
         auto button = std::make_shared<ButtonCommand>();
         adapter_->bindCommand(button, QString("test.mass.%1").arg(i), "text");
-        stateManager.setState(QString("test.mass.%1").arg(i), QString("Value %1").arg(i));
+        stateManager.setState(QString("test.mass.%1").arg(i),
+                              QString("Value %1").arg(i));
         buttons.push_back(button);
     }
 
@@ -377,9 +393,9 @@ void StateManagerAdapterTest::testFrequentUpdatePerformance() {
     qDebug() << "🧪 Testing frequent update performance...";
 
     auto& stateManager = StateManager::instance();
-    
+
     adapter_->bindCommand(button_, "test.frequent", "text");
-    
+
     QElapsedTimer timer;
     timer.start();
 
@@ -400,22 +416,24 @@ void StateManagerAdapterTest::testBatchUpdatePerformance() {
     qDebug() << "🧪 Testing batch update performance...";
 
     auto& stateManager = StateManager::instance();
-    
+
     // Bind many commands
     std::vector<std::shared_ptr<ButtonCommand>> buttons;
     for (int i = 0; i < 100; ++i) {
         auto button = std::make_shared<ButtonCommand>();
-        adapter_->bindCommand(button, QString("test.batch_perf.%1").arg(i), "text");
+        adapter_->bindCommand(button, QString("test.batch_perf.%1").arg(i),
+                              "text");
         buttons.push_back(button);
     }
-    
+
     QElapsedTimer timer;
     timer.start();
 
     // Batch update
     adapter_->beginBatchUpdate();
     for (int i = 0; i < 100; ++i) {
-        stateManager.setState(QString("test.batch_perf.%1").arg(i), QString("Batch %1").arg(i));
+        stateManager.setState(QString("test.batch_perf.%1").arg(i),
+                              QString("Batch %1").arg(i));
     }
     adapter_->commitBatchUpdate();
 
@@ -431,9 +449,9 @@ void StateManagerAdapterTest::testInvalidStateKeyHandling() {
     qDebug() << "🧪 Testing invalid state key handling...";
 
     // Test binding to invalid state keys
-    adapter_->bindCommand(button_, "", "text"); // Empty key
-    adapter_->bindCommand(button_, "invalid..key", "text"); // Invalid format
-    
+    adapter_->bindCommand(button_, "", "text");              // Empty key
+    adapter_->bindCommand(button_, "invalid..key", "text");  // Invalid format
+
     // Should handle gracefully
     QVERIFY(true);
 
@@ -446,7 +464,7 @@ void StateManagerAdapterTest::testNullCommandHandling() {
     // Test operations with null commands
     adapter_->bindCommand(nullptr, "test.null", "text");
     adapter_->setCommandState(nullptr, "text", QString("Value"));
-    
+
     // Should handle gracefully
     QVERIFY(true);
 
@@ -458,8 +476,9 @@ void StateManagerAdapterTest::testBindingConflictResolution() {
 
     // Test resolution of binding conflicts
     adapter_->bindCommand(button_, "test.conflict", "text");
-    adapter_->bindCommand(button_, "test.conflict", "text"); // Duplicate binding
-    
+    adapter_->bindCommand(button_, "test.conflict",
+                          "text");  // Duplicate binding
+
     // Should handle gracefully
     QVERIFY(true);
 

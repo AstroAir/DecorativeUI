@@ -1,12 +1,12 @@
 /**
  * @file 01_hello_world.cpp
  * @brief Minimal DeclarativeUI application - Hello World
- * 
+ *
  * This example demonstrates:
  * - Basic DeclarativeUI setup
  * - Creating a simple widget programmatically
  * - Minimal application structure
- * 
+ *
  * Learning objectives:
  * - Understand the basic structure of a DeclarativeUI application
  * - Learn how to create and display a simple widget
@@ -14,12 +14,12 @@
  */
 
 #include <QApplication>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QWidget>
-#include <QMessageBox>
 #include <QDebug>
+#include <QLabel>
+#include <QMessageBox>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
 
 // Include DeclarativeUI core
 #include "Core/DeclarativeBuilder.hpp"
@@ -33,9 +33,7 @@ class HelloWorldApp : public QObject {
     Q_OBJECT
 
 public:
-    HelloWorldApp(QObject* parent = nullptr) : QObject(parent) {
-        createUI();
-    }
+    HelloWorldApp(QObject* parent = nullptr) : QObject(parent) { createUI(); }
 
     void show() {
         if (main_widget_) {
@@ -46,20 +44,17 @@ public:
 private slots:
     void onHelloClicked() {
         QMessageBox::information(
-            main_widget_.get(),
-            "Hello DeclarativeUI!",
+            main_widget_.get(), "Hello DeclarativeUI!",
             "🎉 Welcome to DeclarativeUI!\n\n"
             "This is your first DeclarativeUI application.\n"
-            "You've successfully created a reactive UI!"
-        );
-        
+            "You've successfully created a reactive UI!");
+
         qDebug() << "Hello button clicked! DeclarativeUI is working! 🚀";
     }
 
     void onAboutClicked() {
         QMessageBox::about(
-            main_widget_.get(),
-            "About Hello World",
+            main_widget_.get(), "About Hello World",
             "<h3>DeclarativeUI Hello World</h3>"
             "<p>This is the simplest possible DeclarativeUI application.</p>"
             "<p><b>Features demonstrated:</b></p>"
@@ -68,8 +63,7 @@ private slots:
             "<li>Event handling</li>"
             "<li>Simple layout management</li>"
             "</ul>"
-            "<p><i>Next: Try the JSON UI Loading example!</i></p>"
-        );
+            "<p><i>Next: Try the JSON UI Loading example!</i></p>");
     }
 
 private:
@@ -94,23 +88,20 @@ private:
             "  font-weight: bold;"
             "  color: #2c3e50;"
             "  text-align: center;"
-            "}"
-        );
+            "}");
         welcome_label->setAlignment(Qt::AlignCenter);
         layout->addWidget(welcome_label);
 
         // Description label
         auto description_label = new QLabel(
             "This is your first DeclarativeUI application.\n"
-            "Click the button below to see it in action!"
-        );
+            "Click the button below to see it in action!");
         description_label->setStyleSheet(
             "QLabel {"
             "  font-size: 14px;"
             "  color: #34495e;"
             "  text-align: center;"
-            "}"
-        );
+            "}");
         description_label->setAlignment(Qt::AlignCenter);
         description_label->setWordWrap(true);
         layout->addWidget(description_label);
@@ -135,9 +126,9 @@ private:
             "}"
             "QPushButton:pressed {"
             "  background-color: #21618c;"
-            "}"
-        );
-        connect(hello_button, &QPushButton::clicked, this, &HelloWorldApp::onHelloClicked);
+            "}");
+        connect(hello_button, &QPushButton::clicked, this,
+                &HelloWorldApp::onHelloClicked);
         layout->addWidget(hello_button);
 
         // About button
@@ -153,22 +144,22 @@ private:
             "}"
             "QPushButton:hover {"
             "  background-color: #7f8c8d;"
-            "}"
-        );
-        connect(about_button, &QPushButton::clicked, this, &HelloWorldApp::onAboutClicked);
+            "}");
+        connect(about_button, &QPushButton::clicked, this,
+                &HelloWorldApp::onAboutClicked);
         layout->addWidget(about_button);
 
         layout->addStretch();
 
         // Status label
-        auto status_label = new QLabel("✅ DeclarativeUI initialized successfully");
+        auto status_label =
+            new QLabel("✅ DeclarativeUI initialized successfully");
         status_label->setStyleSheet(
             "QLabel {"
             "  font-size: 12px;"
             "  color: #27ae60;"
             "  font-style: italic;"
-            "}"
-        );
+            "}");
         status_label->setAlignment(Qt::AlignCenter);
         layout->addWidget(status_label);
 
@@ -186,7 +177,7 @@ int main(int argc, char* argv[]) {
 
     try {
         qDebug() << "🚀 Starting DeclarativeUI Hello World example...";
-        
+
         HelloWorldApp hello_app;
         hello_app.show();
 

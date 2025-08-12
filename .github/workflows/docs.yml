@@ -1,0 +1,79 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - '.github/workflows/docs.yml'
+
+jobs:
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
+
+    - name: Build documentation
+      run: |
+        mkdocs build --strict
+
+    - name: Check for broken links
+      run: |
+        pip install linkchecker
+        linkchecker site/ --check-extern
+
+    - name: Upload documentation artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: site/
+        retention-days: 7
+
+  deploy-docs:
+    name: Deploy Documentation
+    needs: build-docs
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
+
+    - name: Build documentation
+      run: |
+        mkdocs build
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./site
+        cname: declarativeui.github.io

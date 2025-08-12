@@ -12,13 +12,11 @@
 #include <QVBoxLayout>
 #include <memory>
 
-
 #include "Binding/StateManager.hpp"
 #include "Core/DeclarativeBuilder.hpp"
 #include "Exceptions/UIExceptions.hpp"
 #include "JSON/ComponentRegistry.hpp"
 #include "JSON/JSONUILoader.hpp"
-
 
 using namespace DeclarativeUI;
 

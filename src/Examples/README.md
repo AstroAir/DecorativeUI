@@ -132,6 +132,8 @@ cmake --build . --config Release
 
 ## 🔧 Legacy Examples
 
+Note: This src/Examples tree is considered legacy/internal. New and actively maintained examples live under the top-level `examples/` directory and are organized by category (basic, components, command, advanced).
+
 The following legacy examples are maintained for backward compatibility:
 - `BasicExample` (main.cpp)
 - `HotReloadExample` (hot_reload_example.cpp)

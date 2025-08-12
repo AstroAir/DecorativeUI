@@ -1,0 +1,186 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+env:
+  QT_VERSION: 6.5.0
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      release_id: ${{ steps.create_release.outputs.id }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Extract version
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "version_number=${VERSION#v}" >> $GITHUB_OUTPUT
+
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Extract changelog for this version
+        if [[ -f "CHANGELOG.md" ]]; then
+          awk '/^## \['"${{ steps.version.outputs.version_number }}"'\]/{flag=1; next} /^## \[/{flag=0} flag' CHANGELOG.md > release_notes.md
+        else
+          echo "Release ${{ steps.version.outputs.version }}" > release_notes.md
+        fi
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        release_name: DeclarativeUI ${{ steps.version.outputs.version }}
+        body_path: release_notes.md
+        draft: false
+        prerelease: ${{ contains(steps.version.outputs.version, 'alpha') || contains(steps.version.outputs.version, 'beta') || contains(steps.version.outputs.version, 'rc') }}
+
+  build-release:
+    name: Build Release on ${{ matrix.os }}
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: DeclarativeUI-Windows-x64
+            cmake_preset: release
+          - os: ubuntu-latest
+            artifact_name: DeclarativeUI-Linux-x64
+            cmake_preset: release
+          - os: macos-latest
+            artifact_name: DeclarativeUI-macOS-x64
+            cmake_preset: release
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ env.QT_VERSION }}
+        cache: true
+
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: 3.20
+
+    - name: Setup Ninja
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Configure and Build
+      run: |
+        cmake --preset ${{ matrix.cmake_preset }}
+        cmake --build --preset ${{ matrix.cmake_preset }}
+
+    - name: Run Tests
+      run: |
+        cd build
+        ctest --config Release --output-on-failure
+
+    - name: Package Release
+      run: |
+        mkdir release-package
+        
+        # Copy library files
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          cp build/libDeclarativeUI.lib release-package/
+          cp -r build/examples/ release-package/examples/
+        else
+          cp build/libDeclarativeUI.a release-package/
+          cp -r build/examples/ release-package/examples/
+        fi
+        
+        # Copy headers
+        cp -r src/ release-package/include/
+        
+        # Copy documentation
+        cp -r docs/ release-package/docs/
+        
+        # Copy essential files
+        cp README.md LICENSE CONTRIBUTING.md CHANGELOG.md release-package/
+
+    - name: Create archive
+      run: |
+        if [[ "$RUNNER_OS" == "Windows" ]]; then
+          7z a ${{ matrix.artifact_name }}.zip release-package/*
+        else
+          tar -czf ${{ matrix.artifact_name }}.tar.gz -C release-package .
+        fi
+
+    - name: Upload Release Asset (Windows)
+      if: runner.os == 'Windows'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ${{ matrix.artifact_name }}.zip
+        asset_name: ${{ matrix.artifact_name }}.zip
+        asset_content_type: application/zip
+
+    - name: Upload Release Asset (Linux/macOS)
+      if: runner.os != 'Windows'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: ${{ matrix.artifact_name }}.tar.gz
+        asset_name: ${{ matrix.artifact_name }}.tar.gz
+        asset_content_type: application/gzip
+
+  deploy-docs:
+    name: Deploy Documentation
+    needs: create-release
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install MkDocs
+      run: |
+        pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
+
+    - name: Build documentation
+      run: |
+        mkdocs build
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./site

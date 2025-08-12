@@ -1,10 +1,10 @@
-#include <QtTest/QtTest>
 #include <QSignalSpy>
+#include <QtTest/QtTest>
 #include <memory>
 
 #include "../../src/Command/Adapters/UIElementAdapter.hpp"
-#include "../../src/Command/UICommand.hpp"
 #include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/UICommand.hpp"
 #include "../../src/Core/UIElement.hpp"
 
 using namespace DeclarativeUI::Command::Adapters;
@@ -92,7 +92,7 @@ void UIElementAdapterTest::testAdapterInitialization() {
     qDebug() << "🧪 Testing adapter initialization...";
 
     QVERIFY(adapter_ != nullptr);
-    
+
     // Test adapter properties
     QVERIFY(!adapter_->getCommandType().isEmpty());
     QVERIFY(!adapter_->getWidgetType().isEmpty());
@@ -134,8 +134,10 @@ void UIElementAdapterTest::testCommandToUIElementConversion() {
 
     // Test using CommandUIElementAdapter (reverse direction)
     // Convert unique_ptr to shared_ptr for the adapter
-    auto sharedCommand = std::shared_ptr<ButtonCommand>(buttonCommand_.release());
-    auto commandElement = std::make_unique<CommandUIElementAdapter>(sharedCommand);
+    auto sharedCommand =
+        std::shared_ptr<ButtonCommand>(buttonCommand_.release());
+    auto commandElement =
+        std::make_unique<CommandUIElementAdapter>(sharedCommand);
     QVERIFY(commandElement != nullptr);
 
     // Test that we can access the underlying command
@@ -177,7 +179,8 @@ void UIElementAdapterTest::testPropertyMapping() {
     adapter_->getState()->setProperty("double_prop", 3.14);
 
     // Verify properties can be retrieved
-    QCOMPARE(adapter_->getState()->getProperty<QString>("string_prop"), QString("String Value"));
+    QCOMPARE(adapter_->getState()->getProperty<QString>("string_prop"),
+             QString("String Value"));
     QCOMPARE(adapter_->getState()->getProperty<int>("int_prop"), 42);
     QCOMPARE(adapter_->getState()->getProperty<bool>("bool_prop"), true);
     QCOMPARE(adapter_->getState()->getProperty<double>("double_prop"), 3.14);
@@ -197,7 +200,8 @@ void UIElementAdapterTest::testPropertySynchronization() {
 
     // Test that the adapter maintains its state
     adapter_->getState()->setProperty("sync_prop", QString("Test Value"));
-    QCOMPARE(adapter_->getState()->getProperty<QString>("sync_prop"), QString("Test Value"));
+    QCOMPARE(adapter_->getState()->getProperty<QString>("sync_prop"),
+             QString("Test Value"));
 
     qDebug() << "✅ Property synchronization test passed";
 }
@@ -212,7 +216,7 @@ void UIElementAdapterTest::testPropertyValidation() {
     adapter_->getState()->setProperty("invalid_prop", QVariant());
 
     // Adapter should handle invalid properties gracefully
-    QVERIFY(true); // Basic validation test
+    QVERIFY(true);  // Basic validation test
 
     qDebug() << "✅ Property validation test passed";
 }
@@ -221,7 +225,7 @@ void UIElementAdapterTest::testCustomPropertyMapping() {
     qDebug() << "🧪 Testing custom property mapping...";
 
     // Test custom property mapping rules
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Custom property mapping test passed";
 }
@@ -230,7 +234,7 @@ void UIElementAdapterTest::testEventAdaptation() {
     qDebug() << "🧪 Testing event adaptation...";
 
     // Test event adaptation between systems
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event adaptation test passed";
 }
@@ -239,7 +243,7 @@ void UIElementAdapterTest::testEventPropagation() {
     qDebug() << "🧪 Testing event propagation...";
 
     // Test event propagation across adapter boundaries
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event propagation test passed";
 }
@@ -248,7 +252,7 @@ void UIElementAdapterTest::testCustomEventHandling() {
     qDebug() << "🧪 Testing custom event handling...";
 
     // Test custom event handling in adapter
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Custom event handling test passed";
 }
@@ -261,7 +265,7 @@ void UIElementAdapterTest::testHierarchyConversion() {
 
     // Test that adapter can handle hierarchy concepts
     adapter_->getState()->setProperty("parent", QString("Parent"));
-    QVERIFY(true); // Basic hierarchy test
+    QVERIFY(true);  // Basic hierarchy test
 
     qDebug() << "✅ Hierarchy conversion test passed";
 }
@@ -270,7 +274,7 @@ void UIElementAdapterTest::testNestedElementConversion() {
     qDebug() << "🧪 Testing nested element conversion...";
 
     // Test deeply nested element conversion
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Nested element conversion test passed";
 }
@@ -279,7 +283,7 @@ void UIElementAdapterTest::testParentChildRelationships() {
     qDebug() << "🧪 Testing parent-child relationships...";
 
     // Test preservation of parent-child relationships during conversion
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Parent-child relationships test passed";
 }
@@ -288,7 +292,7 @@ void UIElementAdapterTest::testStateAdaptation() {
     qDebug() << "🧪 Testing state adaptation...";
 
     // Test state adaptation between UIElement and Command systems
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ State adaptation test passed";
 }
@@ -297,7 +301,7 @@ void UIElementAdapterTest::testStateSynchronization() {
     qDebug() << "🧪 Testing state synchronization...";
 
     // Test state synchronization across adapter boundaries
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ State synchronization test passed";
 }
@@ -306,7 +310,7 @@ void UIElementAdapterTest::testStateConflictResolution() {
     qDebug() << "🧪 Testing state conflict resolution...";
 
     // Test resolution of state conflicts during adaptation
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ State conflict resolution test passed";
 }
@@ -341,7 +345,8 @@ void UIElementAdapterTest::testMassConversionPerformance() {
 
     // Perform many property operations to simulate mass conversion
     for (int i = 0; i < 1000; ++i) {
-        adapter_->getState()->setProperty("text", QString("Mass Element %1").arg(i));
+        adapter_->getState()->setProperty("text",
+                                          QString("Mass Element %1").arg(i));
         auto value = adapter_->getState()->getProperty<QString>("text");
         Q_UNUSED(value);
     }
@@ -349,7 +354,7 @@ void UIElementAdapterTest::testMassConversionPerformance() {
     qint64 elapsed = timer.elapsed();
     qDebug() << "1000 property operations in" << elapsed << "ms";
 
-    QVERIFY(elapsed < 5000); // Should complete within 5 seconds
+    QVERIFY(elapsed < 5000);  // Should complete within 5 seconds
 
     qDebug() << "✅ Mass conversion performance test passed";
 }
@@ -358,7 +363,7 @@ void UIElementAdapterTest::testSynchronizationPerformance() {
     qDebug() << "🧪 Testing synchronization performance...";
 
     // Test performance of synchronization operations
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Synchronization performance test passed";
 }
@@ -370,11 +375,11 @@ void UIElementAdapterTest::testInvalidElementHandling() {
     QVERIFY(adapter_ != nullptr);
 
     // Test setting invalid properties
-    adapter_->getState()->setProperty("", QVariant()); // Empty name
-    adapter_->getState()->setProperty("invalid", QVariant()); // Invalid value
+    adapter_->getState()->setProperty("", QVariant());         // Empty name
+    adapter_->getState()->setProperty("invalid", QVariant());  // Invalid value
 
     // Should handle gracefully
-    QVERIFY(true); // Basic invalid handling test
+    QVERIFY(true);  // Basic invalid handling test
 
     qDebug() << "✅ Invalid element handling test passed";
 }
@@ -393,7 +398,7 @@ void UIElementAdapterTest::testConversionErrorRecovery() {
     qDebug() << "🧪 Testing conversion error recovery...";
 
     // Test recovery from conversion errors
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Conversion error recovery test passed";
 }

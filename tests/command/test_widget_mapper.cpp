@@ -1,15 +1,15 @@
-#include <QtTest/QtTest>
-#include <QSignalSpy>
-#include <QPushButton>
+#include <QCheckBox>
 #include <QLabel>
 #include <QLineEdit>
-#include <QCheckBox>
+#include <QPushButton>
+#include <QSignalSpy>
+#include <QtTest/QtTest>
 #include <memory>
 
-#include "../../src/Command/WidgetMapper.hpp"
-#include "../../src/Command/UICommand.hpp"
 #include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/UICommand.hpp"
 #include "../../src/Command/UICommandFactory.hpp"
+#include "../../src/Command/WidgetMapper.hpp"
 
 using namespace DeclarativeUI::Command::UI;
 
@@ -105,7 +105,7 @@ void WidgetMapperTest::testWidgetCreation() {
     qDebug() << "🧪 Testing widget creation...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     // Create a button command
     auto button = std::make_shared<ButtonCommand>();
     button->getState()->setProperty("text", "Test Button");
@@ -125,16 +125,16 @@ void WidgetMapperTest::testWidgetDestruction() {
     qDebug() << "🧪 Testing widget destruction...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto button = std::make_shared<ButtonCommand>();
     auto widget = globalMapper.createWidget(button.get());
     QVERIFY(widget != nullptr);
 
     // Test destruction
     globalMapper.destroyWidget(button.get());
-    
+
     // Widget should be properly cleaned up
-    QVERIFY(true); // Placeholder - actual test would verify cleanup
+    QVERIFY(true);  // Placeholder - actual test would verify cleanup
 
     qDebug() << "✅ Widget destruction test passed";
 }
@@ -147,7 +147,7 @@ void WidgetMapperTest::testMappingLookup() {
     // Test built-in mappings
     QVERIFY(globalMapper.hasMapping("Button"));
     QVERIFY(globalMapper.hasMapping("Label"));
-    
+
     // Test non-existent mapping
     QVERIFY(!globalMapper.hasMapping("NonExistentWidget"));
 
@@ -158,11 +158,11 @@ void WidgetMapperTest::testCommandToWidgetSync() {
     qDebug() << "🧪 Testing command to widget sync...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto button = std::make_shared<ButtonCommand>();
     auto widget = globalMapper.createWidget(button.get());
     auto* qButton = qobject_cast<QPushButton*>(widget.get());
-    
+
     QVERIFY(qButton != nullptr);
 
     // Change command property
@@ -179,11 +179,11 @@ void WidgetMapperTest::testWidgetToCommandSync() {
     qDebug() << "🧪 Testing widget to command sync...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto button = std::make_shared<ButtonCommand>();
     auto widget = globalMapper.createWidget(button.get());
     auto* qButton = qobject_cast<QPushButton*>(widget.get());
-    
+
     QVERIFY(qButton != nullptr);
 
     // Change widget property
@@ -191,7 +191,8 @@ void WidgetMapperTest::testWidgetToCommandSync() {
     button->syncFromWidget();
 
     // Command should reflect the change
-    QCOMPARE(button->getState()->getProperty<QString>("text"), QString("Widget Updated"));
+    QCOMPARE(button->getState()->getProperty<QString>("text"),
+             QString("Widget Updated"));
 
     qDebug() << "✅ Widget to command sync test passed";
 }
@@ -200,10 +201,10 @@ void WidgetMapperTest::testBidirectionalSync() {
     qDebug() << "🧪 Testing bidirectional sync...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto button = std::make_shared<ButtonCommand>();
     auto widget = globalMapper.createWidget(button.get());
-    
+
     // Establish bidirectional binding
     globalMapper.establishBinding(button.get(), widget.get());
 
@@ -225,14 +226,14 @@ void WidgetMapperTest::testPropertyMapping() {
     qDebug() << "🧪 Testing property mapping...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto button = std::make_shared<ButtonCommand>();
     button->getState()->setProperty("text", "Test");
     button->getState()->setProperty("enabled", false);
-    
+
     auto widget = globalMapper.createWidget(button.get());
     auto* qButton = qobject_cast<QPushButton*>(widget.get());
-    
+
     QVERIFY(qButton != nullptr);
     QCOMPARE(qButton->text(), QString("Test"));
     QCOMPARE(qButton->isEnabled(), false);
@@ -244,11 +245,11 @@ void WidgetMapperTest::testEventBinding() {
     qDebug() << "🧪 Testing event binding...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto button = std::make_shared<ButtonCommand>();
     auto widget = globalMapper.createWidget(button.get());
     auto* qButton = qobject_cast<QPushButton*>(widget.get());
-    
+
     QVERIFY(qButton != nullptr);
 
     // Set up signal spy
@@ -267,7 +268,7 @@ void WidgetMapperTest::testEventPropagation() {
     qDebug() << "🧪 Testing event propagation...";
 
     // Test that events properly propagate through the command system
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event propagation test passed";
 }
@@ -276,7 +277,7 @@ void WidgetMapperTest::testCustomEventHandling() {
     qDebug() << "🧪 Testing custom event handling...";
 
     // Test custom event handling in widget mapping
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Custom event handling test passed";
 }
@@ -285,14 +286,14 @@ void WidgetMapperTest::testButtonMapping() {
     qDebug() << "🧪 Testing button mapping...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto button = std::make_shared<ButtonCommand>();
     button->getState()->setProperty("text", "Click Me");
     button->getState()->setProperty("enabled", true);
-    
+
     auto widget = globalMapper.createWidget(button.get());
     auto* qButton = qobject_cast<QPushButton*>(widget.get());
-    
+
     QVERIFY(qButton != nullptr);
     QCOMPARE(qButton->text(), QString("Click Me"));
     QVERIFY(qButton->isEnabled());
@@ -304,14 +305,14 @@ void WidgetMapperTest::testLabelMapping() {
     qDebug() << "🧪 Testing label mapping...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto label = UICommandFactory::instance().createCommand("Label");
     if (label) {
         label->getState()->setProperty("text", "Test Label");
-        
+
         auto widget = globalMapper.createWidget(label.get());
         auto* qLabel = qobject_cast<QLabel*>(widget.get());
-        
+
         QVERIFY(qLabel != nullptr);
         QCOMPARE(qLabel->text(), QString("Test Label"));
     }
@@ -323,15 +324,15 @@ void WidgetMapperTest::testTextInputMapping() {
     qDebug() << "🧪 Testing text input mapping...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto textInput = UICommandFactory::instance().createCommand("TextInput");
     if (textInput) {
         textInput->getState()->setProperty("text", "Initial Text");
         textInput->getState()->setProperty("placeholder", "Enter text...");
-        
+
         auto widget = globalMapper.createWidget(textInput.get());
         auto* qLineEdit = qobject_cast<QLineEdit*>(widget.get());
-        
+
         QVERIFY(qLineEdit != nullptr);
         QCOMPARE(qLineEdit->text(), QString("Initial Text"));
         QCOMPARE(qLineEdit->placeholderText(), QString("Enter text..."));
@@ -344,15 +345,15 @@ void WidgetMapperTest::testCheckBoxMapping() {
     qDebug() << "🧪 Testing checkbox mapping...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto checkBox = UICommandFactory::instance().createCommand("CheckBox");
     if (checkBox) {
         checkBox->getState()->setProperty("text", "Check me");
         checkBox->getState()->setProperty("checked", true);
-        
+
         auto widget = globalMapper.createWidget(checkBox.get());
         auto* qCheckBox = qobject_cast<QCheckBox*>(widget.get());
-        
+
         QVERIFY(qCheckBox != nullptr);
         QCOMPARE(qCheckBox->text(), QString("Check me"));
         QVERIFY(qCheckBox->isChecked());
@@ -365,7 +366,7 @@ void WidgetMapperTest::testCustomWidgetMapping() {
     qDebug() << "🧪 Testing custom widget mapping...";
 
     // Test registering and using custom widget mappings
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Custom widget mapping test passed";
 }
@@ -374,7 +375,7 @@ void WidgetMapperTest::testWidgetHierarchy() {
     qDebug() << "🧪 Testing widget hierarchy...";
 
     // Test creating widget hierarchies from command hierarchies
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Widget hierarchy test passed";
 }
@@ -383,7 +384,7 @@ void WidgetMapperTest::testDynamicMapping() {
     qDebug() << "🧪 Testing dynamic mapping...";
 
     // Test dynamic mapping registration and updates
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Dynamic mapping test passed";
 }
@@ -392,7 +393,7 @@ void WidgetMapperTest::testInvalidCommandType() {
     qDebug() << "🧪 Testing invalid command type...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     // Try to create widget for non-existent command type
     auto widget = globalMapper.createWidget(nullptr);
     QVERIFY(widget == nullptr);
@@ -404,7 +405,7 @@ void WidgetMapperTest::testNullCommandHandling() {
     qDebug() << "🧪 Testing null command handling...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     // Test null command handling
     auto widget = globalMapper.createWidget(nullptr);
     QVERIFY(widget == nullptr);
@@ -416,7 +417,7 @@ void WidgetMapperTest::testMappingConflicts() {
     qDebug() << "🧪 Testing mapping conflicts...";
 
     // Test handling of mapping conflicts and overwrites
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Mapping conflicts test passed";
 }
@@ -425,7 +426,7 @@ void WidgetMapperTest::testMassWidgetCreation() {
     qDebug() << "🧪 Testing mass widget creation...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     QElapsedTimer timer;
     timer.start();
 
@@ -443,7 +444,7 @@ void WidgetMapperTest::testMassWidgetCreation() {
     qDebug() << "Created 100 widgets in" << elapsed << "ms";
 
     QCOMPARE(widgets.size(), 100);
-    QVERIFY(elapsed < 1000); // Should be fast
+    QVERIFY(elapsed < 1000);  // Should be fast
 
     qDebug() << "✅ Mass widget creation test passed";
 }
@@ -452,10 +453,10 @@ void WidgetMapperTest::testSyncPerformance() {
     qDebug() << "🧪 Testing sync performance...";
 
     auto& globalMapper = WidgetMapper::instance();
-    
+
     auto button = std::make_shared<ButtonCommand>();
     auto widget = globalMapper.createWidget(button.get());
-    
+
     QElapsedTimer timer;
     timer.start();
 
@@ -468,7 +469,7 @@ void WidgetMapperTest::testSyncPerformance() {
     qint64 elapsed = timer.elapsed();
     qDebug() << "1000 sync operations in" << elapsed << "ms";
 
-    QVERIFY(elapsed < 2000); // Should be reasonably fast
+    QVERIFY(elapsed < 2000);  // Should be reasonably fast
 
     qDebug() << "✅ Sync performance test passed";
 }

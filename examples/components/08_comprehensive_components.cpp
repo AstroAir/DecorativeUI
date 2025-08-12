@@ -1,24 +1,24 @@
 // Examples/comprehensive_components_example.cpp
 #include <QApplication>
-#include <QMainWindow>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGridLayout>
-#include <QTabWidget>
-#include <QPushButton>
 #include <QDebug>
+#include <QGridLayout>
+#include <QHBoxLayout>
+#include <QMainWindow>
+#include <QPushButton>
+#include <QTabWidget>
+#include <QVBoxLayout>
 
 // Include all new components
-#include "Components/RadioButton.hpp"
-#include "Components/Dial.hpp"
-#include "Components/LCDNumber.hpp"
 #include "Components/Calendar.hpp"
-#include "Components/Splitter.hpp"
-#include "Components/ScrollArea.hpp"
-#include "Components/DockWidget.hpp"
-#include "Components/MessageBox.hpp"
-#include "Components/FileDialog.hpp"
 #include "Components/ColorDialog.hpp"
+#include "Components/Dial.hpp"
+#include "Components/DockWidget.hpp"
+#include "Components/FileDialog.hpp"
+#include "Components/LCDNumber.hpp"
+#include "Components/MessageBox.hpp"
+#include "Components/RadioButton.hpp"
+#include "Components/ScrollArea.hpp"
+#include "Components/Splitter.hpp"
 #include "Components/StatusBar.hpp"
 #include "Components/ToolBar.hpp"
 
@@ -28,7 +28,8 @@ class ComprehensiveComponentsExample : public QMainWindow {
     Q_OBJECT
 
 public:
-    ComprehensiveComponentsExample(QWidget* parent = nullptr) : QMainWindow(parent) {
+    ComprehensiveComponentsExample(QWidget* parent = nullptr)
+        : QMainWindow(parent) {
         setupUI();
     }
 
@@ -68,38 +69,41 @@ private:
 
         // RadioButton and ButtonGroup example
         auto* radioGroup = new ButtonGroup();
-        radioGroup->exclusive(true)
-                  .onButtonClicked([this](QAbstractButton* button) {
-                      statusBar()->showMessage(QString("Radio button clicked: %1").arg(button->text()));
-                  });
+        radioGroup->exclusive(true).onButtonClicked(
+            [this](QAbstractButton* button) {
+                statusBar()->showMessage(
+                    QString("Radio button clicked: %1").arg(button->text()));
+            });
 
         auto* radio1 = new RadioButton();
-        radio1->text("Option 1")
-              .checked(true)
-              .onToggled([this](bool checked) {
-                  if (checked) qDebug() << "Option 1 selected";
-              });
+        radio1->text("Option 1").checked(true).onToggled([this](bool checked) {
+            if (checked)
+                qDebug() << "Option 1 selected";
+        });
 
         auto* radio2 = new RadioButton();
-        radio2->text("Option 2")
-              .onToggled([this](bool checked) {
-                  if (checked) qDebug() << "Option 2 selected";
-              });
+        radio2->text("Option 2").onToggled([this](bool checked) {
+            if (checked)
+                qDebug() << "Option 2 selected";
+        });
 
         auto* radio3 = new RadioButton();
-        radio3->text("Option 3")
-              .onToggled([this](bool checked) {
-                  if (checked) qDebug() << "Option 3 selected";
-              });
+        radio3->text("Option 3").onToggled([this](bool checked) {
+            if (checked)
+                qDebug() << "Option 3 selected";
+        });
 
         radio1->initialize();
         radio2->initialize();
         radio3->initialize();
         radioGroup->initialize();
 
-        radioGroup->addButton(qobject_cast<QRadioButton*>(radio1->getWidget()), 1);
-        radioGroup->addButton(qobject_cast<QRadioButton*>(radio2->getWidget()), 2);
-        radioGroup->addButton(qobject_cast<QRadioButton*>(radio3->getWidget()), 3);
+        radioGroup->addButton(qobject_cast<QRadioButton*>(radio1->getWidget()),
+                              1);
+        radioGroup->addButton(qobject_cast<QRadioButton*>(radio2->getWidget()),
+                              2);
+        radioGroup->addButton(qobject_cast<QRadioButton*>(radio3->getWidget()),
+                              3);
 
         layout->addWidget(radio1->getWidget(), 0, 0);
         layout->addWidget(radio2->getWidget(), 0, 1);
@@ -128,20 +132,20 @@ private:
         // LCDNumber example
         auto* lcd = new LCDNumber();
         lcd->digitCount(6)
-           .value(123.45)
-           .mode(QLCDNumber::Dec)
-           .segmentStyle(QLCDNumber::Filled);
+            .value(123.45)
+            .mode(QLCDNumber::Dec)
+            .segmentStyle(QLCDNumber::Filled);
         lcd->initialize();
 
         layout->addWidget(lcd->getWidget(), 0, 0);
 
         // Calendar example
         auto* calendar = new Calendar();
-        calendar->gridVisible(true)
-                .navigationBarVisible(true)
-                .onClicked([this](const QDate& date) {
-                    statusBar()->showMessage(QString("Date selected: %1").arg(date.toString()));
-                });
+        calendar->gridVisible(true).navigationBarVisible(true).onClicked(
+            [this](const QDate& date) {
+                statusBar()->showMessage(
+                    QString("Date selected: %1").arg(date.toString()));
+            });
         calendar->initialize();
 
         layout->addWidget(calendar->getWidget(), 1, 0);
@@ -156,10 +160,13 @@ private:
         // Splitter example
         auto* splitter = new Splitter();
         splitter->orientation(Qt::Horizontal)
-                .childrenCollapsible(true)
-                .onSplitterMoved([this](int pos, int index) {
-                    statusBar()->showMessage(QString("Splitter moved: pos=%1, index=%2").arg(pos).arg(index));
-                });
+            .childrenCollapsible(true)
+            .onSplitterMoved([this](int pos, int index) {
+                statusBar()->showMessage(
+                    QString("Splitter moved: pos=%1, index=%2")
+                        .arg(pos)
+                        .arg(index));
+            });
         splitter->initialize();
 
         // Add widgets to splitter
@@ -172,13 +179,13 @@ private:
         splitter->addWidget(rightWidget);
         splitter->setSizes({200, 300});
 
-        layout->addWidget(splitter->getWidget(0)); // Get the first widget
+        layout->addWidget(splitter->getWidget(0));  // Get the first widget
 
         // ScrollArea example
         auto* scrollArea = new ScrollArea();
         scrollArea->widgetResizable(true)
-                  .horizontalScrollBarPolicy(Qt::ScrollBarAsNeeded)
-                  .verticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+            .horizontalScrollBarPolicy(Qt::ScrollBarAsNeeded)
+            .verticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
         scrollArea->initialize();
 
         auto* scrollContent = new QWidget();
@@ -198,23 +205,29 @@ private:
         // MessageBox examples
         auto* msgButton = new QPushButton("Show Message Box");
         connect(msgButton, &QPushButton::clicked, [this]() {
-            MessageBox::information(this, "Information", "This is an information message!");
+            MessageBox::information(this, "Information",
+                                    "This is an information message!");
         });
         layout->addWidget(msgButton);
 
         auto* questionButton = new QPushButton("Show Question Dialog");
         connect(questionButton, &QPushButton::clicked, [this]() {
-            auto result = MessageBox::question(this, "Question", "Do you want to continue?");
-            statusBar()->showMessage(result == QMessageBox::Yes ? "User clicked Yes" : "User clicked No");
+            auto result = MessageBox::question(this, "Question",
+                                               "Do you want to continue?");
+            statusBar()->showMessage(result == QMessageBox::Yes
+                                         ? "User clicked Yes"
+                                         : "User clicked No");
         });
         layout->addWidget(questionButton);
 
         // FileDialog examples
         auto* fileButton = new QPushButton("Open File Dialog");
         connect(fileButton, &QPushButton::clicked, [this]() {
-            QString fileName = FileDialog::getOpenFileName(this, "Open File", "", "All Files (*.*)");
+            QString fileName = FileDialog::getOpenFileName(
+                this, "Open File", "", "All Files (*.*)");
             if (!fileName.isEmpty()) {
-                statusBar()->showMessage(QString("Selected file: %1").arg(fileName));
+                statusBar()->showMessage(
+                    QString("Selected file: %1").arg(fileName));
             }
         });
         layout->addWidget(fileButton);
@@ -224,7 +237,8 @@ private:
         connect(colorButton, &QPushButton::clicked, [this]() {
             QColor color = ColorDialog::getColor(Qt::red, this, "Select Color");
             if (color.isValid()) {
-                statusBar()->showMessage(QString("Selected color: %1").arg(color.name()));
+                statusBar()->showMessage(
+                    QString("Selected color: %1").arg(color.name()));
             }
         });
         layout->addWidget(colorButton);
@@ -236,16 +250,20 @@ private:
         auto* advancedTab = new QWidget();
         auto* layout = new QVBoxLayout(advancedTab);
 
-        auto* label = new QLabel("Advanced components are integrated into the main window:");
+        auto* label = new QLabel(
+            "Advanced components are integrated into the main window:");
         layout->addWidget(label);
 
-        auto* statusLabel = new QLabel("• StatusBar: Check the bottom of the window");
+        auto* statusLabel =
+            new QLabel("• StatusBar: Check the bottom of the window");
         layout->addWidget(statusLabel);
 
-        auto* toolbarLabel = new QLabel("• ToolBar: Check the top of the window");
+        auto* toolbarLabel =
+            new QLabel("• ToolBar: Check the top of the window");
         layout->addWidget(toolbarLabel);
 
-        auto* dockLabel = new QLabel("• DockWidget: Check the sides of the window");
+        auto* dockLabel =
+            new QLabel("• DockWidget: Check the sides of the window");
         layout->addWidget(dockLabel);
 
         tabWidget->addTab(advancedTab, "Advanced Components");
@@ -254,7 +272,7 @@ private:
     void setupStatusBar() {
         auto* statusBar = new StatusBar();
         statusBar->showMessage("Ready - Comprehensive Components Example")
-                 .setSizeGripEnabled(true);
+            .setSizeGripEnabled(true);
         statusBar->initialize();
 
         setStatusBar(qobject_cast<QStatusBar*>(statusBar->getWidget()));
@@ -263,14 +281,15 @@ private:
     void setupToolBar() {
         auto* toolBar = new ToolBar();
         toolBar->windowTitle("Main Toolbar")
-               .movable(true)
-               .addAction("New", []() { qDebug() << "New action triggered"; })
-               .addAction("Open", []() { qDebug() << "Open action triggered"; })
-               .addSeparator()
-               .addAction("Save", []() { qDebug() << "Save action triggered"; })
-               .onActionTriggered([this](QAction* action) {
-                   statusBar()->showMessage(QString("Toolbar action: %1").arg(action->text()));
-               });
+            .movable(true)
+            .addAction("New", []() { qDebug() << "New action triggered"; })
+            .addAction("Open", []() { qDebug() << "Open action triggered"; })
+            .addSeparator()
+            .addAction("Save", []() { qDebug() << "Save action triggered"; })
+            .onActionTriggered([this](QAction* action) {
+                statusBar()->showMessage(
+                    QString("Toolbar action: %1").arg(action->text()));
+            });
         toolBar->initialize();
 
         addToolBar(qobject_cast<QToolBar*>(toolBar->getWidget()));
@@ -280,29 +299,32 @@ private:
         // Left dock widget
         auto* leftDock = new DockWidget();
         leftDock->windowTitle("Properties")
-                .allowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea)
-                .onDockLocationChanged([this](Qt::DockWidgetArea area) {
-                    statusBar()->showMessage(QString("Dock moved to area: %1").arg(static_cast<int>(area)));
-                });
+            .allowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea)
+            .onDockLocationChanged([this](Qt::DockWidgetArea area) {
+                statusBar()->showMessage(QString("Dock moved to area: %1")
+                                             .arg(static_cast<int>(area)));
+            });
         leftDock->initialize();
 
         auto* leftContent = new QWidget();
         leftContent->setStyleSheet("background-color: lightcyan;");
         leftDock->widget(leftContent);
 
-        addDockWidget(Qt::LeftDockWidgetArea, qobject_cast<QDockWidget*>(leftDock->getWidget()));
+        addDockWidget(Qt::LeftDockWidgetArea,
+                      qobject_cast<QDockWidget*>(leftDock->getWidget()));
 
         // Right dock widget
         auto* rightDock = new DockWidget();
-        rightDock->windowTitle("Tools")
-                 .allowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+        rightDock->windowTitle("Tools").allowedAreas(Qt::LeftDockWidgetArea |
+                                                     Qt::RightDockWidgetArea);
         rightDock->initialize();
 
         auto* rightContent = new QWidget();
         rightContent->setStyleSheet("background-color: lavender;");
         rightDock->widget(rightContent);
 
-        addDockWidget(Qt::RightDockWidgetArea, qobject_cast<QDockWidget*>(rightDock->getWidget()));
+        addDockWidget(Qt::RightDockWidgetArea,
+                      qobject_cast<QDockWidget*>(rightDock->getWidget()));
     }
 };
 

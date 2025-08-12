@@ -1,13 +1,13 @@
-#include <QtTest/QtTest>
 #include <QSignalSpy>
+#include <QtTest/QtTest>
 #include <memory>
 
-#include "../../src/Command/Adapters/IntegrationManager.hpp"
-#include "../../src/Command/Adapters/UIElementAdapter.hpp"
 #include "../../src/Command/Adapters/ComponentSystemAdapter.hpp"
+#include "../../src/Command/Adapters/IntegrationManager.hpp"
 #include "../../src/Command/Adapters/StateManagerAdapter.hpp"
-#include "../../src/Command/UICommand.hpp"
+#include "../../src/Command/Adapters/UIElementAdapter.hpp"
 #include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/UICommand.hpp"
 #include "../../src/Components/Button.hpp"
 #include "../../src/Core/UIElement.hpp"
 
@@ -106,7 +106,7 @@ void IntegrationManagerTest::testManagerInitialization() {
     qDebug() << "🧪 Testing manager initialization...";
 
     QVERIFY(manager_ != nullptr);
-    
+
     // Test singleton access
     auto& instance = IntegrationManager::instance();
     QVERIFY(&instance != nullptr);
@@ -158,7 +158,7 @@ void IntegrationManagerTest::testAdapterUnregistration() {
 
     // After shutdown, adapters should be cleaned up
     // Note: The actual API doesn't have individual unregister methods
-    QVERIFY(true); // Placeholder for actual shutdown verification
+    QVERIFY(true);  // Placeholder for actual shutdown verification
 
     qDebug() << "✅ Adapter unregistration test passed";
 }
@@ -206,7 +206,7 @@ void IntegrationManagerTest::testStateManagerIntegration() {
     QVERIFY(manager_->getStateAdapter() != nullptr);
 
     // Test basic functionality
-    QVERIFY(true); // Placeholder for actual state integration tests
+    QVERIFY(true);  // Placeholder for actual state integration tests
 
     qDebug() << "✅ State Manager integration test passed";
 }
@@ -276,7 +276,7 @@ void IntegrationManagerTest::testSynchronizationConflictResolution() {
     qDebug() << "🧪 Testing synchronization conflict resolution...";
 
     // Test resolution of synchronization conflicts
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Synchronization conflict resolution test passed";
 }
@@ -285,7 +285,7 @@ void IntegrationManagerTest::testCrossSystemEventHandling() {
     qDebug() << "🧪 Testing cross-system event handling...";
 
     // Test event handling across system boundaries
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Cross-system event handling test passed";
 }
@@ -294,7 +294,7 @@ void IntegrationManagerTest::testEventPropagationCoordination() {
     qDebug() << "🧪 Testing event propagation coordination...";
 
     // Test coordination of event propagation across systems
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event propagation coordination test passed";
 }
@@ -303,7 +303,7 @@ void IntegrationManagerTest::testEventFilteringCoordination() {
     qDebug() << "🧪 Testing event filtering coordination...";
 
     // Test coordination of event filtering across systems
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event filtering coordination test passed";
 }
@@ -317,7 +317,7 @@ void IntegrationManagerTest::testTransactionCoordination() {
 
     // Test validation
     bool isValid = manager_->validateIntegration();
-    QVERIFY(isValid || !isValid); // Either result is acceptable
+    QVERIFY(isValid || !isValid);  // Either result is acceptable
 
     qDebug() << "✅ Transaction coordination test passed";
 }
@@ -326,7 +326,7 @@ void IntegrationManagerTest::testCrossSystemTransactions() {
     qDebug() << "🧪 Testing cross-system transactions...";
 
     // Test transactions that span multiple systems
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Cross-system transactions test passed";
 }
@@ -339,7 +339,8 @@ void IntegrationManagerTest::testTransactionRollback() {
 
     // Test getting integration issues
     auto issues = manager_->getIntegrationIssues();
-    QVERIFY(issues.isEmpty() || !issues.isEmpty()); // Either result is acceptable
+    QVERIFY(issues.isEmpty() ||
+            !issues.isEmpty());  // Either result is acceptable
 
     qDebug() << "✅ Transaction rollback test passed";
 }
@@ -353,7 +354,8 @@ void IntegrationManagerTest::testIntegrationPerformance() {
     timer.start();
 
     // Perform many conversions
-    std::vector<std::shared_ptr<DeclarativeUI::Command::UI::BaseUICommand>> commands;
+    std::vector<std::shared_ptr<DeclarativeUI::Command::UI::BaseUICommand>>
+        commands;
     for (int i = 0; i < 100; ++i) {
         auto button = std::make_unique<Button>();
         button->text(QString("Button %1").arg(i));
@@ -368,7 +370,7 @@ void IntegrationManagerTest::testIntegrationPerformance() {
     qDebug() << "100 conversions in" << elapsed << "ms";
 
     QVERIFY(commands.size() > 0);
-    QVERIFY(elapsed < 5000); // Should be reasonably fast
+    QVERIFY(elapsed < 5000);  // Should be reasonably fast
 
     qDebug() << "✅ Integration performance test passed";
 }
@@ -383,9 +385,11 @@ void IntegrationManagerTest::testMassIntegrationPerformance() {
 
     // Mass conversion
     std::vector<std::unique_ptr<Button>> buttons;
-    std::vector<std::shared_ptr<DeclarativeUI::Command::UI::BaseUICommand>> commands;
+    std::vector<std::shared_ptr<DeclarativeUI::Command::UI::BaseUICommand>>
+        commands;
 
-    for (int i = 0; i < 100; ++i) { // Reduced from 1000 to 100 for faster tests
+    for (int i = 0; i < 100;
+         ++i) {  // Reduced from 1000 to 100 for faster tests
         auto button = std::make_unique<Button>();
         button->text(QString("Mass Button %1").arg(i));
 
@@ -400,7 +404,7 @@ void IntegrationManagerTest::testMassIntegrationPerformance() {
     qDebug() << "100 mass conversions in" << elapsed << "ms";
 
     QVERIFY(commands.size() > 0);
-    QVERIFY(elapsed < 10000); // Should handle mass conversion
+    QVERIFY(elapsed < 10000);  // Should handle mass conversion
 
     qDebug() << "✅ Mass integration performance test passed";
 }
@@ -409,7 +413,7 @@ void IntegrationManagerTest::testSynchronizationPerformance() {
     qDebug() << "🧪 Testing synchronization performance...";
 
     // Test performance of synchronization operations
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Synchronization performance test passed";
 }
@@ -424,7 +428,7 @@ void IntegrationManagerTest::testAdapterConflictHandling() {
     manager_->runIntegrationTests();
 
     // Should handle operations gracefully
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Adapter conflict handling test passed";
 }
@@ -433,7 +437,7 @@ void IntegrationManagerTest::testIntegrationErrorRecovery() {
     qDebug() << "🧪 Testing integration error recovery...";
 
     // Test recovery from integration errors
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Integration error recovery test passed";
 }
@@ -442,7 +446,7 @@ void IntegrationManagerTest::testSystemFailureHandling() {
     qDebug() << "🧪 Testing system failure handling...";
 
     // Test handling of system failures during integration
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ System failure handling test passed";
 }

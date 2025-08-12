@@ -40,6 +40,7 @@ add_library(Components
     Layout.hpp
     Layout.cpp
     GroupBox.hpp
+    GroupBox.cpp
     TabWidget.hpp
     Frame.hpp
     Frame.cpp
@@ -59,7 +60,9 @@ add_library(Components
     ListView.cpp
     MenuBar.hpp
     DateTimeEdit.hpp
+    DateTimeEdit.cpp
     Calendar.hpp
+    Calendar.cpp
 
     # Dialogs
     FileDialog.hpp

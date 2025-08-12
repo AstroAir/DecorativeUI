@@ -1,0 +1,105 @@
+name: 📚 Documentation Issue
+description: Report issues with documentation or request documentation improvements
+title: "[Docs]: "
+labels: ["documentation", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve our documentation! Please provide details about the documentation issue or improvement.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation issue is this?
+      options:
+        - Missing documentation
+        - Incorrect information
+        - Unclear explanation
+        - Broken links
+        - Outdated content
+        - Typo/Grammar
+        - API reference issue
+        - Example issue
+        - Tutorial improvement
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Documentation Location
+      description: Where is the documentation issue located?
+      placeholder: "docs/api/core.md, README.md, examples/basic/01_hello_world.cpp"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue Description
+      description: Describe the documentation issue in detail
+      placeholder: What's wrong with the current documentation?
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-improvement
+    attributes:
+      label: Suggested Improvement
+      description: How should the documentation be improved?
+      placeholder: What would make this documentation better?
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-content
+    attributes:
+      label: Current Content (if applicable)
+      description: Copy the current documentation content that needs to be changed
+      render: markdown
+      placeholder: Paste the current content here...
+
+  - type: textarea
+    id: proposed-content
+    attributes:
+      label: Proposed Content (if applicable)
+      description: Provide the improved content if you have specific suggestions
+      render: markdown
+      placeholder: Paste your proposed content here...
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Target Audience
+      description: Who is the primary audience for this documentation?
+      options:
+        - New users/beginners
+        - Experienced developers
+        - Contributors/maintainers
+        - API users
+        - All users
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context about the documentation issue
+      placeholder: Any additional information that might be helpful...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have checked the latest version of the documentation
+          required: true

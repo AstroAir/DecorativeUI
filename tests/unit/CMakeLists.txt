@@ -111,6 +111,86 @@ target_link_libraries(ThreadSafetyTest
     Qt6::Concurrent
 )
 
+# **Modern C++20 Features Tests**
+add_executable(ModernCppTest test_modern_cpp_features.cpp)
+target_link_libraries(ModernCppTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Theme System Tests**
+add_executable(ThemeSystemTest test_theme_system.cpp)
+target_link_libraries(ThemeSystemTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Animation System Tests**
+add_executable(AnimationSystemTest test_animation_system.cpp)
+target_link_libraries(AnimationSystemTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Validation Framework Tests**
+add_executable(ValidationFrameworkTest test_validation_framework.cpp)
+target_link_libraries(ValidationFrameworkTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Error Handling Tests**
+add_executable(ErrorHandlingTest test_error_handling.cpp)
+target_link_libraries(ErrorHandlingTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Component Utils Tests**
+add_executable(ComponentUtilsTest test_component_utils.cpp)
+target_link_libraries(ComponentUtilsTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Smart Pointers Tests**
+add_executable(SmartPointersTest test_smart_pointers.cpp)
+target_link_libraries(SmartPointersTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Accessibility Tests**
+add_executable(AccessibilityTest test_accessibility.cpp)
+target_link_libraries(AccessibilityTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
 # **Set output directory for unit tests**
 set_target_properties(
     CoreTest
@@ -121,6 +201,15 @@ set_target_properties(
     JSONTest
     # HotReloadTest
     ExceptionsTest
+    ThreadSafetyTest
+    ModernCppTest
+    ThemeSystemTest
+    AnimationSystemTest
+    ValidationFrameworkTest
+    ErrorHandlingTest
+    ComponentUtilsTest
+    SmartPointersTest
+    AccessibilityTest
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests/unit
 )
@@ -134,6 +223,15 @@ add_dependencies(PropertyBindingTemplateTest CopyTestResources)
 add_dependencies(JSONTest CopyTestResources)
 # add_dependencies(HotReloadTest CopyTestResources)
 add_dependencies(ExceptionsTest CopyTestResources)
+add_dependencies(ThreadSafetyTest CopyTestResources)
+add_dependencies(ModernCppTest CopyTestResources)
+add_dependencies(ThemeSystemTest CopyTestResources)
+add_dependencies(AnimationSystemTest CopyTestResources)
+add_dependencies(ValidationFrameworkTest CopyTestResources)
+add_dependencies(ErrorHandlingTest CopyTestResources)
+add_dependencies(ComponentUtilsTest CopyTestResources)
+add_dependencies(SmartPointersTest CopyTestResources)
+add_dependencies(AccessibilityTest CopyTestResources)
 
 # **Register tests with CTest**
 add_test(NAME CoreTest COMMAND CoreTest)
@@ -144,3 +242,12 @@ add_test(NAME PropertyBindingTemplateTest COMMAND PropertyBindingTemplateTest)
 add_test(NAME JSONTest COMMAND JSONTest)
 # add_test(NAME HotReloadTest COMMAND HotReloadTest)
 add_test(NAME ExceptionsTest COMMAND ExceptionsTest)
+add_test(NAME ThreadSafetyTest COMMAND ThreadSafetyTest)
+add_test(NAME ModernCppTest COMMAND ModernCppTest)
+add_test(NAME ThemeSystemTest COMMAND ThemeSystemTest)
+add_test(NAME AnimationSystemTest COMMAND AnimationSystemTest)
+add_test(NAME ValidationFrameworkTest COMMAND ValidationFrameworkTest)
+add_test(NAME ErrorHandlingTest COMMAND ErrorHandlingTest)
+add_test(NAME ComponentUtilsTest COMMAND ComponentUtilsTest)
+add_test(NAME SmartPointersTest COMMAND SmartPointersTest)
+add_test(NAME AccessibilityTest COMMAND AccessibilityTest)

@@ -1,11 +1,11 @@
-#include <QtTest/QtTest>
 #include <QSignalSpy>
 #include <QTimer>
+#include <QtTest/QtTest>
 #include <memory>
 
 #include "../../src/Command/CommandEvents.hpp"
-#include "../../src/Command/UICommand.hpp"
 #include "../../src/Command/CoreCommands.hpp"
+#include "../../src/Command/UICommand.hpp"
 
 using namespace DeclarativeUI::Command::UI;
 using namespace DeclarativeUI::Command::UI::Events;
@@ -86,7 +86,7 @@ void CommandEventsTest::testEventCreation() {
     qDebug() << "🧪 Testing event creation...";
 
     auto event = std::make_unique<ClickEvent>(button_.get());
-    
+
     QVERIFY(event != nullptr);
     QCOMPARE(event->getType(), CommandEventType::Clicked);
     QCOMPARE(event->getSource(), button_.get());
@@ -100,7 +100,7 @@ void CommandEventsTest::testEventProperties() {
     qDebug() << "🧪 Testing event properties...";
 
     auto event = std::make_unique<ClickEvent>(button_.get());
-    
+
     // Test basic properties
     QCOMPARE(event->getTypeName(), QString("Clicked"));
     QVERIFY(!event->isAccepted());
@@ -124,7 +124,7 @@ void CommandEventsTest::testEventData() {
     qDebug() << "🧪 Testing event data...";
 
     auto event = std::make_unique<CustomEvent>("test_event", button_.get());
-    
+
     // Test setting and getting data
     event->setData("key1", QString("value1"));
     event->setData("key2", 42);
@@ -135,7 +135,8 @@ void CommandEventsTest::testEventData() {
     QCOMPARE(event->getData("key3").toBool(), true);
 
     // Test default values
-    QCOMPARE(event->getData("nonexistent", "default").toString(), QString("default"));
+    QCOMPARE(event->getData("nonexistent", "default").toString(),
+             QString("default"));
 
     // Test data existence
     QVERIFY(event->hasData("key1"));
@@ -158,7 +159,7 @@ void CommandEventsTest::testEventCloning() {
     original->accept();
 
     auto cloned = original->clone();
-    
+
     QVERIFY(cloned != nullptr);
     QCOMPARE(cloned->getType(), original->getType());
     QCOMPARE(cloned->getSource(), original->getSource());
@@ -175,7 +176,7 @@ void CommandEventsTest::testClickedEvent() {
     qDebug() << "🧪 Testing clicked event...";
 
     auto event = std::make_unique<ClickEvent>(button_.get());
-    
+
     QCOMPARE(event->getType(), CommandEventType::Clicked);
     QCOMPARE(event->getTypeName(), QString("Clicked"));
 
@@ -231,8 +232,9 @@ void CommandEventsTest::testStateChangedEvent() {
 void CommandEventsTest::testCustomEvent() {
     qDebug() << "🧪 Testing custom event...";
 
-    auto event = std::make_unique<CustomEvent>("my_custom_event", button_.get());
-    
+    auto event =
+        std::make_unique<CustomEvent>("my_custom_event", button_.get());
+
     QCOMPARE(event->getType(), CommandEventType::Custom);
     QCOMPARE(event->getCustomType(), QString("my_custom_event"));
 
@@ -250,10 +252,11 @@ void CommandEventsTest::testEventDispatch() {
 
     bool handlerCalled = false;
     dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
-        [&handlerCalled](const CommandEvent& event) {
-            handlerCalled = true;
-            qDebug() << "Handler called for event:" << event.getTypeName();
-        });
+                                 [&handlerCalled](const CommandEvent& event) {
+                                     handlerCalled = true;
+                                     qDebug() << "Handler called for event:"
+                                              << event.getTypeName();
+                                 });
 
     auto event = std::make_unique<ClickEvent>(button_.get());
     dispatcher_->dispatchEvent(std::move(event));
@@ -268,10 +271,9 @@ void CommandEventsTest::testEventHandlerRegistration() {
     qDebug() << "🧪 Testing event handler registration...";
 
     int callCount = 0;
-    auto handlerId = dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
-        [&callCount](const CommandEvent&) {
-            callCount++;
-        });
+    auto handlerId = dispatcher_->registerHandler(
+        button_.get(), CommandEventType::Clicked,
+        [&callCount](const CommandEvent&) { callCount++; });
 
     QVERIFY(!handlerId.isNull());
 
@@ -300,20 +302,20 @@ void CommandEventsTest::testEventPriority() {
     QStringList callOrder;
 
     // Register handlers with different priorities
-    dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
-        [&callOrder](const CommandEvent&) {
-            callOrder.append("Normal");
-        }, CommandEventPriority::Normal);
+    dispatcher_->registerHandler(
+        button_.get(), CommandEventType::Clicked,
+        [&callOrder](const CommandEvent&) { callOrder.append("Normal"); },
+        CommandEventPriority::Normal);
 
-    dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
-        [&callOrder](const CommandEvent&) {
-            callOrder.append("High");
-        }, CommandEventPriority::High);
+    dispatcher_->registerHandler(
+        button_.get(), CommandEventType::Clicked,
+        [&callOrder](const CommandEvent&) { callOrder.append("High"); },
+        CommandEventPriority::High);
 
-    dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
-        [&callOrder](const CommandEvent&) {
-            callOrder.append("Low");
-        }, CommandEventPriority::Low);
+    dispatcher_->registerHandler(
+        button_.get(), CommandEventType::Clicked,
+        [&callOrder](const CommandEvent&) { callOrder.append("Low"); },
+        CommandEventPriority::Low);
 
     // Dispatch event
     auto event = std::make_unique<ClickEvent>(button_.get());
@@ -334,17 +336,19 @@ void CommandEventsTest::testEventPropagation() {
     int callCount = 0;
 
     // Register first handler that stops propagation
-    dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
+    dispatcher_->registerHandler(
+        button_.get(), CommandEventType::Clicked,
         [&callCount](const CommandEvent& event) {
             callCount++;
             const_cast<CommandEvent&>(event).stopPropagation();
-        }, CommandEventPriority::High);
+        },
+        CommandEventPriority::High);
 
     // Register second handler
-    dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
-        [&callCount](const CommandEvent&) {
-            callCount++;
-        }, CommandEventPriority::Normal);
+    dispatcher_->registerHandler(
+        button_.get(), CommandEventType::Clicked,
+        [&callCount](const CommandEvent&) { callCount++; },
+        CommandEventPriority::Normal);
 
     // Dispatch event
     auto event = std::make_unique<ClickEvent>(button_.get());
@@ -360,7 +364,7 @@ void CommandEventsTest::testEventFiltering() {
     qDebug() << "🧪 Testing event filtering...";
 
     // Test event filtering functionality
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event filtering test passed";
 }
@@ -369,7 +373,7 @@ void CommandEventsTest::testEventInterception() {
     qDebug() << "🧪 Testing event interception...";
 
     // Test event interception functionality
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event interception test passed";
 }
@@ -379,10 +383,12 @@ void CommandEventsTest::testEventCancellation() {
 
     int callCount = 0;
 
-    dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
+    dispatcher_->registerHandler(
+        button_.get(), CommandEventType::Clicked,
         [&callCount](const CommandEvent& event) {
             callCount++;
-            const_cast<CommandEvent&>(event).accept(); // Cancel further processing
+            const_cast<CommandEvent&>(event)
+                .accept();  // Cancel further processing
         });
 
     auto event = std::make_unique<ClickEvent>(button_.get());
@@ -397,10 +403,9 @@ void CommandEventsTest::testOnceHandlers() {
     qDebug() << "🧪 Testing once handlers...";
 
     int callCount = 0;
-    dispatcher_->registerOnceHandler(button_.get(), CommandEventType::Clicked,
-        [&callCount](const CommandEvent&) {
-            callCount++;
-        });
+    dispatcher_->registerOnceHandler(
+        button_.get(), CommandEventType::Clicked,
+        [&callCount](const CommandEvent&) { callCount++; });
 
     // Dispatch multiple events
     for (int i = 0; i < 3; ++i) {
@@ -419,15 +424,13 @@ void CommandEventsTest::testGlobalHandlers() {
 
     int callCount = 0;
     // Note: No global handler method exists, so test regular handlers instead
-    dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
-        [&callCount](const CommandEvent&) {
-            callCount++;
-        });
+    dispatcher_->registerHandler(
+        button_.get(), CommandEventType::Clicked,
+        [&callCount](const CommandEvent&) { callCount++; });
 
-    dispatcher_->registerHandler(label_.get(), CommandEventType::Clicked,
-        [&callCount](const CommandEvent&) {
-            callCount++;
-        });
+    dispatcher_->registerHandler(
+        label_.get(), CommandEventType::Clicked,
+        [&callCount](const CommandEvent&) { callCount++; });
 
     // Dispatch events from different sources
     auto event1 = std::make_unique<ClickEvent>(button_.get());
@@ -446,7 +449,7 @@ void CommandEventsTest::testEventQueue() {
     qDebug() << "🧪 Testing event queue...";
 
     // Test event queuing functionality
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Event queue test passed";
 }
@@ -455,7 +458,7 @@ void CommandEventsTest::testBatchEventProcessing() {
     qDebug() << "🧪 Testing batch event processing...";
 
     // Test batch event processing functionality
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Batch event processing test passed";
 }
@@ -464,10 +467,9 @@ void CommandEventsTest::testEventPerformance() {
     qDebug() << "🧪 Testing event performance...";
 
     int callCount = 0;
-    dispatcher_->registerHandler(button_.get(), CommandEventType::Clicked,
-        [&callCount](const CommandEvent&) {
-            callCount++;
-        });
+    dispatcher_->registerHandler(
+        button_.get(), CommandEventType::Clicked,
+        [&callCount](const CommandEvent&) { callCount++; });
 
     QElapsedTimer timer;
     timer.start();
@@ -482,7 +484,7 @@ void CommandEventsTest::testEventPerformance() {
     qDebug() << "Dispatched 1000 events in" << elapsed << "ms";
 
     QCOMPARE(callCount, 1000);
-    QVERIFY(elapsed < 1000); // Should be fast
+    QVERIFY(elapsed < 1000);  // Should be fast
 
     qDebug() << "✅ Event performance test passed";
 }
@@ -491,7 +493,7 @@ void CommandEventsTest::testMassEventDispatch() {
     qDebug() << "🧪 Testing mass event dispatch...";
 
     // Test dispatching many events simultaneously
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Mass event dispatch test passed";
 }
@@ -510,7 +512,7 @@ void CommandEventsTest::testNullEventHandling() {
     qDebug() << "🧪 Testing null event handling...";
 
     // Test null event handling
-    QVERIFY(true); // Placeholder
+    QVERIFY(true);  // Placeholder
 
     qDebug() << "✅ Null event handling test passed";
 }

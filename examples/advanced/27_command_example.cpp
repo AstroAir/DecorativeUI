@@ -18,10 +18,8 @@
 #include <chrono>
 #include <thread>
 
-
 #include "Command/CommandIntegration.hpp"
 #include "Command/CommandSystem.hpp"
-
 
 using namespace DeclarativeUI;
 using namespace DeclarativeUI::Command;

@@ -1,29 +1,29 @@
 #include <QApplication>
-#include <QTest>
+#include <QElapsedTimer>
+#include <QEventLoop>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTemporaryFile>
-#include <QElapsedTimer>
+#include <QTest>
 #include <QTimer>
-#include <QEventLoop>
 #include <memory>
 
 #include "../Binding/StateManager.hpp"
-#include "../Command/CommandSystem.hpp"
-#include "../Command/BuiltinCommands.hpp"
-#include "../Command/Adapters/IntegrationManager.hpp"
 #include "../Command/Adapters/ComponentSystemAdapter.hpp"
-#include "../Command/Adapters/StateManagerAdapter.hpp"
+#include "../Command/Adapters/IntegrationManager.hpp"
 #include "../Command/Adapters/JSONCommandLoader.hpp"
+#include "../Command/Adapters/StateManagerAdapter.hpp"
+#include "../Command/BuiltinCommands.hpp"
+#include "../Command/CommandSystem.hpp"
 #include "../Components/Button.hpp"
-#include "../Components/LineEdit.hpp"
 #include "../Components/Label.hpp"
+#include "../Components/LineEdit.hpp"
 #include "../Core/DeclarativeBuilder.hpp"
-#include "../HotReload/HotReloadManager.hpp"
-#include "../HotReload/FileWatcher.hpp"
-#include "../JSON/JSONUILoader.hpp"
-#include "../JSON/ComponentRegistry.hpp"
 #include "../Exceptions/UIExceptions.hpp"
+#include "../HotReload/FileWatcher.hpp"
+#include "../HotReload/HotReloadManager.hpp"
+#include "../JSON/ComponentRegistry.hpp"
+#include "../JSON/JSONUILoader.hpp"
 
 using namespace DeclarativeUI::Binding;
 using namespace DeclarativeUI::Command;
@@ -46,7 +46,7 @@ private slots:
             char* argv[] = {nullptr};
             new QApplication(argc, argv);
         }
-        
+
         // Register builtin commands
         registerBuiltinCommands();
     }
@@ -74,29 +74,31 @@ private slots:
         qDebug() << "🧪 Testing complete UI creation workflow...";
 
         // Step 1: Create UI using DeclarativeBuilder
-        auto main_widget = create<QWidget>()
-            .property("windowTitle", QString("End-to-End Test"))
-            .property("minimumSize", QSize(400, 300))
-            .layout<QVBoxLayout>()
-            .child<QWidget>([](auto& header) {
-                header.layout<QHBoxLayout>()
-                      .child<QLabel>([](auto& label) {
-                          label.property("text", QString("User Name:"));
-                      })
-                      .child<QLineEdit>([](auto& edit) {
-                          edit.property("placeholderText", QString("Enter your name"));
-                      });
-            })
-            .child<QWidget>([](auto& buttons) {
-                buttons.layout<QHBoxLayout>()
-                       .child<QPushButton>([](auto& btn) {
-                           btn.property("text", QString("Save"));
-                       })
-                       .child<QPushButton>([](auto& btn) {
-                           btn.property("text", QString("Cancel"));
-                       });
-            })
-            .build();
+        auto main_widget =
+            create<QWidget>()
+                .property("windowTitle", QString("End-to-End Test"))
+                .property("minimumSize", QSize(400, 300))
+                .layout<QVBoxLayout>()
+                .child<QWidget>([](auto& header) {
+                    header.layout<QHBoxLayout>()
+                        .child<QLabel>([](auto& label) {
+                            label.property("text", QString("User Name:"));
+                        })
+                        .child<QLineEdit>([](auto& edit) {
+                            edit.property("placeholderText",
+                                          QString("Enter your name"));
+                        });
+                })
+                .child<QWidget>([](auto& buttons) {
+                    buttons.layout<QHBoxLayout>()
+                        .child<QPushButton>([](auto& btn) {
+                            btn.property("text", QString("Save"));
+                        })
+                        .child<QPushButton>([](auto& btn) {
+                            btn.property("text", QString("Cancel"));
+                        });
+                })
+                .build();
 
         QVERIFY(main_widget != nullptr);
         QCOMPARE(main_widget->windowTitle(), QString("End-to-End Test"));
@@ -108,8 +110,10 @@ private slots:
 
         // Step 3: Convert to Command System
         auto integration_manager = std::make_unique<IntegrationManager>();
-        integration_manager->registerAdapter("component", std::make_unique<ComponentSystemAdapter>());
-        integration_manager->registerAdapter("state", std::make_unique<StateManagerAdapter>());
+        integration_manager->registerAdapter(
+            "component", std::make_unique<ComponentSystemAdapter>());
+        integration_manager->registerAdapter(
+            "state", std::make_unique<StateManagerAdapter>());
 
         // Step 4: Verify integration
         QVERIFY(integration_manager->hasAdapter("component"));
@@ -170,7 +174,7 @@ private slots:
         // Step 3: Verify children
         auto labels = widget->findChildren<QLabel*>();
         auto buttons = widget->findChildren<QPushButton*>();
-        
+
         QVERIFY(!labels.isEmpty());
         QVERIFY(!buttons.isEmpty());
         QCOMPARE(labels[0]->text(), QString("Welcome to JSON UI"));
@@ -180,8 +184,9 @@ private slots:
         auto& command_manager = CommandManager::instance();
         CommandContext context;
         context.setParameter("widget_title", QString("Updated Title"));
-        
-        auto result = command_manager.getInvoker().execute("set_property", context);
+
+        auto result =
+            command_manager.getInvoker().execute("set_property", context);
         QVERIFY(result.isSuccess());
 
         qDebug() << "✅ JSON to UI workflow test passed";
@@ -193,25 +198,26 @@ private slots:
 
         // Step 1: Create traditional components
         auto button = std::make_unique<Button>();
-        button->text("Legacy Button")
-              .enabled(true)
-              .onClick([]() { qDebug() << "Legacy button clicked"; });
+        button->text("Legacy Button").enabled(true).onClick([]() {
+            qDebug() << "Legacy button clicked";
+        });
         button->initialize();
 
         auto line_edit = std::make_unique<LineEdit>();
-        line_edit->text("Legacy Text")
-                 .placeholder("Legacy placeholder");
+        line_edit->text("Legacy Text").placeholder("Legacy placeholder");
         line_edit->initialize();
 
         // Step 2: Convert to Command System
         auto adapter = std::make_unique<ComponentSystemAdapter>();
-        
+
         auto button_command = adapter->convertToCommand(button.get());
         QVERIFY(button_command != nullptr);
 
         // Step 3: Verify command properties
-        QCOMPARE(button_command->getState()->getProperty<QString>("text"), QString("Legacy Button"));
-        QCOMPARE(button_command->getState()->getProperty<bool>("enabled"), true);
+        QCOMPARE(button_command->getState()->getProperty<QString>("text"),
+                 QString("Legacy Button"));
+        QCOMPARE(button_command->getState()->getProperty<bool>("enabled"),
+                 true);
 
         // Step 4: Execute command operations
         CommandContext context;
@@ -266,7 +272,8 @@ private slots:
         auto hot_reload_manager = std::make_unique<HotReloadManager>();
         hot_reload_manager->setEnabled(true);
 
-        QSignalSpy reload_spy(hot_reload_manager.get(), &HotReloadManager::fileReloaded);
+        QSignalSpy reload_spy(hot_reload_manager.get(),
+                              &HotReloadManager::fileReloaded);
 
         // Step 3: Load initial UI
         JSONUILoader loader;
@@ -313,7 +320,8 @@ private slots:
 
         // Step 7: Verify reload was detected
         // Note: Actual reload behavior depends on implementation
-        QVERIFY(reload_spy.count() >= 0); // May or may not have fired depending on timing
+        QVERIFY(reload_spy.count() >=
+                0);  // May or may not have fired depending on timing
 
         qDebug() << "✅ Hot reload workflow test passed";
     }
@@ -327,7 +335,8 @@ private slots:
         // Step 1: Set up complex state structure
         state_manager.setState("app.title", QString("Integration Test App"));
         state_manager.setState("user.profile.name", QString("Alice"));
-        state_manager.setState("user.profile.email", QString("alice@example.com"));
+        state_manager.setState("user.profile.email",
+                               QString("alice@example.com"));
         state_manager.setState("user.preferences.theme", QString("dark"));
         state_manager.setState("ui.sidebar.visible", true);
         state_manager.setState("ui.notifications.count", 5);
@@ -339,17 +348,18 @@ private slots:
 
         // Step 3: Set up state bindings through Command System
         auto& command_manager = CommandManager::instance();
-        
+
         CommandContext title_context;
         title_context.setParameter("state_key", QString("app.title"));
         title_context.setParameter("target_property", QString("windowTitle"));
-        
-        auto bind_result = command_manager.getInvoker().execute("bind_state", title_context);
+
+        auto bind_result =
+            command_manager.getInvoker().execute("bind_state", title_context);
         QVERIFY(bind_result.isSuccess());
 
         // Step 4: Test state updates propagate
         state_manager.setState("app.title", QString("Updated App Title"));
-        
+
         auto updated_title = state_manager.getState<QString>("app.title");
         QVERIFY(updated_title != nullptr);
         QCOMPARE(updated_title->get(), QString("Updated App Title"));
@@ -364,7 +374,8 @@ private slots:
             return QString("Unknown User");
         });
 
-        auto display_name = state_manager.getState<QString>("user.display_name");
+        auto display_name =
+            state_manager.getState<QString>("user.display_name");
         QVERIFY(display_name != nullptr);
         QCOMPARE(display_name->get(), QString("Alice <alice@example.com>"));
 
@@ -376,8 +387,10 @@ private slots:
 
         state_manager.applyBatchUpdate(batch);
 
-        auto updated_name = state_manager.getState<QString>("user.profile.name");
-        auto updated_count = state_manager.getState<int>("ui.notifications.count");
+        auto updated_name =
+            state_manager.getState<QString>("user.profile.name");
+        auto updated_count =
+            state_manager.getState<int>("ui.notifications.count");
         QVERIFY(updated_name != nullptr);
         QVERIFY(updated_count != nullptr);
         QCOMPARE(updated_name->get(), QString("Bob"));
@@ -411,7 +424,8 @@ private slots:
         }
 
         qint64 creation_time = timer.elapsed();
-        qDebug() << "Created" << (num_components * 2) << "components in" << creation_time << "ms";
+        qDebug() << "Created" << (num_components * 2) << "components in"
+                 << creation_time << "ms";
 
         // Step 2: Convert all to Command System
         timer.restart();
@@ -426,7 +440,8 @@ private slots:
         }
 
         qint64 conversion_time = timer.elapsed();
-        qDebug() << "Converted" << num_components << "components in" << conversion_time << "ms";
+        qDebug() << "Converted" << num_components << "components in"
+                 << conversion_time << "ms";
 
         // Step 3: Execute batch operations
         timer.restart();
@@ -435,17 +450,19 @@ private slots:
         for (int i = 0; i < num_components; ++i) {
             CommandContext context;
             context.setParameter("text", QString("Updated %1").arg(i));
-            auto result = command_manager.getInvoker().execute("set_property", context);
+            auto result =
+                command_manager.getInvoker().execute("set_property", context);
             Q_UNUSED(result);
         }
 
         qint64 execution_time = timer.elapsed();
-        qDebug() << "Executed" << num_components << "commands in" << execution_time << "ms";
+        qDebug() << "Executed" << num_components << "commands in"
+                 << execution_time << "ms";
 
         // Step 4: Verify performance benchmarks
-        QVERIFY(creation_time < 2000); // Component creation should be fast
-        QVERIFY(conversion_time < 1000); // Conversion should be fast
-        QVERIFY(execution_time < 1000); // Command execution should be fast
+        QVERIFY(creation_time < 2000);    // Component creation should be fast
+        QVERIFY(conversion_time < 1000);  // Conversion should be fast
+        QVERIFY(execution_time < 1000);   // Command execution should be fast
 
         QCOMPARE(button_commands.size(), num_components);
 

@@ -14,7 +14,6 @@
 #include <QWidget>
 #include <memory>
 
-
 #include "Components/Button.hpp"
 #include "Components/CheckBox.hpp"
 #include "Components/ComboBox.hpp"
@@ -22,7 +21,6 @@
 #include "Components/ProgressBar.hpp"
 #include "Components/Slider.hpp"
 #include "HotReload/PerformanceMonitor.hpp"
-
 
 using namespace DeclarativeUI;
 
