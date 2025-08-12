@@ -183,6 +183,8 @@ public:
             return value.toDouble();
         } else if constexpr (std::is_same_v<T, bool>) {
             return value.toBool();
+        } else if constexpr (std::is_same_v<T, QVariant>) {
+            return value.toVariant();
         } else {
             return default_value;
         }

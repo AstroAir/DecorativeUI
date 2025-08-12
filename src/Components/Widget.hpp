@@ -3,11 +3,11 @@
 #include <QFormLayout>
 #include <QGridLayout>
 #include <QHBoxLayout>
+#include <QBoxLayout>
 #include <QLayout>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <concepts>
-#include <span>
 
 #include "../Core/Concepts.hpp"
 #include "../Core/UIElement.hpp"
@@ -220,6 +220,194 @@ Widget& Widget::style(T&& stylesheet) {
         }
     }
     return *this;
+}
+
+// === Missing template implementations (added to resolve linker errors) ===
+
+// Geometry setter
+template <Core::Concepts::RectLike T>
+constexpr Widget& Widget::geometry(T&& rect_value) {
+    if (widget_) {
+        if constexpr (std::same_as<std::decay_t<T>, QRect>) {
+            widget_->setGeometry(rect_value);
+        } else {
+            widget_->setGeometry(QRect{rect_value.x(), rect_value.y(), rect_value.width(), rect_value.height()});
+        }
+    }
+    if constexpr (std::same_as<std::decay_t<T>, QRect>) {
+        return static_cast<Widget&>(setProperty("geometry", std::forward<T>(rect_value)));
+    } else {
+        return static_cast<Widget&>(setProperty("geometry", QRect{rect_value.x(), rect_value.y(), rect_value.width(), rect_value.height()}));
+    }
+}
+
+// Font setter
+template <Core::Concepts::FontLike T>
+Widget& Widget::font(T&& font_value) {
+    if constexpr (std::same_as<std::decay_t<T>, QFont>) {
+        return static_cast<Widget&>(setProperty("font", std::forward<T>(font_value)));
+    } else {
+        return static_cast<Widget&>(setProperty("font", QFont(font_value)));
+    }
+}
+
+// Text related helpers
+template <Core::Concepts::StringLike T>
+Widget& Widget::toolTip(T&& tooltip) {
+    if constexpr (std::same_as<std::decay_t<T>, QString>) {
+        return static_cast<Widget&>(setProperty("toolTip", std::forward<T>(tooltip)));
+    } else {
+        return static_cast<Widget&>(setProperty("toolTip", QString{tooltip}));
+    }
+}
+
+template <Core::Concepts::StringLike T>
+Widget& Widget::statusTip(T&& statusTip) {
+    if constexpr (std::same_as<std::decay_t<T>, QString>) {
+        return static_cast<Widget&>(setProperty("statusTip", std::forward<T>(statusTip)));
+    } else {
+        return static_cast<Widget&>(setProperty("statusTip", QString{statusTip}));
+    }
+}
+
+template <Core::Concepts::StringLike T>
+Widget& Widget::whatsThis(T&& whatsThis) {
+    if constexpr (std::same_as<std::decay_t<T>, QString>) {
+        return static_cast<Widget&>(setProperty("whatsThis", std::forward<T>(whatsThis)));
+    } else {
+        return static_cast<Widget&>(setProperty("whatsThis", QString{whatsThis}));
+    }
+}
+
+template <Core::Concepts::StringLike T>
+Widget& Widget::windowTitle(T&& title) {
+    if constexpr (std::same_as<std::decay_t<T>, QString>) {
+        return static_cast<Widget&>(setProperty("windowTitle", std::forward<T>(title)));
+    } else {
+        return static_cast<Widget&>(setProperty("windowTitle", QString{title}));
+    }
+}
+
+// Generic layout setter
+template <Core::Concepts::LayoutType T>
+Widget& Widget::layout(T* layout_ptr) {
+    if (widget_ && layout_ptr) {
+        if (widget_->layout() && widget_->layout() != layout_ptr) {
+            delete widget_->layout();
+        }
+        layout_ptr->setParent(widget_); // ensure correct parent
+        widget_->setLayout(layout_ptr);
+    }
+    return *this;
+}
+
+// Add a child layout to existing layout
+template <Core::Concepts::LayoutType T>
+Widget& Widget::addLayout(T* layout_ptr) {
+    if (widget_ && widget_->layout() && layout_ptr) {
+        if (auto* grid = qobject_cast<QGridLayout*>(widget_->layout())) {
+            // Append layout on next available row (simple heuristic)
+            int row = grid->rowCount();
+            grid->addLayout(layout_ptr, row, 0, 1, grid->columnCount() > 0 ? grid->columnCount() : 1);
+        } else if (auto* box = qobject_cast<QBoxLayout*>(widget_->layout())) {
+            box->addLayout(layout_ptr);
+        } else {
+            widget_->layout()->addItem(layout_ptr);
+        }
+    }
+    return *this;
+}
+
+// Add single widget (no position)
+template <Core::Concepts::QtWidget T>
+Widget& Widget::addWidget(T* child) {
+    if (widget_ && child) {
+        if (!widget_->layout()) {
+            // default to vertical layout
+            widget_->setLayout(new QVBoxLayout(widget_));
+        }
+        if (auto* grid = qobject_cast<QGridLayout*>(widget_->layout())) {
+            int row = grid->rowCount();
+            grid->addWidget(child, row, 0);
+        } else if (auto* box = qobject_cast<QBoxLayout*>(widget_->layout())) {
+            box->addWidget(child);
+        } else {
+            widget_->layout()->addWidget(child);
+        }
+    }
+    return *this;
+}
+
+// Add widget at grid position (row, column)
+template <Core::Concepts::QtWidget T>
+Widget& Widget::addWidget(T* child, int row, int column, Qt::Alignment alignment) {
+    if (widget_ && child) {
+        if (!widget_->layout()) {
+            widget_->setLayout(new QGridLayout(widget_));
+        }
+        if (auto* grid = qobject_cast<QGridLayout*>(widget_->layout())) {
+            grid->addWidget(child, row, column, alignment);
+        } else {
+            // Fallback: ignore positioning; apply alignment if box layout
+            if (auto* box = qobject_cast<QBoxLayout*>(widget_->layout())) {
+                box->addWidget(child, alignment);
+            } else {
+                widget_->layout()->addWidget(child);
+            }
+        }
+    }
+    return *this;
+}
+
+// Add widget at grid position with span
+template <Core::Concepts::QtWidget T>
+Widget& Widget::addWidget(T* child, int row, int column, int rowSpan, int columnSpan, Qt::Alignment alignment) {
+    if (widget_ && child) {
+        if (!widget_->layout()) {
+            widget_->setLayout(new QGridLayout(widget_));
+        }
+        if (auto* grid = qobject_cast<QGridLayout*>(widget_->layout())) {
+            grid->addWidget(child, row, column, rowSpan, columnSpan, alignment);
+        } else {
+            if (auto* box = qobject_cast<QBoxLayout*>(widget_->layout())) {
+                box->addWidget(child, alignment);
+            } else {
+                widget_->layout()->addWidget(child);
+            }
+        }
+    }
+    return *this;
+}
+
+// Add multiple widgets from a container (container holds QWidget* or derived)
+template <typename T>
+    requires Core::Concepts::Container<T>
+Widget& Widget::addWidgets(T&& widget_container) {
+    for (auto* w : widget_container) {
+        if constexpr (std::is_pointer_v<decltype(w)>) {
+            addWidget(w);
+        }
+    }
+    return *this;
+}
+
+// Event hooks
+template <typename F>
+    requires Core::Concepts::VoidCallback<F>
+Widget& Widget::onResize(F&& resize_handler) {
+    return static_cast<Widget&>(onEvent("resize", std::forward<F>(resize_handler)));
+}
+
+template <typename F>
+    requires Core::Concepts::VoidCallback<F>
+Widget& Widget::onShow(F&& show_handler) {
+    return static_cast<Widget&>(onEvent("show", std::forward<F>(show_handler)));
+}
+
+template <typename F>
+    requires Core::Concepts::VoidCallback<F>
+Widget& Widget::onHide(F&& hide_handler) {
+    return static_cast<Widget&>(onEvent("hide", std::forward<F>(hide_handler)));
 }
 
 }  // namespace DeclarativeUI::Components

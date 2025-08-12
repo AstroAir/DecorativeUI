@@ -5,10 +5,8 @@
 #include <functional>
 #include <string>
 #include <vector>
-#include <optional>
 #include <ranges>
 #include <algorithm>
-#include <regex>
 #include <type_traits>
 #include <QString>
 #include <QRegularExpression>
@@ -29,7 +27,7 @@ struct ValidationMessage {
     QString message;
     ValidationSeverity severity{ValidationSeverity::Error};
     QString field_name;
-    
+
     // **Designated initializer support**
     ValidationMessage(QString msg,
                      ValidationSeverity sev = ValidationSeverity::Error,
@@ -40,9 +38,9 @@ struct ValidationMessage {
 class ValidationResult {
 public:
     ValidationResult() = default;
-    
+
     explicit ValidationResult(bool valid) : is_valid_(valid) {}
-    
+
     ValidationResult(bool valid, std::vector<ValidationMessage> messages)
         : is_valid_(valid), messages_(std::move(messages)) {}
 
@@ -54,19 +52,19 @@ public:
             return msg.severity == ValidationSeverity::Warning;
         });
     }
-    
+
     [[nodiscard]] const std::vector<ValidationMessage>& getMessages() const noexcept {
         return messages_;
     }
-    
+
     // **Get messages by severity**
     [[nodiscard]] auto getErrors() const {
         return messages_ | std::views::filter([](const auto& msg) {
-            return msg.severity == ValidationSeverity::Error || 
+            return msg.severity == ValidationSeverity::Error ||
                    msg.severity == ValidationSeverity::Critical;
         });
     }
-    
+
     [[nodiscard]] auto getWarnings() const {
         return messages_ | std::views::filter([](const auto& msg) {
             return msg.severity == ValidationSeverity::Warning;
@@ -76,7 +74,7 @@ public:
     // **Add messages**
     void addMessage(ValidationMessage message) {
         messages_.push_back(std::move(message));
-        if (message.severity == ValidationSeverity::Error || 
+        if (message.severity == ValidationSeverity::Error ||
             message.severity == ValidationSeverity::Critical) {
             is_valid_ = false;
         }
@@ -102,7 +100,7 @@ private:
 
 // **Validator concept**
 template<typename F, typename T>
-concept Validator = std::invocable<F, const T&> && 
+concept Validator = std::invocable<F, const T&> &&
                    std::convertible_to<std::invoke_result_t<F, const T&>, ValidationResult>;
 
 // **Basic validators**
@@ -112,7 +110,7 @@ namespace Validators {
 template<typename T>
 struct Required {
     QString message{"Field is required"};
-    
+
     [[nodiscard]] ValidationResult operator()(const T& value) const {
         if constexpr (std::same_as<T, QString>) {
             return value.isEmpty() ?
@@ -137,11 +135,11 @@ template<typename T>
 struct MinLength {
     std::size_t min_length;
     QString message;
-    
+
     MinLength(std::size_t min_len, QString msg = {})
         : min_length(min_len),
           message(msg.isEmpty() ? QString("Minimum length is %1").arg(min_len) : std::move(msg)) {}
-    
+
     [[nodiscard]] constexpr ValidationResult operator()(const T& value) const {
         std::size_t length = 0;
         if constexpr (std::same_as<T, QString>) {
@@ -151,9 +149,9 @@ struct MinLength {
         } else if constexpr (requires { value.length(); }) {
             length = value.length();
         }
-        
-        return length >= min_length ? 
-            ValidationResult{true} : 
+
+        return length >= min_length ?
+            ValidationResult{true} :
             ValidationResult{false, {{message}}};
     }
 };
@@ -162,7 +160,7 @@ template<typename T>
 struct MaxLength {
     std::size_t max_length;
     QString message;
-    
+
     MaxLength(std::size_t max_len, QString msg = {})
         : max_length(max_len),
           message(msg.isEmpty() ? QString("Maximum length is %1").arg(max_len) : std::move(msg)) {}
@@ -176,9 +174,9 @@ struct MaxLength {
         } else if constexpr (requires { value.length(); }) {
             length = value.length();
         }
-        
-        return length <= max_length ? 
-            ValidationResult{true} : 
+
+        return length <= max_length ?
+            ValidationResult{true} :
             ValidationResult{false, {{message}}};
     }
 };
@@ -189,14 +187,14 @@ struct Range {
     T min_value;
     T max_value;
     QString message;
-    
+
     Range(T min_val, T max_val, QString msg = {})
         : min_value(min_val), max_value(max_val),
           message(msg.isEmpty() ? QString("Value must be between %1 and %2").arg(min_val).arg(max_val) : std::move(msg)) {}
 
     [[nodiscard]] ValidationResult operator()(const T& value) const {
-        return (value >= min_value && value <= max_value) ? 
-            ValidationResult{true} : 
+        return (value >= min_value && value <= max_value) ?
+            ValidationResult{true} :
             ValidationResult{false, {{message}}};
     }
 };
@@ -205,14 +203,14 @@ template<Concepts::Numeric T>
 struct Min {
     T min_value;
     QString message;
-    
+
     Min(T min_val, QString msg = {})
         : min_value(min_val),
           message(msg.isEmpty() ? QString("Minimum value is %1").arg(min_val) : std::move(msg)) {}
 
     [[nodiscard]] ValidationResult operator()(const T& value) const {
-        return value >= min_value ? 
-            ValidationResult{true} : 
+        return value >= min_value ?
+            ValidationResult{true} :
             ValidationResult{false, {{message}}};
     }
 };
@@ -221,14 +219,14 @@ template<Concepts::Numeric T>
 struct Max {
     T max_value;
     QString message;
-    
+
     Max(T max_val, QString msg = {})
         : max_value(max_val),
           message(msg.isEmpty() ? QString("Maximum value is %1").arg(max_val) : std::move(msg)) {}
 
     [[nodiscard]] ValidationResult operator()(const T& value) const {
-        return value <= max_value ? 
-            ValidationResult{true} : 
+        return value <= max_value ?
+            ValidationResult{true} :
             ValidationResult{false, {{message}}};
     }
 };
@@ -237,13 +235,13 @@ struct Max {
 struct Pattern {
     QRegularExpression regex;
     QString message;
-    
-    Pattern(const QString& pattern, QString msg = "Invalid format") 
+
+    Pattern(const QString& pattern, QString msg = "Invalid format")
         : regex(pattern), message(std::move(msg)) {}
-    
+
     [[nodiscard]] ValidationResult operator()(const QString& value) const {
-        return regex.match(value).hasMatch() ? 
-            ValidationResult{true} : 
+        return regex.match(value).hasMatch() ?
+            ValidationResult{true} :
             ValidationResult{false, {{message}}};
     }
 };
@@ -251,13 +249,13 @@ struct Pattern {
 // **Email validator**
 struct Email {
     QString message{"Invalid email format"};
-    
+
     [[nodiscard]] ValidationResult operator()(const QString& value) const {
         static const QRegularExpression emailRegex(
             R"(^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$)"
         );
-        return emailRegex.match(value).hasMatch() ? 
-            ValidationResult{true} : 
+        return emailRegex.match(value).hasMatch() ?
+            ValidationResult{true} :
             ValidationResult{false, {{message}}};
     }
 };
@@ -265,13 +263,13 @@ struct Email {
 // **URL validator**
 struct Url {
     QString message{"Invalid URL format"};
-    
+
     [[nodiscard]] ValidationResult operator()(const QString& value) const {
         static const QRegularExpression urlRegex(
             R"(^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)$)"
         );
-        return urlRegex.match(value).hasMatch() ? 
-            ValidationResult{true} : 
+        return urlRegex.match(value).hasMatch() ?
+            ValidationResult{true} :
             ValidationResult{false, {{message}}};
     }
 };
@@ -281,7 +279,7 @@ template<typename F>
 struct Custom {
     F validator_func;
     QString message;
-    
+
     template<typename Func>
     Custom(Func&& func, QString msg = "Validation failed")
         : validator_func(std::forward<Func>(func)), message(std::move(msg)) {}
@@ -289,8 +287,8 @@ struct Custom {
     template<typename T>
     [[nodiscard]] ValidationResult operator()(const T& value) const {
         if constexpr (std::same_as<std::invoke_result_t<F, const T&>, bool>) {
-            return validator_func(value) ? 
-                ValidationResult{true} : 
+            return validator_func(value) ?
+                ValidationResult{true} :
                 ValidationResult{false, {{message}}};
         } else {
             return validator_func(value);
@@ -305,7 +303,7 @@ template<typename T>
 class ValidationChain {
 public:
     ValidationChain() = default;
-    
+
     // **Add validators using perfect forwarding**
     template<typename ValidatorType>
     requires Validator<ValidatorType, T>
@@ -313,45 +311,45 @@ public:
         validators_.emplace_back(std::forward<ValidatorType>(validator));
         return *this;
     }
-    
+
     // **Convenience methods for common validators**
     ValidationChain& required(QString message = "Field is required") {
         return add(Validators::Required<T>{std::move(message)});
     }
-    
+
     template<typename LengthType = std::size_t>
     ValidationChain& minLength(LengthType min_len, QString message = {}) {
-        return add(Validators::MinLength<T>{min_len, std::move(message)});
+    return add(Validators::MinLength<T>{static_cast<std::size_t>(min_len), std::move(message)});
     }
-    
+
     template<typename LengthType = std::size_t>
     ValidationChain& maxLength(LengthType max_len, QString message = {}) {
-        return add(Validators::MaxLength<T>{max_len, std::move(message)});
+    return add(Validators::MaxLength<T>{static_cast<std::size_t>(max_len), std::move(message)});
     }
-    
+
     template<typename NumericType>
     requires Concepts::Numeric<NumericType>
     ValidationChain& range(NumericType min_val, NumericType max_val, QString message = {}) {
         return add(Validators::Range<NumericType>{min_val, max_val, std::move(message)});
     }
-    
+
     ValidationChain& pattern(const QString& regex_pattern, QString message = "Invalid format") {
         return add(Validators::Pattern{regex_pattern, std::move(message)});
     }
-    
+
     ValidationChain& email(QString message = "Invalid email format") {
         return add(Validators::Email{std::move(message)});
     }
-    
+
     ValidationChain& url(QString message = "Invalid URL format") {
         return add(Validators::Url{std::move(message)});
     }
-    
+
     template<typename F>
     ValidationChain& custom(F&& func, QString message = "Validation failed") {
         return add(Validators::Custom{std::forward<F>(func), std::move(message)});
     }
-    
+
     // **Validate value**
     [[nodiscard]] ValidationResult validate(const T& value) const {
         ValidationResult result{true};
@@ -369,7 +367,7 @@ public:
 
         return result;
     }
-    
+
     // **Configuration**
     ValidationChain& stopOnFirstError(bool stop = true) {
         stop_on_first_error_ = stop;

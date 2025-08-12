@@ -511,7 +511,7 @@ private slots:
                 "geometry": [0, 0, 300, 200]
             },
             "layout": {
-                "type": "QVBoxLayout"
+                "type": "VBoxLayout"
             },
             "children": [{
                 "type": "QLabel",
@@ -555,13 +555,11 @@ private slots:
 
         // Test valid schema
         QString valid_schema_json = R"({
-            "widget": {
-                "type": "QLabel",
-                "properties": {
-                    "text": "Valid text",
-                    "enabled": true,
-                    "visible": true
-                }
+            "type": "QLabel",
+            "properties": {
+                "text": "Valid text",
+                "enabled": true,
+                "visible": true
             }
         })";
 
@@ -574,10 +572,8 @@ private slots:
 
         // Test invalid schema - missing required fields
         QString invalid_schema_json = R"({
-            "widget": {
-                "properties": {
-                    "text": "Missing type field"
-                }
+            "properties": {
+                "text": "Missing type field"
             }
         })";
 
@@ -619,26 +615,24 @@ private slots:
 
         // Test nested widget validation
         QString nested_json = R"({
-            "widget": {
-                "type": "QWidget",
-                "properties": {
-                    "windowTitle": "Main Window"
-                },
-                "children": [
-                    {
-                        "type": "QLabel",
-                        "properties": {
-                            "text": "Child Label"
-                        }
-                    },
-                    {
-                        "type": "QPushButton",
-                        "properties": {
-                            "text": "Child Button"
-                        }
+            "type": "QWidget",
+            "properties": {
+                "windowTitle": "Main Window"
+            },
+            "children": [
+                {
+                    "type": "QLabel",
+                    "properties": {
+                        "text": "Child Label"
                     }
-                ]
-            }
+                },
+                {
+                    "type": "QPushButton",
+                    "properties": {
+                        "text": "Child Button"
+                    }
+                }
+            ]
         })";
 
         QJsonParseError error;

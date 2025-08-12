@@ -3,11 +3,13 @@
 #include <QObject>
 #include <QVariant>
 #include <QDateTime>
+#include <QRecursiveMutex>
 
 #include <deque>
 #include <functional>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 
 
 namespace DeclarativeUI::Binding {
@@ -161,6 +163,9 @@ private:
     bool performance_monitoring_ = false;
     std::vector<std::function<void()>> pending_updates_;
 
+    // **Thread synchronization**
+    mutable QRecursiveMutex global_lock_;  // Recursive mutex to handle nested calls safely
+
     void processPendingUpdates();
     void addToHistory(const QString& key, const QVariant& value);
     void validateState(const QString& key, const QVariant& value);
@@ -178,7 +183,11 @@ std::shared_ptr<ReactiveProperty<T>> StateManager::createState(
     info.state = state;
     info.update_count = 1;  // Initial creation counts as first update
     info.last_update_time = QDateTime::currentMSecsSinceEpoch();
-    states_[key] = info;
+
+    {
+        QMutexLocker locker(&global_lock_);
+        states_[key] = info;
+    }
 
     // Emit signals
     emit stateAdded(key);
@@ -190,6 +199,7 @@ std::shared_ptr<ReactiveProperty<T>> StateManager::createState(
 template <typename T>
 std::shared_ptr<ReactiveProperty<T>> StateManager::getState(
     const QString& key) {
+    QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end()) {
         return std::static_pointer_cast<ReactiveProperty<T>>(it->second.state);
@@ -208,7 +218,11 @@ std::shared_ptr<ReactiveProperty<T>> StateManager::createComputed(
 
     StateInfo info;
     info.state = computed;
-    states_[key] = info;
+
+    {
+        QMutexLocker locker(&global_lock_);
+        states_[key] = info;
+    }
 
     // TODO: Implement dependency tracking and automatic recomputation
     return computed;
@@ -219,28 +233,30 @@ template <typename T>
 void StateManager::setState(const QString& key, const T& value) {
     auto existing = getState<T>(key);
     if (existing) {
-        // Check if state has a validator
-        auto it = states_.find(key);
-        if (it != states_.end() && it->second.validator) {
-            if (!it->second.validator(QVariant::fromValue(value))) {
-                // Validation failed, don't update
-                return;
+        // Check if state has a validator and update metrics with lock
+        {
+            QMutexLocker locker(&global_lock_);
+            auto it = states_.find(key);
+            if (it != states_.end() && it->second.validator) {
+                if (!it->second.validator(QVariant::fromValue(value))) {
+                    // Validation failed, don't update
+                    return;
+                }
+            }
+
+            // Add to history before updating
+            if (it != states_.end() && it->second.history_enabled) {
+                addToHistory(key, QVariant::fromValue(value));
+            }
+
+            // Update performance metrics
+            if (it != states_.end()) {
+                it->second.update_count++;
+                it->second.last_update_time = QDateTime::currentMSecsSinceEpoch();
             }
         }
 
-        // Add to history before updating
-        if (it != states_.end() && it->second.history_enabled) {
-            addToHistory(key, QVariant::fromValue(value));
-        }
-
         existing->set(value);
-
-        // Update performance metrics
-        if (it != states_.end()) {
-            it->second.update_count++;
-            it->second.last_update_time = QDateTime::currentMSecsSinceEpoch();
-        }
-
         emit stateChanged(key, QVariant::fromValue(value));
     } else {
         createState<T>(key, value);

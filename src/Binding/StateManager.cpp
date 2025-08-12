@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QTimer>
+#include <QMutexLocker>
 #include <algorithm>
 
 namespace DeclarativeUI::Binding {
@@ -16,6 +17,8 @@ void StateManager::batchUpdate(std::function<void()> updates) {
         qWarning() << "Batch update function is null";
         return;
     }
+
+    QMutexLocker locker(&global_lock_);
 
     if (batching_) {
         // **Already batching, just execute**
@@ -41,6 +44,8 @@ void StateManager::batchUpdate(std::function<void()> updates) {
 
 void StateManager::clearState() noexcept {
     try {
+        QMutexLocker locker(&global_lock_);
+
         pending_updates_.clear();
         states_.clear();
         batching_ = false;
@@ -72,10 +77,13 @@ void StateManager::processPendingUpdates() {
 }
 
 bool StateManager::hasState(const QString& key) const {
+    QMutexLocker locker(&global_lock_);
     return states_.find(key) != states_.end();
 }
 
 void StateManager::removeState(const QString& key) {
+    QMutexLocker locker(&global_lock_);
+
     auto it = states_.find(key);
     if (it != states_.end()) {
         emit stateRemoved(key);
@@ -103,6 +111,7 @@ void StateManager::removeState(const QString& key) {
 }
 
 void StateManager::enableHistory(const QString& key, int max_history_size) {
+    QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end()) {
         auto& info = it->second;
@@ -142,6 +151,7 @@ void StateManager::enableHistory(const QString& key, int max_history_size) {
 }
 
 void StateManager::disableHistory(const QString& key) {
+    QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end()) {
         auto& info = it->second;
@@ -153,6 +163,7 @@ void StateManager::disableHistory(const QString& key) {
 }
 
 bool StateManager::canUndo(const QString& key) const {
+    QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end() && it->second.history_enabled) {
         return it->second.history_position > 0;
@@ -161,6 +172,7 @@ bool StateManager::canUndo(const QString& key) const {
 }
 
 bool StateManager::canRedo(const QString& key) const {
+    QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end() && it->second.history_enabled) {
         return it->second.history_position < static_cast<int>(it->second.history.size()) - 1;
@@ -169,8 +181,9 @@ bool StateManager::canRedo(const QString& key) const {
 }
 
 void StateManager::undo(const QString& key) {
+    QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
-    if (it != states_.end() && it->second.history_enabled && canUndo(key)) {
+    if (it != states_.end() && it->second.history_enabled && it->second.history_position > 0) {
         auto& info = it->second;
         info.history_position--;
 
@@ -204,8 +217,10 @@ void StateManager::undo(const QString& key) {
 }
 
 void StateManager::redo(const QString& key) {
+    QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
-    if (it != states_.end() && it->second.history_enabled && canRedo(key)) {
+    if (it != states_.end() && it->second.history_enabled &&
+        it->second.history_position < static_cast<int>(it->second.history.size()) - 1) {
         auto& info = it->second;
         info.history_position++;
 
@@ -239,12 +254,15 @@ void StateManager::redo(const QString& key) {
 }
 
 void StateManager::addDependency(const QString& key, const QString& depends_on) {
+    QMutexLocker locker(&global_lock_);
     dependencies_[key].push_back(depends_on);
     dependents_[depends_on].push_back(key);
     qDebug() << "🔗 Dependency added:" << key << "depends on" << depends_on;
 }
 
 void StateManager::removeDependency(const QString& key, const QString& depends_on) {
+    QMutexLocker locker(&global_lock_);
+
     auto it = dependencies_.find(key);
     if (it != dependencies_.end()) {
         auto& deps = it->second;
@@ -266,6 +284,8 @@ void StateManager::removeDependency(const QString& key, const QString& depends_o
 }
 
 QStringList StateManager::getDependencies(const QString& key) const {
+    QMutexLocker locker(&global_lock_);
+
     auto it = dependencies_.find(key);
     if (it != dependencies_.end()) {
         QStringList result;
@@ -278,6 +298,8 @@ QStringList StateManager::getDependencies(const QString& key) const {
 }
 
 void StateManager::updateDependents(const QString& key) {
+    QMutexLocker locker(&global_lock_);
+
     auto it = dependents_.find(key);
     if (it != dependents_.end()) {
         for (const auto& dependent : it->second) {
@@ -293,6 +315,7 @@ void StateManager::enableDebugMode(bool enabled) {
 }
 
 void StateManager::addToHistory(const QString& key, const QVariant& value) {
+    QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end() && it->second.history_enabled) {
         auto& info = it->second;
@@ -350,6 +373,7 @@ QString StateManager::getPerformanceReport() const {
 // **Template method implementations**
 template<typename T>
 void DeclarativeUI::Binding::StateManager::setValidator(const QString& key, std::function<bool(const T&)> validator) {
+    QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end()) {
         // Convert typed validator to generic QVariant validator

@@ -13,20 +13,35 @@ SetPropertyCommand::SetPropertyCommand(const CommandContext& context)
 
 CommandResult<QVariant> SetPropertyCommand::execute(
     const CommandContext& context) {
-    auto widget_name = context.getParameter<QString>("widget");
     auto property_name = context.getParameter<QString>("property");
-    auto value = context.getParameter<QString>("value");
+    auto value = context.getParameter<QVariant>("value");
 
-    if (!context.hasParameter("widget") || !context.hasParameter("property") ||
-        !context.hasParameter("value")) {
+    if (!context.hasParameter("property") || !context.hasParameter("value")) {
         return CommandResult<QVariant>(
-            QString("Missing required parameters: widget, property, value"));
+            QString("Missing required parameters: property, value"));
     }
 
-    auto* widget = findWidget(widget_name);
+    QWidget* widget = nullptr;
+    QString widget_name;
+
+    // Try to get widget by direct reference first (target parameter)
+    if (context.hasParameter("target")) {
+        auto target_variant = context.getParameter<QVariant>("target");
+        widget = target_variant.value<QWidget*>();
+        if (widget) {
+            widget_name = widget->objectName();
+        }
+    }
+
+    // If no direct widget reference, try to find by name (widget parameter)
+    if (!widget && context.hasParameter("widget")) {
+        widget_name = context.getParameter<QString>("widget");
+        widget = findWidget(widget_name);
+    }
+
     if (!widget) {
         return CommandResult<QVariant>(
-            QString("Widget '%1' not found").arg(widget_name));
+            QString("Widget not found or invalid target"));
     }
 
     old_value_ = widget->property(property_name.toUtf8().constData());
@@ -35,8 +50,8 @@ CommandResult<QVariant> SetPropertyCommand::execute(
         widget->setProperty(property_name.toUtf8().constData(), value);
     if (!success) {
         return CommandResult<QVariant>(
-            QString("Failed to set property '%1' on widget '%2'")
-                .arg(property_name, widget_name));
+            QString("Failed to set property '%1' on widget")
+                .arg(property_name));
     }
 
     widget_name_ = widget_name;

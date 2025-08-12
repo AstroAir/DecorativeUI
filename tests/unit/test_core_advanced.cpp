@@ -69,7 +69,9 @@ private slots:
 
         // Test cache statistics
         auto stats = cache_manager->getCacheStatistics();
-        QVERIFY(stats.contains("widget_cache"));
+        QVERIFY(stats.contains("caches"));
+        auto caches = stats["caches"].toObject();
+        QVERIFY(caches.contains("widget_cache"));
     }
 
     void testCacheManagerStylesheetCaching() {
@@ -87,7 +89,9 @@ private slots:
 
         // Test cache statistics
         auto stats = cache_manager->getCacheStatistics();
-        QVERIFY(stats.contains("stylesheet_cache"));
+        QVERIFY(stats.contains("caches"));
+        auto caches = stats["caches"].toObject();
+        QVERIFY(caches.contains("stylesheet_cache"));
     }
 
     void testCacheManagerPropertyCaching() {
@@ -105,7 +109,9 @@ private slots:
 
         // Test cache statistics
         auto stats = cache_manager->getCacheStatistics();
-        QVERIFY(stats.contains("property_cache"));
+        QVERIFY(stats.contains("caches"));
+        auto caches = stats["caches"].toObject();
+        QVERIFY(caches.contains("property_cache"));
     }
 
     void testCacheManagerMemoryLimits() {
@@ -235,7 +241,7 @@ private slots:
 
         // Test performance metrics access
         auto metrics = processor->getPerformanceMetrics();
-        QVERIFY(metrics.contains("active_tasks"));
+        QVERIFY(metrics.contains("active_task_count"));
     }
 
     void testParallelProcessorTaskExecution() {
@@ -287,7 +293,7 @@ private slots:
 
         // Test task management
         auto metrics = processor->getPerformanceMetrics();
-        QVERIFY(metrics.contains("active_tasks"));
+        QVERIFY(metrics.contains("active_task_count"));
     }
 
     void testParallelProcessorPerformance() {
@@ -316,7 +322,7 @@ private slots:
 
         // Test performance metrics
         auto metrics = processor->getPerformanceMetrics();
-        QVERIFY(metrics.contains("active_tasks"));
+        QVERIFY(metrics.contains("active_task_count"));
         QVERIFY(elapsed < 1000);  // Should submit quickly
     }
 };
