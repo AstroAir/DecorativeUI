@@ -81,7 +81,7 @@ jobs:
         ctest --config Release --output-on-failure --parallel 4
 
     - name: Upload test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.compiler }}
@@ -121,7 +121,7 @@ jobs:
         cmake --build --preset default --target examples
 
     - name: Upload example binaries
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: examples-${{ matrix.os }}
         path: |
