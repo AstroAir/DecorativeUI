@@ -81,6 +81,10 @@ Widget& Widget::updatesEnabled(bool enabled) noexcept {
 
 Widget& Widget::vBoxLayout() {
     if (widget_) {
+        // Delete existing layout if present
+        if (widget_->layout()) {
+            delete widget_->layout();
+        }
         auto* layout = new QVBoxLayout(widget_);
         widget_->setLayout(layout);
     }
@@ -89,6 +93,10 @@ Widget& Widget::vBoxLayout() {
 
 Widget& Widget::hBoxLayout() {
     if (widget_) {
+        // Delete existing layout if present
+        if (widget_->layout()) {
+            delete widget_->layout();
+        }
         auto* layout = new QHBoxLayout(widget_);
         widget_->setLayout(layout);
     }
@@ -97,6 +105,10 @@ Widget& Widget::hBoxLayout() {
 
 Widget& Widget::gridLayout(int rows, int columns) {
     if (widget_) {
+        // Delete existing layout if present
+        if (widget_->layout()) {
+            delete widget_->layout();
+        }
         auto* layout = new QGridLayout(widget_);
         widget_->setLayout(layout);
     }
@@ -105,6 +117,10 @@ Widget& Widget::gridLayout(int rows, int columns) {
 
 Widget& Widget::formLayout() {
     if (widget_) {
+        // Delete existing layout if present
+        if (widget_->layout()) {
+            delete widget_->layout();
+        }
         auto* layout = new QFormLayout(widget_);
         widget_->setLayout(layout);
     }

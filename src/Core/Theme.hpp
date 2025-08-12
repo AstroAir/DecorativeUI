@@ -21,43 +21,43 @@ namespace DeclarativeUI::Core::Theme {
 // **Color palette with semantic naming**
 struct ColorPalette {
     // **Primary colors**
-    QColor primary{0x2196F3};           // Blue
-    QColor primary_variant{0x1976D2};   // Dark Blue
-    QColor secondary{0xFF9800};         // Orange
-    QColor secondary_variant{0xF57C00}; // Dark Orange
-    
+    QColor primary{QRgb(0x2196F3)};           // Blue
+    QColor primary_variant{QRgb(0x1976D2)};   // Dark Blue
+    QColor secondary{QRgb(0xFF9800)};         // Orange
+    QColor secondary_variant{QRgb(0xF57C00)}; // Dark Orange
+
     // **Surface colors**
-    QColor background{0xFAFAFA};        // Light Gray
-    QColor surface{0xFFFFFF};           // White
-    QColor surface_variant{0xF5F5F5};   // Very Light Gray
-    
+    QColor background{QRgb(0xFAFAFA)};        // Light Gray
+    QColor surface{QRgb(0xFFFFFF)};           // White
+    QColor surface_variant{QRgb(0xF5F5F5)};   // Very Light Gray
+
     // **Content colors**
-    QColor on_primary{0xFFFFFF};        // White
-    QColor on_secondary{0x000000};      // Black
-    QColor on_background{0x212121};     // Dark Gray
-    QColor on_surface{0x212121};        // Dark Gray
-    QColor on_surface_variant{0x757575}; // Medium Gray
-    
+    QColor on_primary{QRgb(0xFFFFFF)};        // White
+    QColor on_secondary{QRgb(0x000000)};      // Black
+    QColor on_background{QRgb(0x212121)};     // Dark Gray
+    QColor on_surface{QRgb(0x212121)};        // Dark Gray
+    QColor on_surface_variant{QRgb(0x757575)}; // Medium Gray
+
     // **State colors**
-    QColor error{0xF44336};             // Red
-    QColor warning{0xFF9800};           // Orange
-    QColor success{0x4CAF50};           // Green
-    QColor info{0x2196F3};              // Blue
-    
+    QColor error{QRgb(0xF44336)};             // Red
+    QColor warning{QRgb(0xFF9800)};           // Orange
+    QColor success{QRgb(0x4CAF50)};           // Green
+    QColor info{QRgb(0x2196F3)};              // Blue
+
     // **Interactive colors**
-    QColor hover{0x1976D2};             // Dark Blue
-    QColor pressed{0x0D47A1};           // Very Dark Blue
-    QColor focused{0x2196F3};           // Blue
-    QColor disabled{0xBDBDBD};          // Light Gray
-    
+    QColor hover{QRgb(0x1976D2)};             // Dark Blue
+    QColor pressed{QRgb(0x0D47A1)};           // Very Dark Blue
+    QColor focused{QRgb(0x2196F3)};           // Blue
+    QColor disabled{QRgb(0xBDBDBD)};          // Light Gray
+
     // **Border and outline colors**
-    QColor outline{0xE0E0E0};           // Light Gray
-    QColor outline_variant{0xBDBDBD};   // Medium Light Gray
-    QColor divider{0xE0E0E0};           // Light Gray
-    
+    QColor outline{QRgb(0xE0E0E0)};           // Light Gray
+    QColor outline_variant{QRgb(0xBDBDBD)};   // Medium Light Gray
+    QColor divider{QRgb(0xE0E0E0)};           // Light Gray
+
     // **Shadow colors**
-    QColor shadow{0x000000};            // Black
-    QColor shadow_light{0x00000040};    // Transparent Black
+    QColor shadow{QRgb(0x000000)};            // Black
+    QColor shadow_light{QRgb(0x00000040)};    // Transparent Black
 };
 
 // **Typography configuration**
@@ -66,7 +66,7 @@ struct Typography {
     QString primary_font{"Segoe UI"};
     QString secondary_font{"Arial"};
     QString monospace_font{"Consolas"};
-    
+
     // **Font sizes (in points)**
     struct FontSizes {
         int display_large{57};
@@ -85,7 +85,7 @@ struct Typography {
         int body_medium{14};
         int body_small{12};
     } sizes;
-    
+
     // **Font weights**
     struct FontWeights {
         int thin{100};
@@ -97,7 +97,7 @@ struct Typography {
         int extra_bold{800};
         int black{900};
     } weights;
-    
+
     // **Line heights (multipliers)**
     struct LineHeights {
         double tight{1.2};
@@ -111,7 +111,7 @@ struct Typography {
 struct Spacing {
     // **Base unit (in pixels)**
     int base_unit{8};
-    
+
     // **Spacing scale**
     int xs{base_unit / 2};      // 4px
     int sm{base_unit};          // 8px
@@ -120,7 +120,7 @@ struct Spacing {
     int xl{base_unit * 4};      // 32px
     int xxl{base_unit * 6};     // 48px
     int xxxl{base_unit * 8};    // 64px
-    
+
     // **Component-specific spacing**
     struct ComponentSpacing {
         int button_padding{12};
@@ -165,7 +165,7 @@ struct Animation {
         int slower{750};
         int slowest{1000};
     } duration;
-    
+
     // **Easing curves**
     struct Easing {
         QString linear{"linear"};
@@ -187,7 +187,7 @@ struct ThemeConfig {
     BorderRadius border_radius;
     Shadows shadows;
     Animation animation;
-    
+
     // **Theme metadata**
     bool is_dark_theme{false};
     QString description{"Default light theme"};
@@ -213,39 +213,39 @@ public:
     bool loadThemeFromJson(const QString& json_string) {
         QJsonParseError error;
         auto doc = QJsonDocument::fromJson(json_string.toUtf8(), &error);
-        
+
         if (error.error != QJsonParseError::NoError) {
             return false;
         }
-        
+
         return loadThemeFromJson(doc.object());
     }
 
     bool loadThemeFromJson(const QJsonObject& json) {
         ThemeConfig config;
-        
+
         // Parse theme configuration from JSON
         config.name = json["name"].toString("Default");
         config.version = json["version"].toString("1.0.0");
         config.is_dark_theme = json["isDarkTheme"].toBool(false);
         config.description = json["description"].toString();
         config.author = json["author"].toString();
-        
+
         // Parse colors
         if (auto colors = json["colors"].toObject(); !colors.isEmpty()) {
             parseColors(colors, config.colors);
         }
-        
+
         // Parse typography
         if (auto typography = json["typography"].toObject(); !typography.isEmpty()) {
             parseTypography(typography, config.typography);
         }
-        
+
         // Parse spacing
         if (auto spacing = json["spacing"].toObject(); !spacing.isEmpty()) {
             parseSpacing(spacing, config.spacing);
         }
-        
+
         loadTheme(config);
         return true;
     }
@@ -253,22 +253,22 @@ public:
     // **Export current theme to JSON**
     [[nodiscard]] QString exportThemeToJson() const {
         QJsonObject json;
-        
+
         json["name"] = current_theme_.name;
         json["version"] = current_theme_.version;
         json["isDarkTheme"] = current_theme_.is_dark_theme;
         json["description"] = current_theme_.description;
         json["author"] = current_theme_.author;
-        
+
         // Export colors
         json["colors"] = exportColors(current_theme_.colors);
-        
+
         // Export typography
         json["typography"] = exportTypography(current_theme_.typography);
-        
+
         // Export spacing
         json["spacing"] = exportSpacing(current_theme_.spacing);
-        
+
         return QJsonDocument(json).toJson(QJsonDocument::Compact);
     }
 
@@ -298,18 +298,18 @@ public:
         dark_theme.name = "Dark";
         dark_theme.is_dark_theme = true;
         dark_theme.description = "Modern dark theme";
-        
+
         // Adjust colors for dark theme
-        dark_theme.colors.background = QColor(0x121212);
-        dark_theme.colors.surface = QColor(0x1E1E1E);
-        dark_theme.colors.surface_variant = QColor(0x2D2D2D);
-        dark_theme.colors.on_background = QColor(0xFFFFFF);
-        dark_theme.colors.on_surface = QColor(0xFFFFFF);
-        dark_theme.colors.on_surface_variant = QColor(0xBDBDBD);
-        dark_theme.colors.outline = QColor(0x424242);
-        dark_theme.colors.outline_variant = QColor(0x616161);
-        dark_theme.colors.divider = QColor(0x424242);
-        
+        dark_theme.colors.background = QColor(QRgb(0x121212));
+        dark_theme.colors.surface = QColor(QRgb(0x1E1E1E));
+        dark_theme.colors.surface_variant = QColor(QRgb(0x2D2D2D));
+        dark_theme.colors.on_background = QColor(QRgb(0xFFFFFF));
+        dark_theme.colors.on_surface = QColor(QRgb(0xFFFFFF));
+        dark_theme.colors.on_surface_variant = QColor(QRgb(0xBDBDBD));
+        dark_theme.colors.outline = QColor(QRgb(0x424242));
+        dark_theme.colors.outline_variant = QColor(QRgb(0x616161));
+        dark_theme.colors.divider = QColor(QRgb(0x424242));
+
         loadTheme(dark_theme);
     }
 
@@ -317,7 +317,7 @@ public:
     [[nodiscard]] QFont createFont(int size, int weight = 400) const {
         QFont font(current_theme_.typography.primary_font);
         font.setPointSize(size);
-        font.setWeight(weight);
+        font.setWeight(static_cast<QFont::Weight>(weight));
         return font;
     }
 
@@ -360,7 +360,7 @@ private:
         // Apply theme to application
         if (auto* app = qobject_cast<QApplication*>(QApplication::instance())) {
             QPalette palette;
-            
+
             // Set palette colors based on theme
             palette.setColor(QPalette::Window, current_theme_.colors.background);
             palette.setColor(QPalette::WindowText, current_theme_.colors.on_background);
@@ -371,9 +371,9 @@ private:
             palette.setColor(QPalette::ButtonText, current_theme_.colors.on_primary);
             palette.setColor(QPalette::Highlight, current_theme_.colors.primary);
             palette.setColor(QPalette::HighlightedText, current_theme_.colors.on_primary);
-            
+
             app->setPalette(palette);
-            
+
             // Set application font
             QFont app_font = createFont(current_theme_.typography.sizes.body_medium);
             app->setFont(app_font);
@@ -643,12 +643,12 @@ private:
         // Apply high contrast color scheme
         Theme::ThemeConfig high_contrast_theme;
         high_contrast_theme.name = "High Contrast";
-        high_contrast_theme.colors.background = QColor(0x000000);
-        high_contrast_theme.colors.surface = QColor(0x000000);
-        high_contrast_theme.colors.on_background = QColor(0xFFFFFF);
-        high_contrast_theme.colors.on_surface = QColor(0xFFFFFF);
-        high_contrast_theme.colors.primary = QColor(0xFFFF00);
-        high_contrast_theme.colors.on_primary = QColor(0x000000);
+        high_contrast_theme.colors.background = QColor(QRgb(0x000000));
+        high_contrast_theme.colors.surface = QColor(QRgb(0x000000));
+        high_contrast_theme.colors.on_background = QColor(QRgb(0xFFFFFF));
+        high_contrast_theme.colors.on_surface = QColor(QRgb(0xFFFFFF));
+        high_contrast_theme.colors.primary = QColor(QRgb(0xFFFF00));
+        high_contrast_theme.colors.on_primary = QColor(QRgb(0x000000));
 
         Theme::ThemeManager::instance().loadTheme(high_contrast_theme);
     }

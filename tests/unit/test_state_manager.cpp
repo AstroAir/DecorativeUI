@@ -114,20 +114,23 @@ private slots:
     void testStateValidation() {
         auto& manager = StateManager::instance();
 
-        // Set validator that only allows positive integers
-        auto validator = [](const int& value) -> bool { return value > 0; };
-
-        manager.setStateValidator<int>("positive_int", validator);
-
-        // Valid value should work
+        // Create state first, then set validator
         manager.setState("positive_int", 10);
         auto state = manager.getState<int>("positive_int");
         QVERIFY(state != nullptr);
         QCOMPARE(state->get(), 10);
 
+        // Set validator that only allows positive integers
+        auto validator = [](const int& value) -> bool { return value > 0; };
+        manager.setStateValidator<int>("positive_int", validator);
+
+        // Valid value should work
+        manager.setState("positive_int", 15);
+        QCOMPARE(state->get(), 15);
+
         // Invalid value should be rejected
         manager.setState("positive_int", -5);
-        QCOMPARE(state->get(), 10);  // Should remain unchanged
+        QCOMPARE(state->get(), 15);  // Should remain unchanged
     }
 
     void testBatchUpdates() {
@@ -153,9 +156,10 @@ private slots:
     void testStateHistory() {
         auto& manager = StateManager::instance();
 
+        // Create state first, then enable history
+        manager.setState("history_test", QString("value1"));
         manager.enableHistory("history_test", 5);
 
-        manager.setState("history_test", QString("value1"));
         manager.setState("history_test", QString("value2"));
         manager.setState("history_test", QString("value3"));
 

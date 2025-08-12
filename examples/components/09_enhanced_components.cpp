@@ -66,11 +66,11 @@ private:
                 statusBar()->showMessage(
                     QString("Selected: %1").arg(date.toString()));
             })
-            .onDateDoubleClicked([this](const QDate& date) {
+            .onDateDoubleClicked([](const QDate& date) {
                 qDebug() << "Date double-clicked:" << date.toString();
             })
             .onSelectionChanged(
-                [this]() { qDebug() << "Calendar selection changed"; });
+                []() { qDebug() << "Calendar selection changed"; });
 
         // Add special dates and holidays
         QList<QDate> holidays = {
@@ -143,7 +143,7 @@ private:
                 statusBar()->showMessage(QString("List item clicked: %1")
                                              .arg(index.data().toString()));
             })
-            .onDoubleClicked([this](const QModelIndex& index) {
+            .onDoubleClicked([](const QModelIndex& index) {
                 qDebug() << "List item double-clicked:"
                          << index.data().toString();
             });
@@ -162,7 +162,7 @@ private:
             .checkable(true)
             .onClicked(
                 [this]() { statusBar()->showMessage("Tool button clicked!"); })
-            .onToggled([this](bool checked) {
+            .onToggled([](bool checked) {
                 qDebug() << "Tool button toggled:" << checked;
             });
         toolButton->initialize();

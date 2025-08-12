@@ -20,16 +20,16 @@ target_link_libraries(BuiltinCommandsTest
     Qt6::Test
 )
 
-# add_executable(CommandIntegrationTest test_command_integration.cpp)
-# target_link_libraries(CommandIntegrationTest
-#     DeclarativeUI
-#     Components
-#     Qt6::Core
-#     Qt6::Widgets
-#     Qt6::Test
-# )
+add_executable(CommandIntegrationTest test_command_integration.cpp)
+target_link_libraries(CommandIntegrationTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
 
-# **Command System Specific Tests** (temporarily disabled due to API mismatches)
+# **Command System Specific Tests** (temporarily disabled due to include issues)
 # add_executable(CommandBindingTest test_command_binding.cpp)
 # target_link_libraries(CommandBindingTest
 #     DeclarativeUI
@@ -154,7 +154,7 @@ target_link_libraries(UIElementAdapterTest
 set_target_properties(
     CommandSystemTest
     BuiltinCommandsTest
-    # CommandIntegrationTest
+    CommandIntegrationTest
     # CommandBindingTest
     # CommandBuilderTest
     # CommandCoreTest
@@ -174,7 +174,7 @@ set_target_properties(
 # **Make tests depend on resources**
 add_dependencies(CommandSystemTest CopyTestResources)
 add_dependencies(BuiltinCommandsTest CopyTestResources)
-# add_dependencies(CommandIntegrationTest CopyTestResources)
+add_dependencies(CommandIntegrationTest CopyTestResources)
 # add_dependencies(CommandBindingTest CopyTestResources)
 # add_dependencies(CommandBuilderTest CopyTestResources)
 # add_dependencies(CommandCoreTest CopyTestResources)
@@ -191,7 +191,7 @@ add_dependencies(UIElementAdapterTest CopyTestResources)
 # **Register tests with CTest**
 add_test(NAME CommandSystemTest COMMAND CommandSystemTest)
 add_test(NAME BuiltinCommandsTest COMMAND BuiltinCommandsTest)
-# add_test(NAME CommandIntegrationTest COMMAND CommandIntegrationTest)
+add_test(NAME CommandIntegrationTest COMMAND CommandIntegrationTest)
 # add_test(NAME CommandBindingTest COMMAND CommandBindingTest)
 # add_test(NAME CommandBuilderTest COMMAND CommandBuilderTest)
 # add_test(NAME CommandCoreTest COMMAND CommandCoreTest)

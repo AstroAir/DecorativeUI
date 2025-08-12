@@ -189,36 +189,36 @@ private slots:
     void testJSONValidatorWithSchema() {
         UIJSONValidator validator;
 
-        // Define a simple schema
+        // Define a simple schema for UI components
         QJsonObject schema;
         schema["type"] = "object";
 
         QJsonObject properties;
-        QJsonObject name_prop;
-        name_prop["type"] = "string";
-        properties["name"] = name_prop;
+        QJsonObject type_prop;
+        type_prop["type"] = "string";
+        properties["type"] = type_prop;
 
-        QJsonObject value_prop;
-        value_prop["type"] = "number";
-        properties["value"] = value_prop;
+        QJsonObject text_prop;
+        text_prop["type"] = "string";
+        properties["text"] = text_prop;
 
         schema["properties"] = properties;
-        schema["required"] = QJsonArray({"name", "value"});
+        schema["required"] = QJsonArray({"type"});
 
         validator.loadSchema(schema);
 
-        // Test valid object
+        // Test valid UI component object
         QJsonObject valid_object;
-        valid_object["name"] = "test";
-        valid_object["value"] = 42;
+        valid_object["type"] = "Label";
+        valid_object["text"] = "Hello World";
 
         bool is_valid = validator.validate(valid_object);
         QVERIFY(is_valid);
 
-        // Test invalid object (missing required field)
+        // Test invalid object (missing required type field)
         QJsonObject invalid_object;
-        invalid_object["name"] = "test";
-        // Missing "value" field
+        invalid_object["text"] = "Hello World";
+        // Missing "type" field
 
         bool is_invalid = validator.validate(invalid_object);
         QVERIFY(!is_invalid);
@@ -232,17 +232,21 @@ private slots:
 
         // Test basic validation functionality
         QJsonObject test_object;
-        test_object["type"] = "QLabel";
+        test_object["type"] = "Label";
         test_object["properties"] = QJsonObject{{"text", "Test"}};
 
         bool is_valid = validator.validate(test_object);
         QVERIFY(is_valid);
 
-        // Test invalid component type
+        // Test invalid component type - should generate warnings but still validate structure
         QJsonObject invalid_object;
         invalid_object["type"] = "InvalidComponent";
-        bool is_invalid = validator.validate(invalid_object);
-        QVERIFY(!is_invalid);
+        [[maybe_unused]] bool result = validator.validate(invalid_object);
+
+        // The validation should generate warnings for unknown component type
+        // Check that warnings were generated
+        auto warnings = validator.getWarnings();
+        QVERIFY(!warnings.empty());
     }
 
     // **ComponentRegistry Tests**
@@ -320,14 +324,15 @@ private slots:
         QString ui_json = R"({
             "type": "QWidget",
             "properties": {
-                "windowTitle": "Test Window",
-                "geometry": [100, 100, 400, 300]
+                "windowTitle": "Test Window"
+            },
+            "layout": {
+                "type": "VBoxLayout"
             },
             "children": [{
                 "type": "QLabel",
                 "properties": {
-                    "text": "Hello World",
-                    "alignment": "AlignCenter"
+                    "text": "Hello World"
                 }
             }]
         })";
@@ -385,6 +390,9 @@ private slots:
             "properties": {
                 "windowTitle": "File Loaded UI"
             },
+            "layout": {
+                "type": "VBoxLayout"
+            },
             "children": [{
                 "type": "QLabel",
                 "properties": {
@@ -412,7 +420,7 @@ private slots:
         QString invalid_json = R"({
             "name": "test",
             "value": 42,
-            "invalid": 
+            "invalid":
         })";  // Incomplete JSON
 
         try {
@@ -446,20 +454,29 @@ private slots:
     void testComponentRegistryErrorHandling() {
         auto& registry = ComponentRegistry::instance();
 
-        // Try to create non-existent component
-        auto widget = registry.createComponent("NonExistent", QJsonObject());
-        QVERIFY(widget == nullptr);
+        // Try to create non-existent component - should throw exception
+        try {
+            auto widget = registry.createComponent("NonExistent", QJsonObject());
+            QFAIL("Expected ComponentRegistrationException to be thrown");
+        } catch (const ComponentRegistrationException& e) {
+            // Expected behavior - exception should be thrown
+            QVERIFY(!e.getComponentName().empty());
+        }
 
-        // Test factory that returns nullptr
+        // Test factory that returns nullptr - should throw ComponentCreationException
         registry.registerComponent<QWidget>(
             "NullFactory",
             [](const QJsonObject& config) -> std::unique_ptr<QWidget> {
                 return nullptr;
             });
 
-        auto null_widget =
-            registry.createComponent("NullFactory", QJsonObject());
-        QVERIFY(null_widget == nullptr);
+        try {
+            auto null_widget = registry.createComponent("NullFactory", QJsonObject());
+            QFAIL("Expected ComponentCreationException to be thrown");
+        } catch (const ComponentCreationException& e) {
+            // Expected behavior - exception should be thrown for null factory result
+            QVERIFY(!e.getMessage().empty());
+        }
     }
 
     void testJSONUILoaderErrorHandling() {

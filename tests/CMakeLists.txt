@@ -12,6 +12,25 @@ add_subdirectory(integration)
 add_subdirectory(command)
 add_subdirectory(performance)
 
+# **Standalone comprehensive component tests**
+add_executable(ComponentTests ComponentTests.cpp)
+target_link_libraries(ComponentTests
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Set output directory for standalone tests**
+set_target_properties(ComponentTests
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+)
+
+# **Make standalone tests depend on resources**
+add_dependencies(ComponentTests CopyTestResources)
+
 # **Copy resources for tests**
 add_custom_target(CopyTestResources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -21,3 +40,6 @@ add_custom_target(CopyTestResources ALL
 
 # **Enable CTest integration**
 enable_testing()
+
+# **Register standalone tests with CTest**
+add_test(NAME ComponentTests COMMAND ComponentTests)

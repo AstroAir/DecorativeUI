@@ -160,6 +160,9 @@ void UIElement::refresh() {
     if (!widget_)
         return;
 
+    // Update bound properties first (re-evaluate bindings)
+    updateBoundProperties();
+
     // Apply all stored properties
     applyStoredProperties();
 

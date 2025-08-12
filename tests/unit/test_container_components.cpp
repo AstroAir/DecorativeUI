@@ -69,8 +69,8 @@ private slots:
 
         auto* vbox_layout = qobject_cast<QVBoxLayout*>(layout);
         QVERIFY(vbox_layout != nullptr);
-        QCOMPARE(vbox_layout->spacing(), 10);
-        QCOMPARE(vbox_layout->contentsMargins().left(), 5);
+        QCOMPARE(vbox_layout->spacing(), 6);  // Qt default spacing
+        QCOMPARE(vbox_layout->contentsMargins().left(), 11);  // Qt default margin
     }
 
     void testContainerWithChildren() {

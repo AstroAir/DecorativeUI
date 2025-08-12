@@ -169,17 +169,19 @@ PropertyBinding<SourceType, TargetType>::PropertyBinding(
       m_target_property(target_property), m_direction(direction),
       m_update_mode(UpdateMode::Immediate), m_enabled(true), m_valid(false),
       m_update_count(0), m_last_update_time(0) {
-    
+
     if (m_source && m_target_widget) {
-        // Set up source to target connection
-        m_source_connection = QObject::connect(
-            m_source.get(), &ReactivePropertyBase::valueChanged,
-            this, [this]() {
-                if (m_enabled && m_update_mode == UpdateMode::Immediate) {
-                    updateTargetFromSource();
-                }
-            });
-        
+        // Set up source to target connection (not for OneTime bindings)
+        if (m_direction != BindingDirection::OneTime) {
+            m_source_connection = QObject::connect(
+                m_source.get(), &ReactivePropertyBase::valueChanged,
+                this, [this]() {
+                    if (m_enabled && m_update_mode == UpdateMode::Immediate) {
+                        updateTargetFromSource();
+                    }
+                });
+        }
+
         // Set up target to source connection for two-way binding
         if (m_direction == BindingDirection::TwoWay) {
             // Connect to target widget's property change signal if available
@@ -196,13 +198,11 @@ PropertyBinding<SourceType, TargetType>::PropertyBinding(
                 }
             }
         }
-        
+
         m_valid = true;
-        
-        // Initial update
-        if (m_direction != BindingDirection::OneTime) {
-            updateTargetFromSource();
-        }
+
+        // Initial update (always perform, even for OneTime bindings)
+        updateTargetFromSource();
     }
 }
 
@@ -213,9 +213,49 @@ PropertyBinding<SourceType, TargetType>::PropertyBinding(
     std::shared_ptr<ReactiveProperty<SourceType>> source,
     QWidget *target_widget, const QString &target_property,
     ConverterFunc converter, BindingDirection direction, QObject *parent)
-    : PropertyBinding(source, target_widget, target_property, direction, parent) {
-    
+    : QObject(parent), m_source(source), m_target_widget(target_widget),
+      m_target_property(target_property), m_direction(direction),
+      m_update_mode(UpdateMode::Immediate), m_enabled(true), m_valid(false),
+      m_update_count(0), m_last_update_time(0) {
+
+    // Set converter before initialization
     m_converter = converter;
+
+    // Now perform the same initialization as the base constructor
+    if (m_source && m_target_widget) {
+        // Set up source to target connection (not for OneTime bindings)
+        if (m_direction != BindingDirection::OneTime) {
+            m_source_connection = QObject::connect(
+                m_source.get(), &ReactivePropertyBase::valueChanged,
+                this, [this]() {
+                    if (m_enabled && m_update_mode == UpdateMode::Immediate) {
+                        updateTargetFromSource();
+                    }
+                });
+        }
+
+        // Set up target to source connection for two-way binding
+        if (m_direction == BindingDirection::TwoWay) {
+            // Connect to target widget's property change signal if available
+            const QMetaObject *metaObject = m_target_widget->metaObject();
+            int propIndex = metaObject->indexOfProperty(m_target_property.toLocal8Bit().data());
+            if (propIndex != -1) {
+                QMetaProperty metaProp = metaObject->property(propIndex);
+                if (metaProp.hasNotifySignal()) {
+                    QMetaMethod notifySignal = metaProp.notifySignal();
+                    QMetaMethod updateSlot = this->metaObject()->method(
+                        this->metaObject()->indexOfSlot("updateSourceFromTarget()"));
+                    m_target_connection = QObject::connect(
+                        m_target_widget, notifySignal, this, updateSlot);
+                }
+            }
+        }
+
+        m_valid = true;
+
+        // Initial update (always perform, even for OneTime bindings)
+        updateTargetFromSource();
+    }
 }
 
 // **Bind with computed value**
@@ -228,19 +268,17 @@ PropertyBinding<SourceType, TargetType>::PropertyBinding(
       m_target_property(target_property), m_direction(BindingDirection::OneWay),
       m_update_mode(update_mode), m_enabled(true), m_valid(false),
       m_update_count(0), m_last_update_time(0) {
-    
+
     if (m_target_widget) {
         // Create a converter that calls the compute function
         m_converter = [compute_func](const SourceType&) -> TargetType {
             return compute_func();
         };
-        
+
         m_valid = true;
-        
-        // Initial update
-        if (m_update_mode == UpdateMode::Immediate) {
-            update();
-        }
+
+        // Initial update (always perform for compute functions to set initial value)
+        update();
     }
 }
 
@@ -345,22 +383,36 @@ qint64 PropertyBinding<SourceType, TargetType>::getLastUpdateTime() const {
 // **Private method implementations**
 template <typename SourceType, typename TargetType>
 void PropertyBinding<SourceType, TargetType>::updateTargetFromSource() {
-    if (!m_source || !m_target_widget || !m_valid || !m_enabled) return;
-    
+
+    // Check preconditions (note: m_source can be null for compute function bindings)
+    if (!m_target_widget || !m_valid || !m_enabled) return;
     try {
-        SourceType source_value = m_source->get();
-        TargetType target_value = convertSourceToTarget(source_value);
-        
+        TargetType target_value;
+
+        if (m_source) {
+            // Normal binding with source property
+            SourceType source_value = m_source->get();
+            target_value = convertSourceToTarget(source_value);
+        } else if (m_converter) {
+            // Compute function binding (no source, converter contains the compute function)
+            // Use a dummy source value since the converter ignores it for compute functions
+            SourceType dummy_source{};
+            target_value = m_converter(dummy_source);
+        } else {
+            handleError("No source property or compute function available");
+            return;
+        }
+
         if (m_validator && !validateTargetValue(target_value)) {
             handleError("Validation failed for target value");
             return;
         }
-        
+
         // Set the property on the target widget
         bool success = m_target_widget->setProperty(
-            m_target_property.toLocal8Bit().data(), 
+            m_target_property.toLocal8Bit().data(),
             QVariant::fromValue(target_value));
-        
+
         if (success) {
             m_update_count++;
             m_last_update_time = QDateTime::currentMSecsSinceEpoch();
@@ -376,15 +428,15 @@ template <typename SourceType, typename TargetType>
 void PropertyBinding<SourceType, TargetType>::updateSourceFromTarget() {
     if (!m_source || !m_target_widget || !m_valid || !m_enabled) return;
     if (m_direction != BindingDirection::TwoWay) return;
-    
+
     try {
         QVariant target_variant = m_target_widget->property(
             m_target_property.toLocal8Bit().data());
-        
+
         if (target_variant.isValid()) {
             TargetType target_value = target_variant.value<TargetType>();
             SourceType source_value = convertTargetToSource(target_value);
-            
+
             // Update the source (this will trigger valueChanged signal)
             m_source->set(source_value);
         }
@@ -399,7 +451,7 @@ TargetType PropertyBinding<SourceType, TargetType>::convertSourceToTarget(
     if (m_converter) {
         return m_converter(source_value);
     }
-    
+
     // Default conversion: try direct assignment if types are compatible
     if constexpr (std::is_same_v<SourceType, TargetType>) {
         return source_value;
@@ -409,7 +461,7 @@ TargetType PropertyBinding<SourceType, TargetType>::convertSourceToTarget(
         if (variant.canConvert<TargetType>()) {
             return variant.value<TargetType>();
         }
-        
+
         // Fallback to default construction
         return TargetType{};
     }
@@ -427,7 +479,7 @@ SourceType PropertyBinding<SourceType, TargetType>::convertTargetToSource(
         if (variant.canConvert<SourceType>()) {
             return variant.value<SourceType>();
         }
-        
+
         // Fallback to default construction
         return SourceType{};
     }
@@ -464,7 +516,7 @@ template <typename SourceType, typename TargetType>
 QString PropertyBinding<SourceType, TargetType>::generateTargetPath() const {
     if (m_target_widget) {
         return QString("%1::%2").arg(
-            m_target_widget->metaObject()->className(), 
+            m_target_widget->metaObject()->className(),
             m_target_property);
     }
     return "No Target";

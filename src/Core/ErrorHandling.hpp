@@ -53,7 +53,7 @@ struct ErrorContext {
     QString component_name;
     QString operation;
     std::vector<std::pair<QString, QString>> additional_data;
-    
+
     ErrorContext(std::source_location loc = std::source_location::current())
         : location(loc), timestamp(std::chrono::system_clock::now()) {}
 };
@@ -61,12 +61,12 @@ struct ErrorContext {
 // **Base exception class with rich context**
 class UIException : public std::exception {
 public:
-    UIException(QString message, 
+    UIException(QString message,
                 ErrorSeverity severity = ErrorSeverity::Error,
                 ErrorCategory category = ErrorCategory::General,
                 ErrorContext context = ErrorContext{})
-        : message_(std::move(message)), 
-          severity_(severity), 
+        : message_(std::move(message)),
+          severity_(severity),
           category_(category),
           context_(std::move(context)) {}
 
@@ -140,8 +140,8 @@ public:
 class ConsoleErrorHandler : public IErrorHandler {
 public:
     void handleError(const UIException& error) override {
-        qDebug() << "[" << severityToString(error.getSeverity()) << "]" 
-                 << categoryToString(error.getCategory()) << ":" 
+        qDebug() << "[" << severityToString(error.getSeverity()) << "]"
+                 << categoryToString(error.getCategory()) << ":"
                  << error.getFormattedMessage();
     }
 
@@ -239,7 +239,7 @@ public:
         }
     }
 
-    void handleError(ErrorSeverity severity, const QString& message, 
+    void handleError(ErrorSeverity severity, const QString& message,
                     const ErrorContext& context = ErrorContext{}) {
         for (const auto& handler : handlers_) {
             handler->handleError(severity, message, context);
@@ -273,16 +273,11 @@ public:
 
     // **Exception handling utilities**
     template<typename F>
-    requires std::invocable<F>
+    requires std::invocable<F> && (!std::is_void_v<std::invoke_result_t<F>>)
     auto safeExecute(F&& func, const QString& operation_name = "Unknown operation")
         -> Result<std::invoke_result_t<F>, UIException> {
         try {
-            if constexpr (std::is_void_v<std::invoke_result_t<F>>) {
-                std::invoke(std::forward<F>(func));
-                return true; // Return something for void functions
-            } else {
-                return std::invoke(std::forward<F>(func));
-            }
+            return std::invoke(std::forward<F>(func));
         } catch (const UIException& e) {
             handleError(e);
             return std::nullopt;
@@ -301,6 +296,31 @@ public:
         }
     }
 
+    // **Specialization for void functions**
+    template<typename F>
+    requires std::invocable<F> && std::is_void_v<std::invoke_result_t<F>>
+    bool safeExecute(F&& func, const QString& operation_name = "Unknown operation") {
+        try {
+            std::invoke(std::forward<F>(func));
+            return true;
+        } catch (const UIException& e) {
+            handleError(e);
+            return false;
+        } catch (const std::exception& e) {
+            ErrorContext context;
+            context.operation = operation_name;
+            UIException ui_error(QString::fromStdString(e.what()), ErrorSeverity::Error, ErrorCategory::General, context);
+            handleError(ui_error);
+            return false;
+        } catch (...) {
+            ErrorContext context;
+            context.operation = operation_name;
+            UIException ui_error("Unknown exception occurred", ErrorSeverity::Critical, ErrorCategory::General, context);
+            handleError(ui_error);
+            return false;
+        }
+    }
+
     // **Assertion with custom error handling**
     void uiAssert(bool condition, const QString& message,
                  ErrorSeverity severity = ErrorSeverity::Error,
@@ -308,7 +328,7 @@ public:
         if (!condition) {
             ErrorContext context(location);
             handleError(severity, QString("Assertion failed: %1").arg(message), context);
-            
+
             if (severity == ErrorSeverity::Fatal) {
                 std::terminate();
             }
@@ -320,14 +340,14 @@ public:
     requires std::invocable<F>
     auto measurePerformance(F&& func, const QString& operation_name) {
         auto start = std::chrono::high_resolution_clock::now();
-        
+
         auto result = safeExecute(std::forward<F>(func), operation_name);
-        
+
         auto end = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        
+
         info(QString("Operation '%1' completed in %2ms").arg(operation_name).arg(duration.count()));
-        
+
         return result;
     }
 

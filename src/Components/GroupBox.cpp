@@ -5,54 +5,51 @@ namespace DeclarativeUI::Components {
 
 // **Constructors**
 GroupBox::GroupBox(QObject* parent)
-    : UIElement(parent), current_layout_(nullptr), is_collapsible_(false), 
-      is_animated_(false), animation_duration_(300), min_content_height_(0), 
+    : UIElement(parent), current_layout_(nullptr), is_collapsible_(false),
+      is_animated_(false), animation_duration_(300), min_content_height_(0),
       max_content_height_(16777215) {
-    widget_ = std::make_unique<QGroupBox>();
-    setWidget(widget_.get());
-    setupWidget();
+    // Widget creation is deferred to initialize() method
 }
 
 GroupBox::GroupBox(const QString& title, QObject* parent)
-    : UIElement(parent), current_layout_(nullptr), is_collapsible_(false), 
-      is_animated_(false), animation_duration_(300), min_content_height_(0), 
-      max_content_height_(16777215) {
-    widget_ = std::make_unique<QGroupBox>(title);
-    setWidget(widget_.get());
-    setupWidget();
+    : UIElement(parent), current_layout_(nullptr), is_collapsible_(false),
+      is_animated_(false), animation_duration_(300), min_content_height_(0),
+      max_content_height_(16777215), title_(title) {
+    // Widget creation is deferred to initialize() method
 }
 
 // **Fluent Interface for Group Box Configuration**
 GroupBox& GroupBox::setTitle(const QString& title) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    title_ = title;  // Store for deferred creation
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setTitle(title);
     }
     return *this;
 }
 
 GroupBox& GroupBox::setCheckable(bool checkable) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setCheckable(checkable);
     }
     return *this;
 }
 
 GroupBox& GroupBox::setChecked(bool checked) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setChecked(checked);
     }
     return *this;
 }
 
 GroupBox& GroupBox::setAlignment(Qt::Alignment alignment) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setAlignment(alignment);
     }
     return *this;
 }
 
 GroupBox& GroupBox::setFlat(bool flat) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setFlat(flat);
     }
     return *this;
@@ -60,7 +57,7 @@ GroupBox& GroupBox::setFlat(bool flat) {
 
 // **Layout Management**
 GroupBox& GroupBox::setVBoxLayout() {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         auto layout = new QVBoxLayout();
         groupBox->setLayout(layout);
         current_layout_ = layout;
@@ -69,7 +66,7 @@ GroupBox& GroupBox::setVBoxLayout() {
 }
 
 GroupBox& GroupBox::setHBoxLayout() {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         auto layout = new QHBoxLayout();
         groupBox->setLayout(layout);
         current_layout_ = layout;
@@ -78,7 +75,7 @@ GroupBox& GroupBox::setHBoxLayout() {
 }
 
 GroupBox& GroupBox::setGridLayout(int rows, int cols) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         auto layout = new QGridLayout();
         groupBox->setLayout(layout);
         current_layout_ = layout;
@@ -87,7 +84,7 @@ GroupBox& GroupBox::setGridLayout(int rows, int cols) {
 }
 
 GroupBox& GroupBox::setFormLayout() {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         auto layout = new QFormLayout();
         groupBox->setLayout(layout);
         current_layout_ = layout;
@@ -164,14 +161,14 @@ GroupBox& GroupBox::setMargins(int margin) {
 
 // **Styling**
 GroupBox& GroupBox::setTitleFont(const QFont& font) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setFont(font);
     }
     return *this;
 }
 
 GroupBox& GroupBox::setTitleColor(const QColor& color) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         QPalette palette = groupBox->palette();
         palette.setColor(QPalette::WindowText, color);
         groupBox->setPalette(palette);
@@ -180,7 +177,7 @@ GroupBox& GroupBox::setTitleColor(const QColor& color) {
 }
 
 GroupBox& GroupBox::setBackgroundColor(const QColor& color) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setStyleSheet(
             QString("QGroupBox { background-color: %1; }")
                 .arg(color.name()));
@@ -189,7 +186,7 @@ GroupBox& GroupBox::setBackgroundColor(const QColor& color) {
 }
 
 GroupBox& GroupBox::setBorderColor(const QColor& color) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setStyleSheet(
             QString("QGroupBox { border: 1px solid %1; }")
                 .arg(color.name()));
@@ -198,7 +195,7 @@ GroupBox& GroupBox::setBorderColor(const QColor& color) {
 }
 
 GroupBox& GroupBox::setBorderRadius(int radius) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setStyleSheet(
             QString("QGroupBox { border-radius: %1px; }").arg(radius));
     }
@@ -206,7 +203,7 @@ GroupBox& GroupBox::setBorderRadius(int radius) {
 }
 
 GroupBox& GroupBox::setStyleSheet(const QString& styleSheet) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setStyleSheet(styleSheet);
     }
     return *this;
@@ -214,14 +211,14 @@ GroupBox& GroupBox::setStyleSheet(const QString& styleSheet) {
 
 // **Event Handlers**
 GroupBox& GroupBox::onToggled(std::function<void(bool)> handler) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         QObject::connect(groupBox, &QGroupBox::toggled, handler);
     }
     return *this;
 }
 
 GroupBox& GroupBox::onClicked(std::function<void(bool)> handler) {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         QObject::connect(groupBox, &QGroupBox::clicked, handler);
     }
     return *this;
@@ -229,35 +226,35 @@ GroupBox& GroupBox::onClicked(std::function<void(bool)> handler) {
 
 // **Getters**
 QString GroupBox::getTitle() const {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         return groupBox->title();
     }
-    return QString();
+    return title_;  // Return stored title if widget not created yet
 }
 
 bool GroupBox::isCheckable() const {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         return groupBox->isCheckable();
     }
     return false;
 }
 
 bool GroupBox::isChecked() const {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         return groupBox->isChecked();
     }
     return false;
 }
 
 Qt::Alignment GroupBox::getAlignment() const {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         return groupBox->alignment();
     }
     return Qt::AlignLeft;
 }
 
 bool GroupBox::isFlat() const {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         return groupBox->isFlat();
     }
     return false;
@@ -273,7 +270,7 @@ GroupBox& GroupBox::setCollapsible(bool collapsible) {
     if (collapsible) {
         setCheckable(true);
         onToggled([this](bool checked) {
-            if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+            if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
                 for (int i = 0; i < groupBox->children().size(); ++i) {
                     if (auto child = qobject_cast<QWidget*>(
                             groupBox->children().at(i))) {
@@ -363,16 +360,21 @@ GroupBox& GroupBox::setAnimationDuration(int duration) {
 
 // **Initialization**
 void GroupBox::initialize() {
-    if (!widget_) {
-        widget_ = std::make_unique<QGroupBox>();
-        setWidget(widget_.get());
+    if (!UIElement::getWidget()) {
+        QGroupBox* groupBox;
+        if (!title_.isEmpty()) {
+            groupBox = new QGroupBox(title_);
+        } else {
+            groupBox = new QGroupBox();
+        }
+        setWidget(groupBox);
         setupWidget();
     }
 }
 
 // **Private Helper Methods**
 void GroupBox::setupWidget() {
-    if (auto groupBox = qobject_cast<QGroupBox*>(widget_.get())) {
+    if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         // **Default configuration**
         groupBox->setAlignment(Qt::AlignLeft);
         groupBox->setFlat(false);

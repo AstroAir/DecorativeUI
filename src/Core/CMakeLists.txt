@@ -1,6 +1,7 @@
 set(SOURCES
     UIElement.cpp
     DeclarativeBuilder.cpp
+    ErrorHandling.cpp
 )
 
 add_library(Core ${SOURCES} UIElement.hpp DeclarativeBuilder.hpp)

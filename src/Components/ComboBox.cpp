@@ -69,6 +69,19 @@ void ComboBox::initialize() {
             combobox_widget_->addItems(initial_items_);
         }
 
+        // Apply stored properties after items are added
+        // This ensures currentIndex is set correctly
+        const auto& properties = getProperties();
+        for (const auto& [name, value] : properties) {
+            if (name == "currentIndex") {
+                std::visit([this](const auto& val) {
+                    if constexpr (std::is_same_v<std::decay_t<decltype(val)>, int>) {
+                        combobox_widget_->setCurrentIndex(val);
+                    }
+                }, value);
+            }
+        }
+
         // Connect signals
         if (current_index_changed_handler_) {
             connect(

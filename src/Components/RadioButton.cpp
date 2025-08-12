@@ -57,7 +57,18 @@ bool RadioButton::isChecked() const {
 
 void RadioButton::setChecked(bool checked) {
     if (radio_button_widget_) {
-        radio_button_widget_->setChecked(checked);
+        bool oldState = radio_button_widget_->isChecked();
+
+        // For radio buttons, Qt might not emit toggled when setting to false
+        // We need to temporarily disable autoExclusive to allow unchecking
+        if (!checked && oldState) {
+            bool wasAutoExclusive = radio_button_widget_->autoExclusive();
+            radio_button_widget_->setAutoExclusive(false);
+            radio_button_widget_->setChecked(checked);
+            radio_button_widget_->setAutoExclusive(wasAutoExclusive);
+        } else {
+            radio_button_widget_->setChecked(checked);
+        }
     }
 }
 
@@ -113,8 +124,8 @@ void ButtonGroup::initialize() {
 
         if (button_toggled_handler_) {
             connect(button_group_, QOverload<QAbstractButton*, bool>::of(&QButtonGroup::buttonToggled),
-                    this, [this](QAbstractButton* button, bool checked) { 
-                        button_toggled_handler_(button, checked); 
+                    this, [this](QAbstractButton* button, bool checked) {
+                        button_toggled_handler_(button, checked);
                     });
         }
 

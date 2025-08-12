@@ -450,6 +450,7 @@ private slots:
 
         bool last_toggled = false;
         radio_button->text("Toggle Test")
+            .autoExclusive(false)  // Allow unchecking for this test
             .onToggled(
                 [&last_toggled](bool checked) { last_toggled = checked; });
 

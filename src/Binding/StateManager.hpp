@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QVariant>
+#include <QDateTime>
 
 #include <deque>
 #include <functional>
@@ -124,10 +125,10 @@ public:
     // **Convenience methods for testing and simpler usage**
     template <typename T>
     void setState(const QString& key, const T& value);
-    
+
     bool hasState(const QString& key) const;
     void removeState(const QString& key);
-    
+
     template <typename T>
     void setStateValidator(const QString& key, std::function<bool(const T&)> validator);
 
@@ -175,7 +176,14 @@ std::shared_ptr<ReactiveProperty<T>> StateManager::createState(
         std::make_shared<ReactiveProperty<T>>(std::move(initial_value));
     StateInfo info;
     info.state = state;
+    info.update_count = 1;  // Initial creation counts as first update
+    info.last_update_time = QDateTime::currentMSecsSinceEpoch();
     states_[key] = info;
+
+    // Emit signals
+    emit stateAdded(key);
+    emit stateChanged(key, QVariant::fromValue(initial_value));
+
     return state;
 }
 
@@ -211,7 +219,29 @@ template <typename T>
 void StateManager::setState(const QString& key, const T& value) {
     auto existing = getState<T>(key);
     if (existing) {
+        // Check if state has a validator
+        auto it = states_.find(key);
+        if (it != states_.end() && it->second.validator) {
+            if (!it->second.validator(QVariant::fromValue(value))) {
+                // Validation failed, don't update
+                return;
+            }
+        }
+
+        // Add to history before updating
+        if (it != states_.end() && it->second.history_enabled) {
+            addToHistory(key, QVariant::fromValue(value));
+        }
+
         existing->set(value);
+
+        // Update performance metrics
+        if (it != states_.end()) {
+            it->second.update_count++;
+            it->second.last_update_time = QDateTime::currentMSecsSinceEpoch();
+        }
+
+        emit stateChanged(key, QVariant::fromValue(value));
     } else {
         createState<T>(key, value);
     }

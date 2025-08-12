@@ -34,12 +34,18 @@ target_link_libraries(IntegrationTest
 # **Set output directory for integration tests**
 set_target_properties(
     IntegrationTest
+    # EndToEndWorkflowTest
+    # ErrorHandlingIntegrationTest
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests/integration
 )
 
 # **Make tests depend on resources**
 add_dependencies(IntegrationTest CopyTestResources)
+# add_dependencies(EndToEndWorkflowTest CopyTestResources)
+# add_dependencies(ErrorHandlingIntegrationTest CopyTestResources)
 
 # **Register tests with CTest**
 add_test(NAME IntegrationTest COMMAND IntegrationTest)
+# add_test(NAME EndToEndWorkflowTest COMMAND EndToEndWorkflowTest)
+# add_test(NAME ErrorHandlingIntegrationTest COMMAND ErrorHandlingIntegrationTest)

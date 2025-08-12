@@ -68,7 +68,8 @@ int ProgressBar::getMaximum() const {
 
 void ProgressBar::reset() {
     if (progress_bar_widget_) {
-        progress_bar_widget_->reset();
+        // Set value to minimum instead of using Qt's reset() which sets to minimum-1
+        progress_bar_widget_->setValue(progress_bar_widget_->minimum());
     }
 }
 

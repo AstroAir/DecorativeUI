@@ -108,6 +108,7 @@ private:
     int animation_duration_ = 300;
     int min_content_height_ = 0;
     int max_content_height_ = 16777215;
+    QString title_;  // Store title for deferred widget creation
 
     void setupWidget();
 };
