@@ -374,6 +374,6 @@ Try modifying the examples to experiment:
 After exploring the basic examples:
 
 - **[Component Examples](components.md)** - Explore the full component library
-- **[Command Examples](commands.md)** - Learn the advanced Command System
+- **[Command Examples](command.md)** - Learn the advanced Command System
 - **[Advanced Examples](advanced.md)** - See real-world applications
 - **[User Guide](../user-guide/getting-started.md)** - Comprehensive tutorials

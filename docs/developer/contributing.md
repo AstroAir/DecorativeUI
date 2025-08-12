@@ -571,7 +571,7 @@ We use Semantic Versioning (SemVer):
 
 ## Getting Help
 
-- **Documentation**: Check the [API documentation](../api/) and [user guide](../user-guide/)
+- **Documentation**: Check the [API documentation](../api/README.md) and [user guide](../user-guide/getting-started.md)
 - **Issues**: Search existing issues or create a new one
 - **Discussions**: Use GitHub Discussions for questions and ideas
 - **Code Review**: Maintainers will provide feedback on pull requests

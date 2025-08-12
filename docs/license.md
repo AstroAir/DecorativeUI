@@ -70,7 +70,7 @@ DeclarativeUI depends on the following third-party libraries:
 
 By contributing to DeclarativeUI, you agree that your contributions will be licensed under the same MIT License that covers the project.
 
-For more information about contributing, see our [Contributing Guide](../CONTRIBUTING.md).
+For more information about contributing, see our [Contributing Guide](developer/contributing.md).
 
 ## Questions?
 

@@ -184,9 +184,9 @@ Real-time development workflow:
 For detailed setup and usage instructions, see:
 
 - [User Guide](user-guide/getting-started.md) - Installation and basic usage
-- [API Documentation](api/) - Detailed API reference
-- [Examples](examples/) - Code examples and tutorials
-- [Developer Guide](developer/) - Contributing and advanced topics
+- [API Documentation](api/README.md) - Detailed API reference
+- [Examples](examples/basic.md) - Code examples and tutorials
+- [Developer Guide](developer/architecture.md) - Contributing and advanced topics
 
 ## License
 

@@ -322,9 +322,9 @@ try {
 
 For practical examples of state management:
 
-- **[Basic State Example](../examples/basic.md#state-management)** - Simple state usage
-- **[Reactive UI Example](../examples/advanced.md#reactive-dashboard)** - Complex reactive interfaces
-- **[Form Handling](../examples/advanced.md#form-validation)** - Form state management
+- **[Basic State Example](../examples/basic.md)** - Simple state usage
+- **[Reactive UI Example](../examples/advanced.md)** - Complex reactive interfaces
+- **[Form Handling](../examples/advanced.md)** - Form state management
 
 ## API Reference
 

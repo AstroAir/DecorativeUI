@@ -357,7 +357,7 @@ StateManager::instance().batchUpdate([](StateManager& state) {
 
 For practical examples of the Command System:
 
-- **[Command Examples](../examples/commands.md)** - Basic command usage
+- **[Command Examples](../examples/command.md)** - Basic command usage
 - **[JSON Command Loading](../examples/json-commands.md)** - Loading UIs from JSON
 - **[Legacy Integration](../examples/legacy-integration.md)** - Migrating existing code
 

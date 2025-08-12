@@ -204,7 +204,7 @@ If you encounter build errors:
 1. Clean the build directory: `rm -rf build`
 2. Verify Qt6 installation and PATH
 3. Check compiler compatibility
-4. Review the [troubleshooting guide](user-guide/troubleshooting.md)
+4. Review the [troubleshooting guide](troubleshooting.md)
 
 ## Need Help?
 

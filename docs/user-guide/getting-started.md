@@ -48,13 +48,13 @@ git clone https://github.com/your-org/DeclarativeUI.git
 cd DeclarativeUI
 ```
 
-2. **Build using the provided script (Windows):**
+1. **Build using the provided script (Windows):**
 
 ```bat
 build.bat
 ```
 
-3. **Or build manually:**
+1. **Or build manually:**
 
 ```bash
 mkdir build && cd build
@@ -434,9 +434,9 @@ private:
 
 Now that you have the basics, explore these advanced topics:
 
-1. **[API Documentation](../api/)** - Detailed API reference
-2. **[Examples](../examples/)** - More complex examples
-3. **[Developer Guide](../developer/)** - Contributing and advanced topics
+1. **[API Documentation](../api/README.md)** - Detailed API reference
+2. **[Examples](../examples/basic.md)** - More complex examples
+3. **[Developer Guide](../developer/architecture.md)** - Contributing and advanced topics
 
 ### Recommended Learning Path
 
@@ -458,9 +458,9 @@ Now that you have the basics, explore these advanced topics:
 
 ### Getting Help
 
-- Check the [API documentation](../api/) for detailed reference
-- Look at [examples](../examples/) for common patterns
-- Review [developer documentation](../developer/) for advanced topics
+- Check the [API documentation](../api/README.md) for detailed reference
+- Look at [examples](../examples/basic.md) for common patterns
+- Review [developer documentation](../developer/architecture.md) for advanced topics
 - Report issues on the project repository
 
 ## Build Configuration
