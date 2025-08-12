@@ -7,6 +7,7 @@ This guide will help you get up and running with DeclarativeUI, a modern C++/Qt6
 Before you begin, ensure you have the following installed:
 
 ### Required Software
+
 - **Qt6** (6.2 or higher) with Core, Widgets, Network, and Test modules
 - **CMake** (3.20 or higher)
 - **C++20 compatible compiler**:
@@ -17,17 +18,20 @@ Before you begin, ensure you have the following installed:
 ### Platform-Specific Requirements
 
 #### Windows
+
 - Visual Studio 2019 or later with C++ development tools
 - Qt6 installed via Qt Installer or vcpkg
 - CMake (can be installed via Visual Studio Installer)
 
 #### Linux (Ubuntu/Debian)
+
 ```bash
 sudo apt update
 sudo apt install build-essential cmake qt6-base-dev qt6-tools-dev
 ```
 
 #### macOS
+
 ```bash
 # Using Homebrew
 brew install cmake qt6
@@ -38,17 +42,20 @@ brew install cmake qt6
 ### Option 1: Clone and Build from Source
 
 1. **Clone the repository:**
+
 ```bash
 git clone https://github.com/your-org/DeclarativeUI.git
 cd DeclarativeUI
 ```
 
 2. **Build using the provided script (Windows):**
+
 ```bat
 build.bat
 ```
 
 3. **Or build manually:**
+
 ```bash
 mkdir build && cd build
 cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DBUILD_COMMAND_SYSTEM=ON -DBUILD_ADAPTERS=ON
@@ -58,6 +65,7 @@ cmake --build . --config Release
 ### Option 2: Using CMake FetchContent
 
 Add to your `CMakeLists.txt`:
+
 ```cmake
 include(FetchContent)
 FetchContent_Declare(
@@ -91,7 +99,7 @@ using namespace DeclarativeUI;
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    
+
     // Create main window using declarative syntax
     auto mainWindow = Core::create<QWidget>()
         .property("windowTitle", "Hello DeclarativeUI")
@@ -111,7 +119,7 @@ int main(int argc, char *argv[]) {
                   });
         })
         .build();
-    
+
     mainWindow->show();
     return app.exec();
 }
@@ -135,10 +143,10 @@ add_subdirectory(path/to/DeclarativeUI)
 
 add_executable(HelloDeclarativeUI main.cpp)
 
-target_link_libraries(HelloDeclarativeUI 
-    DeclarativeUI 
+target_link_libraries(HelloDeclarativeUI
+    DeclarativeUI
     Components
-    Qt6::Core 
+    Qt6::Core
     Qt6::Widgets
 )
 
@@ -176,6 +184,7 @@ auto widget = Core::create<QWidget>()
 ### Component Hierarchy
 
 Components are organized in a hierarchy:
+
 - **Core**: Base classes (UIElement, DeclarativeBuilder)
 - **Components**: UI widgets (Button, Label, LineEdit, etc.)
 - **JSON**: JSON-based UI loading
@@ -258,36 +267,36 @@ DeclarativeUI supports loading UIs from JSON files for rapid prototyping:
 
 ```json
 {
-    "type": "QWidget",
-    "properties": {
-        "windowTitle": "JSON UI Example",
-        "minimumSize": [400, 300]
+  "type": "QWidget",
+  "properties": {
+    "windowTitle": "JSON UI Example",
+    "minimumSize": [400, 300]
+  },
+  "layout": {
+    "type": "VBoxLayout",
+    "spacing": 15,
+    "margins": [20, 20, 20, 20]
+  },
+  "children": [
+    {
+      "type": "QLabel",
+      "properties": {
+        "text": "Welcome to JSON UI!",
+        "alignment": 4,
+        "styleSheet": "QLabel { font-size: 16px; font-weight: bold; }"
+      }
     },
-    "layout": {
-        "type": "VBoxLayout",
-        "spacing": 15,
-        "margins": [20, 20, 20, 20]
-    },
-    "children": [
-        {
-            "type": "QLabel",
-            "properties": {
-                "text": "Welcome to JSON UI!",
-                "alignment": 4,
-                "styleSheet": "QLabel { font-size: 16px; font-weight: bold; }"
-            }
-        },
-        {
-            "type": "QPushButton",
-            "properties": {
-                "text": "Click Me",
-                "minimumHeight": 40
-            },
-            "events": {
-                "clicked": "handleButtonClick"
-            }
-        }
-    ]
+    {
+      "type": "QPushButton",
+      "properties": {
+        "text": "Click Me",
+        "minimumHeight": 40
+      },
+      "events": {
+        "clicked": "handleButtonClick"
+      }
+    }
+  ]
 }
 ```
 
@@ -298,20 +307,20 @@ DeclarativeUI supports loading UIs from JSON files for rapid prototyping:
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    
+
     auto loader = std::make_unique<JSON::JSONUILoader>();
-    
+
     // Register event handler
     loader->registerEventHandler("handleButtonClick", []() {
         qDebug() << "Button clicked from JSON UI!";
     });
-    
+
     // Load UI from JSON
     auto widget = loader->loadFromFile("ui/main.json");
     if (widget) {
         widget->show();
     }
-    
+
     return app.exec();
 }
 ```
@@ -325,38 +334,38 @@ Enable hot reload for rapid development:
 
 class MyApplication : public QObject {
     Q_OBJECT
-    
+
 public:
     MyApplication() {
         setupUI();
         setupHotReload();
     }
-    
+
 private:
     void setupUI() {
         ui_loader_ = std::make_unique<JSON::JSONUILoader>();
         main_widget_ = ui_loader_->loadFromFile("ui/main.json");
         main_widget_->show();
     }
-    
+
     void setupHotReload() {
         hot_reload_manager_ = std::make_unique<HotReload::HotReloadManager>();
-        
+
         // Register UI file for hot reloading
         hot_reload_manager_->registerUIFile("ui/main.json", main_widget_.get());
-        
+
         // Connect reload signals
-        connect(hot_reload_manager_.get(), 
+        connect(hot_reload_manager_.get(),
                 &HotReload::HotReloadManager::reloadCompleted,
                 this, &MyApplication::onUIReloaded);
     }
-    
+
 private slots:
     void onUIReloaded(const QString& file_path) {
         qDebug() << "UI reloaded:" << file_path;
         // UI is automatically updated
     }
-    
+
 private:
     std::unique_ptr<JSON::JSONUILoader> ui_loader_;
     std::unique_ptr<QWidget> main_widget_;
@@ -377,24 +386,24 @@ public:
         setupState();
         setupUI();
     }
-    
+
 private:
     void setupState() {
         auto& state = StateManager::instance();
-        
+
         // Initialize state
         state.setState("counter", 0);
         state.setState("counterText", QString("Count: 0"));
-        
+
         // Set up computed state
         state.observeState<int>("counter", [&state](const int& value) {
             state.setState("counterText", QString("Count: %1").arg(value));
         });
     }
-    
+
     void setupUI() {
         auto& state = StateManager::instance();
-        
+
         main_widget_ = Core::create<QWidget>()
             .property("windowTitle", "Counter App")
             .layout<QVBoxLayout>()
@@ -415,7 +424,7 @@ private:
             })
             .build();
     }
-    
+
 private:
     std::unique_ptr<QWidget> main_widget_;
 };
@@ -461,12 +470,14 @@ Now that you have the basics, explore these advanced topics:
 The DeclarativeUI build system supports several configuration options:
 
 #### Core Build Options
+
 - `BUILD_EXAMPLES` (ON/OFF) - Build example applications (25+ examples)
 - `BUILD_TESTS` (ON/OFF) - Build test applications (24+ test executables)
 - `BUILD_SHARED_LIBS` (ON/OFF) - Build shared libraries instead of static
 - `CMAKE_BUILD_TYPE` (Debug/Release/RelWithDebInfo) - Build configuration
 
 #### Command System Options
+
 - `BUILD_COMMAND_SYSTEM` (ON/OFF) - Enable modern Command-based UI system
 - `BUILD_ADAPTERS` (ON/OFF) - Enable integration adapters for legacy code
 - `ENABLE_COMMAND_DEBUG` (ON/OFF) - Enable detailed Command system debug output

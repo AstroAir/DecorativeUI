@@ -93,12 +93,12 @@ Create derived state that automatically updates:
 
 ```cpp
 // Register a computed property
-StateManager::instance().addComputedProperty("user.displayName", 
+StateManager::instance().addComputedProperty("user.displayName",
     [](const StateManager& state) -> QVariant {
         QString firstName = state.getState("user.firstName", QString(""));
         QString lastName = state.getState("user.lastName", QString(""));
         return QString("%1 %2").arg(firstName, lastName).trimmed();
-    }, 
+    },
     {"user.firstName", "user.lastName"}  // Dependencies
 );
 

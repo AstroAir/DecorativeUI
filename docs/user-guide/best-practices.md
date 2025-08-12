@@ -68,17 +68,17 @@ public:
         text_ = text;
         return *this;
     }
-    
+
     CustomButton& variant(ButtonVariant variant) {
         variant_ = variant;
         return *this;
     }
-    
+
     CustomButton& size(ButtonSize size) {
         size_ = size;
         return *this;
     }
-    
+
     // Event handlers
     CustomButton& onClick(std::function<void()> handler) {
         click_handler_ = std::move(handler);
@@ -105,21 +105,21 @@ public:
         label_text_ = text;
         return *this;
     }
-    
+
     FormField& required(bool required = true) {
         is_required_ = required;
         return *this;
     }
-    
+
     FormField& input(std::unique_ptr<Core::UIElement> input) {
         input_element_ = std::move(input);
         return *this;
     }
-    
+
     void initialize() override {
         auto container = new QWidget();
         auto layout = new QVBoxLayout(container);
-        
+
         // Create label
         auto label = new QLabel(label_text_);
         if (is_required_) {
@@ -127,16 +127,16 @@ public:
             label->setStyleSheet("QLabel { color: red; }");
         }
         layout->addWidget(label);
-        
+
         // Add input element
         if (input_element_) {
             input_element_->initialize();
             layout->addWidget(input_element_->getWidget());
         }
-        
+
         setWidget(container);
     }
-    
+
 private:
     QString label_text_;
     bool is_required_ = false;
@@ -155,35 +155,35 @@ class AppState {
 public:
     static void initialize() {
         auto& state = StateManager::instance();
-        
+
         // Initialize application state
         state.setState("user", QVariantMap{});
         state.setState("theme", QString("light"));
         state.setState("language", QString("en"));
-        
+
         // Set up computed states
         setupComputedStates();
-        
+
         // Enable history for user actions
         state.enableHistory("user", 50);
     }
-    
+
     static void setupComputedStates() {
         auto& state = StateManager::instance();
-        
+
         // Computed state for user display name
         state.observeState<QVariantMap>("user", [&state](const QVariantMap& user) {
-            QString displayName = user.value("firstName").toString() + " " + 
+            QString displayName = user.value("firstName").toString() + " " +
                                  user.value("lastName").toString();
             state.setState("userDisplayName", displayName.trimmed());
         });
     }
-    
+
     // Convenience methods
     static void setUser(const QVariantMap& user) {
         StateManager::instance().setState("user", user);
     }
-    
+
     static QVariantMap getUser() {
         auto user = StateManager::instance().getState<QVariantMap>("user");
         return user ? user->get() : QVariantMap{};
@@ -204,18 +204,18 @@ public:
         min_value_ = 0;
         max_value_ = 100;
     }
-    
+
     CounterComponent& range(int min, int max) {
         min_value_ = min;
         max_value_ = max;
         return *this;
     }
-    
+
     CounterComponent& onValueChanged(std::function<void(int)> handler) {
         value_changed_handler_ = std::move(handler);
         return *this;
     }
-    
+
 private:
     void updateValue(int delta) {
         int new_value = qBound(min_value_, count_ + delta, max_value_);
@@ -227,13 +227,13 @@ private:
             }
         }
     }
-    
+
     void updateDisplay() {
         if (display_label_) {
             display_label_->setText(QString::number(count_));
         }
     }
-    
+
 private:
     int count_;
     int min_value_;
@@ -252,52 +252,52 @@ Initialize components only when needed:
 ```cpp
 class TabContainer : public Core::UIElement {
 public:
-    TabContainer& addTab(const QString& title, 
+    TabContainer& addTab(const QString& title,
                         std::function<std::unique_ptr<Core::UIElement>()> factory) {
         tab_factories_[title] = std::move(factory);
         return *this;
     }
-    
+
     void initialize() override {
         tab_widget_ = new QTabWidget();
-        
+
         // Create placeholder tabs
         for (const auto& [title, factory] : tab_factories_) {
             auto placeholder = new QWidget();
             tab_widget_->addTab(placeholder, title);
         }
-        
+
         // Load content on demand
         connect(tab_widget_, &QTabWidget::currentChanged,
                 this, &TabContainer::loadTabContent);
-        
+
         setWidget(tab_widget_);
     }
-    
+
 private:
     void loadTabContent(int index) {
         QString title = tab_widget_->tabText(index);
-        
+
         // Check if already loaded
         if (loaded_tabs_.contains(title)) {
             return;
         }
-        
+
         // Create and load content
         auto factory = tab_factories_[title];
         if (factory) {
             auto content = factory();
             content->initialize();
-            
+
             tab_widget_->removeTab(index);
             tab_widget_->insertTab(index, content->getWidget(), title);
             tab_widget_->setCurrentIndex(index);
-            
+
             loaded_tabs_.insert(title);
             tab_content_[title] = std::move(content);
         }
     }
-    
+
 private:
     QTabWidget* tab_widget_ = nullptr;
     std::unordered_map<QString, std::function<std::unique_ptr<Core::UIElement>()>> tab_factories_;
@@ -311,17 +311,17 @@ private:
 Use batch updates for multiple state changes:
 
 ```cpp
-void updateUserProfile(const QString& firstName, const QString& lastName, 
+void updateUserProfile(const QString& firstName, const QString& lastName,
                       const QString& email) {
     StateManager::instance().batchUpdate([&]() {
         auto& state = StateManager::instance();
-        
+
         QVariantMap user = state.getState<QVariantMap>("user")->get();
         user["firstName"] = firstName;
         user["lastName"] = lastName;
         user["email"] = email;
         user["lastModified"] = QDateTime::currentDateTime();
-        
+
         state.setState("user", user);
         state.setState("profileModified", true);
     });
@@ -371,34 +371,34 @@ public:
             // Create widgets
             auto container = std::make_unique<QWidget>();
             auto layout = std::make_unique<QVBoxLayout>();
-            
+
             // Configure widgets
             setupWidgets(container.get(), layout.get());
-            
+
             // Only set widget if everything succeeded
             container->setLayout(layout.release());
             setWidget(container.release());
-            
+
         } catch (const std::exception& e) {
             qCritical() << "Failed to initialize component:" << e.what();
-            
+
             // Create fallback UI
             auto fallback = new QLabel("Component failed to load");
             fallback->setStyleSheet("QLabel { color: red; }");
             setWidget(fallback);
         }
     }
-    
+
 private:
     void setupWidgets(QWidget* container, QLayout* layout) {
         // Widget setup that might throw
         if (!validateConfiguration()) {
             throw std::runtime_error("Invalid configuration");
         }
-        
+
         // Continue setup...
     }
-    
+
     bool validateConfiguration() const {
         // Validation logic
         return true;
@@ -417,10 +417,10 @@ public:
         image_path_ = path;
         return *this;
     }
-    
+
     void initialize() override {
         auto label = new QLabel();
-        
+
         QPixmap pixmap(image_path_);
         if (pixmap.isNull()) {
             // Fallback to placeholder
@@ -430,10 +430,10 @@ public:
         } else {
             label->setPixmap(pixmap.scaled(200, 200, Qt::KeepAspectRatio, Qt::SmoothTransformation));
         }
-        
+
         setWidget(label);
     }
-    
+
 private:
     QString image_path_;
 };
@@ -450,23 +450,23 @@ class TestableButton : public Core::UIElement {
 public:
     // Expose internal state for testing
     bool isInitialized() const { return button_ != nullptr; }
-    QString getCurrentText() const { 
-        return button_ ? button_->text() : QString(); 
+    QString getCurrentText() const {
+        return button_ ? button_->text() : QString();
     }
-    
+
     // Allow injection of dependencies for testing
     TestableButton& setClickHandler(std::function<void()> handler) {
         click_handler_ = std::move(handler);
         return *this;
     }
-    
+
     // Trigger events programmatically for testing
     void simulateClick() {
         if (click_handler_) {
             click_handler_();
         }
     }
-    
+
 private:
     QPushButton* button_ = nullptr;
     std::function<void()> click_handler_;
@@ -475,13 +475,13 @@ private:
 // Test
 void testButtonClick() {
     bool clicked = false;
-    
+
     auto button = std::make_unique<TestableButton>();
     button->setClickHandler([&clicked]() { clicked = true; });
     button->initialize();
-    
+
     button->simulateClick();
-    
+
     assert(clicked);
 }
 ```
@@ -494,24 +494,24 @@ Test state management separately:
 void testUserState() {
     // Clear state for testing
     StateManager::instance().clearState();
-    
+
     // Set up test state
     QVariantMap testUser{
         {"firstName", "John"},
         {"lastName", "Doe"},
         {"email", "john@example.com"}
     };
-    
+
     StateManager::instance().setState("user", testUser);
-    
+
     // Test computed state
     auto displayName = StateManager::instance().getState<QString>("userDisplayName");
     assert(displayName && displayName->get() == "John Doe");
-    
+
     // Test state updates
     testUser["firstName"] = "Jane";
     StateManager::instance().setState("user", testUser);
-    
+
     displayName = StateManager::instance().getState<QString>("userDisplayName");
     assert(displayName && displayName->get() == "Jane Doe");
 }
@@ -526,10 +526,10 @@ Document component APIs clearly:
 ```cpp
 /**
  * @brief A customizable search input component
- * 
+ *
  * SearchBox provides a text input with an integrated search button.
  * It supports placeholder text, search callbacks, and custom styling.
- * 
+ *
  * @example
  * auto search = std::make_unique<SearchBox>();
  * search->placeholder("Search products...")
@@ -547,7 +547,7 @@ public:
      * @return Reference to this SearchBox for method chaining
      */
     SearchBox& placeholder(const QString& text);
-    
+
     /**
      * @brief Sets the search callback
      * @param handler Function called when search is triggered
@@ -563,37 +563,37 @@ Document JSON UI schemas:
 
 ```json
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "DeclarativeUI Component Schema",
-    "type": "object",
-    "required": ["type"],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DeclarativeUI Component Schema",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "description": "Widget type (e.g., 'QPushButton', 'QLabel')"
+    },
+    "id": {
+      "type": "string",
+      "description": "Optional unique identifier for the component"
+    },
     "properties": {
-        "type": {
-            "type": "string",
-            "description": "Widget type (e.g., 'QPushButton', 'QLabel')"
-        },
-        "id": {
-            "type": "string",
-            "description": "Optional unique identifier for the component"
-        },
-        "properties": {
-            "type": "object",
-            "description": "Widget properties (text, size, etc.)"
-        },
-        "events": {
-            "type": "object",
-            "description": "Event handler mappings"
-        },
-        "bindings": {
-            "type": "object",
-            "description": "Property bindings to state"
-        },
-        "children": {
-            "type": "array",
-            "description": "Child components",
-            "items": { "$ref": "#" }
-        }
+      "type": "object",
+      "description": "Widget properties (text, size, etc.)"
+    },
+    "events": {
+      "type": "object",
+      "description": "Event handler mappings"
+    },
+    "bindings": {
+      "type": "object",
+      "description": "Property bindings to state"
+    },
+    "children": {
+      "type": "array",
+      "description": "Child components",
+      "items": { "$ref": "#" }
     }
+  }
 }
 ```
 
@@ -612,16 +612,16 @@ public:
         if (file.open(QIODevice::ReadOnly)) {
             return file.readAll();
         }
-        
+
         // Fallback to file system in development
         QFile devFile(QString("ui/%1.json").arg(name));
         if (devFile.open(QIODevice::ReadOnly)) {
             return devFile.readAll();
         }
-        
+
         return QString();
     }
-    
+
     static QPixmap getIcon(const QString& name) {
         return QPixmap(QString(":/icons/%1.png").arg(name));
     }
@@ -642,12 +642,12 @@ public:
             return QCoreApplication::arguments().contains("--dev");
         #endif
     }
-    
+
     static bool isHotReloadEnabled() {
-        return isDevelopment() && 
+        return isDevelopment() &&
                QCoreApplication::arguments().contains("--hot-reload");
     }
-    
+
     static QString getUIPath() {
         if (isDevelopment()) {
             return "ui/";

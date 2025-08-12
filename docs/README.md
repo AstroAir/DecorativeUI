@@ -10,9 +10,11 @@ DeclarativeUI provides two complementary approaches for building user interfaces
 ## 📚 Documentation Structure
 
 ### [Project Overview](overview.md)
+
 Get started with understanding what DeclarativeUI is, its key features, architecture overview, and core concepts.
 
 ### [API Documentation](api/)
+
 Detailed reference documentation for all DeclarativeUI modules and classes:
 
 - **[Core API](api/core.md)** - UIElement and DeclarativeBuilder foundation classes
@@ -23,6 +25,7 @@ Detailed reference documentation for all DeclarativeUI modules and classes:
 - **[Components Library](api/components.md)** - Complete UI component reference
 
 ### [User Guide](user-guide/)
+
 Step-by-step guides for using DeclarativeUI in your applications:
 
 - **[Getting Started](user-guide/getting-started.md)** - Installation, setup, and your first application
@@ -30,6 +33,7 @@ Step-by-step guides for using DeclarativeUI in your applications:
 - **[Best Practices](user-guide/best-practices.md)** - Recommended patterns and optimization techniques
 
 ### [Developer Documentation](developer/)
+
 In-depth information for contributors and advanced users:
 
 - **[Architecture](developer/architecture.md)** - Framework design, implementation details, and design decisions
@@ -63,7 +67,7 @@ using namespace DeclarativeUI;
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
-    
+
     auto window = Core::create<QWidget>()
         .property("windowTitle", "Hello DeclarativeUI")
         .property("minimumSize", QSize(300, 200))
@@ -78,7 +82,7 @@ int main(int argc, char *argv[]) {
                   });
         })
         .build();
-    
+
     window->show();
     return app.exec();
 }
@@ -87,6 +91,7 @@ int main(int argc, char *argv[]) {
 ## 🎯 Key Features
 
 ### Declarative Syntax
+
 Build UIs using a fluent, declarative API that describes what your UI should look like:
 
 ```cpp
@@ -99,23 +104,25 @@ auto widget = create<QWidget>()
 ```
 
 ### JSON-Based UI Definitions
+
 Create UIs from JSON for rapid prototyping and dynamic interfaces:
 
 ```json
 {
-    "type": "QWidget",
-    "layout": { "type": "VBoxLayout" },
-    "children": [
-        {
-            "type": "QPushButton",
-            "properties": { "text": "Click Me" },
-            "events": { "clicked": "handleClick" }
-        }
-    ]
+  "type": "QWidget",
+  "layout": { "type": "VBoxLayout" },
+  "children": [
+    {
+      "type": "QPushButton",
+      "properties": { "text": "Click Me" },
+      "events": { "clicked": "handleClick" }
+    }
+  ]
 }
 ```
 
 ### Hot Reload Development
+
 Make changes to your UI definitions and see them instantly without restarting your application:
 
 ```cpp
@@ -125,6 +132,7 @@ hot_reload->registerUIFile("ui/main.json", main_widget);
 ```
 
 ### State Management
+
 Centralized, reactive state management with property binding:
 
 ```cpp
@@ -138,6 +146,7 @@ label->bindProperty("text", []() {
 ```
 
 ### Command System
+
 Centralized command handling with undo/redo support:
 
 ```cpp
@@ -147,18 +156,21 @@ CommandManager::instance().getInvoker().execute("save_file", context);
 ## 📖 Learning Path
 
 ### For Beginners
+
 1. Start with [Project Overview](overview.md) to understand the framework
 2. Follow the [Getting Started Guide](user-guide/getting-started.md)
 3. Explore [Examples](user-guide/examples.md) to see common patterns
 4. Review [Best Practices](user-guide/best-practices.md) for optimal usage
 
 ### For Experienced Developers
+
 1. Review [Architecture Documentation](developer/architecture.md) for design insights
 2. Check [API Documentation](api/) for detailed reference
 3. Explore [Contributing Guidelines](developer/contributing.md) to get involved
 4. Study [Testing Documentation](developer/testing.md) for quality assurance
 
 ### For Contributors
+
 1. Read [Contributing Guidelines](developer/contributing.md) thoroughly
 2. Understand the [Architecture](developer/architecture.md) and design decisions
 3. Follow [Testing Guidelines](developer/testing.md) for quality code
@@ -167,6 +179,7 @@ CommandManager::instance().getInvoker().execute("save_file", context);
 ## 🔧 Requirements
 
 ### System Requirements
+
 - **Qt6** (6.0 or higher) with development packages
 - **CMake** (3.20 or higher)
 - **C++20 compatible compiler**:
@@ -175,6 +188,7 @@ CommandManager::instance().getInvoker().execute("save_file", context);
   - MSVC 2019+ (Windows)
 
 ### Supported Platforms
+
 - Windows 10/11 (MSVC 2019+)
 - Linux (Ubuntu 20.04+, GCC 10+)
 - macOS (macOS 11+, Clang 12+)
@@ -182,30 +196,35 @@ CommandManager::instance().getInvoker().execute("save_file", context);
 ## 📋 Examples Overview
 
 ### Basic Components
+
 - Simple button with click handling
 - Form inputs with validation
 - Layout management
 - Custom component creation
 
 ### State Management
+
 - Counter application with undo/redo
 - Data binding between components
 - Computed state properties
 - Batch state updates
 
 ### JSON UIs
+
 - Loading UIs from JSON files
 - Dynamic UI generation
 - Event handler registration
 - Property binding in JSON
 
 ### Hot Reload
+
 - Development workflow setup
 - File watching configuration
 - Error handling and recovery
 - Performance monitoring
 
 ### Advanced Features
+
 - Custom command implementation
 - Component composition patterns
 - Performance optimization techniques
@@ -214,13 +233,16 @@ CommandManager::instance().getInvoker().execute("save_file", context);
 ## 🤝 Community and Support
 
 ### Getting Help
+
 - **Documentation**: Comprehensive guides and API reference
 - **Examples**: Working code samples for common scenarios
 - **Issues**: Report bugs or request features on GitHub
 - **Discussions**: Ask questions and share ideas
 
 ### Contributing
+
 We welcome contributions! Whether you're:
+
 - Fixing bugs
 - Adding new features
 - Improving documentation
@@ -230,6 +252,7 @@ We welcome contributions! Whether you're:
 Please read our [Contributing Guidelines](developer/contributing.md) to get started.
 
 ### Code of Conduct
+
 We are committed to providing a welcoming and inclusive environment for all contributors. Please be respectful and constructive in all interactions.
 
 ## 📄 License

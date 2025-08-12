@@ -15,13 +15,13 @@ The Command System separates UI logic from widget implementation, enabling:
 
 ### Commands vs Components
 
-| Aspect | Components | Commands |
-|--------|------------|----------|
-| **Approach** | Widget-centric | Logic-centric |
-| **Dependencies** | Direct Qt coupling | Framework independent |
-| **Testing** | Requires Qt widgets | Pure logic testing |
-| **Flexibility** | Qt-specific | Backend agnostic |
-| **Learning Curve** | Familiar to Qt developers | New paradigm |
+| Aspect             | Components                | Commands              |
+| ------------------ | ------------------------- | --------------------- |
+| **Approach**       | Widget-centric            | Logic-centric         |
+| **Dependencies**   | Direct Qt coupling        | Framework independent |
+| **Testing**        | Requires Qt widgets       | Pure logic testing    |
+| **Flexibility**    | Qt-specific               | Backend agnostic      |
+| **Learning Curve** | Familiar to Qt developers | New paradigm          |
 
 ### Command Architecture
 
@@ -31,10 +31,10 @@ graph TD
     B --> C[UICommand]
     C --> D[WidgetMapper]
     D --> E[Qt Widget]
-    
+
     F[State Manager] --> C
     C --> F
-    
+
     G[Event System] --> C
     C --> H[Command Events]
 ```
@@ -131,7 +131,7 @@ auto button = CommandBuilder("Button")
         // Access event data
         auto modifiers = event.getData("modifiers").value<Qt::KeyboardModifiers>();
         auto position = event.getData("position").toPoint();
-        
+
         if (modifiers & Qt::ControlModifier) {
             // Save as...
         } else {
@@ -278,6 +278,7 @@ MVCIntegrationBridge::instance().executeCommandAction("document.save");
 ### When to Use Commands
 
 Use Commands when:
+
 - Building new applications from scratch
 - You need framework-independent UI logic
 - Testing UI logic is important
@@ -287,6 +288,7 @@ Use Commands when:
 ### When to Use Components
 
 Use Components when:
+
 - Migrating existing Qt applications
 - You need direct Qt widget access
 - You're familiar with Qt patterns

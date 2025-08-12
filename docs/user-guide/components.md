@@ -41,6 +41,7 @@ QWidget* widget = button->getWidget();
 ### Input Components
 
 #### Button
+
 Standard push button with click handling:
 
 ```cpp
@@ -52,6 +53,7 @@ button->text("Save Document")
 ```
 
 #### LineEdit
+
 Single-line text input with validation:
 
 ```cpp
@@ -66,6 +68,7 @@ lineEdit->placeholder("Enter your name")
 ```
 
 #### CheckBox
+
 Checkbox with tri-state support:
 
 ```cpp
@@ -81,6 +84,7 @@ checkBox->text("Enable notifications")
 ### Display Components
 
 #### Label
+
 Text and image display with rich formatting:
 
 ```cpp
@@ -92,6 +96,7 @@ label->text("Welcome to DeclarativeUI")
 ```
 
 #### ProgressBar
+
 Progress indication with custom styling:
 
 ```cpp
@@ -106,6 +111,7 @@ progressBar->minimum(0)
 ### Container Components
 
 #### Container
+
 Generic container with layout management:
 
 ```cpp
@@ -122,6 +128,7 @@ container->layout<QHBoxLayout>([](auto& layout) {
 ```
 
 #### GroupBox
+
 Grouped controls with borders and titles:
 
 ```cpp
@@ -160,7 +167,7 @@ button->onClick([this](const auto& event) {
     // Access event details
     auto modifiers = event.modifiers();
     auto position = event.position();
-    
+
     if (modifiers & Qt::ControlModifier) {
         // Handle Ctrl+Click
     } else {
@@ -215,31 +222,37 @@ button->style(R"(
 For a complete list of all available components and their APIs, see the [Components API Reference](../api/components.md).
 
 ### Input Components
+
 - Button, RadioButton, ToolButton
 - LineEdit, TextEdit, PlainTextEdit
 - CheckBox, ComboBox
 - SpinBox, DoubleSpinBox
 - Slider, Dial
 
-### Display Components  
+### Display Components
+
 - Label, ProgressBar
 - LCDNumber
 
 ### Container Components
+
 - Container, Widget
 - GroupBox, TabWidget
 - Frame, ScrollArea, Splitter
 
 ### Advanced Components
+
 - TableView, TreeView, ListView
 - MenuBar, ToolBar, StatusBar
 - DateTimeEdit, Calendar
 
 ### Dialog Components
+
 - FileDialog, ColorDialog
 - FontDialog, MessageBox
 
 ### Specialized Components
+
 - DockWidget
 
 ## Next Steps

@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ master ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ master ]
 
 env:
   QT_VERSION: 6.5.0
@@ -23,13 +23,13 @@ jobs:
             compiler: msvc
             qt_arch: win64_msvc2019_64
             cmake_preset: default
-          
+
           # Linux builds
           - os: ubuntu-latest
             compiler: gcc
             qt_arch: gcc_64
             cmake_preset: default
-          
+
           # macOS builds
           - os: macos-latest
             compiler: clang

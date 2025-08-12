@@ -1,61 +1,60 @@
 # DeclarativeUI Examples
 
-This directory contains all examples for the DeclarativeUI project, organized by complexity and feature focus.
+This directory contains all examples for the DeclarativeUI project, organized by learning progression and feature focus.
 
-## Directory Structure
+## 🎯 Quick Start
+
+**New to DeclarativeUI?** Start here:
+1. **01-getting-started/hello-world/** - Your first DeclarativeUI app
+2. **01-getting-started/basic-ui/** - Learn basic components
+3. **02-fundamentals/state-management/** - Understand reactive state
+
+## 📁 Directory Structure
 
 ```text
 examples/
-├── CMakeLists.txt          # Main examples configuration
-├── basic/                  # Basic examples and tutorials
-│   ├── CMakeLists.txt
-│   ├── 01_hello_world.cpp
-│   ├── 02_json_ui_loading.cpp
-│   ├── 03_simple_state.cpp
-│   ├── 04_basic_hot_reload.cpp
-│   ├── 05_event_handling.cpp
-│   ├── 06_counter_app.cpp
-│   ├── 08_command_basics.cpp
-│   ├── 08_command_basics_simple.cpp
-│   ├── 16_reactive_state.cpp
-│   ├── 21_file_watching.cpp
-│   └── 22_hot_reload_example.cpp
-├── components/             # Component demonstrations
-│   ├── CMakeLists.txt
-│   ├── 06_basic_components.cpp
-│   ├── 07_input_components.cpp
-│   ├── 08_comprehensive_components.cpp
-│   ├── 09_enhanced_components.cpp
-│   └── 10_new_components.cpp
-├── command/                # Command system examples
-│   ├── CMakeLists.txt
-│   ├── CommandUIExample.cpp
-│   ├── CommandUIExample.hpp
-│   ├── IntegrationExample.cpp
-│   ├── IntegrationExample.hpp
-│   ├── command_builder_example.cpp
-│   ├── integration_main.cpp
-│   ├── json_command_example.cpp
-│   ├── main.cpp
-│   └── state_integration_example.cpp
-├── advanced/               # Advanced applications
-│   ├── CMakeLists.txt
-│   ├── 26_command_system.cpp
-│   ├── 27_command_example.cpp
-│   ├── 28_advanced_example.cpp
-│   ├── 29_comprehensive_example.cpp
-│   ├── 30_command_ui_builder.cpp
-│   ├── 31_integration_example.cpp
-│   ├── 36_todo_app.cpp
-│   ├── 37_form_example.cpp
-│   ├── 38_settings_example.cpp
-│   └── 39_dashboard_example.cpp
-└── resources/              # Shared example resources
-    ├── command_ui_example.json
-    └── mixed_components_example.json
+├── README.md                           # This file
+├── CMakeLists.txt                      # Build configuration
+├── 01-getting-started/                 # 🌱 Absolute beginner examples
+│   ├── hello-world/                    # Minimal DeclarativeUI app
+│   ├── basic-ui/                       # Basic UI components
+│   └── simple-events/                  # Event handling basics
+├── 02-fundamentals/                    # 🏗️ Core concepts
+│   ├── state-management/               # Reactive state patterns
+│   ├── json-ui-loading/                # JSON-driven UI creation
+│   ├── event-handling/                 # Advanced event patterns
+│   └── property-binding/               # Reactive property binding
+├── 03-components/                      # 🧩 UI component showcase
+│   ├── basic-components/               # Core UI components
+│   ├── input-components/               # Form and input controls
+│   ├── layout-components/              # Layout management
+│   └── custom-components/              # Advanced component usage
+├── 04-advanced-features/               # 🚀 Advanced DeclarativeUI features
+│   ├── hot-reload/                     # Development hot reload
+│   ├── reactive-state/                 # Advanced reactive patterns
+│   ├── file-watching/                  # File system monitoring
+│   └── performance/                    # Performance optimization
+├── 05-command-system/                  # ⚡ Command architecture (experimental)
+│   ├── command-basics/                 # Command pattern fundamentals
+│   ├── command-builder/                # Builder patterns (disabled)
+│   ├── json-commands/                  # JSON-driven commands (disabled)
+│   └── state-integration/              # Command-state integration (disabled)
+├── 06-applications/                    # 📱 Complete sample applications
+│   ├── counter-app/                    # Simple counter application
+│   ├── todo-app/                       # Full-featured todo app
+│   ├── form-example/                   # Form handling and validation
+│   ├── settings-app/                   # Configuration management
+│   └── dashboard/                      # Complex dashboard application
+├── shared/                             # 📦 Shared resources
+│   ├── json/                           # JSON UI definitions
+│   ├── assets/                         # Images and other assets
+│   └── common/                         # Shared utilities
+└── templates/                          # 📋 Example templates
+    ├── basic-example-template/         # Template for new basic examples
+    └── application-template/           # Template for new applications
 ```
 
-## Running Examples
+## 🚀 Running Examples
 
 ### Build All Examples
 
@@ -68,208 +67,220 @@ cmake --build . --config Release
 ### Run Specific Examples
 
 ```bash
-# Basic examples
-./examples/basic/HelloWorldExample
-./examples/basic/CounterAppExample
+# Getting Started
+./examples/01-getting-started/HelloWorldExample
+./examples/01-getting-started/BasicUIExample
 
-# Component examples
-./examples/components/BasicComponentsExample
-./examples/components/InputComponentsExample
+# Fundamentals
+./examples/02-fundamentals/StateManagementExample
+./examples/02-fundamentals/JSONUILoadingExample
 
-# Command system examples
-./examples/command/CommandUIExample
-./examples/command/IntegrationExample
+# Components
+./examples/03-components/BasicComponentsExample
+./examples/03-components/InputComponentsExample
 
-# Advanced examples
-./examples/advanced/TodoAppExample
-./examples/advanced/DashboardExample
+# Advanced Features
+./examples/04-advanced-features/ReactiveStateExample
+./examples/04-advanced-features/PerformanceExample
+
+# Command System (experimental)
+./examples/05-command-system/CommandBasicsExample
+
+# Applications
+./examples/06-applications/TodoAppExample
+./examples/06-applications/DashboardExample
 ```
 
-## Example Categories
+## 📚 Learning Path
 
-### Basic Examples (`basic/`)
+### 🌱 Beginner (Start Here)
+**Goal:** Get familiar with DeclarativeUI basics
 
-Perfect for learning the fundamentals:
+1. **01-getting-started/hello-world/** - Create your first app
+2. **01-getting-started/basic-ui/** - Learn basic components
+3. **01-getting-started/simple-events/** - Handle user interactions
+4. **02-fundamentals/state-management/** - Understand reactive state
 
-- **HelloWorldExample**: Simple "Hello World" application
-- **JSONUILoadingExample**: Loading UI from JSON files
-- **SimpleStateExample**: Basic state management
-- **BasicHotReloadExample**: Hot reload functionality
-- **EventHandlingExample**: Event handling patterns
-- **CounterAppExample**: Simple counter application
-- **CommandBasicsExample**: Command system introduction
-- **CommandBasicsSimpleExample**: Simplified command basics
-- **ReactiveStateExample**: Reactive state management
-- **FileWatchingExample**: File watching functionality
-- **HotReloadExample**: Advanced hot reload features
+**Time:** 2-4 hours
 
-### Component Examples (`components/`)
+### 🏗️ Intermediate
+**Goal:** Master core concepts and components
 
-Showcasing UI components:
+1. **02-fundamentals/property-binding/** - Reactive connections
+2. **02-fundamentals/json-ui-loading/** - Dynamic UI creation
+3. **03-components/basic-components/** - Core UI components
+4. **03-components/input-components/** - Form controls
+5. **03-components/layout-components/** - Layout management
+6. **06-applications/counter-app/** - Simple application
 
-- **BasicComponentsExample**: Basic UI components showcase
-- **InputComponentsExample**: Input component demonstrations
-- **ComprehensiveComponentsExample**: All components showcase
-- **EnhancedComponentsExample**: Enhanced component features
-- **NewComponentsExample**: Latest component additions
+**Time:** 4-8 hours
 
-### Command System Examples (`command/`)
+### 🚀 Advanced
+**Goal:** Explore advanced features and patterns
 
-Demonstrating the command architecture:
+1. **04-advanced-features/reactive-state/** - Advanced reactive patterns
+2. **04-advanced-features/hot-reload/** - Development workflow
+3. **04-advanced-features/performance/** - Optimization techniques
+4. **05-command-system/command-basics/** - Command patterns
+5. **06-applications/todo-app/** - Complex application
+6. **06-applications/dashboard/** - Advanced UI composition
 
-Note: Several command examples are currently disabled in CMake due to API mismatches. Sources are available for reference and will be re-enabled after alignment.
+**Time:** 8-16 hours
 
-- **CommandUIExample**: Command-based UI construction (disabled)
-- **IntegrationExample**: Legacy-Command integration (disabled)
-- **CommandBuilderExample**: Command Builder patterns (disabled)
-- **JSONCommandExample**: Loading UI from JSON with Commands (disabled)
-- **StateIntegrationExample**: State management with Commands (disabled)
-- **CommandMainExample**: Main Command system demo (disabled)
-- **IntegrationMainExample**: Integration scenarios (disabled)
+### 🎯 Expert
+**Goal:** Build production-ready applications
 
-### Advanced Examples (`advanced/`)
+1. **06-applications/form-example/** - Form handling
+2. **06-applications/settings-app/** - Configuration management
+3. **Create your own application** - Apply all concepts
+4. **Contribute to DeclarativeUI** - Help improve the framework
 
-Complex real-world applications:
+**Time:** 16+ hours
 
-- **CommandSystemExample**: Comprehensive Command system demo
-- **CommandExample**: Advanced Command usage patterns
-- **AdvancedExample**: Advanced DeclarativeUI features
-- **ComprehensiveExample**: Complete feature showcase
-- **CommandUIBuilderExample**: Advanced Command Builder patterns
-- **IntegrationExampleAdvanced**: Complex integration scenarios
-- **TodoAppExample**: Complete todo application
-- **FormExample**: Form handling and validation
-- **SettingsExample**: Settings management
-- **DashboardExample**: Dashboard application
+## 🎨 Example Categories
 
-## Learning Path
+### 🌱 01-getting-started
+Perfect for absolute beginners. These examples use minimal code and focus on single concepts.
 
-### Beginner
+- **Difficulty:** ⭐☆☆☆☆
+- **Prerequisites:** Basic C++ knowledge
+- **Focus:** Getting familiar with DeclarativeUI
 
-1. Start with `basic/HelloWorldExample`
-2. Try `basic/SimpleStateExample`
-3. Explore `basic/EventHandlingExample`
-4. Build `basic/CounterAppExample`
+### 🏗️ 02-fundamentals
+Core concepts that every DeclarativeUI developer should understand.
 
-### Intermediate
+- **Difficulty:** ⭐⭐⭐☆☆
+- **Prerequisites:** Completed getting-started
+- **Focus:** State management, property binding, JSON UI
 
-1. Study `components/BasicComponentsExample`
-2. Try `basic/JSONUILoadingExample`
-3. Explore `basic/HotReloadExample`
-4. Build `components/ComprehensiveComponentsExample`
+### 🧩 03-components
+Comprehensive showcase of UI components and layout patterns.
 
-### Advanced
+- **Difficulty:** ⭐⭐⭐☆☆
+- **Prerequisites:** Understanding of fundamentals
+- **Focus:** UI components, layouts, styling
 
-1. Learn `command/CommandUIExample`
-2. Study `command/IntegrationExample`
-3. Try `advanced/TodoAppExample`
-4. Build `advanced/DashboardExample`
+### 🚀 04-advanced-features
+Advanced DeclarativeUI features for sophisticated applications.
 
-## Key Concepts Demonstrated
+- **Difficulty:** ⭐⭐⭐⭐☆
+- **Prerequisites:** Component mastery
+- **Focus:** Hot reload, reactive state, performance
+
+### ⚡ 05-command-system (Experimental)
+Command-based architecture patterns. Some examples currently disabled.
+
+- **Difficulty:** ⭐⭐⭐⭐⭐
+- **Prerequisites:** Advanced features understanding
+- **Focus:** Command patterns, MVVM architecture
+
+### 📱 06-applications
+Complete sample applications demonstrating real-world usage.
+
+- **Difficulty:** ⭐⭐⭐⭐☆
+- **Prerequisites:** All previous categories
+- **Focus:** Application architecture, best practices
+
+## 🛠️ Key Concepts Demonstrated
 
 ### State Management
-
-- Property binding
-- Reactive updates
-- State synchronization
-- Event-driven updates
+- **Property binding** - Reactive connections between components
+- **Reactive updates** - Automatic UI synchronization
+- **State synchronization** - Keeping data consistent
+- **Event-driven updates** - Responding to user actions
 
 ### UI Construction
-
-- Declarative UI building
-- Component composition
-- Layout management
-- Dynamic UI creation
+- **Declarative UI building** - Describe what you want, not how
+- **Component composition** - Building complex UIs from simple parts
+- **Layout management** - Organizing UI elements effectively
+- **Dynamic UI creation** - Creating UI at runtime
 
 ### Command System
-
-- Command-based architecture
-- Builder patterns
-- Integration with legacy components
-- JSON-driven UI construction
+- **Command-based architecture** - Encapsulating operations as objects
+- **Builder patterns** - Fluent interfaces for complex operations
+- **Integration patterns** - Connecting different system parts
+- **JSON-driven UI** - Creating UI from configuration
 
 ### Hot Reload
+- **File watching** - Monitoring file system changes
+- **Dynamic reloading** - Updating running applications
+- **Performance monitoring** - Measuring and optimizing performance
+- **Development workflow** - Improving developer experience
 
-- File watching
-- Dynamic reloading
-- Performance monitoring
-- Development workflow
-
-## Adding New Examples
+## 📋 Adding New Examples
 
 ### Basic Example
+1. Choose appropriate category (01-06)
+2. Create subdirectory with descriptive kebab-case name
+3. Add source files and README.md
+4. Update category CMakeLists.txt
+5. Test and document
 
-1. Create `.cpp` file in `basic/` directory
-2. Add executable to `basic/CMakeLists.txt`
-3. Focus on single concept demonstration
-4. Include clear comments and documentation
+### Application Example
+1. Create subdirectory in `06-applications/`
+2. Include comprehensive README.md
+3. Demonstrate multiple DeclarativeUI features
+4. Follow application architecture best practices
+5. Include error handling and user feedback
 
-### Component Example
-
-1. Create `.cpp` file in `components/` directory
-2. Add executable to `components/CMakeLists.txt`
-3. Showcase specific UI components
-4. Demonstrate component features and usage
-
-### Command Example
-
-1. Create `.cpp` file in `command/` directory
-2. Add executable to `command/CMakeLists.txt`
-3. Demonstrate command system features
-4. Show integration patterns
-
-### Advanced Example
-
-1. Create `.cpp` file in `advanced/` directory
-2. Add executable to `advanced/CMakeLists.txt`
-3. Build complete applications
-4. Combine multiple features
-
-## Example Template
-
-```cpp
-#include <QApplication>
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-
-// Include DeclarativeUI headers
-#include "src/Core/DeclarativeBuilder.hpp"
-#include "src/Components/Button.hpp"
-
-int main(int argc, char *argv[])
-{
-    QApplication app(argc, argv);
-
-    // Your example code here
-    auto widget = std::make_unique<QWidget>();
-    auto layout = std::make_unique<QVBoxLayout>(widget.get());
-
-    auto label = std::make_unique<QLabel>("Hello, DeclarativeUI!");
-    layout->addWidget(label.get());
-
-    widget->show();
-
-    return app.exec();
-}
-```
-
-## Dependencies
+## 📦 Dependencies
 
 Examples depend on:
+- **DeclarativeUI library** - Core framework
+- **Components library** - UI component implementations
+- **Qt6::Core** - Qt core functionality
+- **Qt6::Widgets** - Widget-based UI
+- **Qt6::Network** - Network functionality (some examples)
 
-- DeclarativeUI library
-- Components library
-- Qt6::Core
-- Qt6::Widgets
-- Qt6::Network (for some examples)
+## 📁 Resources
 
-## Resources
+Examples use resources from:
+- **shared/json/** - JSON UI definitions
+- **shared/assets/** - Images and other assets
+- **shared/common/** - Shared utilities and helpers
 
-Examples may use resources from:
+Resources are automatically copied to build directory during build.
 
-- `Resources/` (main project resources)
-- `examples/resources/` (example-specific resources)
+## 🔧 Troubleshooting
 
-Resources are automatically copied to the build directory during build.
+### Build Issues
+- **Qt6 not found:** Ensure Qt6 is installed and in PATH
+- **DeclarativeUI not found:** Build DeclarativeUI library first
+- **CMake errors:** Check CMake version (3.16+ required)
+
+### Runtime Issues
+- **Missing libraries:** Check library paths and dependencies
+- **Resource not found:** Verify resources are copied to build directory
+- **Crashes:** Check console output for error messages
+
+### Performance Issues
+- **Slow startup:** Check for expensive initialization
+- **UI lag:** Profile using performance example
+- **Memory leaks:** Use memory profiling tools
+
+## 🤝 Contributing
+
+### Adding Examples
+1. Follow existing naming conventions
+2. Include comprehensive documentation
+3. Test on multiple platforms
+4. Follow code style guidelines
+
+### Improving Documentation
+1. Keep README files up to date
+2. Add clear learning objectives
+3. Include troubleshooting information
+4. Provide context and background
+
+### Reporting Issues
+1. Use GitHub issues for bug reports
+2. Include minimal reproduction case
+3. Specify platform and Qt version
+4. Provide clear steps to reproduce
+
+## 📖 Additional Resources
+
+- **DeclarativeUI Documentation** - Complete framework documentation
+- **Qt Documentation** - Underlying Qt concepts and APIs
+- **Design Patterns** - Software design pattern references
+- **C++ Best Practices** - Modern C++ programming guidelines

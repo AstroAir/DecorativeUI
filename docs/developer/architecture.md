@@ -42,7 +42,7 @@ DeclarativeUI/
 
 #### 1. Declarative Programming Model
 
-The framework emphasizes describing *what* the UI should look like rather than *how* to build it:
+The framework emphasizes describing _what_ the UI should look like rather than _how_ to build it:
 
 ```cpp
 // Declarative approach
@@ -72,7 +72,7 @@ class UIElement {
 private:
     std::unique_ptr<QWidget> widget_;  // Automatic cleanup
     std::unordered_map<QString, std::unique_ptr<QPropertyAnimation>> animations_;
-    
+
 public:
     ~UIElement() = default;  // Automatic cleanup via smart pointers
 };
@@ -84,7 +84,7 @@ The framework uses concepts to ensure type safety at compile time:
 
 ```cpp
 template<typename T>
-concept QtWidget = std::is_base_of_v<QWidget, T> && 
+concept QtWidget = std::is_base_of_v<QWidget, T> &&
                    std::is_constructible_v<T>;
 
 template<QtWidget WidgetType>
@@ -113,33 +113,33 @@ The `UIElement` class is the foundation of all UI components:
 ```cpp
 class UIElement : public QObject {
     Q_OBJECT
-    
+
 protected:
     // Property system
     std::unordered_map<QString, PropertyValue> properties_;
     std::unordered_map<QString, std::function<PropertyValue()>> bindings_;
     std::unordered_map<QString, std::function<void()>> event_handlers_;
-    
+
     // Widget management
     std::unique_ptr<QWidget> widget_;
-    
+
     // Animation system
     std::unordered_map<QString, std::unique_ptr<QPropertyAnimation>> animations_;
-    
+
     // Performance monitoring
     PerformanceMetrics performance_metrics_;
-    
+
 public:
     // Fluent interface
     template<typename T>
     UIElement& setProperty(const QString& name, T&& value);
-    
-    UIElement& bindProperty(const QString& property, 
+
+    UIElement& bindProperty(const QString& property,
                            const std::function<PropertyValue()>& binding);
-    
-    UIElement& onEvent(const QString& event, 
+
+    UIElement& onEvent(const QString& event,
                       const std::function<void()>& handler);
-    
+
     // Lifecycle management
     virtual void initialize() = 0;
     virtual void cleanup() noexcept;
@@ -159,14 +159,14 @@ private:
     std::vector<std::function<void(WidgetType*)>> configurators_;
     std::unique_ptr<QLayout> layout_;
     std::vector<std::unique_ptr<QWidget>> children_;
-    
+
 public:
     template<typename T>
     DeclarativeBuilder& property(const QString& name, T&& value) {
         element_->setProperty(name, std::forward<T>(value));
         return *this;
     }
-    
+
     template<QtWidget ChildType>
     DeclarativeBuilder& child(
         std::function<void(DeclarativeBuilder<ChildType>&)> config) {
@@ -176,7 +176,7 @@ public:
         children_.push_back(std::move(child_widget));
         return *this;
     }
-    
+
     std::unique_ptr<WidgetType> build() {
         auto widget = element_->createWidget<WidgetType>();
         applyConfiguration(widget.get());
@@ -195,22 +195,22 @@ The JSON module uses a factory pattern for component creation:
 class ComponentRegistry {
 private:
     std::unordered_map<QString, std::unique_ptr<IComponentFactory>> factories_;
-    
+
 public:
     template<typename WidgetType>
     void registerComponent(
         const QString& type_name,
         std::function<std::unique_ptr<WidgetType>(const QJsonObject&)> factory) {
-        
+
         auto component_factory = std::make_unique<ComponentFactoryImpl<WidgetType>>(
             std::move(factory));
         factories_[type_name] = std::move(component_factory);
     }
-    
+
     std::unique_ptr<QWidget> createComponent(
-        const QString& type_name, 
+        const QString& type_name,
         const QJsonObject& config) {
-        
+
         auto it = factories_.find(type_name);
         if (it != factories_.end()) {
             return it->second->create(config);
@@ -235,32 +235,32 @@ private:
         int current_depth = 0;
         int max_validation_depth = 100;
     };
-    
+
 public:
     bool validate(const QJsonObject& ui_definition) {
         ValidationContext context;
         context.root_object = ui_definition;
-        
+
         // Stage 1: Basic structure validation
         if (!validateBasicStructure(ui_definition, context)) {
             return false;
         }
-        
+
         // Stage 2: Component-specific validation
         if (!validateComponentStructure(ui_definition, context.current_path)) {
             return false;
         }
-        
+
         // Stage 3: Property validation
         if (!validateProperties(ui_definition, context)) {
             return false;
         }
-        
+
         // Stage 4: Cross-reference validation
         if (!validateReferences(ui_definition, context)) {
             return false;
         }
-        
+
         return !context.hasErrors();
     }
 };
@@ -281,44 +281,44 @@ private:
         QDateTime last_reload;
         QString backup_content;
     };
-    
+
     std::unique_ptr<FileWatcher> file_watcher_;
     std::unique_ptr<JSON::JSONUILoader> ui_loader_;
     std::unordered_map<QString, UIFileInfo> registered_files_;
-    
+
 public:
     void registerUIFile(const QString& file_path, QWidget* target_widget) {
         // Create backup
         createBackup(file_path);
-        
+
         // Register with file watcher
         file_watcher_->watchFile(file_path);
-        
+
         // Store file info
         UIFileInfo& info = registered_files_[file_path];
         info.target_widget = target_widget;
         info.parent_widget = target_widget->parentWidget();
         info.last_reload = QDateTime::currentDateTime();
     }
-    
+
 private:
     void performReload(const QString& file_path) {
         emit reloadStarted(file_path);
-        
+
         try {
             // Load new UI
             auto new_widget = ui_loader_->loadFromFile(file_path);
-            
+
             // Validate new widget
             if (!validateWidget(new_widget.get())) {
                 throw std::runtime_error("Widget validation failed");
             }
-            
+
             // Replace widget
             replaceWidget(file_path, std::move(new_widget));
-            
+
             emit reloadCompleted(file_path);
-            
+
         } catch (const std::exception& e) {
             // Restore backup on failure
             restoreBackup(file_path);
@@ -350,12 +350,12 @@ private:
     std::deque<PerformanceMetrics> metrics_history_;
     std::unordered_map<QString, std::deque<PerformanceMetrics>> file_metrics_;
     std::unordered_map<QString, QElapsedTimer> active_operations_;
-    
+
 public:
     void startOperation(const QString& operation_name) {
         active_operations_[operation_name].start();
     }
-    
+
     qint64 endOperation(const QString& operation_name) {
         auto it = active_operations_.find(operation_name);
         if (it != active_operations_.end()) {
@@ -365,17 +365,17 @@ public:
         }
         return 0;
     }
-    
-    void recordReloadMetrics(const QString& file_path, 
+
+    void recordReloadMetrics(const QString& file_path,
                            const PerformanceMetrics& metrics) {
         metrics_history_.push_back(metrics);
         file_metrics_[file_path].push_back(metrics);
-        
+
         // Check performance thresholds
         if (metrics.total_time_ms > warning_threshold_ms_) {
             emit performanceWarning(file_path, metrics.total_time_ms);
         }
-        
+
         pruneHistory();
     }
 };
@@ -398,29 +398,29 @@ private:
         bool history_enabled = false;
         qint64 last_update_time = 0;
     };
-    
+
     std::unordered_map<QString, StateInfo> states_;
     std::unordered_map<QString, std::vector<QString>> dependencies_;
     std::unordered_map<QString, std::vector<QString>> dependents_;
-    
+
     bool batching_ = false;
     std::vector<std::function<void()>> pending_updates_;
-    
+
 public:
     template<typename T>
     void setState(const QString& key, T&& value) {
         auto& info = states_[key];
-        
+
         // Validate if validator exists
         if (info.validator && !info.validator(QVariant::fromValue(value))) {
             throw std::invalid_argument("State validation failed");
         }
-        
+
         // Update history
         if (info.history_enabled) {
             addToHistory(key, QVariant::fromValue(value));
         }
-        
+
         // Update state
         if (!info.state) {
             info.state = std::make_shared<ReactiveProperty<T>>(std::forward<T>(value));
@@ -428,32 +428,32 @@ public:
             auto reactive_prop = std::static_pointer_cast<ReactiveProperty<T>>(info.state);
             reactive_prop->set(std::forward<T>(value));
         }
-        
+
         // Update dependents
         if (!batching_) {
             updateDependents(key);
         } else {
             pending_updates_.push_back([this, key]() { updateDependents(key); });
         }
-        
+
         emit stateChanged(key, QVariant::fromValue(value));
     }
-    
+
     void batchUpdate(std::function<void()> updates) {
         if (batching_) {
             updates();
             return;
         }
-        
+
         batching_ = true;
         updates();
-        
+
         // Process pending updates
         for (auto& update : pending_updates_) {
             update();
         }
         pending_updates_.clear();
-        
+
         batching_ = false;
     }
 };
@@ -472,60 +472,60 @@ private:
     QString source_property_;
     QString target_property_;
     BindingDirection direction_;
-    
+
     std::function<TargetType(const SourceType&)> converter_;
     std::function<bool(const TargetType&)> validator_;
-    
+
 public:
     PropertyBinding(QObject* source, const QString& source_prop,
                    QObject* target, const QString& target_prop,
-                   BindingDirection direction) 
+                   BindingDirection direction)
         : source_object_(source), target_object_(target),
           source_property_(source_prop), target_property_(target_prop),
           direction_(direction) {
-        
+
         connectSignals();
     }
-    
+
     void update() override {
         if (!isValid()) return;
-        
+
         // Get source value
         QVariant source_value = source_object_->property(source_property_.toUtf8());
         SourceType typed_source = source_value.value<SourceType>();
-        
+
         // Convert if needed
-        TargetType target_value = converter_ ? 
-            converter_(typed_source) : 
+        TargetType target_value = converter_ ?
+            converter_(typed_source) :
             static_cast<TargetType>(typed_source);
-        
+
         // Validate if needed
         if (validator_ && !validator_(target_value)) {
             return;
         }
-        
+
         // Set target value
-        target_object_->setProperty(target_property_.toUtf8(), 
+        target_object_->setProperty(target_property_.toUtf8(),
                                    QVariant::fromValue(target_value));
     }
-    
+
 private:
     void connectSignals() {
         // Connect property change signals
         auto source_meta = source_object_->metaObject();
         int prop_index = source_meta->indexOfProperty(source_property_.toUtf8());
-        
+
         if (prop_index >= 0) {
             auto prop = source_meta->property(prop_index);
             if (prop.hasNotifySignal()) {
                 auto notify_signal = prop.notifySignal();
                 auto update_slot = metaObject()->method(
                     metaObject()->indexOfSlot("update()"));
-                
+
                 connect(source_object_, notify_signal, this, update_slot);
             }
         }
-        
+
         // For bidirectional binding, connect reverse direction
         if (direction_ == BindingDirection::TwoWay) {
             // Similar setup for target -> source
@@ -551,11 +551,11 @@ private:
         QElapsedTimer timer;
         ExecutionMode mode;
     };
-    
+
     std::map<QUuid, ExecutionContext> running_commands_;
     std::queue<ExecutionContext> batch_queue_;
     QTimer* batch_timer_;
-    
+
 public:
     CommandResult<QVariant> executeInternal(const QString& command_name,
                                            const CommandContext& context,
@@ -565,19 +565,19 @@ public:
         if (!command) {
             return CommandResult<QVariant>("Command not found: " + command_name);
         }
-        
+
         // Stage 2: Validate execution
         if (!command->canExecute(context)) {
             return CommandResult<QVariant>("Command cannot be executed");
         }
-        
+
         // Stage 3: Run interceptors
         for (auto& interceptor : interceptors_) {
             if (!interceptor->beforeExecution(command_name, context)) {
                 return CommandResult<QVariant>("Command blocked by interceptor");
             }
         }
-        
+
         // Stage 4: Execute command
         ExecutionContext exec_context;
         exec_context.command_id = QUuid::createUuid();
@@ -586,16 +586,16 @@ public:
         exec_context.command = std::move(command);
         exec_context.mode = mode;
         exec_context.timer.start();
-        
+
         auto result = exec_context.command->execute(context);
-        
+
         // Stage 5: Post-execution processing
         qint64 elapsed = exec_context.timer.elapsed();
-        
+
         for (auto& interceptor : interceptors_) {
             interceptor->afterExecution(command_name, context, result, elapsed);
         }
-        
+
         return result;
     }
 };
@@ -612,21 +612,21 @@ class ComponentManager {
 private:
     std::vector<std::unique_ptr<UIElement>> components_;
     std::unordered_map<QString, std::weak_ptr<UIElement>> named_components_;
-    
+
 public:
     template<typename T, typename... Args>
     std::shared_ptr<T> createComponent(const QString& name, Args&&... args) {
         auto component = std::make_shared<T>(std::forward<Args>(args)...);
-        
+
         // Store in containers
         components_.push_back(component);
         if (!name.isEmpty()) {
             named_components_[name] = component;
         }
-        
+
         return component;
     }
-    
+
     ~ComponentManager() {
         // Automatic cleanup via smart pointers
         // Components are destroyed in reverse order
@@ -652,7 +652,7 @@ public:
             return createFallbackWidget();
         }
     }
-    
+
 private:
     std::unique_ptr<QWidget> createFallbackWidget() noexcept {
         try {
@@ -679,7 +679,7 @@ DeclarativeUI follows Qt's threading model:
 class ThreadSafeStateManager {
 private:
     mutable QReadWriteLock states_lock_;
-    
+
 public:
     template<typename T>
     std::shared_ptr<ReactiveProperty<T>> getState(const QString& key) const {
@@ -690,7 +690,7 @@ public:
         }
         return nullptr;
     }
-    
+
     template<typename T>
     void setState(const QString& key, T&& value) {
         // Ensure UI updates happen on main thread

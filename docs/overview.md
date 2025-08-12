@@ -7,29 +7,34 @@ DeclarativeUI is a modern, declarative UI framework built on top of Qt6 that ena
 ## Key Features
 
 ### 🚀 **Declarative Syntax**
+
 - Fluent C++ API for building UIs declaratively
 - JSON-based UI definitions for rapid prototyping
 - Template-based builder pattern with type safety
 
 ### 🔥 **Hot Reload**
+
 - Real-time UI updates without application restart
 - File watching with automatic reload triggers
 - Performance monitoring and optimization
 - Backup and restore functionality for safe reloading
 
 ### 🔗 **Advanced Property Binding**
+
 - Bidirectional property binding between UI elements
 - State management with dependency tracking
 - Batch updates for performance optimization
 - History support with undo/redo functionality
 
 ### ⚡ **Command System**
+
 - Centralized command handling and execution
 - Built-in commands for common operations
 - Keyboard shortcut integration
 - Asynchronous command execution support
 
 ### 🎨 **Rich Component Library**
+
 - Comprehensive set of UI components
 - Input components: Button, LineEdit, CheckBox, ComboBox, SpinBox, Slider
 - Display components: Label, ProgressBar, TextEdit
@@ -37,6 +42,7 @@ DeclarativeUI is a modern, declarative UI framework built on top of Qt6 that ena
 - Advanced components: TableView, TreeView, MenuBar, DateTimeEdit
 
 ### 🛡️ **Modern C++ Design**
+
 - C++20 standard with concepts and templates
 - RAII and exception-safe resource management
 - Move semantics and perfect forwarding
@@ -77,7 +83,9 @@ DeclarativeUI/
 ## Core Concepts
 
 ### UIElement
+
 The foundation of all UI components, providing:
+
 - Property management with type safety
 - Event handling system
 - Animation support
@@ -86,7 +94,9 @@ The foundation of all UI components, providing:
 - Responsive design features
 
 ### DeclarativeBuilder
+
 A template-based builder that enables fluent UI construction:
+
 - Type-safe widget creation
 - Property binding integration
 - Event handler registration
@@ -94,7 +104,9 @@ A template-based builder that enables fluent UI construction:
 - Exception-safe building
 
 ### State Management
+
 Centralized state management with:
+
 - Global state store
 - Dependency tracking
 - Batch updates
@@ -102,7 +114,9 @@ Centralized state management with:
 - Performance monitoring
 
 ### Hot Reload System
+
 Real-time development workflow:
+
 - File system monitoring
 - Automatic UI reconstruction
 - Error handling and recovery
@@ -111,6 +125,7 @@ Real-time development workflow:
 ## Dependencies
 
 ### Required Dependencies
+
 - **Qt6** (6.0 or higher)
   - Qt6::Core - Core Qt functionality
   - Qt6::Widgets - Widget system
@@ -121,6 +136,7 @@ Real-time development workflow:
   - GCC 10+ / Clang 10+ / MSVC 2019+
 
 ### Build Requirements
+
 - Modern C++20 compiler with concepts support
 - Qt6 development packages
 - CMake build system
@@ -143,18 +159,21 @@ Real-time development workflow:
 ## Design Philosophy
 
 ### Modern C++
+
 - Leverage C++20 features for type safety and performance
 - Use RAII for automatic resource management
 - Prefer value semantics and move operations
 - Template metaprogramming for compile-time optimizations
 
 ### Declarative Paradigm
+
 - Describe what the UI should look like, not how to build it
 - Separate UI structure from business logic
 - Enable rapid iteration and prototyping
 - Support both code and data-driven UI definitions
 
 ### Developer Experience
+
 - Minimize boilerplate code
 - Provide clear error messages
 - Enable hot reload for rapid development
@@ -163,6 +182,7 @@ Real-time development workflow:
 ## Getting Started
 
 For detailed setup and usage instructions, see:
+
 - [User Guide](user-guide/getting-started.md) - Installation and basic usage
 - [API Documentation](api/) - Detailed API reference
 - [Examples](examples/) - Code examples and tutorials

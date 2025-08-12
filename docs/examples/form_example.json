@@ -2,13 +2,21 @@
     "type": "QWidget",
     "properties": {
         "windowTitle": "User Registration Form",
-        "minimumSize": [450, 600],
+        "minimumSize": [
+            450,
+            600
+        ],
         "styleSheet": "QWidget { background-color: #ecf0f1; font-family: 'Segoe UI', Arial, sans-serif; }"
     },
     "layout": {
         "type": "VBoxLayout",
         "spacing": 20,
-        "margins": [40, 40, 40, 40]
+        "margins": [
+            40,
+            40,
+            40,
+            40
+        ]
     },
     "children": [
         {
@@ -28,7 +36,12 @@
             "layout": {
                 "type": "VBoxLayout",
                 "spacing": 15,
-                "margins": [20, 20, 20, 20]
+                "margins": [
+                    20,
+                    20,
+                    20,
+                    20
+                ]
             },
             "children": [
                 {
@@ -154,7 +167,12 @@
             "layout": {
                 "type": "VBoxLayout",
                 "spacing": 15,
-                "margins": [20, 20, 20, 20]
+                "margins": [
+                    20,
+                    20,
+                    20,
+                    20
+                ]
             },
             "children": [
                 {

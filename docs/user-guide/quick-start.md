@@ -9,9 +9,9 @@ Before you begin, ensure you have:
 - **Qt6** (6.2 or later) with development packages
 - **CMake** 3.20 or higher
 - **C++20 compatible compiler**:
-    - GCC 10+ (Linux)
-    - Clang 12+ (macOS)
-    - MSVC 2019+ (Windows)
+  - GCC 10+ (Linux)
+  - Clang 12+ (macOS)
+  - MSVC 2019+ (Windows)
 
 ## Installation
 
@@ -29,7 +29,7 @@ cd DeclarativeUI
     ```bat
     # Use the provided build script
     build.bat
-    
+
     # Or use CMake directly
     cmake --preset default
     cmake --build --preset default
@@ -41,7 +41,7 @@ cd DeclarativeUI
     # Configure and build
     cmake --preset default
     cmake --build --preset default
-    
+
     # Run tests to verify
     cd build
     ctest --output-on-failure
@@ -82,7 +82,7 @@ using namespace DeclarativeUI;
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    
+
     // Create a simple UI with declarative syntax
     auto window = Core::create<QWidget>()
         .windowTitle("My First DeclarativeUI App")
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
                });
         })
         .build();
-    
+
     window->show();
     return app.exec();
 }
@@ -152,21 +152,25 @@ cmake --build .
 Now that you have DeclarativeUI working, explore these areas:
 
 ### Learn the Basics
+
 - **[Component System](components.md)** - Learn about the 30+ built-in components
 - **[State Management](state-management.md)** - Understand reactive state and property binding
 - **[JSON Support](json-support.md)** - Load UIs from JSON definitions
 
 ### Explore Advanced Features
+
 - **[Command System](commands.md)** - Modern command-based UI architecture
 - **[Hot Reload](hot-reload.md)** - Real-time development workflow
 - **[Integration Guide](../integration-guide.md)** - Integrate with existing Qt projects
 
 ### Browse Examples
+
 - **[Basic Examples](../examples/basic.md)** - Simple demonstrations
 - **[Component Examples](../examples/components.md)** - Component showcase
 - **[Advanced Examples](../examples/advanced.md)** - Real-world applications
 
 ### Get Involved
+
 - **[Contributing](../developer/contributing.md)** - Help improve DeclarativeUI
 - **[Architecture](../developer/architecture.md)** - Understand the framework design
 - **[Testing](../developer/testing.md)** - Learn about our testing practices
@@ -174,6 +178,7 @@ Now that you have DeclarativeUI working, explore these areas:
 ## Common Issues
 
 ### Qt6 Not Found
+
 If CMake can't find Qt6, set the Qt installation path:
 
 ```bash
@@ -183,6 +188,7 @@ set CMAKE_PREFIX_PATH=C:\Qt\6.5.0\msvc2019_64
 ```
 
 ### Compiler Issues
+
 Ensure you're using a C++20 compatible compiler:
 
 ```bash
@@ -192,6 +198,7 @@ clang --version  # Should be 12+
 ```
 
 ### Build Errors
+
 If you encounter build errors:
 
 1. Clean the build directory: `rm -rf build`

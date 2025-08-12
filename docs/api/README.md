@@ -5,30 +5,36 @@ This section provides comprehensive API documentation for all DeclarativeUI modu
 ## 📚 Module Overview
 
 ### [Core Module](core.md)
+
 Foundation classes that provide the base functionality for all UI components.
 
 **Key Classes:**
+
 - **UIElement** - Base class for all UI components with property management, event handling, and lifecycle management
 - **DeclarativeBuilder** - Template-based builder pattern for fluent UI construction
 - **PropertyValue** - Type-safe property value container
 - **PerformanceMetrics** - Performance monitoring and optimization
 
 **Core Concepts:**
+
 - RAII-based resource management
 - Fluent interface design
 - Type-safe property system
 - Exception safety guarantees
 
 ### [JSON Support Module](json.md)
+
 Comprehensive JSON support for loading, parsing, validating, and managing UI definitions.
 
 **Key Classes:**
+
 - **JSONUILoader** - Load UI definitions from JSON files, strings, or objects
 - **JSONParser** - Advanced JSON parsing with comments, includes, and preprocessing
 - **JSONValidator** - Schema validation for UI JSON definitions
 - **ComponentRegistry** - Component type registration and factory management
 
 **Features:**
+
 - JSON schema validation
 - Custom property converters
 - Event handler registration
@@ -36,14 +42,17 @@ Comprehensive JSON support for loading, parsing, validating, and managing UI def
 - Error handling and recovery
 
 ### [Hot Reload Module](hot-reload.md)
+
 Real-time UI updates without application restart for rapid development workflows.
 
 **Key Classes:**
+
 - **HotReloadManager** - Coordinates hot reload system and manages file registration
 - **FileWatcher** - Low-level file system monitoring with debouncing
 - **PerformanceMonitor** - Tracks and analyzes hot reload performance metrics
 
 **Features:**
+
 - File system monitoring
 - Automatic UI reconstruction
 - Error handling and recovery
@@ -51,15 +60,18 @@ Real-time UI updates without application restart for rapid development workflows
 - Backup and restore functionality
 
 ### [Binding System Module](binding.md)
+
 Comprehensive property binding system with state management and dependency tracking.
 
 **Key Classes:**
+
 - **StateManager** - Centralized state management with dependency tracking
 - **PropertyBinding** - Type-safe property binding between objects
 - **ReactiveProperty** - Reactive property implementation
 - **PropertyBindingManager** - Manages multiple property bindings
 
 **Features:**
+
 - Bidirectional property binding
 - State observation and dependency tracking
 - Batch updates for performance
@@ -67,9 +79,11 @@ Comprehensive property binding system with state management and dependency track
 - Thread-safe operations
 
 ### [Command System Module](command.md)
+
 Centralized command handling with support for synchronous/asynchronous execution and undo/redo.
 
 **Key Classes:**
+
 - **CommandSystem** - Core command execution engine
 - **CommandInvoker** - Handles command execution with various modes
 - **CommandManager** - High-level command management with history
@@ -77,6 +91,7 @@ Centralized command handling with support for synchronous/asynchronous execution
 - **BuiltinCommands** - Standard command implementations
 
 **Features:**
+
 - Synchronous and asynchronous execution
 - Command composition and chaining
 - Undo/redo functionality
@@ -84,11 +99,13 @@ Centralized command handling with support for synchronous/asynchronous execution
 - UI integration helpers
 
 ### [Components Library Module](components.md)
+
 Rich set of UI components built on top of the DeclarativeUI Core framework.
 
 **Component Categories:**
 
 #### Input Components
+
 - **Button** - Customizable push button with click handling
 - **LineEdit** - Single-line text input with validation
 - **CheckBox** - Checkbox with tri-state support
@@ -97,17 +114,20 @@ Rich set of UI components built on top of the DeclarativeUI Core framework.
 - **Slider** - Value selection slider with customization
 
 #### Display Components
+
 - **Label** - Text and image display with rich formatting
 - **ProgressBar** - Progress indication with custom styling
 - **TextEdit** - Multi-line text display and editing
 
 #### Container Components
+
 - **Container** - Generic container for grouping components
 - **Layout** - Layout management with various layout types
 - **GroupBox** - Grouped controls with border and title
 - **TabWidget** - Tabbed interface with dynamic content
 
 #### Advanced Components
+
 - **TableView** - Tabular data display with sorting and selection
 - **TreeView** - Hierarchical data display with expansion
 - **MenuBar** - Application menu bar with actions
@@ -118,6 +138,7 @@ Rich set of UI components built on top of the DeclarativeUI Core framework.
 ### Common Patterns
 
 #### Creating Components
+
 ```cpp
 // Using DeclarativeBuilder
 auto widget = Core::create<QWidget>()
@@ -136,6 +157,7 @@ button->text("Save")
 ```
 
 #### State Management
+
 ```cpp
 // Set up state
 auto& state = StateManager::instance();
@@ -149,6 +171,7 @@ label->bindProperty("text", []() {
 ```
 
 #### JSON UI Loading
+
 ```cpp
 auto loader = std::make_unique<JSON::JSONUILoader>();
 loader->registerEventHandler("buttonClick", []() {
@@ -159,6 +182,7 @@ auto widget = loader->loadFromFile("ui/main.json");
 ```
 
 #### Hot Reload Setup
+
 ```cpp
 auto hot_reload = std::make_unique<HotReload::HotReloadManager>();
 hot_reload->registerUIFile("ui/main.json", main_widget);
@@ -166,6 +190,7 @@ hot_reload->registerUIFile("ui/main.json", main_widget);
 ```
 
 #### Command Execution
+
 ```cpp
 CommandContext context;
 context.setParameter("target", my_widget);
@@ -182,6 +207,7 @@ auto result = CommandManager::instance()
 Each module documentation includes:
 
 ### Class Reference
+
 - **Class Declaration** - Full class signature with inheritance
 - **Constructor/Destructor** - Object lifecycle management
 - **Public Methods** - Complete method reference with parameters and return types
@@ -189,6 +215,7 @@ Each module documentation includes:
 - **Properties** - Accessible properties and their types
 
 ### Method Documentation
+
 - **Method Signature** - Complete signature with template parameters
 - **Parameters** - Detailed parameter descriptions
 - **Return Values** - Return type and value descriptions
@@ -196,12 +223,14 @@ Each module documentation includes:
 - **Usage Examples** - Practical code examples
 
 ### Usage Patterns
+
 - **Basic Usage** - Simple usage examples
 - **Advanced Patterns** - Complex scenarios and best practices
 - **Integration Examples** - How to use with other modules
 - **Performance Considerations** - Optimization tips and guidelines
 
 ### Error Handling
+
 - **Exception Types** - Custom exception hierarchy
 - **Error Recovery** - How to handle and recover from errors
 - **Debugging Tips** - Common issues and solutions
@@ -209,6 +238,7 @@ Each module documentation includes:
 ## 🔍 Finding What You Need
 
 ### By Functionality
+
 - **UI Creation**: [Core Module](core.md) → DeclarativeBuilder
 - **JSON UIs**: [JSON Module](json.md) → JSONUILoader
 - **State Management**: [Binding Module](binding.md) → StateManager
@@ -217,12 +247,14 @@ Each module documentation includes:
 - **UI Components**: [Components Module](components.md) → Specific components
 
 ### By Use Case
+
 - **Getting Started**: Start with [Core Module](core.md) and [Components Module](components.md)
 - **Rapid Prototyping**: Use [JSON Module](json.md) for data-driven UIs
 - **Development Workflow**: Set up [Hot Reload Module](hot-reload.md)
 - **Complex Applications**: Leverage [Binding Module](binding.md) and [Command Module](command.md)
 
 ### By Component Type
+
 - **Input Controls**: [Components Module](components.md) → Input Components
 - **Display Elements**: [Components Module](components.md) → Display Components
 - **Layout Management**: [Components Module](components.md) → Container Components
@@ -231,14 +263,18 @@ Each module documentation includes:
 ## 🛠️ Development Tools
 
 ### Type Safety
+
 All APIs use C++20 concepts for compile-time type checking:
+
 ```cpp
 template<QtWidget T>
 concept ValidWidget = std::is_base_of_v<QWidget, T>;
 ```
 
 ### Exception Safety
+
 All classes provide strong exception safety guarantees with RAII:
+
 ```cpp
 class UIElement {
     std::unique_ptr<QWidget> widget_;  // Automatic cleanup
@@ -247,7 +283,9 @@ class UIElement {
 ```
 
 ### Performance Monitoring
+
 Built-in performance tracking for optimization:
+
 ```cpp
 auto metrics = element->getPerformanceMetrics();
 qDebug() << "Render time:" << metrics.render_time_ms;

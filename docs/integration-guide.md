@@ -5,6 +5,7 @@
 This comprehensive guide explains how to integrate DeclarativeUI into existing Qt applications and how to migrate between the legacy Component system and the modern Command-based UI architecture. It covers integration patterns, migration strategies, adapter usage, and best practices for adopting DeclarativeUI in various scenarios.
 
 The framework provides multiple integration approaches:
+
 - **Direct Integration**: Add DeclarativeUI to existing Qt applications
 - **Component Migration**: Gradually migrate from legacy Components to modern Commands
 - **Hybrid Applications**: Mix legacy Components and modern Commands in the same application
@@ -15,12 +16,15 @@ The framework provides multiple integration approaches:
 Before integrating DeclarativeUI, ensure your project meets these requirements:
 
 ### Required Dependencies
+
 - **Qt6** (6.2 or higher) with Core, Widgets, Network, and Test modules
 - **CMake** 3.20 or higher
 - **C++20 compatible compiler** (GCC 10+, Clang 12+, MSVC 2019+)
 
 ### Build Configuration
+
 Enable the necessary DeclarativeUI features:
+
 ```cmake
 # Enable Command system and adapters
 set(BUILD_COMMAND_SYSTEM ON)
@@ -592,26 +596,26 @@ Traditional DeclarativeUI JSON format:
 
 ```json
 {
-    "type": "Widget",
-    "properties": {
-        "windowTitle": "Legacy App",
-        "layout": "VBox"
+  "type": "Widget",
+  "properties": {
+    "windowTitle": "Legacy App",
+    "layout": "VBox"
+  },
+  "children": [
+    {
+      "type": "Button",
+      "properties": {
+        "text": "Legacy Button",
+        "enabled": true
+      }
     },
-    "children": [
-        {
-            "type": "Button",
-            "properties": {
-                "text": "Legacy Button",
-                "enabled": true
-            }
-        },
-        {
-            "type": "LineEdit",
-            "properties": {
-                "placeholderText": "Enter text"
-            }
-        }
-    ]
+    {
+      "type": "LineEdit",
+      "properties": {
+        "placeholderText": "Enter text"
+      }
+    }
+  ]
 }
 ```
 
@@ -621,81 +625,81 @@ Enhanced JSON format with Command system features:
 
 ```json
 {
-    "type": "Container",
-    "properties": {
-        "layout": "VBox",
-        "spacing": 15,
-        "margins": [20, 20, 20, 20]
+  "type": "Container",
+  "properties": {
+    "layout": "VBox",
+    "spacing": 15,
+    "margins": [20, 20, 20, 20]
+  },
+  "style": {
+    "background-color": "#f8f9fa",
+    "border-radius": "8px"
+  },
+  "children": [
+    {
+      "type": "Label",
+      "properties": {
+        "text": "Modern Command App",
+        "alignment": "center"
+      },
+      "style": {
+        "font-size": "24px",
+        "font-weight": "bold",
+        "color": "#2c3e50",
+        "margin-bottom": "20px"
+      },
+      "bindings": {
+        "text": "app.title"
+      }
     },
-    "style": {
-        "background-color": "#f8f9fa",
-        "border-radius": "8px"
+    {
+      "type": "Button",
+      "id": "actionButton",
+      "properties": {
+        "text": "Command Button"
+      },
+      "style": {
+        "background-color": "#3498db",
+        "color": "white",
+        "padding": "12px 24px",
+        "border-radius": "6px",
+        "font-weight": "bold"
+      },
+      "events": {
+        "click": "handleButtonClick"
+      },
+      "bindings": {
+        "enabled": "ui.button.enabled",
+        "text": "ui.button.text"
+      },
+      "validation": {
+        "enabled": "form.isValid === true"
+      }
     },
-    "children": [
-        {
-            "type": "Label",
-            "properties": {
-                "text": "Modern Command App",
-                "alignment": "center"
-            },
-            "style": {
-                "font-size": "24px",
-                "font-weight": "bold",
-                "color": "#2c3e50",
-                "margin-bottom": "20px"
-            },
-            "bindings": {
-                "text": "app.title"
-            }
-        },
-        {
-            "type": "Button",
-            "id": "actionButton",
-            "properties": {
-                "text": "Command Button"
-            },
-            "style": {
-                "background-color": "#3498db",
-                "color": "white",
-                "padding": "12px 24px",
-                "border-radius": "6px",
-                "font-weight": "bold"
-            },
-            "events": {
-                "click": "handleButtonClick"
-            },
-            "bindings": {
-                "enabled": "ui.button.enabled",
-                "text": "ui.button.text"
-            },
-            "validation": {
-                "enabled": "form.isValid === true"
-            }
-        },
-        {
-            "type": "TextInput",
-            "id": "userInput",
-            "properties": {
-                "placeholder": "Enter your message"
-            },
-            "style": {
-                "padding": "10px",
-                "border": "1px solid #bdc3c7",
-                "border-radius": "4px"
-            },
-            "bindings": {
-                "text": "user.message"
-            },
-            "events": {
-                "textChanged": "validateInput"
-            },
-            "validation": {
-                "required": true,
-                "minLength": 3,
-                "maxLength": 100
-            }
-        }
-    ]
+    {
+      "type": "TextInput",
+      "id": "userInput",
+      "properties": {
+        "placeholder": "Enter your message"
+      },
+      "style": {
+        "padding": "10px",
+        "border": "1px solid #bdc3c7",
+        "border-radius": "4px"
+      },
+      "bindings": {
+        "text": "user.message"
+      },
+      "events": {
+        "textChanged": "validateInput"
+      },
+      "validation": {
+        "required": true,
+        "minLength": 3,
+        "maxLength": 100
+      }
+    }
+  ]
 }
 ```
 
@@ -865,6 +869,7 @@ private:
 ### 3. State Integration
 
 **Bind existing components to Command state:**
+
 ```cpp
 // Legacy component
 auto legacyInput = new QLineEdit();
@@ -910,6 +915,7 @@ hybrid->addCommand(commandButton);
 ```
 
 **Benefits:**
+
 - Seamless coexistence of legacy and Command components
 - Automatic conversion when needed
 - Gradual migration path
@@ -932,6 +938,7 @@ auto wrappedCommand = IntegrationManager::instance().convertToCommand(legacyButt
 ```
 
 **Benefits:**
+
 - Modern Command-based architecture
 - Automatic legacy component wrapping
 - Full Command system features
@@ -958,6 +965,7 @@ qDebug() << "Migration progress:" << analysis.completion_percentage << "%";
 ```
 
 **Benefits:**
+
 - Migration progress tracking
 - Compatibility warnings
 - Migration assistance tools
@@ -985,6 +993,7 @@ qDebug() << "Average conversion time:" << metrics.avg_conversion_time_ms << "ms"
 ```
 
 **Benefits:**
+
 - Comprehensive debugging information
 - Performance monitoring
 - Validation and error checking
@@ -2092,19 +2101,19 @@ public:
         auto& manager = IntegrationManager::instance();
         manager.initialize();
         manager.setCompatibilityMode(IntegrationManager::CompatibilityMode::Migration);
-        
+
         // 2. Analyze existing code
         auto analysis = MigrationAssistant::analyzeProject(QCoreApplication::applicationDirPath());
         qDebug() << "Found" << analysis.ui_files << "UI files to migrate";
-        
+
         // 3. Create hybrid container for gradual migration
         auto hybrid = ComponentSystemAdapter::instance().createHybridContainer();
-        
+
         // 4. Add existing components
         auto legacyButton = std::make_unique<Components::Button>();
         legacyButton->text("Legacy Button");
         hybrid->addComponent(std::move(legacyButton));
-        
+
         // 5. Add new Command components
         auto commandButton = CommandBuilder("Button")
             .text("Command Button")
@@ -2112,17 +2121,17 @@ public:
             .onClick([]() { qDebug() << "Command button clicked!"; })
             .build();
         hybrid->addCommand(commandButton);
-        
+
         // 6. Enable synchronization
         hybrid->enableAutoSync(true);
-        
+
         // 7. Convert to widget for display
         auto widget = hybrid->toWidget();
-        
+
         // 8. Set up state management
         auto& stateAdapter = CommandStateManagerAdapter::instance();
         stateAdapter.setAutoSync(true);
-        
+
         qDebug() << "Migration completed successfully!";
     }
 };
@@ -2133,16 +2142,19 @@ public:
 ### Common Issues
 
 1. **Conversion Failures**
+
    - Check if component type is registered
    - Verify adapter is properly initialized
    - Use IntegrationManager validation tools
 
 2. **State Synchronization Issues**
+
    - Ensure state keys are consistent
    - Check binding directions
    - Verify StateManager integration
 
 3. **Performance Problems**
+
    - Monitor conversion overhead
    - Use batch operations
    - Cache converted components

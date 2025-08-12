@@ -37,21 +37,22 @@ using namespace DeclarativeUI;
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    
+
     // Create a simple label with declarative syntax
     auto label = std::make_unique<Components::Label>();
     label->text("Hello, DeclarativeUI!")
          .alignment(Qt::AlignCenter)
          .style("font-size: 18px; font-weight: bold; padding: 20px;");
-    
+
     label->initialize();
     label->getWidget()->show();
-    
+
     return app.exec();
 }
 ```
 
 **Key Concepts**:
+
 - Basic component creation
 - Fluent interface usage
 - Component initialization
@@ -69,23 +70,24 @@ Demonstrates loading UI from JSON definitions:
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    
+
     // Load UI from JSON file
     JSON::JSONUILoader loader;
     auto widget = loader.loadFromFile("examples/resources/simple_ui.json");
-    
+
     if (widget) {
         widget->show();
     } else {
         qCritical() << "Failed to load UI from JSON";
         return 1;
     }
-    
+
     return app.exec();
 }
 ```
 
 **JSON Definition** (`examples/resources/simple_ui.json`):
+
 ```json
 {
   "type": "Container",
@@ -118,6 +120,7 @@ int main(int argc, char* argv[]) {
 ```
 
 **Key Concepts**:
+
 - JSON UI loading
 - Component configuration from JSON
 - Event handler registration
@@ -140,10 +143,10 @@ using namespace DeclarativeUI;
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    
+
     // Initialize state
     Binding::StateManager::instance().setState("counter", 0);
-    
+
     // Create UI with state binding
     auto window = Core::create<QWidget>()
         .windowTitle("Simple State Example")
@@ -170,13 +173,14 @@ int main(int argc, char* argv[]) {
                });
         })
         .build();
-    
+
     window->show();
     return app.exec();
 }
 ```
 
 **Key Concepts**:
+
 - State initialization
 - Property binding to state
 - State updates from UI events
@@ -195,22 +199,22 @@ Real-time UI updates without application restart:
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    
+
     // Set up hot reload
     HotReload::HotReloadManager reloadManager;
     JSON::JSONUILoader loader;
-    
+
     // Load initial UI
     auto widget = loader.loadFromFile("examples/resources/hot_reload_ui.json");
     if (!widget) {
         qCritical() << "Failed to load initial UI";
         return 1;
     }
-    
+
     // Enable hot reload for the JSON file
     reloadManager.watchFile("examples/resources/hot_reload_ui.json", [&](const QString& filePath) {
         qDebug() << "Reloading UI from:" << filePath;
-        
+
         auto newWidget = loader.loadFromFile(filePath);
         if (newWidget) {
             // Replace the current widget
@@ -222,13 +226,14 @@ int main(int argc, char* argv[]) {
             qWarning() << "Failed to reload UI, keeping current version";
         }
     });
-    
+
     widget->show();
     return app.exec();
 }
 ```
 
 **Key Concepts**:
+
 - File watching setup
 - Hot reload manager usage
 - UI replacement on file changes
@@ -252,12 +257,12 @@ using namespace DeclarativeUI;
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    
+
     // Initialize state
     auto& state = Binding::StateManager::instance();
     state.setState("counter", 0);
     state.setState("step", 1);
-    
+
     // Create counter application
     auto window = Core::create<QWidget>()
         .windowTitle("Counter Application")
@@ -325,13 +330,14 @@ int main(int argc, char* argv[]) {
                  .style("background: #e74c3c; color: white;");
         })
         .build();
-    
+
     window->show();
     return app.exec();
 }
 ```
 
 **Key Concepts**:
+
 - Complex UI layout with nested containers
 - Multiple state variables
 - State-driven UI updates

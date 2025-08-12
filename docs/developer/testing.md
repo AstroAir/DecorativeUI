@@ -63,39 +63,39 @@ tests/
 
 class TestButton : public QObject {
     Q_OBJECT
-    
+
 private slots:
     void initTestCase();
     void cleanupTestCase();
     void init();
     void cleanup();
-    
+
     // Basic functionality tests
     void testInitialization();
     void testTextProperty();
     void testIconProperty();
     void testEnabledProperty();
     void testStyleProperty();
-    
+
     // Event handling tests
     void testClickHandler();
     void testMultipleHandlers();
     void testHandlerRemoval();
-    
+
     // Property binding tests
     void testPropertyBinding();
     void testBindingUpdates();
     void testBindingDisconnection();
-    
+
     // Error handling tests
     void testInvalidProperties();
     void testExceptionSafety();
     void testResourceCleanup();
-    
+
     // Performance tests
     void testCreationPerformance();
     void testUpdatePerformance();
-    
+
 private:
     std::unique_ptr<Components::Button> button_;
     TestHelpers::MockStateManager* mock_state_;
@@ -121,9 +121,9 @@ void TestButton::cleanup() {
 void TestButton::testInitialization() {
     QVERIFY(button_ != nullptr);
     QVERIFY(!button_->isInitialized());
-    
+
     button_->initialize();
-    
+
     QVERIFY(button_->isInitialized());
     QVERIFY(button_->getWidget() != nullptr);
     QVERIFY(qobject_cast<QPushButton*>(button_->getWidget()) != nullptr);
@@ -131,14 +131,14 @@ void TestButton::testInitialization() {
 
 void TestButton::testTextProperty() {
     const QString test_text = "Test Button";
-    
+
     button_->text(test_text);
     button_->initialize();
-    
+
     auto qt_button = qobject_cast<QPushButton*>(button_->getWidget());
     QVERIFY(qt_button != nullptr);
     QCOMPARE(qt_button->text(), test_text);
-    
+
     // Test property retrieval
     auto property_value = button_->getProperty("text");
     QVERIFY(std::holds_alternative<QString>(property_value));
@@ -147,49 +147,49 @@ void TestButton::testTextProperty() {
 
 void TestButton::testClickHandler() {
     bool clicked = false;
-    
+
     button_->onClick([&clicked]() {
         clicked = true;
     });
     button_->initialize();
-    
+
     // Simulate click
     auto qt_button = qobject_cast<QPushButton*>(button_->getWidget());
     QVERIFY(qt_button != nullptr);
-    
+
     QTest::mouseClick(qt_button, Qt::LeftButton);
-    
+
     QVERIFY(clicked);
 }
 
 void TestButton::testPropertyBinding() {
     mock_state_->setState("button_text", QString("Initial Text"));
-    
+
     button_->bindProperty("text", [this]() {
         return mock_state_->getState<QString>("button_text")->get();
     });
     button_->initialize();
-    
+
     auto qt_button = qobject_cast<QPushButton*>(button_->getWidget());
     QCOMPARE(qt_button->text(), QString("Initial Text"));
-    
+
     // Update state and refresh
     mock_state_->setState("button_text", QString("Updated Text"));
     button_->refresh();
-    
+
     QCOMPARE(qt_button->text(), QString("Updated Text"));
 }
 
 void TestButton::testExceptionSafety() {
     // Test that exceptions during initialization don't leak resources
     button_->text(""); // Invalid empty text
-    
+
     QVERIFY_EXCEPTION_THROWN(button_->initialize(), std::invalid_argument);
-    
+
     // Button should still be in a valid state
     QVERIFY(!button_->isInitialized());
     QVERIFY(button_->getWidget() == nullptr);
-    
+
     // Should be able to recover
     button_->text("Valid Text");
     QVERIFY_NO_EXCEPTION_THROWN(button_->initialize());
@@ -199,24 +199,24 @@ void TestButton::testExceptionSafety() {
 void TestButton::testCreationPerformance() {
     QElapsedTimer timer;
     timer.start();
-    
+
     const int num_buttons = 1000;
     std::vector<std::unique_ptr<Components::Button>> buttons;
     buttons.reserve(num_buttons);
-    
+
     for (int i = 0; i < num_buttons; ++i) {
         auto button = std::make_unique<Components::Button>();
         button->text(QString("Button %1").arg(i));
         button->initialize();
         buttons.push_back(std::move(button));
     }
-    
+
     qint64 elapsed = timer.elapsed();
     qDebug() << "Created" << num_buttons << "buttons in" << elapsed << "ms";
-    
+
     // Should create 1000 buttons in less than 1 second
     QVERIFY(elapsed < 1000);
-    
+
     // Average creation time should be reasonable
     double avg_time = static_cast<double>(elapsed) / num_buttons;
     QVERIFY(avg_time < 1.0); // Less than 1ms per button
@@ -232,11 +232,11 @@ QTEST_MAIN(TestButton)
 // test_state_manager.cpp
 class TestStateManager : public QObject {
     Q_OBJECT
-    
+
 private slots:
     void init();
     void cleanup();
-    
+
     void testBasicStateOperations();
     void testStateObservation();
     void testBatchUpdates();
@@ -245,7 +245,7 @@ private slots:
     void testDependencyTracking();
     void testPerformanceMonitoring();
     void testThreadSafety();
-    
+
 private:
     StateManager* state_manager_;
 };
@@ -259,20 +259,20 @@ void TestStateManager::testBasicStateOperations() {
     // Test setting and getting state
     state_manager_->setState("test_int", 42);
     state_manager_->setState("test_string", QString("hello"));
-    
+
     auto int_state = state_manager_->getState<int>("test_int");
     auto string_state = state_manager_->getState<QString>("test_string");
-    
+
     QVERIFY(int_state != nullptr);
     QVERIFY(string_state != nullptr);
     QCOMPARE(int_state->get(), 42);
     QCOMPARE(string_state->get(), QString("hello"));
-    
+
     // Test state existence
     QVERIFY(state_manager_->hasState("test_int"));
     QVERIFY(state_manager_->hasState("test_string"));
     QVERIFY(!state_manager_->hasState("nonexistent"));
-    
+
     // Test state removal
     QVERIFY(state_manager_->removeState("test_int"));
     QVERIFY(!state_manager_->hasState("test_int"));
@@ -282,19 +282,19 @@ void TestStateManager::testBasicStateOperations() {
 void TestStateManager::testStateObservation() {
     int observation_count = 0;
     QString last_observed_value;
-    
+
     // Set up observer
-    state_manager_->observeState<QString>("observed_state", 
+    state_manager_->observeState<QString>("observed_state",
         [&](const QString& value) {
             observation_count++;
             last_observed_value = value;
         });
-    
+
     // Initial state setting should trigger observer
     state_manager_->setState("observed_state", QString("initial"));
     QCOMPARE(observation_count, 1);
     QCOMPARE(last_observed_value, QString("initial"));
-    
+
     // State updates should trigger observer
     state_manager_->setState("observed_state", QString("updated"));
     QCOMPARE(observation_count, 2);
@@ -303,18 +303,18 @@ void TestStateManager::testStateObservation() {
 
 void TestStateManager::testBatchUpdates() {
     QSignalSpy spy(state_manager_, &StateManager::stateChanged);
-    
+
     state_manager_->batchUpdate([this]() {
         state_manager_->setState("batch1", 1);
         state_manager_->setState("batch2", 2);
         state_manager_->setState("batch3", 3);
     });
-    
+
     // All states should be set
     QCOMPARE(state_manager_->getState<int>("batch1")->get(), 1);
     QCOMPARE(state_manager_->getState<int>("batch2")->get(), 2);
     QCOMPARE(state_manager_->getState<int>("batch3")->get(), 3);
-    
+
     // Should have received exactly 3 signals (one per state)
     QCOMPARE(spy.count(), 3);
 }
@@ -324,38 +324,38 @@ void TestStateManager::testStateValidation() {
     state_manager_->setValidator<int>("positive_int", [](const int& value) {
         return value > 0;
     });
-    
+
     // Valid value should be accepted
     QVERIFY_NO_EXCEPTION_THROWN(state_manager_->setState("positive_int", 42));
     QCOMPARE(state_manager_->getState<int>("positive_int")->get(), 42);
-    
+
     // Invalid value should be rejected
     QVERIFY_EXCEPTION_THROWN(
-        state_manager_->setState("positive_int", -1), 
+        state_manager_->setState("positive_int", -1),
         std::invalid_argument
     );
-    
+
     // State should remain unchanged
     QCOMPARE(state_manager_->getState<int>("positive_int")->get(), 42);
 }
 
 void TestStateManager::testHistoryAndUndo() {
     state_manager_->enableHistory("history_test", 10);
-    
+
     // Set initial value
     state_manager_->setState("history_test", 1);
     QVERIFY(!state_manager_->canUndo("history_test")); // No previous value
-    
+
     // Update value
     state_manager_->setState("history_test", 2);
     QVERIFY(state_manager_->canUndo("history_test"));
     QVERIFY(!state_manager_->canRedo("history_test"));
-    
+
     // Undo
     state_manager_->undo("history_test");
     QCOMPARE(state_manager_->getState<int>("history_test")->get(), 1);
     QVERIFY(state_manager_->canRedo("history_test"));
-    
+
     // Redo
     state_manager_->redo("history_test");
     QCOMPARE(state_manager_->getState<int>("history_test")->get(), 2);
@@ -365,15 +365,15 @@ void TestStateManager::testHistoryAndUndo() {
 void TestStateManager::testThreadSafety() {
     const int num_threads = 4;
     const int operations_per_thread = 100;
-    
+
     QVector<QFuture<void>> futures;
-    
+
     for (int t = 0; t < num_threads; ++t) {
         auto future = QtConcurrent::run([this, t, operations_per_thread]() {
             for (int i = 0; i < operations_per_thread; ++i) {
                 QString key = QString("thread_%1_key_%2").arg(t).arg(i);
                 state_manager_->setState(key, i);
-                
+
                 auto state = state_manager_->getState<int>(key);
                 QVERIFY(state != nullptr);
                 QCOMPARE(state->get(), i);
@@ -381,12 +381,12 @@ void TestStateManager::testThreadSafety() {
         });
         futures.append(future);
     }
-    
+
     // Wait for all threads to complete
     for (auto& future : futures) {
         future.waitForFinished();
     }
-    
+
     // Verify all states were set correctly
     for (int t = 0; t < num_threads; ++t) {
         for (int i = 0; i < operations_per_thread; ++i) {
@@ -410,11 +410,11 @@ QTEST_MAIN(TestStateManager)
 // test_json_ui_loading.cpp
 class TestJSONUILoading : public QObject {
     Q_OBJECT
-    
+
 private slots:
     void init();
     void cleanup();
-    
+
     void testBasicWidgetCreation();
     void testNestedWidgets();
     void testPropertyApplication();
@@ -422,7 +422,7 @@ private slots:
     void testStateBinding();
     void testLayoutManagement();
     void testErrorHandling();
-    
+
 private:
     std::unique_ptr<JSON::JSONUILoader> loader_;
     std::unique_ptr<StateManager> state_manager_;
@@ -437,10 +437,10 @@ void TestJSONUILoading::testBasicWidgetCreation() {
             "minimumSize": [100, 30]
         }
     })";
-    
+
     auto widget = loader_->loadFromString(json);
     QVERIFY(widget != nullptr);
-    
+
     auto button = qobject_cast<QPushButton*>(widget.get());
     QVERIFY(button != nullptr);
     QCOMPARE(button->text(), QString("Test Button"));
@@ -452,20 +452,20 @@ void TestJSONUILoading::testStateBinding() {
     state_manager_->setState("button_text", QString("Dynamic Text"));
     loader_->bindStateManager(
         std::shared_ptr<StateManager>(state_manager_.get(), [](auto*){}));
-    
+
     QString json = R"({
         "type": "QPushButton",
         "bindings": {
             "text": "button_text"
         }
     })";
-    
+
     auto widget = loader_->loadFromString(json);
     auto button = qobject_cast<QPushButton*>(widget.get());
-    
+
     QVERIFY(button != nullptr);
     QCOMPARE(button->text(), QString("Dynamic Text"));
-    
+
     // Update state and verify binding
     state_manager_->setState("button_text", QString("Updated Text"));
     // Note: In real implementation, this would trigger automatic update
@@ -479,7 +479,7 @@ void TestJSONUILoading::testErrorHandling() {
         loader_->loadFromString(invalid_json),
         JSON::JSONParsingException
     );
-    
+
     // Test missing required properties
     QString missing_type = R"({
         "properties": {
@@ -490,7 +490,7 @@ void TestJSONUILoading::testErrorHandling() {
         loader_->loadFromString(missing_type),
         JSON::JSONValidationException
     );
-    
+
     // Test unknown component type
     QString unknown_type = R"({
         "type": "UnknownWidget"
@@ -510,13 +510,13 @@ void TestJSONUILoading::testErrorHandling() {
 // test_component_creation.cpp
 class TestComponentCreationPerformance : public QObject {
     Q_OBJECT
-    
+
 private slots:
     void benchmarkButtonCreation();
     void benchmarkComplexWidgetCreation();
     void benchmarkJSONLoading();
     void benchmarkStateUpdates();
-    
+
 private:
     void createButtons(int count);
     void createComplexWidget();
@@ -531,7 +531,7 @@ void TestComponentCreationPerformance::benchmarkButtonCreation() {
 void TestComponentCreationPerformance::createButtons(int count) {
     std::vector<std::unique_ptr<Components::Button>> buttons;
     buttons.reserve(count);
-    
+
     for (int i = 0; i < count; ++i) {
         auto button = std::make_unique<Components::Button>();
         button->text(QString("Button %1").arg(i))
@@ -547,9 +547,9 @@ void TestComponentCreationPerformance::benchmarkJSONLoading() {
         "layout": {
             "type": "VBoxLayout"
         },
-        "children": [)" + 
+        "children": [)" +
         // Generate 100 button definitions
-        [](){ 
+        [](){
             QStringList buttons;
             for (int i = 0; i < 100; ++i) {
                 buttons << QString(R"({
@@ -562,9 +562,9 @@ void TestComponentCreationPerformance::benchmarkJSONLoading() {
             return buttons.join(",");
         }() + R"(]
     })";
-    
+
     JSON::JSONUILoader loader;
-    
+
     QBENCHMARK {
         auto widget = loader.loadFromString(json);
         Q_UNUSED(widget);
@@ -580,12 +580,12 @@ void TestComponentCreationPerformance::benchmarkJSONLoading() {
 // test_component_appearance.cpp
 class TestComponentAppearance : public QObject {
     Q_OBJECT
-    
+
 private slots:
     void testButtonAppearance();
     void testLayoutAppearance();
     void testThemeApplication();
-    
+
 private:
     QPixmap captureWidget(QWidget* widget);
     bool compareImages(const QPixmap& actual, const QString& reference_path);
@@ -596,13 +596,13 @@ void TestComponentAppearance::testButtonAppearance() {
     button->text("Test Button")
           .style("QPushButton { background-color: blue; color: white; }");
     button->initialize();
-    
+
     auto widget = button->getWidget();
     widget->resize(100, 30);
     widget->show();
-    
+
     QTest::qWaitForWindowExposed(widget);
-    
+
     QPixmap actual = captureWidget(widget);
     QVERIFY(compareImages(actual, "reference_images/blue_button.png"));
 }
@@ -611,7 +611,7 @@ QPixmap TestComponentAppearance::captureWidget(QWidget* widget) {
     return widget->grab();
 }
 
-bool TestComponentAppearance::compareImages(const QPixmap& actual, 
+bool TestComponentAppearance::compareImages(const QPixmap& actual,
                                           const QString& reference_path) {
     QPixmap reference(reference_path);
     if (reference.isNull()) {
@@ -619,7 +619,7 @@ bool TestComponentAppearance::compareImages(const QPixmap& actual,
         actual.save(reference_path);
         return true;
     }
-    
+
     // Compare images (simplified - real implementation would use
     // more sophisticated comparison with tolerance)
     return actual.toImage() == reference.toImage();
@@ -642,7 +642,7 @@ public:
         states_[key] = QVariant::fromValue(std::forward<T>(value));
         emit stateChanged(key, states_[key]);
     }
-    
+
     template<typename T>
     std::shared_ptr<ReactiveProperty<T>> getState(const QString& key) const override {
         auto it = states_.find(key);
@@ -651,7 +651,7 @@ public:
         }
         return nullptr;
     }
-    
+
 private:
     QVariantMap states_;
 };
@@ -662,9 +662,9 @@ public:
         initialized_ = true;
         widget_ = std::make_unique<QWidget>();
     }
-    
+
     bool isInitialized() const { return initialized_; }
-    
+
 private:
     bool initialized_ = false;
 };

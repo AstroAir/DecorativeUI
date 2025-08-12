@@ -7,18 +7,21 @@ We welcome contributions to DeclarativeUI! This guide will help you get started 
 ### Development Environment Setup
 
 1. **Prerequisites:**
+
    - Qt6 (6.0 or higher) with development packages
    - CMake 3.20 or higher
    - C++20 compatible compiler (GCC 10+, Clang 10+, MSVC 2019+)
    - Git
 
 2. **Clone the repository:**
+
    ```bash
    git clone https://github.com/your-org/DeclarativeUI.git
    cd DeclarativeUI
    ```
 
 3. **Set up development build:**
+
    ```bash
    mkdir build-dev && cd build-dev
    cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON -DDECLARATIVE_UI_DEBUG=ON
@@ -33,6 +36,7 @@ We welcome contributions to DeclarativeUI! This guide will help you get started 
 ### Development Workflow
 
 1. **Create a feature branch:**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -42,6 +46,7 @@ We welcome contributions to DeclarativeUI! This guide will help you get started 
 3. **Write tests for your changes**
 
 4. **Run the test suite:**
+
    ```bash
    cmake --build . --target test
    ```
@@ -61,11 +66,11 @@ We follow a modified version of the Google C++ Style Guide with these key points
 class MyComponent : public UIElement {
     // Public methods: camelCase
     MyComponent& setText(const QString& text);
-    
+
     // Private members: snake_case with trailing underscore
     QString text_;
     std::unique_ptr<QWidget> widget_;
-    
+
     // Constants: UPPER_SNAKE_CASE
     static constexpr int MAX_RETRY_COUNT = 3;
 };
@@ -108,29 +113,29 @@ namespace DeclarativeUI::Components {
 
 /**
  * @brief Brief description of the component
- * 
+ *
  * Detailed description explaining the purpose,
  * usage, and any important considerations.
  */
 class MyComponent : public Core::UIElement {
     Q_OBJECT
-    
+
 public:
     explicit MyComponent(QObject* parent = nullptr);
     ~MyComponent() override = default;
-    
+
     // Move-only semantics
     MyComponent(const MyComponent&) = delete;
     MyComponent& operator=(const MyComponent&) = delete;
     MyComponent(MyComponent&&) = default;
     MyComponent& operator=(MyComponent&&) = default;
-    
+
     // Public interface
     MyComponent& setText(const QString& text);
     MyComponent& onClick(std::function<void()> handler);
-    
+
     void initialize() override;
-    
+
 private:
     QString text_;
     std::function<void()> click_handler_;
@@ -178,18 +183,18 @@ constexpr bool isValidPropertyType() {
 ```cpp
 /**
  * @brief A customizable button component with enhanced features
- * 
+ *
  * The EnhancedButton extends the basic button functionality with
  * additional features like loading states, confirmation dialogs,
  * and custom styling options.
- * 
+ *
  * @example
  * auto button = std::make_unique<EnhancedButton>();
  * button->text("Save Document")
  *       .confirmationMessage("Are you sure you want to save?")
  *       .loadingText("Saving...")
  *       .onClick([this]() { saveDocument(); });
- * 
+ *
  * @see Button, UIElement
  * @since 1.0.0
  */
@@ -203,13 +208,13 @@ class EnhancedButton : public Button {
 ```cpp
 /**
  * @brief Sets the confirmation message shown before action execution
- * 
+ *
  * When set, clicking the button will show a confirmation dialog
  * with the specified message before executing the click handler.
- * 
+ *
  * @param message The confirmation message to display
  * @return Reference to this button for method chaining
- * 
+ *
  * @example
  * button->confirmationMessage("Delete this item?")
  *       .onClick([]() { deleteItem(); });
@@ -230,19 +235,19 @@ Write comprehensive unit tests for all new functionality:
 
 class TestMyComponent : public QObject {
     Q_OBJECT
-    
+
 private slots:
     void initTestCase();
     void cleanupTestCase();
     void init();
     void cleanup();
-    
+
     void testInitialization();
     void testTextProperty();
     void testClickHandler();
     void testPropertyBinding();
     void testErrorHandling();
-    
+
 private:
     std::unique_ptr<MyComponent> component_;
 };
@@ -250,16 +255,16 @@ private:
 void TestMyComponent::testTextProperty() {
     component_->setText("Test Text");
     component_->initialize();
-    
+
     QCOMPARE(component_->getText(), QString("Test Text"));
-    
+
     // Test property binding
     bool text_changed = false;
     component_->bindProperty("text", [&text_changed]() {
         text_changed = true;
         return QString("Bound Text");
     });
-    
+
     component_->refresh();
     QVERIFY(text_changed);
     QCOMPARE(component_->getText(), QString("Bound Text"));
@@ -268,10 +273,10 @@ void TestMyComponent::testTextProperty() {
 void TestMyComponent::testErrorHandling() {
     // Test exception safety
     QVERIFY_EXCEPTION_THROWN(
-        component_->setText(QString()), 
+        component_->setText(QString()),
         std::invalid_argument
     );
-    
+
     // Test graceful degradation
     component_->setText("Valid Text");
     QVERIFY(component_->isValid());
@@ -288,12 +293,12 @@ Test component interactions and JSON loading:
 ```cpp
 class TestJSONIntegration : public QObject {
     Q_OBJECT
-    
+
 private slots:
     void testComponentCreation();
     void testPropertyBinding();
     void testEventHandling();
-    
+
 private:
     std::unique_ptr<JSON::JSONUILoader> loader_;
 };
@@ -309,15 +314,15 @@ void TestJSONIntegration::testComponentCreation() {
             "clicked": "handleClick"
         }
     })";
-    
+
     bool event_triggered = false;
     loader_->registerEventHandler("handleClick", [&event_triggered]() {
         event_triggered = true;
     });
-    
+
     auto widget = loader_->loadFromString(json);
     QVERIFY(widget != nullptr);
-    
+
     // Simulate click
     auto component = qobject_cast<MyComponent*>(widget.get());
     QVERIFY(component != nullptr);
@@ -334,23 +339,23 @@ Include performance tests for critical paths:
 void TestPerformance::testLargeUICreation() {
     QElapsedTimer timer;
     timer.start();
-    
+
     auto widget = Core::create<QWidget>()
         .layout<QVBoxLayout>();
-    
+
     // Create 1000 components
     for (int i = 0; i < 1000; ++i) {
         widget.child<Components::Button>([i](auto& btn) {
             btn.text(QString("Button %1").arg(i));
         });
     }
-    
+
     auto result = widget.build();
     qint64 elapsed = timer.elapsed();
-    
+
     QVERIFY(result != nullptr);
     QVERIFY(elapsed < 1000); // Should complete within 1 second
-    
+
     qDebug() << "Created 1000 components in" << elapsed << "ms";
 }
 ```
@@ -360,27 +365,29 @@ void TestPerformance::testLargeUICreation() {
 ### Adding a New Component
 
 1. **Create the component files:**
+
    ```
    src/Components/MyNewComponent.hpp
    src/Components/MyNewComponent.cpp
    ```
 
 2. **Implement the component:**
+
    ```cpp
    // MyNewComponent.hpp
    class MyNewComponent : public Core::UIElement {
        Q_OBJECT
-       
+
    public:
        explicit MyNewComponent(QObject* parent = nullptr);
-       
+
        // Fluent interface
        MyNewComponent& property1(const QString& value);
        MyNewComponent& property2(int value);
        MyNewComponent& onEvent(std::function<void()> handler);
-       
+
        void initialize() override;
-       
+
    private:
        QString property1_;
        int property2_ = 0;
@@ -389,6 +396,7 @@ void TestPerformance::testLargeUICreation() {
    ```
 
 3. **Add to CMakeLists.txt:**
+
    ```cmake
    # In src/Components/CMakeLists.txt
    add_library(Components
@@ -399,11 +407,12 @@ void TestPerformance::testLargeUICreation() {
    ```
 
 4. **Register with ComponentRegistry:**
+
    ```cpp
    // In ComponentRegistry.cpp
    void ComponentRegistry::registerBuiltinComponents() {
        // ... existing registrations ...
-       
+
        registerComponent<MyNewComponent>("MyNewComponent",
            [](const QJsonObject& config) {
                auto component = std::make_unique<MyNewComponent>();
@@ -414,6 +423,7 @@ void TestPerformance::testLargeUICreation() {
    ```
 
 5. **Write tests:**
+
    ```cpp
    // tests/test_my_new_component.cpp
    class TestMyNewComponent : public QObject {
@@ -425,7 +435,7 @@ void TestPerformance::testLargeUICreation() {
    ```cpp
    /**
     * @brief Brief description of MyNewComponent
-    * 
+    *
     * Detailed description and usage examples.
     */
    ```
@@ -433,6 +443,7 @@ void TestPerformance::testLargeUICreation() {
 ### Adding a New Module
 
 1. **Create module directory structure:**
+
    ```
    src/MyModule/
    ├── CMakeLists.txt
@@ -442,26 +453,28 @@ void TestPerformance::testLargeUICreation() {
    ```
 
 2. **Create CMakeLists.txt:**
+
    ```cmake
    add_library(MyModule
        MyModuleClass.hpp
        MyModuleClass.cpp
    )
-   
+
    target_link_libraries(MyModule
        Qt6::Core
        Qt6::Widgets
    )
-   
+
    target_include_directories(MyModule PUBLIC
        ${CMAKE_CURRENT_SOURCE_DIR}
    )
    ```
 
 3. **Add to main CMakeLists.txt:**
+
    ```cmake
    add_subdirectory(src/MyModule)
-   
+
    target_link_libraries(DeclarativeUI
        # ... existing libraries ...
        MyModule
@@ -473,16 +486,19 @@ void TestPerformance::testLargeUICreation() {
 ### Before Submitting
 
 1. **Ensure all tests pass:**
+
    ```bash
    cmake --build . --target test
    ```
 
 2. **Run static analysis (if available):**
+
    ```bash
    clang-tidy src/**/*.cpp
    ```
 
 3. **Check code formatting:**
+
    ```bash
    clang-format -i src/**/*.{hpp,cpp}
    ```
@@ -495,20 +511,24 @@ void TestPerformance::testLargeUICreation() {
 
 ```markdown
 ## Description
+
 Brief description of the changes made.
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Unit tests added/updated
 - [ ] Integration tests added/updated
 - [ ] Manual testing performed
 
 ## Checklist
+
 - [ ] Code follows the project's coding standards
 - [ ] Self-review of code completed
 - [ ] Code is commented, particularly in hard-to-understand areas
@@ -517,6 +537,7 @@ Brief description of the changes made.
 - [ ] All tests pass locally
 
 ## Related Issues
+
 Fixes #(issue number)
 ```
 
@@ -533,6 +554,7 @@ Fixes #(issue number)
 ### Version Numbering
 
 We use Semantic Versioning (SemVer):
+
 - **MAJOR**: Incompatible API changes
 - **MINOR**: Backwards-compatible functionality additions
 - **PATCH**: Backwards-compatible bug fixes

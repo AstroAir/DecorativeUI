@@ -23,4 +23,3 @@ cmake --build --preset default --target CommandSystemExample CommandExample Adva
 - FormExample — Forms and validation
 - SettingsExample — Settings management
 - DashboardExample — Simple dashboard
-

@@ -7,6 +7,7 @@ The Command module provides a comprehensive command-based UI architecture with d
 The Command system introduces a sophisticated abstraction layer that separates UI logic from widget implementation:
 
 ### Core Components
+
 - **Commands** represent UI controls without inheriting from QWidget, providing framework independence
 - **CommandBuilder** provides fluent API for declarative UI construction with type safety
 - **WidgetMapper** handles automatic Command-to-QWidget translation and bidirectional synchronization
@@ -16,6 +17,7 @@ The Command system introduces a sophisticated abstraction layer that separates U
 - **Integration Adapters** provide seamless migration from legacy Component systems
 
 ### Advanced Features
+
 - **Asynchronous Command Execution** with progress tracking and cancellation
 - **Command Composition** for building complex UI workflows
 - **MVC Integration** for enterprise application patterns
@@ -975,25 +977,25 @@ loader.registerEventHandler("customAction", [](const CommandEvent& event) {
 
 ```json
 {
-    "type": "Button",
-    "properties": {
-        "text": "Click Me",
-        "enabled": true,
-        "tooltip": "This is a button"
-    },
-    "style": {
-        "background-color": "#3498db",
-        "color": "white",
-        "padding": "10px",
-        "border-radius": "5px"
-    },
-    "events": {
-        "click": "handleButtonClick"
-    },
-    "bindings": {
-        "enabled": "ui.button.enabled",
-        "text": "ui.button.text"
-    }
+  "type": "Button",
+  "properties": {
+    "text": "Click Me",
+    "enabled": true,
+    "tooltip": "This is a button"
+  },
+  "style": {
+    "background-color": "#3498db",
+    "color": "white",
+    "padding": "10px",
+    "border-radius": "5px"
+  },
+  "events": {
+    "click": "handleButtonClick"
+  },
+  "bindings": {
+    "enabled": "ui.button.enabled",
+    "text": "ui.button.text"
+  }
 }
 ```
 
@@ -1001,34 +1003,34 @@ loader.registerEventHandler("customAction", [](const CommandEvent& event) {
 
 ```json
 {
-    "type": "Container",
-    "properties": {
-        "layout": "VBox",
-        "spacing": 10,
-        "margins": [20, 20, 20, 20]
+  "type": "Container",
+  "properties": {
+    "layout": "VBox",
+    "spacing": 10,
+    "margins": [20, 20, 20, 20]
+  },
+  "children": [
+    {
+      "type": "Label",
+      "properties": {
+        "text": "Welcome to DeclarativeUI",
+        "alignment": "center"
+      },
+      "style": {
+        "font-size": "18px",
+        "font-weight": "bold"
+      }
     },
-    "children": [
-        {
-            "type": "Label",
-            "properties": {
-                "text": "Welcome to DeclarativeUI",
-                "alignment": "center"
-            },
-            "style": {
-                "font-size": "18px",
-                "font-weight": "bold"
-            }
-        },
-        {
-            "type": "Button",
-            "properties": {
-                "text": "Get Started"
-            },
-            "events": {
-                "click": "startApplication"
-            }
-        }
-    ]
+    {
+      "type": "Button",
+      "properties": {
+        "text": "Get Started"
+      },
+      "events": {
+        "click": "startApplication"
+      }
+    }
+  ]
 }
 ```
 
@@ -1036,57 +1038,57 @@ loader.registerEventHandler("customAction", [](const CommandEvent& event) {
 
 ```json
 {
-    "type": "Container",
-    "properties": {
-        "layout": "Form"
+  "type": "Container",
+  "properties": {
+    "layout": "Form"
+  },
+  "children": [
+    {
+      "type": "TextInput",
+      "id": "nameInput",
+      "properties": {
+        "placeholder": "Enter your name",
+        "required": true
+      },
+      "bindings": {
+        "text": "form.name"
+      },
+      "validation": {
+        "required": true,
+        "minLength": 2,
+        "pattern": "^[a-zA-Z\\s]+$"
+      },
+      "events": {
+        "textChanged": "validateName"
+      }
     },
-    "children": [
-        {
-            "type": "TextInput",
-            "id": "nameInput",
-            "properties": {
-                "placeholder": "Enter your name",
-                "required": true
-            },
-            "bindings": {
-                "text": "form.name"
-            },
-            "validation": {
-                "required": true,
-                "minLength": 2,
-                "pattern": "^[a-zA-Z\\s]+$"
-            },
-            "events": {
-                "textChanged": "validateName"
-            }
-        },
-        {
-            "type": "TextInput",
-            "id": "emailInput",
-            "properties": {
-                "placeholder": "Enter your email"
-            },
-            "bindings": {
-                "text": "form.email"
-            },
-            "validation": {
-                "required": true,
-                "pattern": "^[^@]+@[^@]+\\.[^@]+$"
-            }
-        },
-        {
-            "type": "Button",
-            "properties": {
-                "text": "Submit"
-            },
-            "bindings": {
-                "enabled": "form.valid"
-            },
-            "events": {
-                "click": "submitForm"
-            }
-        }
-    ]
+    {
+      "type": "TextInput",
+      "id": "emailInput",
+      "properties": {
+        "placeholder": "Enter your email"
+      },
+      "bindings": {
+        "text": "form.email"
+      },
+      "validation": {
+        "required": true,
+        "pattern": "^[^@]+@[^@]+\\.[^@]+$"
+      }
+    },
+    {
+      "type": "Button",
+      "properties": {
+        "text": "Submit"
+      },
+      "bindings": {
+        "enabled": "form.valid"
+      },
+      "events": {
+        "click": "submitForm"
+      }
+    }
+  ]
 }
 ```
 
@@ -1096,22 +1098,22 @@ loader.registerEventHandler("customAction", [](const CommandEvent& event) {
 
 ```json
 {
-    "type": "Slider",
-    "properties": {
-        "minimum": 0,
-        "maximum": 100,
-        "value": 50
-    },
-    "bindings": {
-        "value": {
-            "stateKey": "audio.volume",
-            "direction": "TwoWay",
-            "converter": {
-                "toState": "value / 100.0",
-                "fromState": "value * 100"
-            }
-        }
+  "type": "Slider",
+  "properties": {
+    "minimum": 0,
+    "maximum": 100,
+    "value": 50
+  },
+  "bindings": {
+    "value": {
+      "stateKey": "audio.volume",
+      "direction": "TwoWay",
+      "converter": {
+        "toState": "value / 100.0",
+        "fromState": "value * 100"
+      }
     }
+  }
 }
 ```
 
@@ -1119,19 +1121,19 @@ loader.registerEventHandler("customAction", [](const CommandEvent& event) {
 
 ```json
 {
-    "type": "Button",
-    "properties": {
-        "text": "Custom Action"
-    },
-    "events": {
-        "click": {
-            "handler": "customHandler",
-            "parameters": {
-                "action": "save",
-                "target": "document"
-            }
-        }
+  "type": "Button",
+  "properties": {
+    "text": "Custom Action"
+  },
+  "events": {
+    "click": {
+      "handler": "customHandler",
+      "parameters": {
+        "action": "save",
+        "target": "document"
+      }
     }
+  }
 }
 ```
 
@@ -1139,20 +1141,20 @@ loader.registerEventHandler("customAction", [](const CommandEvent& event) {
 
 ```json
 {
-    "type": "Button",
-    "properties": {
-        "text": "Submit"
+  "type": "Button",
+  "properties": {
+    "text": "Submit"
+  },
+  "conditionalProperties": {
+    "enabled": {
+      "condition": "form.valid === true",
+      "value": true
     },
-    "conditionalProperties": {
-        "enabled": {
-            "condition": "form.valid === true",
-            "value": true
-        },
-        "style": {
-            "condition": "form.hasErrors === true",
-            "value": "background-color: #e74c3c;"
-        }
+    "style": {
+      "condition": "form.hasErrors === true",
+      "value": "background-color: #e74c3c;"
     }
+  }
 }
 ```
 
@@ -1415,11 +1417,13 @@ The system includes several built-in commands for common operations.
 Sets a property on a QObject.
 
 **Required Parameters:**
-- `target`: Target object (QObject*)
+
+- `target`: Target object (QObject\*)
 - `property`: Property name (QString)
 - `value`: Property value (QVariant)
 
 **Example:**
+
 ```cpp
 CommandContext context;
 context.setParameter("target", my_widget);
@@ -1434,6 +1438,7 @@ invoker.execute("set_property", context);
 Updates a value in the StateManager.
 
 **Required Parameters:**
+
 - `key`: State key (QString)
 - `value`: New value (QVariant)
 
@@ -1442,6 +1447,7 @@ Updates a value in the StateManager.
 File operations with dialog support.
 
 **Parameters:**
+
 - `file_path`: File path (QString, optional - shows dialog if not provided)
 - `content`: Content to save (QByteArray, for save command)
 
@@ -1454,6 +1460,7 @@ Clipboard operations.
 Shows a message box.
 
 **Required Parameters:**
+
 - `title`: Message title (QString)
 - `message`: Message text (QString)
 - `type`: Message type (QString: "information", "warning", "critical")
@@ -1467,11 +1474,11 @@ Extends UIElement with command capabilities.
 ```cpp
 class CommandableUIElement : public Core::UIElement {
     Q_OBJECT
-    
+
 public:
     CommandableUIElement& onCommand(const QString& command_name, const CommandContext& context = {});
     CommandableUIElement& onShortcut(const QKeySequence& shortcut, const QString& command_name, const CommandContext& context = {});
-    
+
     virtual CommandResult<QVariant> executeCommand(const QString& command_name, const CommandContext& context = {});
     virtual QFuture<CommandResult<QVariant>> executeCommandAsync(const QString& command_name, const CommandContext& context = {});
 };
@@ -1493,12 +1500,12 @@ auto button = create<CommandableUIElement>()
 ```cpp
 class MyCommand : public ICommand {
     Q_OBJECT
-    
+
 public:
     explicit MyCommand(const CommandContext& context) : ICommand() {
         // Initialize from context
     }
-    
+
     CommandResult<QVariant> execute(const CommandContext& context) override {
         try {
             // Perform command logic
@@ -1508,7 +1515,7 @@ public:
             return CommandResult<QVariant>::error(QString::fromStdString(e.what()));
         }
     }
-    
+
     CommandMetadata getMetadata() const override {
         CommandMetadata metadata;
         metadata.name = "my_command";
@@ -1518,12 +1525,12 @@ public:
         metadata.supports_undo = true;
         return metadata;
     }
-    
+
     CommandResult<QVariant> undo(const CommandContext& context) override {
         // Implement undo logic
         return CommandResult<QVariant>::success(QVariant());
     }
-    
+
 private:
     QString performOperation(const CommandContext& context) {
         // Implementation
@@ -1537,7 +1544,7 @@ private:
 ```cpp
 class MyAsyncCommand : public AsyncCommand {
     Q_OBJECT
-    
+
 public:
     QFuture<CommandResult<QVariant>> executeAsync(const CommandContext& context) override {
         return QtConcurrent::run([this, context]() -> CommandResult<QVariant> {
@@ -1546,7 +1553,7 @@ public:
             return CommandResult<QVariant>::success(QVariant("Async result"));
         });
     }
-    
+
     CommandMetadata getMetadata() const override {
         CommandMetadata metadata;
         metadata.name = "my_async_command";
@@ -1559,6 +1566,7 @@ public:
 ## Best Practices
 
 ### Command Design
+
 - Keep commands focused on single operations
 - Use meaningful command names and descriptions
 - Implement proper error handling
@@ -1566,18 +1574,21 @@ public:
 - Use appropriate command types (sync/async/transactional)
 
 ### Performance
+
 - Use async commands for long-running operations
 - Implement proper progress reporting
 - Use batch execution for multiple related commands
 - Monitor command execution times
 
 ### Error Handling
+
 - Always return proper CommandResult objects
 - Provide meaningful error messages
 - Implement proper exception handling
 - Use command interceptors for logging
 
 ### Testing
+
 - Test command execution in isolation
 - Test undo/redo functionality
 - Test error conditions
@@ -1592,11 +1603,13 @@ The Command system provides comprehensive integration adapters for seamless migr
 Provides bidirectional integration between the legacy Component system and the modern Command system.
 
 #### Header
+
 ```cpp
 #include "Command/Adapters/ComponentSystemAdapter.hpp"
 ```
 
 #### Key Features
+
 - **Component-to-Command Conversion**: Automatically convert existing Components to Commands
 - **Hybrid Containers**: Mix Components and Commands in the same container
 - **Bidirectional Synchronization**: Keep Components and Commands in sync
@@ -1605,6 +1618,7 @@ Provides bidirectional integration between the legacy Component system and the m
 #### Usage Examples
 
 ##### Converting Components to Commands
+
 ```cpp
 // Convert existing component to command
 auto legacyButton = std::make_unique<Components::Button>();
@@ -1619,6 +1633,7 @@ ComponentSystemAdapter::instance()
 ```
 
 ##### Hybrid Containers
+
 ```cpp
 // Create hybrid container that supports both Components and Commands
 auto hybrid = ComponentSystemAdapter::instance().createHybridContainer();
@@ -1647,11 +1662,13 @@ widget->show();
 Enables loading Command hierarchies from JSON definitions with automatic widget creation.
 
 #### Header
+
 ```cpp
 #include "Command/Adapters/JSONCommandLoader.hpp"
 ```
 
 #### Key Features
+
 - **JSON-to-Command Conversion**: Load complete Command hierarchies from JSON
 - **Automatic Widget Creation**: Generate QWidgets from Commands automatically
 - **Event Handler Registration**: Register C++ event handlers for JSON-defined events

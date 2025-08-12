@@ -10,30 +10,35 @@ A modern, declarative UI framework for Qt applications that provides both tradit
 ## 🚀 Key Features
 
 ### Core Framework
+
 - **Declarative Syntax**: Fluent, chainable API for building UIs with modern C++20
 - **Modern C++20**: Type-safe, RAII-based design with move semantics and concepts
 - **Qt6 Integration**: Full compatibility with Qt6 widgets, layouts, and event system
 - **Performance Optimized**: Efficient property binding, caching, and memory management
 
 ### Component System
+
 - **Rich Component Library**: 30+ pre-built UI components covering all common use cases
 - **Custom Components**: Easy creation of reusable custom components with fluent interfaces
 - **Property Binding**: Reactive property system with automatic UI updates and validation
 - **Event Handling**: Type-safe event system with lambda support and flexible registration
 
 ### Command System (Advanced)
+
 - **Command-Based Architecture**: Modern UI development with separation of concerns
 - **Declarative Builders**: CommandBuilder and CommandHierarchyBuilder for fluent construction
 - **Widget Mapping**: Automatic Command-to-QWidget translation with bidirectional sync
 - **State Integration**: Seamless integration with centralized state management
 
 ### State Management
+
 - **Centralized State**: Global reactive state store with dependency tracking
 - **Reactive Properties**: Automatic UI updates when state changes with computed properties
 - **Type Safety**: Template-based type-safe state access with compile-time validation
 - **Batch Updates**: Efficient handling of multiple state changes with transaction support
 
 ### Hot Reload System
+
 - **Real-time Updates**: Instant UI updates without application restart
 - **File Watching**: Advanced file system monitoring with debouncing and error recovery
 - **Performance Monitoring**: Detailed metrics, bottleneck detection, and optimization recommendations
@@ -47,7 +52,7 @@ using namespace DeclarativeUI;
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
-    
+
     // Create a simple counter app with declarative syntax
     auto counter = Core::create<QWidget>()
         .layout<QVBoxLayout>([](auto& layout) {
@@ -68,7 +73,7 @@ int main(int argc, char* argv[]) {
                });
         })
         .build();
-    
+
     counter->show();
     return app.exec();
 }
@@ -79,7 +84,7 @@ int main(int argc, char* argv[]) {
 ### Prerequisites
 
 - **Qt6** (6.2 or later) with Core, Widgets, Network, and Test modules
-- **CMake** 3.20 or higher  
+- **CMake** 3.20 or higher
 - **C++20 compatible compiler** (GCC 10+, Clang 12+, MSVC 2019+)
 
 ### Quick Installation
@@ -90,10 +95,10 @@ int main(int argc, char* argv[]) {
     # Clone the repository
     git clone https://github.com/DeclarativeUI/DeclarativeUI.git
     cd DeclarativeUI
-    
+
     # Build with provided script
     build.bat
-    
+
     # Run an example
     build\examples\basic\HelloWorldExample.exe
     ```
@@ -104,14 +109,14 @@ int main(int argc, char* argv[]) {
     # Clone the repository
     git clone https://github.com/DeclarativeUI/DeclarativeUI.git
     cd DeclarativeUI
-    
+
     # Build with CMake
     cmake --preset default
     cmake --build --preset default
-    
+
     # Run tests
     cd build && ctest --output-on-failure
-    
+
     # Run an example
     ./examples/basic/HelloWorldExample
     ```
@@ -121,13 +126,13 @@ int main(int argc, char* argv[]) {
     ```bash
     # Install Qt6 via Homebrew
     brew install qt6
-    
+
     # Clone and build
     git clone https://github.com/DeclarativeUI/DeclarativeUI.git
     cd DeclarativeUI
     cmake --preset default
     cmake --build --preset default
-    
+
     # Run an example
     ./build/examples/basic/HelloWorldExample
     ```
@@ -145,7 +150,7 @@ int main(int argc, char* argv[]) {
 DeclarativeUI bridges the gap between traditional Qt development and modern UI frameworks:
 
 - **Familiar**: Built on Qt6, works with existing Qt knowledge
-- **Modern**: C++20 features, reactive patterns, declarative syntax  
+- **Modern**: C++20 features, reactive patterns, declarative syntax
 - **Flexible**: Choose between Components or Commands based on your needs
 - **Productive**: Hot reload, state management, and comprehensive tooling
 - **Maintainable**: Clear separation of concerns, testable architecture

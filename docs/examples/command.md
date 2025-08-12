@@ -18,4 +18,3 @@ cmake --build --preset command-dev --target CommandUIExample IntegrationExample 
 - CommandBuilderExample — Command builder patterns
 - JSONCommandExample — Loading UI from JSON using command adapters
 - StateIntegrationExample — Command-state integration patterns
-

@@ -7,6 +7,7 @@ This document provides comprehensive examples demonstrating various features and
 The project includes 25+ examples organized into four categories:
 
 ### Basic Examples (`examples/basic/`)
+
 - **01_hello_world.cpp** - Simple "Hello World" application demonstrating basic widget creation
 - **02_json_ui_loading.cpp** - Loading UI from JSON files with dynamic creation
 - **03_simple_state.cpp** - Basic state management with StateManager
@@ -19,6 +20,7 @@ The project includes 25+ examples organized into four categories:
 - **22_hot_reload_example.cpp** - Advanced hot reload features with performance monitoring
 
 ### Component Examples (`examples/components/`)
+
 - **06_basic_components.cpp** - Essential UI components (Button, Label, LineEdit, Container)
 - **07_input_components.cpp** - Input component showcase (CheckBox, ComboBox, SpinBox, Slider)
 - **08_comprehensive_components.cpp** - Complete tour of all 30+ components
@@ -26,6 +28,7 @@ The project includes 25+ examples organized into four categories:
 - **10_new_components.cpp** - Latest component additions (TableView, TreeView, Dialogs)
 
 ### Command System Examples (`examples/command/`)
+
 - **CommandUIExample.cpp** - Command-based UI construction with CommandBuilder
 - **IntegrationExample.cpp** - Legacy-Command integration with adapters
 - **command_builder_example.cpp** - Command Builder patterns and fluent API
@@ -35,6 +38,7 @@ The project includes 25+ examples organized into four categories:
 - **integration_main.cpp** - Integration scenarios and migration strategies
 
 ### Advanced Examples (`examples/advanced/`)
+
 - **26_command_system.cpp** - Comprehensive Command system demonstration
 - **27_command_example.cpp** - Advanced command patterns and usage
 - **28_advanced_example.cpp** - Advanced DeclarativeUI features and optimization
@@ -49,11 +53,13 @@ The project includes 25+ examples organized into four categories:
 ## Building and Running Examples
 
 ### Prerequisites
+
 - Qt6 (6.2 or higher) with Core, Widgets, Network, and Test modules
 - CMake 3.20 or higher
 - C++20 compatible compiler
 
 ### Building Examples
+
 ```bash
 # Build all examples (recommended)
 mkdir build && cd build
@@ -64,6 +70,7 @@ cmake --build . --config Release
 ```
 
 ### Running Examples
+
 ```bash
 # Run a basic example
 ./build/examples/basic/01_hello_world
@@ -79,7 +86,9 @@ cmake --build . --config Release
 ```
 
 ### Example Resources
+
 Examples include JSON UI definitions in `examples/resources/`:
+
 - `command_ui_example.json` - Command system UI definition
 - `mixed_components_example.json` - Mixed Components/Commands example
 
@@ -468,235 +477,235 @@ Load UI definitions from JSON with automatic state binding and event handling:
 
 ```json
 {
-    "type": "Container",
-    "properties": {
-        "layout": "VBox",
-        "spacing": 20,
-        "margins": [30, 30, 30, 30]
+  "type": "Container",
+  "properties": {
+    "layout": "VBox",
+    "spacing": 20,
+    "margins": [30, 30, 30, 30]
+  },
+  "style": {
+    "background-color": "#f8f9fa"
+  },
+  "children": [
+    {
+      "type": "Label",
+      "properties": {
+        "text": "📊 JSON Dashboard",
+        "alignment": "center"
+      },
+      "style": {
+        "font-size": "24px",
+        "font-weight": "bold",
+        "color": "#2c3e50",
+        "margin-bottom": "20px"
+      },
+      "bindings": {
+        "text": "dashboard.title"
+      }
     },
-    "style": {
-        "background-color": "#f8f9fa"
-    },
-    "children": [
+    {
+      "type": "Container",
+      "properties": {
+        "layout": "HBox",
+        "spacing": 15
+      },
+      "children": [
         {
-            "type": "Label",
-            "properties": {
-                "text": "📊 JSON Dashboard",
+          "type": "Container",
+          "properties": {
+            "layout": "VBox",
+            "spacing": 10
+          },
+          "style": {
+            "border": "2px solid #3498db",
+            "border-radius": "8px",
+            "padding": "20px",
+            "background-color": "#f8fbff"
+          },
+          "children": [
+            {
+              "type": "Label",
+              "properties": {
+                "text": "Statistics",
                 "alignment": "center"
-            },
-            "style": {
-                "font-size": "24px",
+              },
+              "style": {
                 "font-weight": "bold",
-                "color": "#2c3e50",
-                "margin-bottom": "20px"
+                "color": "#3498db",
+                "font-size": "16px"
+              }
             },
-            "bindings": {
-                "text": "dashboard.title"
+            {
+              "type": "Label",
+              "id": "usersLabel",
+              "bindings": {
+                "text": "stats.users"
+              },
+              "style": {
+                "font-size": "18px",
+                "color": "#27ae60",
+                "text-align": "center"
+              }
+            },
+            {
+              "type": "Label",
+              "id": "revenueLabel",
+              "bindings": {
+                "text": "stats.revenue"
+              },
+              "style": {
+                "font-size": "18px",
+                "color": "#e74c3c",
+                "text-align": "center"
+              }
             }
+          ]
         },
         {
-            "type": "Container",
-            "properties": {
-                "layout": "HBox",
-                "spacing": 15
+          "type": "Container",
+          "properties": {
+            "layout": "VBox",
+            "spacing": 10
+          },
+          "style": {
+            "border": "2px solid #27ae60",
+            "border-radius": "8px",
+            "padding": "20px",
+            "background-color": "#f8fff8"
+          },
+          "children": [
+            {
+              "type": "Label",
+              "properties": {
+                "text": "Actions",
+                "alignment": "center"
+              },
+              "style": {
+                "font-weight": "bold",
+                "color": "#27ae60",
+                "font-size": "16px"
+              }
             },
-            "children": [
-                {
-                    "type": "Container",
-                    "properties": {
-                        "layout": "VBox",
-                        "spacing": 10
-                    },
-                    "style": {
-                        "border": "2px solid #3498db",
-                        "border-radius": "8px",
-                        "padding": "20px",
-                        "background-color": "#f8fbff"
-                    },
-                    "children": [
-                        {
-                            "type": "Label",
-                            "properties": {
-                                "text": "Statistics",
-                                "alignment": "center"
-                            },
-                            "style": {
-                                "font-weight": "bold",
-                                "color": "#3498db",
-                                "font-size": "16px"
-                            }
-                        },
-                        {
-                            "type": "Label",
-                            "id": "usersLabel",
-                            "bindings": {
-                                "text": "stats.users"
-                            },
-                            "style": {
-                                "font-size": "18px",
-                                "color": "#27ae60",
-                                "text-align": "center"
-                            }
-                        },
-                        {
-                            "type": "Label",
-                            "id": "revenueLabel",
-                            "bindings": {
-                                "text": "stats.revenue"
-                            },
-                            "style": {
-                                "font-size": "18px",
-                                "color": "#e74c3c",
-                                "text-align": "center"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "type": "Container",
-                    "properties": {
-                        "layout": "VBox",
-                        "spacing": 10
-                    },
-                    "style": {
-                        "border": "2px solid #27ae60",
-                        "border-radius": "8px",
-                        "padding": "20px",
-                        "background-color": "#f8fff8"
-                    },
-                    "children": [
-                        {
-                            "type": "Label",
-                            "properties": {
-                                "text": "Actions",
-                                "alignment": "center"
-                            },
-                            "style": {
-                                "font-weight": "bold",
-                                "color": "#27ae60",
-                                "font-size": "16px"
-                            }
-                        },
-                        {
-                            "type": "Button",
-                            "properties": {
-                                "text": "📈 Generate Report"
-                            },
-                            "style": {
-                                "background-color": "#3498db",
-                                "color": "white",
-                                "padding": "12px 24px",
-                                "border-radius": "6px",
-                                "font-weight": "bold"
-                            },
-                            "events": {
-                                "click": "generateReport"
-                            }
-                        },
-                        {
-                            "type": "Button",
-                            "properties": {
-                                "text": "🔄 Refresh Data"
-                            },
-                            "style": {
-                                "background-color": "#27ae60",
-                                "color": "white",
-                                "padding": "12px 24px",
-                                "border-radius": "6px",
-                                "font-weight": "bold"
-                            },
-                            "events": {
-                                "click": "refreshData"
-                            }
-                        },
-                        {
-                            "type": "Button",
-                            "properties": {
-                                "text": "⚙️ Settings"
-                            },
-                            "style": {
-                                "background-color": "#95a5a6",
-                                "color": "white",
-                                "padding": "12px 24px",
-                                "border-radius": "6px",
-                                "font-weight": "bold"
-                            },
-                            "events": {
-                                "click": "openSettings"
-                            },
-                            "bindings": {
-                                "enabled": "ui.settingsEnabled"
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "Container",
-            "properties": {
-                "layout": "Form",
-                "spacing": 10
+            {
+              "type": "Button",
+              "properties": {
+                "text": "📈 Generate Report"
+              },
+              "style": {
+                "background-color": "#3498db",
+                "color": "white",
+                "padding": "12px 24px",
+                "border-radius": "6px",
+                "font-weight": "bold"
+              },
+              "events": {
+                "click": "generateReport"
+              }
             },
-            "style": {
-                "border": "2px solid #9b59b6",
-                "border-radius": "8px",
-                "padding": "20px",
-                "background-color": "#fdf7ff"
+            {
+              "type": "Button",
+              "properties": {
+                "text": "🔄 Refresh Data"
+              },
+              "style": {
+                "background-color": "#27ae60",
+                "color": "white",
+                "padding": "12px 24px",
+                "border-radius": "6px",
+                "font-weight": "bold"
+              },
+              "events": {
+                "click": "refreshData"
+              }
             },
-            "children": [
-                {
-                    "type": "Label",
-                    "properties": {
-                        "text": "User Input",
-                        "alignment": "center"
-                    },
-                    "style": {
-                        "font-weight": "bold",
-                        "color": "#9b59b6",
-                        "font-size": "16px",
-                        "margin-bottom": "10px"
-                    }
-                },
-                {
-                    "type": "TextInput",
-                    "id": "nameInput",
-                    "properties": {
-                        "placeholder": "Enter your name"
-                    },
-                    "style": {
-                        "padding": "10px",
-                        "border": "1px solid #bdc3c7",
-                        "border-radius": "4px"
-                    },
-                    "bindings": {
-                        "text": "user.name"
-                    },
-                    "events": {
-                        "textChanged": "validateInput"
-                    }
-                },
-                {
-                    "type": "TextInput",
-                    "id": "emailInput",
-                    "properties": {
-                        "placeholder": "Enter your email"
-                    },
-                    "style": {
-                        "padding": "10px",
-                        "border": "1px solid #bdc3c7",
-                        "border-radius": "4px"
-                    },
-                    "bindings": {
-                        "text": "user.email"
-                    },
-                    "events": {
-                        "textChanged": "validateInput"
-                    }
-                }
-            ]
+            {
+              "type": "Button",
+              "properties": {
+                "text": "⚙️ Settings"
+              },
+              "style": {
+                "background-color": "#95a5a6",
+                "color": "white",
+                "padding": "12px 24px",
+                "border-radius": "6px",
+                "font-weight": "bold"
+              },
+              "events": {
+                "click": "openSettings"
+              },
+              "bindings": {
+                "enabled": "ui.settingsEnabled"
+              }
+            }
+          ]
         }
-    ]
+      ]
+    },
+    {
+      "type": "Container",
+      "properties": {
+        "layout": "Form",
+        "spacing": 10
+      },
+      "style": {
+        "border": "2px solid #9b59b6",
+        "border-radius": "8px",
+        "padding": "20px",
+        "background-color": "#fdf7ff"
+      },
+      "children": [
+        {
+          "type": "Label",
+          "properties": {
+            "text": "User Input",
+            "alignment": "center"
+          },
+          "style": {
+            "font-weight": "bold",
+            "color": "#9b59b6",
+            "font-size": "16px",
+            "margin-bottom": "10px"
+          }
+        },
+        {
+          "type": "TextInput",
+          "id": "nameInput",
+          "properties": {
+            "placeholder": "Enter your name"
+          },
+          "style": {
+            "padding": "10px",
+            "border": "1px solid #bdc3c7",
+            "border-radius": "4px"
+          },
+          "bindings": {
+            "text": "user.name"
+          },
+          "events": {
+            "textChanged": "validateInput"
+          }
+        },
+        {
+          "type": "TextInput",
+          "id": "emailInput",
+          "properties": {
+            "placeholder": "Enter your email"
+          },
+          "style": {
+            "padding": "10px",
+            "border": "1px solid #bdc3c7",
+            "border-radius": "4px"
+          },
+          "bindings": {
+            "text": "user.email"
+          },
+          "events": {
+            "textChanged": "validateInput"
+          }
+        }
+      ]
+    }
+  ]
 }
 ```
 
@@ -1359,16 +1368,16 @@ private:
 
 ### Feature Comparison
 
-| Feature | Legacy Components | Command System |
-|---------|------------------|----------------|
-| **Declarative Syntax** | ✅ Fluent API | ✅ Enhanced fluent API |
-| **State Binding** | ⚠️ Manual binding | ✅ Automatic binding |
-| **Event Handling** | ⚠️ Qt signals/slots | ✅ Abstract event system |
-| **JSON Loading** | ✅ Basic JSON support | ✅ Enhanced JSON with bindings |
-| **Widget Independence** | ❌ Inherits from QWidget | ✅ Complete abstraction |
-| **Hot Reload** | ✅ Supported | ✅ Enhanced support |
-| **Performance** | ✅ Good | ✅ Optimized |
-| **Migration Path** | N/A | ✅ Hybrid mode available |
+| Feature                 | Legacy Components        | Command System                 |
+| ----------------------- | ------------------------ | ------------------------------ |
+| **Declarative Syntax**  | ✅ Fluent API            | ✅ Enhanced fluent API         |
+| **State Binding**       | ⚠️ Manual binding        | ✅ Automatic binding           |
+| **Event Handling**      | ⚠️ Qt signals/slots      | ✅ Abstract event system       |
+| **JSON Loading**        | ✅ Basic JSON support    | ✅ Enhanced JSON with bindings |
+| **Widget Independence** | ❌ Inherits from QWidget | ✅ Complete abstraction        |
+| **Hot Reload**          | ✅ Supported             | ✅ Enhanced support            |
+| **Performance**         | ✅ Good                  | ✅ Optimized                   |
+| **Migration Path**      | N/A                      | ✅ Hybrid mode available       |
 
 ### When to Use Each Approach
 
@@ -1504,6 +1513,7 @@ private:
 ### Legacy Component Best Practices
 
 1. **Initialize Components**: Always call initialize()
+
    ```cpp
    auto button = std::make_unique<Components::Button>();
    button->text("Click Me");
@@ -1511,6 +1521,7 @@ private:
    ```
 
 2. **Manage Lifecycle**: Properly manage component lifecycles
+
    ```cpp
    class MyWidget : public QWidget {
    private:
@@ -1544,104 +1555,104 @@ Create `ui/dashboard.json`:
 
 ```json
 {
-    "type": "QWidget",
-    "properties": {
-        "windowTitle": "Dashboard Example",
-        "minimumSize": [600, 400],
-        "styleSheet": "QWidget { background-color: #f5f5f5; }"
+  "type": "QWidget",
+  "properties": {
+    "windowTitle": "Dashboard Example",
+    "minimumSize": [600, 400],
+    "styleSheet": "QWidget { background-color: #f5f5f5; }"
+  },
+  "layout": {
+    "type": "VBoxLayout",
+    "spacing": 20,
+    "margins": [20, 20, 20, 20]
+  },
+  "children": [
+    {
+      "type": "QLabel",
+      "properties": {
+        "text": "📊 Dashboard",
+        "alignment": 4,
+        "styleSheet": "QLabel { font-size: 24px; font-weight: bold; color: #2c3e50; }"
+      }
     },
-    "layout": {
-        "type": "VBoxLayout",
-        "spacing": 20,
-        "margins": [20, 20, 20, 20]
-    },
-    "children": [
+    {
+      "type": "QWidget",
+      "layout": {
+        "type": "HBoxLayout",
+        "spacing": 15
+      },
+      "children": [
         {
-            "type": "QLabel",
-            "properties": {
-                "text": "📊 Dashboard",
-                "alignment": 4,
-                "styleSheet": "QLabel { font-size: 24px; font-weight: bold; color: #2c3e50; }"
+          "type": "QGroupBox",
+          "properties": {
+            "title": "Statistics",
+            "styleSheet": "QGroupBox { font-weight: bold; }"
+          },
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 10
+          },
+          "children": [
+            {
+              "type": "QLabel",
+              "id": "users_count",
+              "bindings": {
+                "text": "users_count"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 18px; color: #27ae60; }"
+              }
+            },
+            {
+              "type": "QLabel",
+              "id": "revenue_label",
+              "bindings": {
+                "text": "revenue_text"
+              },
+              "properties": {
+                "styleSheet": "QLabel { font-size: 18px; color: #e74c3c; }"
+              }
             }
+          ]
         },
         {
-            "type": "QWidget",
-            "layout": {
-                "type": "HBoxLayout",
-                "spacing": 15
+          "type": "QGroupBox",
+          "properties": {
+            "title": "Actions",
+            "styleSheet": "QGroupBox { font-weight: bold; }"
+          },
+          "layout": {
+            "type": "VBoxLayout",
+            "spacing": 10
+          },
+          "children": [
+            {
+              "type": "QPushButton",
+              "properties": {
+                "text": "📈 Generate Report",
+                "minimumHeight": 40,
+                "styleSheet": "QPushButton { background-color: #3498db; color: white; font-weight: bold; border-radius: 5px; }"
+              },
+              "events": {
+                "clicked": "generateReport"
+              }
             },
-            "children": [
-                {
-                    "type": "QGroupBox",
-                    "properties": {
-                        "title": "Statistics",
-                        "styleSheet": "QGroupBox { font-weight: bold; }"
-                    },
-                    "layout": {
-                        "type": "VBoxLayout",
-                        "spacing": 10
-                    },
-                    "children": [
-                        {
-                            "type": "QLabel",
-                            "id": "users_count",
-                            "bindings": {
-                                "text": "users_count"
-                            },
-                            "properties": {
-                                "styleSheet": "QLabel { font-size: 18px; color: #27ae60; }"
-                            }
-                        },
-                        {
-                            "type": "QLabel",
-                            "id": "revenue_label",
-                            "bindings": {
-                                "text": "revenue_text"
-                            },
-                            "properties": {
-                                "styleSheet": "QLabel { font-size: 18px; color: #e74c3c; }"
-                            }
-                        }
-                    ]
-                },
-                {
-                    "type": "QGroupBox",
-                    "properties": {
-                        "title": "Actions",
-                        "styleSheet": "QGroupBox { font-weight: bold; }"
-                    },
-                    "layout": {
-                        "type": "VBoxLayout",
-                        "spacing": 10
-                    },
-                    "children": [
-                        {
-                            "type": "QPushButton",
-                            "properties": {
-                                "text": "📈 Generate Report",
-                                "minimumHeight": 40,
-                                "styleSheet": "QPushButton { background-color: #3498db; color: white; font-weight: bold; border-radius: 5px; }"
-                            },
-                            "events": {
-                                "clicked": "generateReport"
-                            }
-                        },
-                        {
-                            "type": "QPushButton",
-                            "properties": {
-                                "text": "🔄 Refresh Data",
-                                "minimumHeight": 40,
-                                "styleSheet": "QPushButton { background-color: #2ecc71; color: white; font-weight: bold; border-radius: 5px; }"
-                            },
-                            "events": {
-                                "clicked": "refreshData"
-                            }
-                        }
-                    ]
-                }
-            ]
+            {
+              "type": "QPushButton",
+              "properties": {
+                "text": "🔄 Refresh Data",
+                "minimumHeight": 40,
+                "styleSheet": "QPushButton { background-color: #2ecc71; color: white; font-weight: bold; border-radius: 5px; }"
+              },
+              "events": {
+                "clicked": "refreshData"
+              }
+            }
+          ]
         }
-    ]
+      ]
+    }
+  ]
 }
 ```
 
@@ -1653,76 +1664,76 @@ Create `ui/dashboard.json`:
 
 class DashboardApp : public QObject {
     Q_OBJECT
-    
+
 public:
     DashboardApp() {
         setupState();
         setupUI();
     }
-    
+
 private:
     void setupState() {
         auto& state = StateManager::instance();
-        
+
         // Initialize dashboard state
         state.setState("users_count", QString("👥 Users: 1,234"));
         state.setState("revenue_text", QString("💰 Revenue: $12,345"));
-        
+
         // Simulate data updates
         timer_ = new QTimer(this);
         connect(timer_, &QTimer::timeout, this, &DashboardApp::updateData);
         timer_->start(5000); // Update every 5 seconds
     }
-    
+
     void setupUI() {
         ui_loader_ = std::make_unique<JSON::JSONUILoader>();
-        
+
         // Bind state manager
         ui_loader_->bindStateManager(
             std::shared_ptr<Binding::StateManager>(&StateManager::instance(), [](auto*){}));
-        
+
         // Register event handlers
         ui_loader_->registerEventHandler("generateReport", [this]() {
             generateReport();
         });
-        
+
         ui_loader_->registerEventHandler("refreshData", [this]() {
             refreshData();
         });
-        
+
         // Load UI from JSON
         main_widget_ = ui_loader_->loadFromFile("ui/dashboard.json");
         if (main_widget_) {
             main_widget_->show();
         }
     }
-    
+
 private slots:
     void updateData() {
         auto& state = StateManager::instance();
-        
+
         // Simulate changing data
         static int users = 1234;
         static int revenue = 12345;
-        
+
         users += QRandomGenerator::global()->bounded(10, 50);
         revenue += QRandomGenerator::global()->bounded(100, 500);
-        
+
         state.setState("users_count", QString("👥 Users: %1").arg(users));
         state.setState("revenue_text", QString("💰 Revenue: $%1").arg(revenue));
     }
-    
+
     void generateReport() {
-        QMessageBox::information(main_widget_.get(), "Report", 
+        QMessageBox::information(main_widget_.get(), "Report",
                                "📊 Report generated successfully!");
     }
-    
+
     void refreshData() {
         updateData();
-        QMessageBox::information(main_widget_.get(), "Refresh", 
+        QMessageBox::information(main_widget_.get(), "Refresh",
                                "🔄 Data refreshed!");
     }
-    
+
 private:
     std::unique_ptr<JSON::JSONUILoader> ui_loader_;
     std::unique_ptr<QWidget> main_widget_;
@@ -1739,36 +1750,36 @@ private:
 
 class HotReloadApp : public QObject {
     Q_OBJECT
-    
+
 public:
     HotReloadApp() {
         setupUI();
         setupHotReload();
     }
-    
+
 private:
     void setupUI() {
         ui_loader_ = std::make_unique<JSON::JSONUILoader>();
-        
+
         // Register event handlers
         ui_loader_->registerEventHandler("saveFile", [this]() {
             QMessageBox::information(main_widget_.get(), "Save", "File saved!");
         });
-        
+
         ui_loader_->registerEventHandler("openFile", [this]() {
             QMessageBox::information(main_widget_.get(), "Open", "File opened!");
         });
-        
+
         // Load initial UI
         main_widget_ = ui_loader_->loadFromFile("ui/editor.json");
         if (main_widget_) {
             main_widget_->show();
         }
     }
-    
+
     void setupHotReload() {
         hot_reload_manager_ = std::make_unique<HotReload::HotReloadManager>();
-        
+
         // Set up error handling
         hot_reload_manager_->setErrorHandler(
             [this](const QString& file, const QString& error) {
@@ -1776,31 +1787,31 @@ private:
                 QMessageBox::warning(main_widget_.get(), "Hot Reload Error",
                                    QString("Failed to reload %1:\n%2").arg(file, error));
             });
-        
+
         // Register UI file for hot reloading
         hot_reload_manager_->registerUIFile("ui/editor.json", main_widget_.get());
-        
+
         // Connect hot reload signals
-        connect(hot_reload_manager_.get(), 
+        connect(hot_reload_manager_.get(),
                 &HotReload::HotReloadManager::reloadStarted,
                 this, &HotReloadApp::onReloadStarted);
-                
-        connect(hot_reload_manager_.get(), 
+
+        connect(hot_reload_manager_.get(),
                 &HotReload::HotReloadManager::reloadCompleted,
                 this, &HotReloadApp::onReloadCompleted);
-        
+
         qDebug() << "🔥 Hot reload enabled for ui/editor.json";
         qDebug() << "🔥 Edit the JSON file to see live updates!";
     }
-    
+
 private slots:
     void onReloadStarted(const QString& file_path) {
         qDebug() << "🔥 Reloading:" << file_path;
     }
-    
+
     void onReloadCompleted(const QString& file_path) {
         qDebug() << "✅ Reload completed:" << file_path;
-        
+
         // Reload the UI
         try {
             auto new_widget = ui_loader_->loadFromFile(file_path);
@@ -1808,7 +1819,7 @@ private slots:
                 main_widget_->close();
                 main_widget_ = std::move(new_widget);
                 main_widget_->show();
-                
+
                 // Re-register for hot reload
                 hot_reload_manager_->registerUIFile(file_path, main_widget_.get());
             }
@@ -1816,7 +1827,7 @@ private slots:
             qCritical() << "Failed to reload UI:" << e.what();
         }
     }
-    
+
 private:
     std::unique_ptr<JSON::JSONUILoader> ui_loader_;
     std::unique_ptr<QWidget> main_widget_;
@@ -1832,49 +1843,49 @@ private:
 // Custom component that combines multiple widgets
 class SearchBox : public Core::UIElement {
     Q_OBJECT
-    
+
 public:
     explicit SearchBox(QObject* parent = nullptr) : UIElement(parent) {}
-    
+
     SearchBox& placeholder(const QString& text) {
         placeholder_text_ = text;
         return *this;
     }
-    
+
     SearchBox& onSearch(std::function<void(const QString&)> handler) {
         search_handler_ = std::move(handler);
         return *this;
     }
-    
+
     void initialize() override {
         auto container = new QWidget();
         auto layout = new QHBoxLayout(container);
         layout->setContentsMargins(0, 0, 0, 0);
-        
+
         // Search input
         search_input_ = new QLineEdit();
         search_input_->setPlaceholderText(placeholder_text_);
         layout->addWidget(search_input_);
-        
+
         // Search button
         search_button_ = new QPushButton("🔍");
         search_button_->setMaximumWidth(40);
         layout->addWidget(search_button_);
-        
+
         // Connect signals
         connect(search_button_, &QPushButton::clicked, this, &SearchBox::performSearch);
         connect(search_input_, &QLineEdit::returnPressed, this, &SearchBox::performSearch);
-        
+
         setWidget(container);
     }
-    
+
 private slots:
     void performSearch() {
         if (search_handler_) {
             search_handler_(search_input_->text());
         }
     }
-    
+
 private:
     QString placeholder_text_;
     std::function<void(const QString&)> search_handler_;

@@ -2,7 +2,10 @@
     "type": "QMainWindow",
     "properties": {
         "windowTitle": "DeclarativeUI Dashboard",
-        "minimumSize": [800, 600],
+        "minimumSize": [
+            800,
+            600
+        ],
         "styleSheet": "QMainWindow { background-color: #2c3e50; }"
     },
     "centralWidget": {
@@ -13,7 +16,12 @@
         "layout": {
             "type": "VBoxLayout",
             "spacing": 0,
-            "margins": [0, 0, 0, 0]
+            "margins": [
+                0,
+                0,
+                0,
+                0
+            ]
         },
         "children": [
             {
@@ -26,7 +34,12 @@
                 "layout": {
                     "type": "HBoxLayout",
                     "spacing": 20,
-                    "margins": [30, 20, 30, 20]
+                    "margins": [
+                        30,
+                        20,
+                        30,
+                        20
+                    ]
                 },
                 "children": [
                     {
@@ -59,7 +72,12 @@
                 "layout": {
                     "type": "HBoxLayout",
                     "spacing": 20,
-                    "margins": [20, 20, 20, 20]
+                    "margins": [
+                        20,
+                        20,
+                        20,
+                        20
+                    ]
                 },
                 "children": [
                     {
@@ -72,7 +90,12 @@
                         "layout": {
                             "type": "VBoxLayout",
                             "spacing": 15,
-                            "margins": [20, 20, 20, 20]
+                            "margins": [
+                                20,
+                                20,
+                                20,
+                                20
+                            ]
                         },
                         "children": [
                             {
@@ -90,7 +113,12 @@
                                 "layout": {
                                     "type": "VBoxLayout",
                                     "spacing": 5,
-                                    "margins": [15, 15, 15, 15]
+                                    "margins": [
+                                        15,
+                                        15,
+                                        15,
+                                        15
+                                    ]
                                 },
                                 "children": [
                                     {
@@ -120,7 +148,12 @@
                                 "layout": {
                                     "type": "VBoxLayout",
                                     "spacing": 5,
-                                    "margins": [15, 15, 15, 15]
+                                    "margins": [
+                                        15,
+                                        15,
+                                        15,
+                                        15
+                                    ]
                                 },
                                 "children": [
                                     {
@@ -150,7 +183,12 @@
                                 "layout": {
                                     "type": "VBoxLayout",
                                     "spacing": 5,
-                                    "margins": [15, 15, 15, 15]
+                                    "margins": [
+                                        15,
+                                        15,
+                                        15,
+                                        15
+                                    ]
                                 },
                                 "children": [
                                     {
@@ -182,7 +220,12 @@
                         "layout": {
                             "type": "VBoxLayout",
                             "spacing": 15,
-                            "margins": [20, 20, 20, 20]
+                            "margins": [
+                                20,
+                                20,
+                                20,
+                                20
+                            ]
                         },
                         "children": [
                             {

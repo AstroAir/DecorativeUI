@@ -33,6 +33,7 @@ SOFTWARE.
 The MIT License is a permissive open-source license that allows you to:
 
 ### ✅ Permissions
+
 - **Commercial use**: Use DeclarativeUI in commercial projects
 - **Modification**: Modify the source code to suit your needs
 - **Distribution**: Distribute the original or modified versions
@@ -40,10 +41,12 @@ The MIT License is a permissive open-source license that allows you to:
 - **Patent use**: Use any patents that may be applicable
 
 ### ❗ Conditions
+
 - **License and copyright notice**: Include the license and copyright notice in all copies
 - **State changes**: Document any changes you make to the original code (recommended)
 
 ### ❌ Limitations
+
 - **Liability**: The authors are not liable for any damages
 - **Warranty**: No warranty is provided with the software
 
@@ -52,11 +55,13 @@ The MIT License is a permissive open-source license that allows you to:
 DeclarativeUI depends on the following third-party libraries:
 
 ### Qt6
+
 - **License**: LGPL v3 / GPL v3 / Commercial
 - **Website**: https://www.qt.io/licensing/
 - **Usage**: Core framework dependency
 
 ### CMake
+
 - **License**: BSD 3-Clause
 - **Website**: https://cmake.org/licensing/
 - **Usage**: Build system

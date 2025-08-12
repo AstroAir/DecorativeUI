@@ -59,10 +59,10 @@ class BaseUICommand : public QObject {
     virtual UICommandMetadata getMetadata() const = 0;
     virtual QString getCommandType() const = 0;
     virtual QString getWidgetType() const = 0;
-    
+
     // State management
     UICommandState* getState() const;
-    
+
     // Widget lifecycle (managed by WidgetMapper)
     virtual void onWidgetCreated(QWidget* widget);
     virtual void syncToWidget();
@@ -191,7 +191,7 @@ Events::dispatch(std::move(event));
 ```cpp
 // High priority handler
 CommandEventDispatcher::instance().registerHandler(
-    command.get(), 
+    command.get(),
     CommandEventType::Clicked,
     [](const CommandEvent& event) { /* high priority logic */ },
     CommandEventPriority::High
@@ -202,7 +202,7 @@ CommandEventDispatcher::instance().registerFilteredHandler(
     command.get(),
     CommandEventType::ValueChanged,
     [](const CommandEvent& event) { /* handler */ },
-    [](const CommandEvent& event) { 
+    [](const CommandEvent& event) {
         // Filter: only handle values > 50
         auto valueEvent = static_cast<const ValueChangeEvent&>(event);
         return valueEvent.getNewValue().toInt() > 50;

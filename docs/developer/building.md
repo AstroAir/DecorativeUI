@@ -62,27 +62,27 @@ cd build && ctest --output-on-failure
 
 The project includes several CMake presets for different use cases:
 
-| Preset | Description | Use Case |
-|--------|-------------|----------|
-| `default` | Release build with all features | Production builds |
-| `debug` | Debug build with diagnostics | Development |
-| `release` | Optimized release build | Distribution |
-| `minimal` | Library only, no examples/tests | Integration |
-| `command-dev` | Command system development | Command development |
-| `legacy-only` | Components only, no Commands | Legacy integration |
+| Preset        | Description                     | Use Case            |
+| ------------- | ------------------------------- | ------------------- |
+| `default`     | Release build with all features | Production builds   |
+| `debug`       | Debug build with diagnostics    | Development         |
+| `release`     | Optimized release build         | Distribution        |
+| `minimal`     | Library only, no examples/tests | Integration         |
+| `command-dev` | Command system development      | Command development |
+| `legacy-only` | Components only, no Commands    | Legacy integration  |
 
 ### Build Options
 
 Configure the build with CMake options:
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `BUILD_EXAMPLES` | ON | Build example applications |
-| `BUILD_TESTS` | ON | Build test suite |
-| `BUILD_SHARED_LIBS` | OFF | Build shared libraries |
-| `BUILD_COMMAND_SYSTEM` | ON | Enable Command system |
-| `BUILD_ADAPTERS` | ON | Enable integration adapters |
-| `ENABLE_COMMAND_DEBUG` | OFF | Enable Command debug output |
+| Option                 | Default | Description                 |
+| ---------------------- | ------- | --------------------------- |
+| `BUILD_EXAMPLES`       | ON      | Build example applications  |
+| `BUILD_TESTS`          | ON      | Build test suite            |
+| `BUILD_SHARED_LIBS`    | OFF     | Build shared libraries      |
+| `BUILD_COMMAND_SYSTEM` | ON      | Enable Command system       |
+| `BUILD_ADAPTERS`       | ON      | Enable integration adapters |
+| `ENABLE_COMMAND_DEBUG` | OFF     | Enable Command debug output |
 
 ### Manual Configuration
 
