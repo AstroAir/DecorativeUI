@@ -1,4 +1,5 @@
 #include <QSignalSpy>
+#include <QtConcurrent/QtConcurrent>
 #include <QtTest/QtTest>
 #include <memory>
 

@@ -1,4 +1,5 @@
 #include "BuiltinCommands.hpp"
+#include "ComponentCommands.hpp"
 #include <QDebug>
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
@@ -345,6 +346,205 @@ void registerBuiltinCommands() {
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
             return std::make_unique<DatabaseTransactionCommand>(context);
         });
+
+    // ========================================================================
+    // COMPONENT-SPECIFIC COMMANDS
+    // ========================================================================
+
+    // Button components
+    factory.registerCommand(
+        "button",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::ButtonCommand>(context);
+        });
+
+    factory.registerCommand(
+        "checkbox",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::CheckBoxCommand>(context);
+        });
+
+    factory.registerCommand(
+        "radiobutton",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::RadioButtonCommand>(context);
+        });
+
+    // Text components
+    factory.registerCommand(
+        "label",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::LabelCommand>(context);
+        });
+
+    factory.registerCommand(
+        "lineedit",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::LineEditCommand>(context);
+        });
+
+    factory.registerCommand(
+        "textedit",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::TextEditCommand>(context);
+        });
+
+    // Input components
+    factory.registerCommand(
+        "spinbox",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::SpinBoxCommand>(context);
+        });
+
+    factory.registerCommand(
+        "slider",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::SliderCommand>(context);
+        });
+
+    factory.registerCommand(
+        "combobox",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::ComboBoxCommand>(context);
+        });
+
+    // Container components
+    factory.registerCommand(
+        "tabwidget",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::TabWidgetCommand>(context);
+        });
+
+    // ========================================================================
+    // PRIORITY 1 - COMMON INPUT COMPONENTS
+    // ========================================================================
+
+    factory.registerCommand(
+        "doublespinbox",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::DoubleSpinBoxCommand>(context);
+        });
+
+    factory.registerCommand(
+        "dial",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::DialCommand>(context);
+        });
+
+    factory.registerCommand(
+        "datetimeedit",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::DateTimeEditCommand>(context);
+        });
+
+    factory.registerCommand(
+        "progressbar",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::ProgressBarCommand>(context);
+        });
+
+    // ========================================================================
+    // PRIORITY 2 - DISPLAY COMPONENTS
+    // ========================================================================
+
+    factory.registerCommand(
+        "lcdnumber",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::LCDNumberCommand>(context);
+        });
+
+    factory.registerCommand(
+        "calendar",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::CalendarCommand>(context);
+        });
+
+    // ========================================================================
+    // PRIORITY 3 - VIEW COMPONENTS
+    // ========================================================================
+
+    factory.registerCommand(
+        "listview",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::ListViewCommand>(context);
+        });
+
+    factory.registerCommand(
+        "tableview",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::TableViewCommand>(context);
+        });
+
+    factory.registerCommand(
+        "treeview",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::TreeViewCommand>(context);
+        });
+
+    // ========================================================================
+    // PRIORITY 4 - CONTAINER COMPONENTS
+    // ========================================================================
+
+    factory.registerCommand(
+        "groupbox",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::GroupBoxCommand>(context);
+        });
+
+    factory.registerCommand(
+        "frame",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::FrameCommand>(context);
+        });
+
+    factory.registerCommand(
+        "scrollarea",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::ScrollAreaCommand>(context);
+        });
+
+    factory.registerCommand(
+        "splitter",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::SplitterCommand>(context);
+        });
+
+    factory.registerCommand(
+        "dockwidget",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::DockWidgetCommand>(context);
+        });
+
+    // ========================================================================
+    // PRIORITY 5 - MENU/TOOLBAR COMPONENTS
+    // ========================================================================
+
+    factory.registerCommand(
+        "menubar",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::MenuBarCommand>(context);
+        });
+
+    factory.registerCommand(
+        "statusbar",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::StatusBarCommand>(context);
+        });
+
+    factory.registerCommand(
+        "toolbar",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::ToolBarCommand>(context);
+        });
+
+    factory.registerCommand(
+        "toolbutton",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComponentCommands::ToolButtonCommand>(context);
+        });
+
+    // Register component commands
+    ComponentCommands::registerComponentCommands();
 }
 
 }  // namespace Commands

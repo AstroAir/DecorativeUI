@@ -238,7 +238,8 @@ private slots:
         bool is_valid = validator.validate(test_object);
         QVERIFY(is_valid);
 
-        // Test invalid component type - should generate warnings but still validate structure
+        // Test invalid component type - should generate warnings but still
+        // validate structure
         QJsonObject invalid_object;
         invalid_object["type"] = "InvalidComponent";
         [[maybe_unused]] bool result = validator.validate(invalid_object);
@@ -456,14 +457,16 @@ private slots:
 
         // Try to create non-existent component - should throw exception
         try {
-            auto widget = registry.createComponent("NonExistent", QJsonObject());
+            auto widget =
+                registry.createComponent("NonExistent", QJsonObject());
             QFAIL("Expected ComponentRegistrationException to be thrown");
         } catch (const ComponentRegistrationException& e) {
             // Expected behavior - exception should be thrown
             QVERIFY(!e.getComponentName().empty());
         }
 
-        // Test factory that returns nullptr - should throw ComponentCreationException
+        // Test factory that returns nullptr - should throw
+        // ComponentCreationException
         registry.registerComponent<QWidget>(
             "NullFactory",
             [](const QJsonObject& config) -> std::unique_ptr<QWidget> {
@@ -471,10 +474,12 @@ private slots:
             });
 
         try {
-            auto null_widget = registry.createComponent("NullFactory", QJsonObject());
+            auto null_widget =
+                registry.createComponent("NullFactory", QJsonObject());
             QFAIL("Expected ComponentCreationException to be thrown");
         } catch (const ComponentCreationException& e) {
-            // Expected behavior - exception should be thrown for null factory result
+            // Expected behavior - exception should be thrown for null factory
+            // result
             QVERIFY(!e.getMessage().empty());
         }
     }

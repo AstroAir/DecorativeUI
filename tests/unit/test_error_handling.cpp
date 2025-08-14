@@ -1,7 +1,7 @@
 // tests/unit/test_error_handling.cpp
 #include <QtTest/QtTest>
-#include <stdexcept>
 #include <memory>
+#include <stdexcept>
 
 #include "../../src/Core/ErrorHandling.hpp"
 
@@ -72,7 +72,8 @@ void ErrorHandlingTest::testUIException() {
     // Test formatted message
     QString formatted = exception.getFormattedMessage();
     QVERIFY(formatted.contains(message));
-    QVERIFY(formatted.contains("TestComponent") || formatted.contains("TestOperation"));
+    QVERIFY(formatted.contains("TestComponent") ||
+            formatted.contains("TestOperation"));
 }
 
 void ErrorHandlingTest::testSpecificExceptions() {
@@ -109,26 +110,30 @@ void ErrorHandlingTest::testExceptionContext() {
 void ErrorHandlingTest::testConsoleErrorHandler() {
     ConsoleErrorHandler handler;
 
-    UIException exception("Test console error", ErrorSeverity::Error, ErrorCategory::General);
+    UIException exception("Test console error", ErrorSeverity::Error,
+                          ErrorCategory::General);
 
     // Test that handler doesn't crash
     handler.handleError(exception);
-    handler.handleError(ErrorSeverity::Info, "Test info message", ErrorContext{});
+    handler.handleError(ErrorSeverity::Info, "Test info message",
+                        ErrorContext{});
 
-    QVERIFY(true); // Test passes if no crash occurs
+    QVERIFY(true);  // Test passes if no crash occurs
 }
 
 void ErrorHandlingTest::testFileErrorHandler() {
     QString testFilename = "test_error_log.txt";
     FileErrorHandler handler(testFilename);
 
-    UIException exception("Test file error", ErrorSeverity::Warning, ErrorCategory::IO);
+    UIException exception("Test file error", ErrorSeverity::Warning,
+                          ErrorCategory::IO);
 
     // Test that handler doesn't crash
     handler.handleError(exception);
-    handler.handleError(ErrorSeverity::Debug, "Test debug message", ErrorContext{});
+    handler.handleError(ErrorSeverity::Debug, "Test debug message",
+                        ErrorContext{});
 
-    QVERIFY(true); // Test passes if no crash occurs
+    QVERIFY(true);  // Test passes if no crash occurs
 
     // Cleanup test file
     QFile::remove(testFilename);
@@ -160,25 +165,23 @@ void ErrorHandlingTest::testSafeExecution() {
     ErrorManager& manager = ErrorManager::instance();
 
     // Test successful execution
-    auto successResult = manager.safeExecute([]() {
-        return 42;
-    }, "Test operation");
+    auto successResult =
+        manager.safeExecute([]() { return 42; }, "Test operation");
 
     QVERIFY(successResult.has_value());
     QCOMPARE(successResult.value(), 42);
 
     // Test execution with exception
-    auto failureResult = manager.safeExecute([]() -> int {
-        throw std::runtime_error("Test exception");
-    }, "Test operation");
+    auto failureResult = manager.safeExecute(
+        []() -> int { throw std::runtime_error("Test exception"); },
+        "Test operation");
 
     QVERIFY(!failureResult.has_value());
 
     // Test void function execution
     bool executed = false;
-    auto voidResult = manager.safeExecute([&executed]() {
-        executed = true;
-    }, "Void operation");
+    auto voidResult = manager.safeExecute([&executed]() { executed = true; },
+                                          "Void operation");
 
     QVERIFY(voidResult.has_value());
     QVERIFY(executed);
@@ -187,10 +190,12 @@ void ErrorHandlingTest::testSafeExecution() {
 void ErrorHandlingTest::testPerformanceMeasurement() {
     ErrorManager& manager = ErrorManager::instance();
 
-    auto result = manager.measurePerformance([]() {
-        QThread::msleep(10); // Simulate work
-        return "Done";
-    }, "Performance test");
+    auto result = manager.measurePerformance(
+        []() {
+            QThread::msleep(10);  // Simulate work
+            return "Done";
+        },
+        "Performance test");
 
     QVERIFY(result.has_value());
     QCOMPARE(result.value(), QString("Done"));
@@ -205,7 +210,7 @@ void ErrorHandlingTest::testAssertion() {
     // Test failed assertion (should not terminate in test)
     manager.uiAssert(false, "This should fail", ErrorSeverity::Warning);
 
-    QVERIFY(true); // Test passes if we reach here
+    QVERIFY(true);  // Test passes if we reach here
 }
 
 // **Result Type Tests**

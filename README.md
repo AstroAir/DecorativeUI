@@ -20,7 +20,7 @@ A modern, declarative UI framework for Qt applications that provides both tradit
 - **🔧 Rich Component Library**: 30+ pre-built UI components covering all common use cases
 - **🔄 Hot Reload System**: Real-time UI updates without application restart
 - **📊 State Management**: Centralized reactive state store with automatic UI updates
-- **📋 Command System**: Advanced command-based architecture for complex applications
+- **📋 Command System**: Comprehensive component-specific commands with automatic widget mapping and undo support
 - **📄 JSON Support**: Dynamic UI loading from JSON with validation and error reporting
 - **🧪 Comprehensive Testing**: 24+ test executables with 95%+ code coverage
 
@@ -134,12 +134,20 @@ button->text("Click Me").onClick([]() { /* handler */ });
 ```
 
 ### Command System
-Framework-independent UI logic for advanced applications:
+Framework-independent UI logic with comprehensive component support:
 ```cpp
-auto button = CommandBuilder("Button")
-    .text("Click Me")
-    .addEventListener("click", handler)
-    .build();
+// Component-specific commands for all UI elements
+CommandContext context;
+context.setParameter("widget", "myButton");
+context.setParameter("operation", "setText");
+context.setParameter("text", "Click Me!");
+
+ButtonCommand command(context);
+auto result = command.execute(context);
+
+// Automatic widget mapping and event handling
+auto& mapper = WidgetMapper::instance();
+auto widget = mapper.createWidget(&command);
 ```
 
 **[📖 Learn More](https://declarativeui.github.io/DeclarativeUI/user-guide/components/)** about choosing the right approach for your project.

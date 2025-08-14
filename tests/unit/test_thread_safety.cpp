@@ -130,7 +130,8 @@ private slots:
         qDebug() << "Errors:" << errors.load();
 
         // Allow for some race conditions in concurrent access
-        // The current StateManager implementation doesn't have full thread safety
+        // The current StateManager implementation doesn't have full thread
+        // safety
         QCOMPARE(errors.load(), 0);
 
         // Expect at least 80% success rate for concurrent operations

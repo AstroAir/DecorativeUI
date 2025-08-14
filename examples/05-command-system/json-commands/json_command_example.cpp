@@ -1,14 +1,14 @@
 #include <QApplication>
-#include <QMainWindow>
 #include <QDebug>
-#include <QJsonObject>
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QMainWindow>
 
 #ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
 #ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
 
-#include "../../Command/Adapters/JSONCommandLoader.hpp"
-#include "../../Command/WidgetMapper.hpp"
+#include "../../../src/Command/Adapters/JSONCommandLoader.hpp"
+#include "../../../src/Command/WidgetMapper.hpp"
 
 using namespace DeclarativeUI::Command;
 using namespace DeclarativeUI::Command::Adapters;
@@ -20,7 +20,7 @@ public:
     JSONCommandExampleWindow(QWidget* parent = nullptr) : QMainWindow(parent) {
         setWindowTitle("JSON Command Loading Example");
         setMinimumSize(600, 500);
-        
+
         setupUI();
     }
 
@@ -129,92 +129,105 @@ private:
 
             // Create JSON loader
             JSONCommandLoader loader;
-            
+
             // Configure loader
             loader.setAutoMVCIntegration(true);
             loader.setAutoStateBinding(true);
             loader.setAutoEventHandling(true);
-            
+
             // Register event handlers
-            loader.registerEventHandler("onGreetClicked", [this](const QVariant&) {
-                auto& stateManager = DeclarativeUI::Binding::StateManager::instance();
-                auto nameState = stateManager.getState<QString>("user.name");
-                QString name = nameState ? nameState->get() : "World";
-                
-                QString greeting = QString("Hello, %1!").arg(name);
-                stateManager.setState("greeting.message", greeting);
-                
-                qDebug() << "👋 Greeting:" << greeting;
-            });
-            
-            loader.registerEventHandler("onButton1Clicked", [](const QVariant&) {
-                qDebug() << "🔘 Button 1 clicked via JSON event handler";
-            });
-            
-            loader.registerEventHandler("onButton2Clicked", [](const QVariant&) {
-                qDebug() << "🔘 Button 2 clicked via JSON event handler";
-            });
-            
-            loader.registerEventHandler("onButton3Clicked", [](const QVariant&) {
-                qDebug() << "🔘 Button 3 clicked via JSON event handler";
-            });
-            
+            loader.registerEventHandler(
+                "onGreetClicked", [this](const QVariant&) {
+                    auto& stateManager =
+                        DeclarativeUI::Binding::StateManager::instance();
+                    auto nameState =
+                        stateManager.getState<QString>("user.name");
+                    QString name = nameState ? nameState->get() : "World";
+
+                    QString greeting = QString("Hello, %1!").arg(name);
+                    stateManager.setState("greeting.message", greeting);
+
+                    qDebug() << "👋 Greeting:" << greeting;
+                });
+
+            loader.registerEventHandler(
+                "onButton1Clicked", [](const QVariant&) {
+                    qDebug() << "🔘 Button 1 clicked via JSON event handler";
+                });
+
+            loader.registerEventHandler(
+                "onButton2Clicked", [](const QVariant&) {
+                    qDebug() << "🔘 Button 2 clicked via JSON event handler";
+                });
+
+            loader.registerEventHandler(
+                "onButton3Clicked", [](const QVariant&) {
+                    qDebug() << "🔘 Button 3 clicked via JSON event handler";
+                });
+
             // Initialize state
-            auto& stateManager = DeclarativeUI::Binding::StateManager::instance();
+            auto& stateManager =
+                DeclarativeUI::Binding::StateManager::instance();
             stateManager.setState("user.name", QString(""));
             stateManager.setState("greeting.message", QString("Hello, World!"));
-            
+
             // Load command from JSON
             auto command = loader.loadCommandFromString(jsonUI);
             if (!command) {
                 qWarning() << "❌ Failed to load command from JSON";
                 return;
             }
-            
+
             // Convert to widget
-            auto widget = UI::WidgetMapper::instance().createWidget(command.get());
+            auto widget =
+                UI::WidgetMapper::instance().createWidget(command.get());
             if (widget) {
                 setCentralWidget(widget.release());
                 qDebug() << "✅ JSON Command example UI created successfully";
-                
+
                 // Monitor state changes
-                connect(&stateManager, &DeclarativeUI::Binding::StateManager::stateChanged,
+                connect(&stateManager,
+                        &DeclarativeUI::Binding::StateManager::stateChanged,
                         this, [](const QString& key, const QVariant& value) {
-                            qDebug() << "🔄 State changed:" << key << "=" << value;
+                            qDebug()
+                                << "🔄 State changed:" << key << "=" << value;
                         });
-                
+
             } else {
                 qWarning() << "❌ Failed to create widget from command";
             }
-            
+
         } catch (const std::exception& e) {
             qWarning() << "❌ Error creating JSON Command example:" << e.what();
         }
     }
 };
 
-#include "json_command_example.moc"
+// #include "json_command_example.moc" // MOC file will be generated during
+// build
 
-#endif // DECLARATIVE_UI_ADAPTERS_ENABLED
-#endif // DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
+#endif  // DECLARATIVE_UI_ADAPTERS_ENABLED
+#endif  // DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
 #ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
 #ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
     qDebug() << "🚀 Starting JSON Command Loading Example";
-    
+
     JSONCommandExampleWindow window;
     window.show();
-    
+
     return app.exec();
 #else
-    qWarning() << "❌ Adapters not enabled. Please build with BUILD_ADAPTERS=ON";
+    qWarning()
+        << "❌ Adapters not enabled. Please build with BUILD_ADAPTERS=ON";
     return 1;
 #endif
 #else
-    qWarning() << "❌ Command system not enabled. Please build with BUILD_COMMAND_SYSTEM=ON";
+    qWarning() << "❌ Command system not enabled. Please build with "
+                  "BUILD_COMMAND_SYSTEM=ON";
     return 1;
 #endif
 }

@@ -1,8 +1,8 @@
 // tests/unit/test_theme_system.cpp
-#include <QtTest/QtTest>
 #include <QApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QtTest/QtTest>
 #include <memory>
 
 #include "../../src/Core/Theme.hpp"
@@ -277,9 +277,8 @@ void ThemeSystemTest::testCustomTheme() {
 void ThemeSystemTest::testThemeChangeNotification() {
     bool notificationReceived = false;
 
-    themeManager->onThemeChanged([&notificationReceived]() {
-        notificationReceived = true;
-    });
+    themeManager->onThemeChanged(
+        [&notificationReceived]() { notificationReceived = true; });
 
     themeManager->loadDarkTheme();
 

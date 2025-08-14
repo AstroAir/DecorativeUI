@@ -65,6 +65,15 @@ add_library(DeclarativeUI STATIC
     # Command System - Core Commands
     src/Command/CoreCommands.cpp
     src/Command/SpecializedCommands.cpp
+    src/Command/ComponentCommands.cpp
+    src/Command/ComponentCommandsExtended.cpp
+    src/Command/ComponentCommandsInput.cpp
+    src/Command/ComponentCommandsDisplay.cpp
+    src/Command/ComponentCommandsView.cpp
+    src/Command/ComponentCommandsContainer.cpp
+    src/Command/ComponentCommandsContainerExtended.cpp
+    src/Command/ComponentCommandsMenu.cpp
+    src/Command/ComponentCommandsMenuExtended.cpp
 
     # Command System - Builders and Binding
     src/Command/CommandBuilder.cpp

@@ -14,16 +14,19 @@ Command-based architecture demonstrations for DeclarativeUI applications.
 ## Examples in this Category
 
 ### Command Basics (`command-basics/`)
-**Difficulty:** ⭐⭐⭐☆☆  
+
+**Difficulty:** ⭐⭐⭐☆☆
 **Concepts:** Command pattern, basic command operations, undo/redo
 
 Introduction to the command system and basic command operations.
 
 **Examples included:**
+
 - `command-basics.cpp` - Core command pattern implementation
 - `command-basics-simple.cpp` - Simplified command examples
 
 **What you'll learn:**
+
 - Command pattern fundamentals
 - Creating and executing commands
 - Basic undo/redo functionality
@@ -31,6 +34,7 @@ Introduction to the command system and basic command operations.
 - Command validation
 
 **Run these examples:**
+
 ```bash
 cmake --build . --target CommandBasicsExample
 ./examples/05-command-system/CommandBasicsExample
@@ -40,7 +44,8 @@ cmake --build . --target CommandBasicsSimpleExample
 ```
 
 ### Command Builder (`command-builder/`) 🚧
-**Difficulty:** ⭐⭐⭐⭐☆  
+
+**Difficulty:** ⭐⭐⭐⭐☆
 **Concepts:** Builder pattern, fluent interfaces, command composition
 
 **Status:** Currently disabled - being updated for API compatibility
@@ -48,6 +53,7 @@ cmake --build . --target CommandBasicsSimpleExample
 Advanced command construction using builder patterns and fluent interfaces.
 
 **What you'll learn (when re-enabled):**
+
 - Command builder patterns
 - Fluent interface design
 - Complex command composition
@@ -55,7 +61,8 @@ Advanced command construction using builder patterns and fluent interfaces.
 - Performance optimization for command chains
 
 ### JSON Commands (`json-commands/`) 🚧
-**Difficulty:** ⭐⭐⭐⭐☆  
+
+**Difficulty:** ⭐⭐⭐⭐☆
 **Concepts:** JSON-driven commands, dynamic command creation
 
 **Status:** Currently disabled - being updated for API compatibility
@@ -63,6 +70,7 @@ Advanced command construction using builder patterns and fluent interfaces.
 Creating and executing commands from JSON definitions.
 
 **What you'll learn (when re-enabled):**
+
 - JSON command schemas
 - Dynamic command creation
 - Command serialization/deserialization
@@ -70,7 +78,8 @@ Creating and executing commands from JSON definitions.
 - Command versioning and migration
 
 ### State Integration (`state-integration/`) 🚧
-**Difficulty:** ⭐⭐⭐⭐⭐☆  
+
+**Difficulty:** ⭐⭐⭐⭐⭐☆
 **Concepts:** Command-state integration, reactive commands, state synchronization
 
 **Status:** Currently disabled - being updated for API compatibility
@@ -78,6 +87,7 @@ Creating and executing commands from JSON definitions.
 Integration between command system and reactive state management.
 
 **What you'll learn (when re-enabled):**
+
 - Command-driven state changes
 - Reactive command execution
 - State synchronization patterns
@@ -87,10 +97,12 @@ Integration between command system and reactive state management.
 ## Learning Path
 
 ### Currently Available
+
 1. **Start with:** `command-basics/command-basics-simple.cpp` - Simple command concepts
 2. **Then:** `command-basics/command-basics.cpp` - Full command pattern
 
 ### When Re-enabled
+
 3. **Advance to:** `command-builder/` - Builder patterns
 4. **Explore:** `json-commands/` - Dynamic commands
 5. **Master:** `state-integration/` - Advanced integration
@@ -100,18 +112,21 @@ Integration between command system and reactive state management.
 ### Core Concepts
 
 **Command Pattern**
+
 - Encapsulates requests as objects
 - Enables parameterization and queuing
 - Supports undo/redo operations
 - Decouples invoker from receiver
 
 **Command Types**
+
 - **Simple Commands** - Single operations
 - **Composite Commands** - Multiple operations
 - **Macro Commands** - Recorded command sequences
 - **Conditional Commands** - Context-dependent execution
 
 **Command Lifecycle**
+
 1. **Creation** - Command instantiation
 2. **Validation** - Pre-execution checks
 3. **Execution** - Command operation
@@ -121,18 +136,21 @@ Integration between command system and reactive state management.
 ### Benefits
 
 **Flexibility**
+
 - Dynamic command creation
 - Runtime command composition
 - Configurable command behavior
 - Extensible command system
 
 **Maintainability**
+
 - Clear separation of concerns
 - Testable command logic
 - Reusable command components
 - Consistent error handling
 
 **User Experience**
+
 - Undo/redo functionality
 - Command history
 - Batch operations
@@ -141,6 +159,7 @@ Integration between command system and reactive state management.
 ## Best Practices
 
 ### Command Design
+
 1. **Keep commands focused** - Single responsibility principle
 2. **Make commands immutable** - Avoid side effects
 3. **Validate early** - Check preconditions before execution
@@ -148,12 +167,14 @@ Integration between command system and reactive state management.
 5. **Document command contracts** - Clear input/output specifications
 
 ### Performance
+
 1. **Lazy execution** - Defer expensive operations
 2. **Command pooling** - Reuse command objects
 3. **Batch processing** - Group related commands
 4. **Memory management** - Clean up command history
 
 ### Error Handling
+
 1. **Validation** - Check command validity before execution
 2. **Rollback** - Implement proper undo mechanisms
 3. **Error reporting** - Provide detailed error information
@@ -162,19 +183,20 @@ Integration between command system and reactive state management.
 ## Common Patterns
 
 ### Basic Command
+
 ```cpp
 class IncrementCommand : public Command {
 public:
     IncrementCommand(int& value) : m_value(value), m_oldValue(value) {}
-    
+
     void execute() override {
         m_value++;
     }
-    
+
     void undo() override {
         m_value = m_oldValue;
     }
-    
+
 private:
     int& m_value;
     int m_oldValue;
@@ -182,6 +204,7 @@ private:
 ```
 
 ### Command Builder (when available)
+
 ```cpp
 auto command = CommandBuilder()
     .setTarget(widget)
@@ -192,6 +215,7 @@ auto command = CommandBuilder()
 ```
 
 ### JSON Command (when available)
+
 ```json
 {
     "type": "SetPropertyCommand",
@@ -208,15 +232,18 @@ auto command = CommandBuilder()
 ## Current Status
 
 ### Working Examples
+
 - ✅ `command-basics/command-basics.cpp`
 - ✅ `command-basics/command-basics-simple.cpp`
 
 ### Under Development
+
 - 🚧 `command-builder/` - API alignment in progress
 - 🚧 `json-commands/` - Schema updates needed
 - 🚧 `state-integration/` - Integration refactoring
 
 ### Planned Features
+
 - Command recording and playback
 - Visual command editor
 - Command performance profiling
@@ -234,6 +261,7 @@ If you're updating from older command system examples:
 ## Next Steps
 
 After understanding the command system:
+
 - **06-applications/** - See commands used in complete applications
 - Explore creating custom command types
 - Consider contributing to command system development

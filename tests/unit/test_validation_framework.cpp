@@ -1,6 +1,6 @@
 // tests/unit/test_validation_framework.cpp
-#include <QtTest/QtTest>
 #include <QString>
+#include <QtTest/QtTest>
 #include <memory>
 
 #include "../../src/Core/Validation.hpp"
@@ -71,8 +71,7 @@ void ValidationFrameworkTest::testValidationResult() {
     // Test constructor with messages
     std::vector<ValidationMessage> messages = {
         ValidationMessage{"Error message", ValidationSeverity::Error},
-        ValidationMessage{"Warning message", ValidationSeverity::Warning}
-    };
+        ValidationMessage{"Warning message", ValidationSeverity::Warning}};
     ValidationResult resultWithMessages(false, std::move(messages));
     QVERIFY(!resultWithMessages.isValid());
     QVERIFY(resultWithMessages.hasErrors());
@@ -82,7 +81,8 @@ void ValidationFrameworkTest::testValidationResult() {
 
 void ValidationFrameworkTest::testValidationMessage() {
     // Test ValidationMessage construction
-    ValidationMessage message("Test message", ValidationSeverity::Warning, "test_field");
+    ValidationMessage message("Test message", ValidationSeverity::Warning,
+                              "test_field");
     QCOMPARE(message.message, QString("Test message"));
     QCOMPARE(message.severity, ValidationSeverity::Warning);
     QCOMPARE(message.field_name, QString("test_field"));
@@ -123,7 +123,8 @@ void ValidationFrameworkTest::testRequiredValidator() {
     ValidationResult invalidResult = validator("");
     QVERIFY(!invalidResult.isValid());
     QCOMPARE(invalidResult.getMessages().size(), 1);
-    QCOMPARE(invalidResult.getMessages()[0].message, QString("Field is required"));
+    QCOMPARE(invalidResult.getMessages()[0].message,
+             QString("Field is required"));
 }
 
 void ValidationFrameworkTest::testMinLengthValidator() {
@@ -136,13 +137,15 @@ void ValidationFrameworkTest::testMinLengthValidator() {
     // Test short string
     ValidationResult invalidResult = validator("Hi");
     QVERIFY(!invalidResult.isValid());
-    QCOMPARE(invalidResult.getMessages()[0].message, QString("Minimum 5 characters"));
+    QCOMPARE(invalidResult.getMessages()[0].message,
+             QString("Minimum 5 characters"));
 
     // Test default message
     Validators::MinLength<QString> defaultValidator(3);
     ValidationResult defaultResult = defaultValidator("Hi");
     QVERIFY(!defaultResult.isValid());
-    QVERIFY(defaultResult.getMessages()[0].message.contains("Minimum length is 3"));
+    QVERIFY(
+        defaultResult.getMessages()[0].message.contains("Minimum length is 3"));
 }
 
 void ValidationFrameworkTest::testMaxLengthValidator() {
@@ -155,7 +158,8 @@ void ValidationFrameworkTest::testMaxLengthValidator() {
     // Test long string
     ValidationResult invalidResult = validator("This is a very long string");
     QVERIFY(!invalidResult.isValid());
-    QCOMPARE(invalidResult.getMessages()[0].message, QString("Maximum 10 characters"));
+    QCOMPARE(invalidResult.getMessages()[0].message,
+             QString("Maximum 10 characters"));
 }
 
 void ValidationFrameworkTest::testRangeValidator() {
@@ -194,7 +198,8 @@ void ValidationFrameworkTest::testMinValidator() {
     // Test invalid value
     ValidationResult invalidResult = validator(3);
     QVERIFY(!invalidResult.isValid());
-    QCOMPARE(invalidResult.getMessages()[0].message, QString("Minimum value is 5"));
+    QCOMPARE(invalidResult.getMessages()[0].message,
+             QString("Minimum value is 5"));
 }
 
 void ValidationFrameworkTest::testMaxValidator() {
@@ -211,11 +216,13 @@ void ValidationFrameworkTest::testMaxValidator() {
     // Test invalid value
     ValidationResult invalidResult = validator(150);
     QVERIFY(!invalidResult.isValid());
-    QCOMPARE(invalidResult.getMessages()[0].message, QString("Maximum value is 100"));
+    QCOMPARE(invalidResult.getMessages()[0].message,
+             QString("Maximum value is 100"));
 }
 
 void ValidationFrameworkTest::testPatternValidator() {
-    Validators::Pattern validator("^[A-Z][a-z]+$", "Must start with uppercase letter");
+    Validators::Pattern validator("^[A-Z][a-z]+$",
+                                  "Must start with uppercase letter");
 
     // Test valid string
     ValidationResult validResult = validator("Hello");
@@ -224,7 +231,8 @@ void ValidationFrameworkTest::testPatternValidator() {
     // Test invalid string
     ValidationResult invalidResult = validator("hello");
     QVERIFY(!invalidResult.isValid());
-    QCOMPARE(invalidResult.getMessages()[0].message, QString("Must start with uppercase letter"));
+    QCOMPARE(invalidResult.getMessages()[0].message,
+             QString("Must start with uppercase letter"));
 }
 
 void ValidationFrameworkTest::testEmailValidator() {
@@ -255,7 +263,8 @@ void ValidationFrameworkTest::testUrlValidator() {
     ValidationResult validResult1 = validator("https://www.example.com");
     QVERIFY(validResult1.isValid());
 
-    ValidationResult validResult2 = validator("http://subdomain.domain.org/path?query=value");
+    ValidationResult validResult2 =
+        validator("http://subdomain.domain.org/path?query=value");
     QVERIFY(validResult2.isValid());
 
     // Test invalid URLs
@@ -268,7 +277,8 @@ void ValidationFrameworkTest::testUrlValidator() {
 
 void ValidationFrameworkTest::testCustomValidator() {
     // Test custom validator with boolean return
-    Validators::Custom validator([](const int& value) { return value % 2 == 0; }, "Must be even");
+    Validators::Custom validator(
+        [](const int& value) { return value % 2 == 0; }, "Must be even");
 
     ValidationResult validResult = validator(4);
     QVERIFY(validResult.isValid());
@@ -283,9 +293,9 @@ void ValidationFrameworkTest::testCustomValidator() {
             if (value.contains("test")) {
                 return ValidationResult{true};
             }
-            return ValidationResult{false, {{ValidationMessage{"Must contain 'test'"}}}};
-        }
-    );
+            return ValidationResult{
+                false, {{ValidationMessage{"Must contain 'test'"}}}};
+        });
 
     ValidationResult customValidResult = validationResultValidator("testing");
     QVERIFY(customValidResult.isValid());
@@ -297,18 +307,20 @@ void ValidationFrameworkTest::testCustomValidator() {
 // **Validation Chain Tests**
 void ValidationFrameworkTest::testValidationChainCreation() {
     ValidationChain<QString> chain;
-    
+
     // Test that chain can be created
-    QVERIFY(true); // Chain creation is tested by not crashing
+    QVERIFY(true);  // Chain creation is tested by not crashing
 }
 
 void ValidationFrameworkTest::testValidationChainMethods() {
-    auto chain = validate<QString>()
-        .required("String is required")
-        .minLength(3, "Minimum 3 characters")
-        .maxLength(20, "Maximum 20 characters")
-        .pattern("^[A-Za-z]+$", "Only letters allowed")
-        .custom([](const QString& value) { return !value.contains("bad"); }, "Cannot contain 'bad'");
+    auto chain =
+        validate<QString>()
+            .required("String is required")
+            .minLength(3, "Minimum 3 characters")
+            .maxLength(20, "Maximum 20 characters")
+            .pattern("^[A-Za-z]+$", "Only letters allowed")
+            .custom([](const QString& value) { return !value.contains("bad"); },
+                    "Cannot contain 'bad'");
 
     // Test valid string
     ValidationResult validResult = chain.validate("Hello");
@@ -329,8 +341,9 @@ void ValidationFrameworkTest::testValidationChainMethods() {
 
 void ValidationFrameworkTest::testValidationChainExecution() {
     auto chain = validate<int>()
-        .range(1, 100, "Must be between 1 and 100")
-        .custom([](const int& value) { return value % 5 == 0; }, "Must be divisible by 5");
+                     .range(1, 100, "Must be between 1 and 100")
+                     .custom([](const int& value) { return value % 5 == 0; },
+                             "Must be divisible by 5");
 
     // Test valid value
     ValidationResult validResult = chain.validate(25);
@@ -347,26 +360,28 @@ void ValidationFrameworkTest::testValidationChainExecution() {
 
 void ValidationFrameworkTest::testValidationChainStopOnError() {
     auto chain = validate<QString>()
-        .required("Required")
-        .minLength(5, "Min 5 chars")
-        .maxLength(10, "Max 10 chars")
-        .stopOnFirstError(true);
+                     .required("Required")
+                     .minLength(5, "Min 5 chars")
+                     .maxLength(10, "Max 10 chars")
+                     .stopOnFirstError(true);
 
     // Test that validation stops on first error
     ValidationResult result = chain.validate("");
     QVERIFY(!result.isValid());
-    QCOMPARE(result.getMessages().size(), 1); // Should only have the "Required" error
+    QCOMPARE(result.getMessages().size(),
+             1);  // Should only have the "Required" error
     QCOMPARE(result.getMessages()[0].message, QString("Required"));
 
     // Test without stop on first error
     auto chainContinue = validate<QString>()
-        .required("Required")
-        .minLength(5, "Min 5 chars")
-        .stopOnFirstError(false);
+                             .required("Required")
+                             .minLength(5, "Min 5 chars")
+                             .stopOnFirstError(false);
 
     ValidationResult continueResult = chainContinue.validate("");
     QVERIFY(!continueResult.isValid());
-    // Should have both errors since string is empty (fails required and minLength)
+    // Should have both errors since string is empty (fails required and
+    // minLength)
     QCOMPARE(continueResult.getMessages().size(), 2);
 }
 
