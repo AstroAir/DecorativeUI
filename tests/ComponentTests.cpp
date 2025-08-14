@@ -15,7 +15,7 @@
 #include "../src/Components/DateTimeEdit.hpp"
 #include "../src/Components/GroupBox.hpp"
 #include "../src/Components/Widget.hpp"
-#include "../src/Core/Animation.hpp"
+#include "../src/Animation/AnimationEngine.hpp"
 #include "../src/Core/ComponentUtils.hpp"
 #include "../src/Core/ErrorHandling.hpp"
 #include "../src/Core/Theme.hpp"

@@ -1,6 +1,8 @@
-// HotReload/HotReloadManager.cpp
 #include "HotReloadManager.hpp"
+
 #include "FileWatcher.hpp"
+#include "UIExceptions.hpp"
+
 #include <QApplication>
 #include <QBoxLayout>
 #include <QDebug>
@@ -8,7 +10,6 @@
 #include <QGridLayout>
 #include <QLayout>
 #include <QTimer>
-
 
 namespace DeclarativeUI::HotReload {
 
@@ -32,9 +33,7 @@ HotReloadManager::HotReloadManager(QObject* parent) : QObject(parent) {
     uptime_timer_.start();
 }
 
-HotReloadManager::~HotReloadManager() {
-    cleanupThreadPool();
-}
+HotReloadManager::~HotReloadManager() { cleanupThreadPool(); }
 
 void HotReloadManager::registerUIFile(const QString& file_path,
                                       QWidget* target_widget) {
@@ -452,7 +451,8 @@ void HotReloadManager::replaceWidget(const QString& file_path,
 // **New optimized methods implementation**
 
 void HotReloadManager::setupThreadPool() {
-    int thread_count = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) / 2);
+    int thread_count =
+        std::max(1, static_cast<int>(std::thread::hardware_concurrency()) / 2);
     thread_pool_.reserve(thread_count);
 
     for (int i = 0; i < thread_count; ++i) {
@@ -497,7 +497,8 @@ void HotReloadManager::enableSmartCaching(bool enabled) {
 }
 
 void HotReloadManager::reloadFileIncremental(const QString& file_path) {
-    if (!enabled_.load()) return;
+    if (!enabled_.load())
+        return;
 
     if (incremental_reloading_.load()) {
         performReloadIncremental(file_path);
@@ -507,7 +508,8 @@ void HotReloadManager::reloadFileIncremental(const QString& file_path) {
 }
 
 void HotReloadManager::reloadBatch(const QStringList& file_paths) {
-    if (!enabled_.load()) return;
+    if (!enabled_.load())
+        return;
 
     if (parallel_processing_.load()) {
         performReloadBatch(file_paths);
@@ -539,7 +541,8 @@ void HotReloadManager::optimizeMemoryUsage() {
     }
 }
 
-ReloadMetrics HotReloadManager::getLastReloadMetrics(const QString& file_path) const {
+ReloadMetrics HotReloadManager::getLastReloadMetrics(
+    const QString& file_path) const {
     std::shared_lock<std::shared_mutex> lock(data_mutex_);
     auto it = performance_metrics_.find(file_path);
     return (it != performance_metrics_.end()) ? it->second : ReloadMetrics{};
@@ -548,14 +551,18 @@ ReloadMetrics HotReloadManager::getLastReloadMetrics(const QString& file_path) c
 QJsonObject HotReloadManager::getPerformanceReport() const {
     QJsonObject report;
     report["total_reloads"] = static_cast<qint64>(total_reloads_.load());
-    report["successful_reloads"] = static_cast<qint64>(successful_reloads_.load());
+    report["successful_reloads"] =
+        static_cast<qint64>(successful_reloads_.load());
     report["failed_reloads"] = static_cast<qint64>(failed_reloads_.load());
     report["uptime_ms"] = uptime_timer_.elapsed();
     report["memory_usage"] = static_cast<qint64>(current_memory_usage_.load());
     report["cache_size"] = static_cast<qint64>(widget_cache_.size());
 
-    double success_rate = total_reloads_.load() > 0 ?
-        static_cast<double>(successful_reloads_.load()) / total_reloads_.load() * 100.0 : 0.0;
+    double success_rate =
+        total_reloads_.load() > 0
+            ? static_cast<double>(successful_reloads_.load()) /
+                  total_reloads_.load() * 100.0
+            : 0.0;
     report["success_rate"] = success_rate;
 
     return report;
@@ -585,7 +592,8 @@ void HotReloadManager::performReloadBatch(const QStringList& file_paths) {
     std::vector<std::future<void>> futures;
 
     for (const QString& file_path : file_paths) {
-        if (futures.size() >= static_cast<size_t>(max_concurrent_reloads_.load())) {
+        if (futures.size() >=
+            static_cast<size_t>(max_concurrent_reloads_.load())) {
             // Wait for some tasks to complete
             for (auto& future : futures) {
                 future.wait();
@@ -617,11 +625,12 @@ QStringList HotReloadManager::getAffectedFiles(const QString& file_path) const {
 
 bool HotReloadManager::shouldReloadIncremental(const QString& file_path) const {
     auto it = dependency_graph_.find(file_path);
-    if (it == dependency_graph_.end()) return true;
+    if (it == dependency_graph_.end())
+        return true;
 
     QFileInfo file_info(file_path);
     return it->second.hasChanged(file_info.lastModified(),
-                                qHash(file_info.canonicalFilePath()));
+                                 qHash(file_info.canonicalFilePath()));
 }
 
 void HotReloadManager::cleanupCache() {
@@ -646,7 +655,8 @@ void HotReloadManager::updateMemoryUsage() {
     current_memory_usage_.store(total_memory);
 }
 
-void HotReloadManager::recordMetrics(const QString& file_path, const ReloadMetrics& metrics) {
+void HotReloadManager::recordMetrics(const QString& file_path,
+                                     const ReloadMetrics& metrics) {
     std::unique_lock<std::shared_mutex> lock(data_mutex_);
     performance_metrics_[file_path] = metrics;
     updatePerformanceCounters(metrics.success);
@@ -663,15 +673,16 @@ void HotReloadManager::updatePerformanceCounters(bool success) {
 
 void HotReloadManager::onFileChangedOptimized(const QString& file_path) {
     try {
-        if (!enabled_.load()) return;
-        
+        if (!enabled_.load())
+            return;
+
         // Add to reload queue with optimization
         if (incremental_reloading_.load()) {
             reloadFileIncremental(file_path);
         } else {
             reloadFile(file_path);
         }
-        
+
         emit reloadCompleted(file_path);
     } catch (const std::exception& e) {
         qDebug() << "Optimized file change error:" << e.what();
@@ -680,12 +691,13 @@ void HotReloadManager::onFileChangedOptimized(const QString& file_path) {
 
 void HotReloadManager::onFileAddedOptimized(const QString& file_path) {
     try {
-        if (!enabled_.load()) return;
-        
+        if (!enabled_.load())
+            return;
+
         // Register new file with dummy widget and reload if needed
         registerUIFile(file_path, nullptr);
         reloadFile(file_path);
-        
+
         emit reloadCompleted(file_path);
     } catch (const std::exception& e) {
         qDebug() << "Optimized file add error:" << e.what();
@@ -694,16 +706,17 @@ void HotReloadManager::onFileAddedOptimized(const QString& file_path) {
 
 void HotReloadManager::onFileRemovedOptimized(const QString& file_path) {
     try {
-        if (!enabled_.load()) return;
-        
+        if (!enabled_.load())
+            return;
+
         // Unregister file and clean up
         unregisterUIFile(file_path);
-        
+
         // Clean up cache entries
         std::unique_lock<std::shared_mutex> lock(data_mutex_);
         widget_cache_.erase(file_path);
         dependency_graph_.erase(file_path);
-        
+
         emit reloadCompleted(file_path);
     } catch (const std::exception& e) {
         qDebug() << "Optimized file remove error:" << e.what();
@@ -714,7 +727,7 @@ void HotReloadManager::onReloadQueueTimeout() {
     try {
         // Process pending reload queue
         qDebug() << "Processing reload queue timeout";
-        
+
         // Trigger batch processing if enabled
         if (parallel_processing_.load()) {
             // Could implement queue processing here
@@ -729,8 +742,8 @@ void HotReloadManager::onMemoryCleanupTimeout() {
         // Perform memory cleanup
         cleanupCache();
         updateMemoryUsage();
-        
-        qDebug() << "Memory cleanup completed. Current usage:" 
+
+        qDebug() << "Memory cleanup completed. Current usage:"
                  << current_memory_usage_.load() << "bytes";
     } catch (const std::exception& e) {
         qDebug() << "Memory cleanup timeout error:" << e.what();

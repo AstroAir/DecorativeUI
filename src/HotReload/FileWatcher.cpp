@@ -16,9 +16,7 @@ FileWatcher::FileWatcher(QObject *parent) : QObject(parent) {
     performance_timer_.start();
 }
 
-FileWatcher::~FileWatcher() {
-    cleanupThreadPool();
-}
+FileWatcher::~FileWatcher() { cleanupThreadPool(); }
 
 void FileWatcher::setupWatcher() {
     try {
@@ -218,7 +216,7 @@ void FileWatcher::onDebounceTimeout() {
     }
 
     // Process events in batch
-    for (const auto& event : events_to_process) {
+    for (const auto &event : events_to_process) {
         processFileChange(event.file_path);
         total_events_processed_.fetch_add(1);
     }
@@ -314,20 +312,23 @@ void FileWatcher::scanDirectory(const QString &directory_path, bool recursive) {
 
 // **FileFilter implementation**
 void FileFilter::compilePatterns() const {
-    if (patterns_compiled) return;
+    if (patterns_compiled)
+        return;
 
     compiled_patterns.clear();
     compiled_patterns.reserve(patterns.size());
 
-    for (const QString& pattern : patterns) {
-        QString regex_pattern = QRegularExpression::wildcardToRegularExpression(pattern);
-        compiled_patterns.emplace_back(regex_pattern, QRegularExpression::CaseInsensitiveOption);
+    for (const QString &pattern : patterns) {
+        QString regex_pattern =
+            QRegularExpression::wildcardToRegularExpression(pattern);
+        compiled_patterns.emplace_back(
+            regex_pattern, QRegularExpression::CaseInsensitiveOption);
     }
 
     patterns_compiled = true;
 }
 
-bool FileFilter::matches(const QString& file_path, qint64 file_size) const {
+bool FileFilter::matches(const QString &file_path, qint64 file_size) const {
     QFileInfo file_info(file_path);
 
     // Check file size limit
@@ -344,13 +345,14 @@ bool FileFilter::matches(const QString& file_path, qint64 file_size) const {
     if (!extensions.isEmpty()) {
         QString suffix = file_info.suffix().toLower();
         bool extension_match = false;
-        for (const QString& ext : extensions) {
+        for (const QString &ext : extensions) {
             if (suffix == ext.toLower()) {
                 extension_match = true;
                 break;
             }
         }
-        if (!extension_match) return false;
+        if (!extension_match)
+            return false;
     }
 
     // Check patterns
@@ -358,13 +360,14 @@ bool FileFilter::matches(const QString& file_path, qint64 file_size) const {
         compilePatterns();
         QString filename = file_info.fileName();
         bool pattern_match = false;
-        for (const auto& regex : compiled_patterns) {
+        for (const auto &regex : compiled_patterns) {
             if (regex.match(filename).hasMatch()) {
                 pattern_match = true;
                 break;
             }
         }
-        if (!pattern_match) return false;
+        if (!pattern_match)
+            return false;
     }
 
     return true;
@@ -373,7 +376,8 @@ bool FileFilter::matches(const QString& file_path, qint64 file_size) const {
 // **New optimized methods implementation**
 
 void FileWatcher::setupThreadPool() {
-    int thread_count = std::max(1, static_cast<int>(std::thread::hardware_concurrency()) / 2);
+    int thread_count =
+        std::max(1, static_cast<int>(std::thread::hardware_concurrency()) / 2);
     thread_pool_.reserve(thread_count);
 
     for (int i = 0; i < thread_count; ++i) {
@@ -384,7 +388,7 @@ void FileWatcher::setupThreadPool() {
 }
 
 void FileWatcher::cleanupThreadPool() {
-    for (auto& thread : thread_pool_) {
+    for (auto &thread : thread_pool_) {
         if (thread && thread->isRunning()) {
             thread->quit();
             thread->wait(5000);  // Wait up to 5 seconds
@@ -399,7 +403,7 @@ void FileWatcher::enablePlatformOptimizations() {
     setMaxWatchedFiles(8192);  // Windows limit
 #elif defined(Q_OS_LINUX)
     // Linux-specific optimizations
-    setMaxWatchedFiles(65536); // Higher limit on Linux
+    setMaxWatchedFiles(65536);  // Higher limit on Linux
 #elif defined(Q_OS_MAC)
     // macOS-specific optimizations
     setMaxWatchedFiles(10240);
@@ -409,12 +413,12 @@ void FileWatcher::enablePlatformOptimizations() {
 void FileWatcher::watchFiles(const QStringList &file_paths) {
     if (batch_processing_enabled_.load()) {
         // Batch processing for better performance
-        for (const auto& path : file_paths) {
+        for (const auto &path : file_paths) {
             watchFile(path);
         }
     } else {
         // Process individually
-        for (const auto& path : file_paths) {
+        for (const auto &path : file_paths) {
             watchFile(path);
         }
     }
@@ -441,7 +445,8 @@ void FileWatcher::setMaxBatchSize(int batch_size) {
     max_batch_size_.store(batch_size);
 }
 
-int FileWatcher::calculateAdaptiveDebounceInterval(const QString &file_path) const {
+int FileWatcher::calculateAdaptiveDebounceInterval(
+    const QString &file_path) const {
     auto it = change_frequencies_.find(file_path);
     if (it == change_frequencies_.end()) {
         return debounce_interval_.load();
@@ -449,9 +454,11 @@ int FileWatcher::calculateAdaptiveDebounceInterval(const QString &file_path) con
 
     int frequency = it->second;
     if (frequency > 10) {
-        return debounce_interval_.load() * 2;  // Increase interval for frequently changing files
+        return debounce_interval_.load() *
+               2;  // Increase interval for frequently changing files
     } else if (frequency < 3) {
-        return debounce_interval_.load() / 2;  // Decrease interval for rarely changing files
+        return debounce_interval_.load() /
+               2;  // Decrease interval for rarely changing files
     }
 
     return debounce_interval_.load();
@@ -462,7 +469,8 @@ void FileWatcher::updateChangeFrequency(const QString &file_path) {
     auto it = last_change_times_.find(file_path);
 
     if (it != last_change_times_.end()) {
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - it->second);
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+            now - it->second);
         if (duration.count() < 1000) {  // Less than 1 second
             change_frequencies_[file_path]++;
         }
@@ -500,12 +508,12 @@ void FileWatcher::onFileChangedOptimized(const QString &path) {
     try {
         updateChangeFrequency(path);
         auto debounce_time = calculateAdaptiveDebounceInterval(path);
-        
+
         // Use optimized debounce timing
         debounce_timer_->stop();
         debounce_timer_->setInterval(debounce_time);
         debounce_timer_->start();
-        
+
         // Process file change immediately for now
         emit fileChanged(path);
         total_events_processed_++;

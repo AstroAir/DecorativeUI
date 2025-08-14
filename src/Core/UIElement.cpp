@@ -224,4 +224,180 @@ void UIElement::onAnimationFinished() {
     emit animationFinished(QString());
 }
 
+// **Animation method implementations using new Animation system**
+UIElement &UIElement::animate(const QString &property, const QVariant &target_value,
+                             const AnimationConfig &config) {
+    if (!config.enabled || !widget_) {
+        return *this;
+    }
+
+    try {
+        auto animation = createAnimation(property, target_value, config);
+        if (animation) {
+            animations_[property] = animation;
+            animation->start();
+            emit animationStarted(property);
+        }
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to create animation for property" << property << ":" << e.what();
+    }
+
+    return *this;
+}
+
+UIElement &UIElement::fadeIn(const AnimationConfig &config) {
+    if (!config.enabled || !widget_) {
+        return *this;
+    }
+
+    try {
+        auto &engine = Animation::AnimationEngine::instance();
+        auto animation = engine.fadeIn(widget_.get(), static_cast<int>(config.duration.count()));
+
+        if (animation) {
+            animations_["opacity"] = animation;
+            emit animationStarted("opacity");
+        }
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to create fade in animation:" << e.what();
+    }
+
+    return *this;
+}
+
+UIElement &UIElement::fadeOut(const AnimationConfig &config) {
+    if (!config.enabled || !widget_) {
+        return *this;
+    }
+
+    try {
+        auto &engine = Animation::AnimationEngine::instance();
+        auto animation = engine.fadeOut(widget_.get(), static_cast<int>(config.duration.count()));
+
+        if (animation) {
+            animations_["opacity"] = animation;
+            emit animationStarted("opacity");
+        }
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to create fade out animation:" << e.what();
+    }
+
+    return *this;
+}
+
+UIElement &UIElement::slideIn(const AnimationConfig &config) {
+    if (!config.enabled || !widget_) {
+        return *this;
+    }
+
+    try {
+        auto &engine = Animation::AnimationEngine::instance();
+        auto animation = engine.slideIn(widget_.get(), "left", static_cast<int>(config.duration.count()));
+
+        if (animation) {
+            animations_["position"] = animation;
+            emit animationStarted("position");
+        }
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to create slide in animation:" << e.what();
+    }
+
+    return *this;
+}
+
+UIElement &UIElement::slideOut(const AnimationConfig &config) {
+    if (!config.enabled || !widget_) {
+        return *this;
+    }
+
+    try {
+        auto &engine = Animation::AnimationEngine::instance();
+        auto animation = engine.slideOut(widget_.get(), "right", static_cast<int>(config.duration.count()));
+
+        if (animation) {
+            animations_["position"] = animation;
+            emit animationStarted("position");
+        }
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to create slide out animation:" << e.what();
+    }
+
+    return *this;
+}
+
+UIElement &UIElement::setOpacity(qreal opacity, const AnimationConfig &config) {
+    if (!widget_) {
+        return *this;
+    }
+
+    if (!config.enabled) {
+        // Set opacity immediately without animation
+        widget_->setWindowOpacity(opacity);
+        return *this;
+    }
+
+    try {
+        auto &engine = Animation::AnimationEngine::instance();
+        QVariant current_opacity = widget_->windowOpacity();
+        auto animation = engine.animateProperty(widget_.get(), "windowOpacity",
+                                              current_opacity, QVariant(opacity),
+                                              static_cast<int>(config.duration.count()),
+                                              config.toAnimationProperties().easing);
+
+        if (animation) {
+            animations_["windowOpacity"] = animation;
+            emit animationStarted("windowOpacity");
+        }
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to create opacity animation:" << e.what();
+        // Fallback to immediate setting
+        widget_->setWindowOpacity(opacity);
+    }
+
+    return *this;
+}
+
+// **Animation helper implementations**
+std::shared_ptr<Animation::Animation> UIElement::createAnimation(const QString &property,
+                                                               const QVariant &target_value,
+                                                               const AnimationConfig &config) {
+    if (!widget_) {
+        return nullptr;
+    }
+
+    try {
+        auto &engine = Animation::AnimationEngine::instance();
+        QVariant current_value = widget_->property(property.toUtf8().constData());
+
+        auto animation = engine.animateProperty(widget_.get(), property,
+                                              current_value, target_value,
+                                              static_cast<int>(config.duration.count()),
+                                              config.toAnimationProperties().easing);
+
+        setupAnimation(animation, config);
+        return animation;
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to create animation for property" << property << ":" << e.what();
+        return nullptr;
+    }
+}
+
+void UIElement::setupAnimation(std::shared_ptr<Animation::Animation> animation,
+                              const AnimationConfig &config) {
+    if (!animation) {
+        return;
+    }
+
+    try {
+        auto props = config.toAnimationProperties();
+        animation->setProperties(props);
+
+        // Connect animation finished signal to our slot
+        connect(animation.get(), &Animation::Animation::finished,
+                this, &UIElement::onAnimationFinished);
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to setup animation:" << e.what();
+    }
+}
+
 }  // namespace DeclarativeUI::Core

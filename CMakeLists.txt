@@ -36,7 +36,6 @@ add_library(DeclarativeUI STATIC
     src/Core/CacheManager.cpp
     src/Core/MemoryManager.cpp
     src/Core/ParallelProcessor.cpp
-    src/Animation/AnimationEngine.cpp
     src/Debug/ProfilerDashboard.cpp
 
     # JSON Support
@@ -94,10 +93,12 @@ add_library(DeclarativeUI STATIC
 )
 
 # **Add subdirectories before main library linking**
+add_subdirectory(src/Animation)
 add_subdirectory(src/Core)
 add_subdirectory(src/Components)
 
 target_link_libraries(DeclarativeUI
+    Animation
     Core
     Components
     Qt6::Core

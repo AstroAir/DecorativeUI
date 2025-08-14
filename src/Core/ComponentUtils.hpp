@@ -25,7 +25,7 @@
 #include "SmartPointers.hpp"
 #include "ErrorHandling.hpp"
 #include "Theme.hpp"
-#include "Animation.hpp"
+#include "../Animation/AnimationEngine.hpp"
 
 namespace DeclarativeUI::Core::Utils {
 
@@ -48,12 +48,12 @@ public:
         try {
             QVariant variant = QVariant::fromValue(std::forward<ValueType>(value));
             bool success = target_->setProperty(name, variant);
-            
+
             if (!success) {
                 UI_LOG_WARNING(QString("Failed to set property '%1' on object of type '%2'")
                               .arg(name).arg(target_->metaObject()->className()));
             }
-            
+
             return success;
         } catch (const std::exception& e) {
             UI_LOG_ERROR(QString("Exception while setting property '%1': %2")
@@ -84,7 +84,7 @@ public:
     // **Check if property exists**
     [[nodiscard]] bool hasProperty(const char* name) const {
         if (!target_) return false;
-        
+
         const QMetaObject* metaObj = target_->metaObject();
         return metaObj->indexOfProperty(name) != -1;
     }
@@ -92,15 +92,15 @@ public:
     // **List all properties**
     [[nodiscard]] std::vector<QString> listProperties() const {
         std::vector<QString> properties;
-        
+
         if (!target_) return properties;
-        
+
         const QMetaObject* metaObj = target_->metaObject();
         for (int i = 0; i < metaObj->propertyCount(); ++i) {
             QMetaProperty prop = metaObj->property(i);
             properties.emplace_back(prop.name());
         }
-        
+
         return properties;
     }
 
@@ -169,7 +169,7 @@ bool addWidget(LayoutType* layout, WidgetType* widget, int position = -1) {
 
 // **Grid layout utilities**
 template<Concepts::QtWidget WidgetType>
-bool addWidgetToGrid(QGridLayout* layout, WidgetType* widget, int row, int column, 
+bool addWidgetToGrid(QGridLayout* layout, WidgetType* widget, int row, int column,
                     int rowSpan = 1, int columnSpan = 1, Qt::Alignment alignment = Qt::Alignment{}) {
     if (!layout || !widget) {
         UI_LOG_ERROR("Cannot add null widget to grid layout");
@@ -252,16 +252,16 @@ void applyThemeStyle(WidgetType* widget, const QString& component_name = {}) {
         QString styleSheet = Theme::ThemeManager::instance().generateStyleSheet(
             component_name.isEmpty() ? widget->metaObject()->className() : component_name
         );
-        
+
         widget->setStyleSheet(styleSheet);
-        
+
         // Apply theme-specific font
         QFont font = Theme::ThemeManager::instance().createFont(
             theme.typography.sizes.body_medium,
             theme.typography.weights.regular
         );
         widget->setFont(font);
-        
+
     } catch (const std::exception& e) {
         UI_LOG_ERROR(QString("Failed to apply theme: %1").arg(QString::fromStdString(e.what())));
     }
@@ -269,7 +269,7 @@ void applyThemeStyle(WidgetType* widget, const QString& component_name = {}) {
 
 // **Add drop shadow effect**
 template<Concepts::QtWidget WidgetType>
-void addDropShadow(WidgetType* widget, const QColor& color = QColor(0, 0, 0, 80), 
+void addDropShadow(WidgetType* widget, const QColor& color = QColor(0, 0, 0, 80),
                   int blur_radius = 10, const QPointF& offset = QPointF(2, 2)) {
     if (!widget) {
         UI_LOG_ERROR("Cannot add shadow to null widget");
@@ -302,7 +302,7 @@ void setBorderRadius(WidgetType* widget, int radius) {
     try {
         QString currentStyle = widget->styleSheet();
         QString borderStyle = QString("border-radius: %1px;").arg(radius);
-        
+
         if (currentStyle.isEmpty()) {
             widget->setStyleSheet(borderStyle);
         } else {
@@ -318,43 +318,39 @@ void setBorderRadius(WidgetType* widget, int radius) {
 // **Animation utilities**
 namespace AnimationUtils {
 
-// **Fade animation with error handling**
+// **Fade animation with error handling - Using new Animation system**
 template<Concepts::QtWidget WidgetType>
-[[nodiscard]] std::unique_ptr<QPropertyAnimation> createFadeAnimation(
+[[nodiscard]] std::shared_ptr<Animation::Animation> createFadeAnimation(
     WidgetType* widget, double from_opacity, double to_opacity, int duration_ms = 300) {
-    
+
     if (!widget) {
         UI_LOG_ERROR("Cannot create fade animation for null widget");
         return nullptr;
     }
 
-    return UI_SAFE_EXECUTE([&]() -> std::unique_ptr<QPropertyAnimation> {
-        auto animation = std::make_unique<QPropertyAnimation>(widget, "windowOpacity");
-        animation->setStartValue(from_opacity);
-        animation->setEndValue(to_opacity);
-        animation->setDuration(duration_ms);
-        animation->setEasingCurve(QEasingCurve::OutCubic);
-        return animation;
+    return UI_SAFE_EXECUTE([&]() -> std::shared_ptr<Animation::Animation> {
+        auto& engine = Animation::AnimationEngine::instance();
+        return engine.animateProperty(widget, "windowOpacity",
+                                    QVariant(from_opacity), QVariant(to_opacity),
+                                    duration_ms, Animation::EasingType::CubicOut);
     }, "Creating fade animation").value_or(nullptr);
 }
 
-// **Slide animation**
+// **Slide animation - Using new Animation system**
 template<Concepts::QtWidget WidgetType>
-[[nodiscard]] std::unique_ptr<QPropertyAnimation> createSlideAnimation(
+[[nodiscard]] std::shared_ptr<Animation::Animation> createSlideAnimation(
     WidgetType* widget, const QPoint& from_pos, const QPoint& to_pos, int duration_ms = 400) {
-    
+
     if (!widget) {
         UI_LOG_ERROR("Cannot create slide animation for null widget");
         return nullptr;
     }
 
-    return UI_SAFE_EXECUTE([&]() -> std::unique_ptr<QPropertyAnimation> {
-        auto animation = std::make_unique<QPropertyAnimation>(widget, "pos");
-        animation->setStartValue(from_pos);
-        animation->setEndValue(to_pos);
-        animation->setDuration(duration_ms);
-        animation->setEasingCurve(QEasingCurve::OutQuart);
-        return animation;
+    return UI_SAFE_EXECUTE([&]() -> std::shared_ptr<Animation::Animation> {
+        auto& engine = Animation::AnimationEngine::instance();
+        return engine.animateProperty(widget, "pos",
+                                    QVariant(from_pos), QVariant(to_pos),
+                                    duration_ms, Animation::EasingType::QuartOut);
     }, "Creating slide animation").value_or(nullptr);
 }
 

@@ -124,17 +124,23 @@ cmake --build --preset default
 
 ## 🧩 Architecture
 
-DeclarativeUI provides two complementary approaches:
+DeclarativeUI provides two complementary approaches with a modern animation system:
 
 ### Component System
+
 Traditional widget-based development with modern C++20 syntax:
+
 ```cpp
 auto button = std::make_unique<Components::Button>();
-button->text("Click Me").onClick([]() { /* handler */ });
+button->text("Click Me")
+      .onClick([]() { /* handler */ })
+      .fadeIn(500ms);  // Modern animation support
 ```
 
 ### Command System
+
 Framework-independent UI logic with comprehensive component support:
+
 ```cpp
 // Component-specific commands for all UI elements
 CommandContext context;
@@ -148,6 +154,22 @@ auto result = command.execute(context);
 // Automatic widget mapping and event handling
 auto& mapper = WidgetMapper::instance();
 auto widget = mapper.createWidget(&command);
+```
+
+### Animation System
+
+Centralized, high-performance animation engine with modern features:
+
+```cpp
+// Fluent animation API
+auto element = UIElement::create<QPushButton>("Animated Button")
+    .fadeIn(AnimationConfig{500ms, QEasingCurve::OutCubic})
+    .slideIn("left", 300ms)
+    .onClicked([](){ /* handle click */ });
+
+// Advanced animation sequences
+auto& engine = Animation::AnimationEngine::instance();
+auto animation = engine.animateProperty(widget, "opacity", 0.0, 1.0, 500);
 ```
 
 **[📖 Learn More](https://declarativeui.github.io/DeclarativeUI/user-guide/components/)** about choosing the right approach for your project.

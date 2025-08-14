@@ -36,6 +36,7 @@
 #include <type_traits>
 
 #include "../Exceptions/UIExceptions.hpp"
+#include "../Animation/AnimationEngine.hpp"
 
 Q_DECLARE_METATYPE(std::function<void()>)
 
@@ -75,11 +76,55 @@ using PropertyValue =
     std::variant<int, double, bool, QString, QColor, QFont,
                  std::function<void()>, QSize, QRect, QIcon, QPixmap, QVariant>;
 
-// **Animation configuration**
+// **Animation configuration - Bridge to new Animation system**
 struct AnimationConfig {
     std::chrono::milliseconds duration{250};
     QEasingCurve::Type easing = QEasingCurve::OutCubic;
     bool enabled = true;
+
+    // **Convert to new Animation system properties**
+    Animation::AnimationProperties toAnimationProperties() const {
+        Animation::AnimationProperties props;
+        props.duration_ms = static_cast<int>(duration.count());
+        props.easing = convertEasingType(easing);
+        return props;
+    }
+
+private:
+    // **Convert QEasingCurve::Type to Animation::EasingType**
+    static Animation::EasingType convertEasingType(QEasingCurve::Type qt_easing) {
+        switch (qt_easing) {
+            case QEasingCurve::Linear: return Animation::EasingType::Linear;
+            case QEasingCurve::InQuad: return Animation::EasingType::QuadIn;
+            case QEasingCurve::OutQuad: return Animation::EasingType::QuadOut;
+            case QEasingCurve::InOutQuad: return Animation::EasingType::QuadInOut;
+            case QEasingCurve::InCubic: return Animation::EasingType::CubicIn;
+            case QEasingCurve::OutCubic: return Animation::EasingType::CubicOut;
+            case QEasingCurve::InOutCubic: return Animation::EasingType::CubicInOut;
+            case QEasingCurve::InQuart: return Animation::EasingType::QuartIn;
+            case QEasingCurve::OutQuart: return Animation::EasingType::QuartOut;
+            case QEasingCurve::InOutQuart: return Animation::EasingType::QuartInOut;
+            case QEasingCurve::InSine: return Animation::EasingType::SineIn;
+            case QEasingCurve::OutSine: return Animation::EasingType::SineOut;
+            case QEasingCurve::InOutSine: return Animation::EasingType::SineInOut;
+            case QEasingCurve::InExpo: return Animation::EasingType::ExpoIn;
+            case QEasingCurve::OutExpo: return Animation::EasingType::ExpoOut;
+            case QEasingCurve::InOutExpo: return Animation::EasingType::ExpoInOut;
+            case QEasingCurve::InCirc: return Animation::EasingType::CircIn;
+            case QEasingCurve::OutCirc: return Animation::EasingType::CircOut;
+            case QEasingCurve::InOutCirc: return Animation::EasingType::CircInOut;
+            case QEasingCurve::InBack: return Animation::EasingType::BackIn;
+            case QEasingCurve::OutBack: return Animation::EasingType::BackOut;
+            case QEasingCurve::InOutBack: return Animation::EasingType::BackInOut;
+            case QEasingCurve::InElastic: return Animation::EasingType::ElasticIn;
+            case QEasingCurve::OutElastic: return Animation::EasingType::ElasticOut;
+            case QEasingCurve::InOutElastic: return Animation::EasingType::ElasticInOut;
+            case QEasingCurve::InBounce: return Animation::EasingType::BounceIn;
+            case QEasingCurve::OutBounce: return Animation::EasingType::BounceOut;
+            case QEasingCurve::InOutBounce: return Animation::EasingType::BounceInOut;
+            default: return Animation::EasingType::Linear;
+        }
+    }
 };
 
 // **Theme configuration**
@@ -219,8 +264,8 @@ protected:
     // **RAII widget management**
     std::unique_ptr<QWidget> widget_;
 
-    // **Animation management**
-    std::unordered_map<QString, std::unique_ptr<QPropertyAnimation>>
+    // **Animation management - Using new Animation system**
+    std::unordered_map<QString, std::shared_ptr<Animation::Animation>>
         animations_;
     AnimationConfig default_animation_config_;
 
@@ -245,11 +290,11 @@ protected:
     void measurePerformance(std::function<void()> operation);
     void checkBreakpoints();
 
-    // **Animation helpers**
-    QPropertyAnimation *createAnimation(const QString &property,
-                                        const QVariant &target_value,
-                                        const AnimationConfig &config);
-    void setupAnimation(QPropertyAnimation *animation,
+    // **Animation helpers - Using new Animation system**
+    std::shared_ptr<Animation::Animation> createAnimation(const QString &property,
+                                                         const QVariant &target_value,
+                                                         const AnimationConfig &config);
+    void setupAnimation(std::shared_ptr<Animation::Animation> animation,
                         const AnimationConfig &config);
 
 private slots:
