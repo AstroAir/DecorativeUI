@@ -251,6 +251,34 @@ target_link_libraries(CacheManagerTest
     Qt6::Test
 )
 
+# **Debug Component Tests**
+add_executable(DebuggingConsoleTest test_debugging_console.cpp)
+target_link_libraries(DebuggingConsoleTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+add_executable(BottleneckDetectorWidgetTest test_bottleneck_detector_widget.cpp)
+target_link_libraries(BottleneckDetectorWidgetTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+add_executable(PerformanceProfilerWidgetTest test_performance_profiler_widget.cpp)
+target_link_libraries(PerformanceProfilerWidgetTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
 # **Set output directory for unit tests**
 set_target_properties(
     CoreTest
@@ -278,6 +306,9 @@ set_target_properties(
     # SmartPointersTest
     AccessibilityTest
     CacheManagerTest
+    DebuggingConsoleTest
+    BottleneckDetectorWidgetTest
+    PerformanceProfilerWidgetTest
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests/unit
 )
@@ -308,6 +339,9 @@ add_dependencies(ThemeSystemTest CopyTestResources)
 # add_dependencies(SmartPointersTest CopyTestResources)
 add_dependencies(AccessibilityTest CopyTestResources)
 add_dependencies(CacheManagerTest CopyTestResources)
+add_dependencies(DebuggingConsoleTest CopyTestResources)
+add_dependencies(BottleneckDetectorWidgetTest CopyTestResources)
+add_dependencies(PerformanceProfilerWidgetTest CopyTestResources)
 
 # **Register tests with CTest**
 add_test(NAME CoreTest COMMAND CoreTest)
@@ -335,3 +369,6 @@ add_test(NAME ThemeSystemTest COMMAND ThemeSystemTest)
 # add_test(NAME SmartPointersTest COMMAND SmartPointersTest)
 add_test(NAME AccessibilityTest COMMAND AccessibilityTest)
 add_test(NAME CacheManagerTest COMMAND CacheManagerTest)
+add_test(NAME DebuggingConsoleTest COMMAND DebuggingConsoleTest)
+add_test(NAME BottleneckDetectorWidgetTest COMMAND BottleneckDetectorWidgetTest)
+add_test(NAME PerformanceProfilerWidgetTest COMMAND PerformanceProfilerWidgetTest)

@@ -36,7 +36,12 @@ add_library(DeclarativeUI STATIC
     src/Core/CacheManager.cpp
     src/Core/MemoryManager.cpp
     src/Core/ParallelProcessor.cpp
+
+    # Debug Components
     src/Debug/ProfilerDashboard.cpp
+    src/Debug/DebuggingConsole.cpp
+    src/Debug/BottleneckDetectorWidget.cpp
+    src/Debug/PerformanceProfilerWidget.cpp
 
     # JSON Support
     src/JSON/JSONUILoader.cpp

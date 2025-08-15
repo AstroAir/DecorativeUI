@@ -104,6 +104,16 @@ public slots:
      */
     void setLogText(const QString& full_text);
 
+    /**
+     * @brief Add a formatted log message with level, component, and message.
+     * @param level The log level (e.g., "INFO", "ERROR", "WARNING").
+     * @param component The component or module name.
+     * @param message The actual log message.
+     *
+     * This method formats the message and calls appendLogLine internally.
+     */
+    void addLogMessage(const QString& level, const QString& component, const QString& message);
+
 private slots:
     /**
      * @brief Handler invoked when the export button is clicked.
@@ -152,6 +162,19 @@ private:
      * @brief Vertical layout that arranges controls within the widget.
      */
     QVBoxLayout* layout_;
+
+    /**
+     * @brief Storage for all log lines for filtering purposes.
+     */
+    QStringList all_log_lines_;
+
+    /**
+     * @brief Helper method to determine if a log line should be shown based on the current filter.
+     * @param line The log line to check.
+     * @param filter The current filter setting.
+     * @return True if the line should be shown, false otherwise.
+     */
+    bool shouldShowLogLine(const QString& line, const QString& filter) const;
 };
 
 }  // namespace DeclarativeUI::Debug

@@ -144,6 +144,11 @@ private:
      * @brief Vertical layout arranging the controls.
      */
     QVBoxLayout* layout_;
+
+    /**
+     * @brief Adds sample bottlenecks for demonstration purposes.
+     */
+    void addSampleBottlenecks();
 };
 
 }  // namespace DeclarativeUI::Debug

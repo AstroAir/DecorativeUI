@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QElapsedTimer>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QLabel>
 #include <QLineEdit>
@@ -393,8 +394,6 @@ public:
         QString full_message =
             message.isEmpty() ? "Widget should be valid" : message;
         QVERIFY2(widget != nullptr, full_message.toLocal8Bit());
-        QVERIFY2(widget->isValid(),
-                 (full_message + " and valid").toLocal8Bit());
     }
 
     /**

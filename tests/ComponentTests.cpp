@@ -7,7 +7,6 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QtTest/QtTest>
-#include <chrono>
 #include <memory>
 
 #include "../src/Components/Button.hpp"
@@ -15,7 +14,6 @@
 #include "../src/Components/DateTimeEdit.hpp"
 #include "../src/Components/GroupBox.hpp"
 #include "../src/Components/Widget.hpp"
-#include "../src/Animation/AnimationEngine.hpp"
 #include "../src/Core/ComponentUtils.hpp"
 #include "../src/Core/ErrorHandling.hpp"
 #include "../src/Core/Theme.hpp"

@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QBoxLayout>
 #include <QDebug>
+#include <QDir>
 #include <QFileInfo>
 #include <QGridLayout>
 #include <QLayout>

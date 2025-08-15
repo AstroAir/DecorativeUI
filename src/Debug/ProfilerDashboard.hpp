@@ -21,6 +21,11 @@
 #include <shared_mutex>
 #include <vector>
 
+// Include the separate Debug component headers
+#include "BottleneckDetectorWidget.hpp"
+#include "DebuggingConsole.hpp"
+#include "PerformanceProfilerWidget.hpp"
+
 namespace DeclarativeUI::Debug {
 
 /**
@@ -215,206 +220,11 @@ private:
     void updateAllocationTable(const QJsonArray& allocations);
 };
 
-/**
- * @class BottleneckDetectorWidget
- * @brief Widget that lists detected bottlenecks and exposes resolution actions.
- *
- * This widget provides a compact tree + details UI:
- *  - bottleneck_tree_: hierarchical list of detected issues grouped by
- * component/type.
- *  - details_text_: narrative description of the selected bottleneck.
- *  - recommendations_text_: suggested mitigation steps the developer can
- * follow.
- *  - resolve_button_: emits a resolution request for the selected entry.
- *  - refresh_button_: requests re-evaluation or an update from the host
- * detection logic.
- *
- * Public API:
- *  - addBottleneck(): append a single BottleneckInfo to the current view.
- *  - updateBottlenecks(): replace the current set with an authoritative list.
- *  - clearBottlenecks(): clear all entries from the UI.
- *
- * Signals:
- *  - bottleneckResolutionRequested: emitted when the user requests an automated
- * or host-driven attempt to resolve the selected bottleneck. The host should
- * perform any necessary confirmation and actions.
- *
- * Threading:
- *  - All public methods must be invoked on the GUI thread. Hosts collecting
- * data on other threads must post updates via signals/slots.
- */
-class BottleneckDetectorWidget : public QWidget {
-    Q_OBJECT
+// BottleneckDetectorWidget is now defined in BottleneckDetectorWidget.hpp
 
-public:
-    explicit BottleneckDetectorWidget(QWidget* parent = nullptr);
-    ~BottleneckDetectorWidget() override = default;
+// DebuggingConsole is now defined in DebuggingConsole.hpp
 
-    /**
-     * @brief Add a single bottleneck entry to the current list.
-     * @param bottleneck Structured description of the issue to display.
-     */
-    void addBottleneck(const BottleneckInfo& bottleneck);
-
-    /**
-     * @brief Replace the current list of displayed bottlenecks with a new set.
-     * @param bottlenecks Vector of BottleneckInfo instances to display.
-     */
-    void updateBottlenecks(const std::vector<BottleneckInfo>& bottlenecks);
-
-    /** @brief Remove all displayed bottlenecks and reset UI state. */
-    void clearBottlenecks();
-
-private slots:
-    void onBottleneckSelected();
-    void onResolveBottleneckClicked();
-    void onRefreshClicked();
-
-signals:
-    void bottleneckResolutionRequested(const QString& component,
-                                       const QString& type);
-
-private:
-    QVBoxLayout* layout_;
-    QTreeWidget* bottleneck_tree_;
-    QTextEdit* details_text_;
-    QTextEdit* recommendations_text_;
-    QPushButton* resolve_button_;
-    QPushButton* refresh_button_;
-
-    std::vector<BottleneckInfo> bottlenecks_;
-
-    void setupUI();
-    void updateBottleneckTree();
-    QString formatBottleneckSeverity(double severity) const;
-};
-
-/**
- * @class DebuggingConsole
- * @brief Compact, embeddable log console used by the ProfilerDashboard.
- *
- * The console supports adding timestamped log messages, filtering by level,
- * clearing and exporting the visible log. The widget is intentionally minimal:
- * the host provides log text and controls export/filter semantics.
- *
- * Public API:
- *  - addLogMessage(): append a single formatted message to the view.
- *  - setLogLevel(): change the active filter level (host-driven filtering may
- * be applied).
- *  - enableAutoScroll(): toggle automatic scrolling to the latest message.
- *  - clearLog(): clear the visible contents.
- *
- * Styling:
- *  - getLogLevelColor() returns a color for each level; hosts can use this when
- *    pushing HTML-formatted content to the QTextEdit.
- */
-class DebuggingConsole : public QWidget {
-    Q_OBJECT
-
-public:
-    explicit DebuggingConsole(QWidget* parent = nullptr);
-    ~DebuggingConsole() override = default;
-
-    void addLogMessage(const QString& level, const QString& component,
-                       const QString& message);
-    void setLogLevel(const QString& level);
-    void enableAutoScroll(bool enabled);
-    void clearLog();
-
-public slots:
-    void onFilterChanged();
-    void onExportLogClicked();
-
-private:
-    QVBoxLayout* layout_;
-    QTextEdit* log_display_;
-    QHBoxLayout* controls_layout_;
-    QPushButton* clear_button_;
-    QPushButton* export_button_;
-    QCheckBox* auto_scroll_checkbox_;
-    QSpinBox* max_lines_spinbox_;
-
-    QString current_log_level_ = "INFO";
-    bool auto_scroll_enabled_ = true;
-    int max_log_lines_ = 1000;
-
-    void setupUI();
-    QString formatLogMessage(const QString& level, const QString& component,
-                             const QString& message) const;
-    QColor getLogLevelColor(const QString& level) const;
-};
-
-/**
- * @class PerformanceProfilerWidget
- * @brief Minimal control and summary UI for short-lived profiling sessions.
- *
- * The widget exposes buttons to start/stop/reset/export profiling sessions and
- * provides tabular summary views for function, memory and thread-level data.
- * Heavy capture logic and serialization belong to the backend; the widget only
- * signals user intent and displays the returned results.
- *
- * Public API:
- *  - updateProfileData(): take a JSON payload from the profiler backend and
- * update UI tables.
- *  - startProfiling()/stopProfiling()/resetProfiling(): user-triggered
- * lifecycle calls.
- *
- * Signals:
- *  - profilingStarted/profilingStopped/profilingReset: emitted on user action
- * to allow hosts to act.
- */
-class PerformanceProfilerWidget : public QWidget {
-    Q_OBJECT
-
-public:
-    explicit PerformanceProfilerWidget(QWidget* parent = nullptr);
-    ~PerformanceProfilerWidget() override = default;
-
-    /**
-     * @brief Update UI with serialized profile data returned by the backend.
-     * @param profile_data JSON object with function, memory, thread arrays and
-     * metadata.
-     *
-     * The widget expects the host to provide a stable schema. Parsing and heavy
-     * aggregation should occur on the host before calling this method.
-     */
-    void updateProfileData(const QJsonObject& profile_data);
-
-    void startProfiling();
-    void stopProfiling();
-    void resetProfiling();
-
-private slots:
-    void onStartProfilingClicked();
-    void onStopProfilingClicked();
-    void onResetProfilingClicked();
-    void onExportProfileClicked();
-
-signals:
-    void profilingStarted();
-    void profilingStopped();
-    void profilingReset();
-
-private:
-    QVBoxLayout* layout_;
-    QHBoxLayout* controls_layout_;
-    QPushButton* start_button_;
-    QPushButton* stop_button_;
-    QPushButton* reset_button_;
-    QPushButton* export_button_;
-
-    QTabWidget* profile_tabs_;
-    QTableWidget* function_table_;
-    QTableWidget* memory_table_;
-    QTableWidget* thread_table_;
-
-    bool is_profiling_ = false;
-
-    void setupUI();
-    void updateFunctionTable(const QJsonArray& functions);
-    void updateMemoryTable(const QJsonArray& memory_data);
-    void updateThreadTable(const QJsonArray& threads);
-};
+// PerformanceProfilerWidget is now defined in PerformanceProfilerWidget.hpp
 
 /**
  * @class ProfilerDashboard

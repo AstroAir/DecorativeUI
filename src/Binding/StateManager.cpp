@@ -3,6 +3,11 @@
 #include <QDebug>
 #include <QTimer>
 #include <QMutexLocker>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFile>
+#include <QElapsedTimer>
 #include <algorithm>
 
 namespace DeclarativeUI::Binding {
@@ -399,7 +404,187 @@ QString StateManager::getPerformanceReport() const {
     return report;
 }
 
+void StateManager::saveState(const QString& filename) const {
+    QMutexLocker locker(&global_lock_);
 
+    QJsonObject rootObject;
+    rootObject["version"] = "1.0";
+    rootObject["timestamp"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+
+    QJsonObject statesObject;
+
+    // Save state data
+    for (const auto& [key, value] : state_data_) {
+        QJsonObject stateEntry;
+
+        // Convert QVariant to JSON-compatible format
+        if (value.canConvert<QString>()) {
+            stateEntry["value"] = value.toString();
+            stateEntry["type"] = "QString";
+        } else if (value.canConvert<int>()) {
+            stateEntry["value"] = value.toInt();
+            stateEntry["type"] = "int";
+        } else if (value.canConvert<double>()) {
+            stateEntry["value"] = value.toDouble();
+            stateEntry["type"] = "double";
+        } else if (value.canConvert<bool>()) {
+            stateEntry["value"] = value.toBool();
+            stateEntry["type"] = "bool";
+        } else {
+            // Fallback to string representation
+            stateEntry["value"] = value.toString();
+            stateEntry["type"] = "QString";
+        }
+
+        statesObject[key] = stateEntry;
+    }
+
+    rootObject["states"] = statesObject;
+
+    // Save dependencies
+    QJsonObject dependenciesObject;
+    for (const auto& [key, deps] : dependencies_) {
+        QJsonArray depsArray;
+        for (const auto& dep : deps) {
+            depsArray.append(dep);
+        }
+        dependenciesObject[key] = depsArray;
+    }
+    rootObject["dependencies"] = dependenciesObject;
+
+    // Write to file
+    QJsonDocument doc(rootObject);
+    QFile file(filename);
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(doc.toJson());
+        file.close();
+        qDebug() << "💾 State saved to:" << filename;
+    } else {
+        qWarning() << "❌ Failed to save state to:" << filename;
+    }
+}
+
+void StateManager::loadState(const QString& filename) {
+    QFile file(filename);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "❌ Failed to load state from:" << filename;
+        return;
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    QJsonParseError error;
+    QJsonDocument doc = QJsonDocument::fromJson(data, &error);
+
+    if (error.error != QJsonParseError::NoError) {
+        qWarning() << "❌ JSON parse error:" << error.errorString();
+        return;
+    }
+
+    QJsonObject rootObject = doc.object();
+    QString version = rootObject["version"].toString();
+
+    if (version != "1.0") {
+        qWarning() << "❌ Unsupported state file version:" << version;
+        return;
+    }
+
+    QMutexLocker locker(&global_lock_);
+
+    // Load states
+    QJsonObject statesObject = rootObject["states"].toObject();
+    for (auto it = statesObject.begin(); it != statesObject.end(); ++it) {
+        QString key = it.key();
+        QJsonObject stateEntry = it.value().toObject();
+        QString type = stateEntry["type"].toString();
+
+        QVariant value;
+        if (type == "QString") {
+            value = stateEntry["value"].toString();
+        } else if (type == "int") {
+            value = stateEntry["value"].toInt();
+        } else if (type == "double") {
+            value = stateEntry["value"].toDouble();
+        } else if (type == "bool") {
+            value = stateEntry["value"].toBool();
+        }
+
+        state_data_[key] = value;
+    }
+
+    // Load dependencies
+    QJsonObject dependenciesObject = rootObject["dependencies"].toObject();
+    for (auto it = dependenciesObject.begin(); it != dependenciesObject.end(); ++it) {
+        QString key = it.key();
+        QJsonArray depsArray = it.value().toArray();
+
+        std::vector<QString> deps;
+        for (const auto& depValue : depsArray) {
+            deps.push_back(depValue.toString());
+        }
+        dependencies_[key] = deps;
+    }
+
+    qDebug() << "📂 State loaded from:" << filename;
+}
+
+void StateManager::logStateChange(const QString& key, const QVariant& oldValue, const QVariant& newValue) {
+    if (!debug_mode_) {
+        return;
+    }
+
+    QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
+    qDebug() << QString("[%1] State changed: %2 | %3 -> %4")
+                .arg(timestamp)
+                .arg(key)
+                .arg(oldValue.toString())
+                .arg(newValue.toString());
+}
+
+void StateManager::validateState(const QString& key, const QVariant& value) {
+    QMutexLocker locker(&global_lock_);
+    auto it = states_.find(key);
+    if (it != states_.end() && it->second.validator) {
+        if (!it->second.validator(value)) {
+            qWarning() << "❌ Validation failed for state:" << key << "value:" << value;
+            throw std::invalid_argument(QString("Validation failed for state: %1").arg(key).toStdString());
+        }
+    }
+}
+
+void StateManager::measurePerformance(const QString& key, std::function<void()> operation) {
+    if (!performance_monitoring_ || !operation) {
+        if (operation) {
+            operation();
+        }
+        return;
+    }
+
+    QElapsedTimer timer;
+    timer.start();
+
+    try {
+        operation();
+    } catch (...) {
+        qint64 elapsed = timer.elapsed();
+        qWarning() << "⚡ Performance measurement failed for state:" << key << "time:" << elapsed << "ms";
+        throw;
+    }
+
+    qint64 elapsed = timer.elapsed();
+
+    // Log performance if it exceeds threshold
+    const qint64 performanceThreshold = 10; // 10ms threshold
+    if (elapsed > performanceThreshold) {
+        qWarning() << "⚡ Performance warning for state:" << key << "time:" << elapsed << "ms";
+        emit performanceWarning(key, elapsed);
+    }
+
+    if (debug_mode_) {
+        qDebug() << "⚡ Performance measurement for state:" << key << "time:" << elapsed << "ms";
+    }
+}
 
 }  // namespace DeclarativeUI::Binding
 

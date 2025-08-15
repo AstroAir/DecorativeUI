@@ -2,8 +2,11 @@
 #include <QSignalSpy>
 #include <QTest>
 #include <QTimer>
+#include <QTemporaryFile>
+#include <QJsonDocument>
+#include <QJsonObject>
 
-#include "../Binding/StateManager.hpp"
+#include "../../src/Binding/StateManager.hpp"
 
 using namespace DeclarativeUI::Binding;
 
@@ -296,6 +299,114 @@ private slots:
             manager.setState("concurrent_test", i);
             QCOMPARE(state->get(), i);
         }
+    }
+
+    // **New tests for implemented functionality**
+    void testStatePersistence() {
+        auto& manager = StateManager::instance();
+
+        // Set up test data
+        manager.setState("string_state", QString("test_value"));
+        manager.setState("int_state", 42);
+        manager.setState("double_state", 3.14);
+        manager.setState("bool_state", true);
+
+        // Create temporary file for testing
+        QTemporaryFile tempFile;
+        QVERIFY(tempFile.open());
+        QString tempFileName = tempFile.fileName();
+        tempFile.close();
+
+        // Save state
+        manager.saveState(tempFileName);
+
+        // Clear state
+        manager.clearState();
+        QVERIFY(!manager.hasState("string_state"));
+
+        // Load state
+        manager.loadState(tempFileName);
+
+        // Verify loaded state
+        QVERIFY(manager.hasState("string_state"));
+        QVERIFY(manager.hasState("int_state"));
+        QVERIFY(manager.hasState("double_state"));
+        QVERIFY(manager.hasState("bool_state"));
+    }
+
+    void testStateValidationEnhanced() {
+        auto& manager = StateManager::instance();
+
+        // Create state with validator
+        auto state = manager.createState<int>("validated_state_enhanced", 10);
+
+        // Set validator that only allows positive values
+        manager.setValidator<int>("validated_state_enhanced", [](const int& value) {
+            return value > 0;
+        });
+
+        // Valid value should work
+        manager.setState("validated_state_enhanced", 20);
+        QCOMPARE(state->get(), 20);
+
+        // Invalid value should be rejected (not change the state)
+        manager.setState("validated_state_enhanced", -5);
+        QCOMPARE(state->get(), 20);  // Should remain unchanged
+    }
+
+    void testPerformanceMonitoringEnhanced() {
+        auto& manager = StateManager::instance();
+
+        // Enable performance monitoring
+        manager.enablePerformanceMonitoring(true);
+        QVERIFY(manager.getPerformanceReport().contains("Performance monitoring: ON"));
+
+        // Create and update state
+        manager.setState("perf_test_enhanced", QString("initial"));
+        manager.setState("perf_test_enhanced", QString("updated"));
+
+        // Get performance report
+        QString report = manager.getPerformanceReport();
+        QVERIFY(report.contains("perf_test_enhanced"));
+        QVERIFY(report.contains("updates"));
+
+        // Disable performance monitoring
+        manager.enablePerformanceMonitoring(false);
+        QVERIFY(manager.getPerformanceReport().contains("Performance monitoring: OFF"));
+    }
+
+    void testDebugModeEnhanced() {
+        auto& manager = StateManager::instance();
+
+        // Enable debug mode
+        manager.enableDebugMode(true);
+
+        // Create and update state (should generate debug output)
+        manager.setState("debug_test_enhanced", QString("value1"));
+        manager.setState("debug_test_enhanced", QString("value2"));
+
+        // Disable debug mode
+        manager.enableDebugMode(false);
+
+        // This test mainly verifies the methods don't crash
+        QVERIFY(true);
+    }
+
+    void testLogStateChange() {
+        auto& manager = StateManager::instance();
+
+        // Enable debug mode to see log output
+        manager.enableDebugMode(true);
+
+        // Test log state change method
+        QVariant oldValue = QVariant::fromValue(QString("old"));
+        QVariant newValue = QVariant::fromValue(QString("new"));
+
+        // This should not crash
+        manager.logStateChange("test_key", oldValue, newValue);
+
+        manager.enableDebugMode(false);
+        QVERIFY(true);
     }
 };
 

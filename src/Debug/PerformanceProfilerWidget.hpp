@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QProgressBar>
 #include <QPushButton>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -174,6 +175,26 @@ private:
      * @brief Vertical layout arranging the widget's controls.
      */
     QVBoxLayout* layout_;
+
+    /**
+     * @brief Flag indicating if profiling is currently active.
+     */
+    bool is_profiling_;
+
+    /**
+     * @brief Timer for updating profiling progress.
+     */
+    QTimer* profiling_timer_;
+
+    /**
+     * @brief Timestamp when profiling started.
+     */
+    qint64 profiling_start_time_;
+
+    /**
+     * @brief Updates the profiling progress display.
+     */
+    void updateProfilingProgress();
 };
 
 }  // namespace DeclarativeUI::Debug
