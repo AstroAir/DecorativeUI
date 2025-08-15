@@ -1,5 +1,8 @@
 set(SOURCES
     JSONUILoader.cpp
+    JSONParser.cpp
+    ComponentRegistry.cpp
+    JSONValidator.cpp
 )
 
 add_library(JSON

@@ -470,6 +470,304 @@ private slots:
         manager->unregisterUIFile(ui_file.fileName());
     }
 
+    // **New PerformanceMonitor Tests**
+    void testPerformanceMonitorPauseResume() {
+        auto monitor = std::make_unique<PerformanceMonitor>();
+
+        // Test initial state
+        QVERIFY(monitor->isMonitoring() == false);
+
+        // Start monitoring
+        monitor->startMonitoring();
+        QVERIFY(monitor->isMonitoring() == true);
+
+        // Pause monitoring
+        monitor->pauseMonitoring();
+        QVERIFY(monitor->isMonitoring() == false);
+
+        // Resume monitoring
+        monitor->resumeMonitoring();
+        QVERIFY(monitor->isMonitoring() == true);
+
+        // Stop monitoring
+        monitor->stopMonitoring();
+        QVERIFY(monitor->isMonitoring() == false);
+    }
+
+    void testPerformanceMonitorMemoryTracking() {
+        auto monitor = std::make_unique<PerformanceMonitor>();
+        monitor->startMonitoring();
+
+        // Test memory usage recording
+        monitor->recordMemoryUsage(100);
+        monitor->recordMemoryUsage(150);
+        monitor->recordMemoryUsage(120);
+
+        // Test memory heavy files detection
+        QStringList heavy_files = monitor->getMemoryHeavyFiles(50);
+        // Should be empty since we haven't associated memory with specific files
+
+        monitor->stopMonitoring();
+    }
+
+    void testPerformanceMonitorCPUTracking() {
+        auto monitor = std::make_unique<PerformanceMonitor>();
+        monitor->startMonitoring();
+
+        // Test CPU usage recording
+        monitor->recordCPUUsage(25.5);
+        monitor->recordCPUUsage(45.0);
+        monitor->recordCPUUsage(30.2);
+
+        // Test that monitoring is still active
+        QVERIFY(monitor->isMonitoring() == true);
+
+        monitor->stopMonitoring();
+    }
+
+    void testPerformanceMonitorBottleneckDetection() {
+        auto monitor = std::make_unique<PerformanceMonitor>();
+        monitor->startMonitoring();
+        monitor->enableBottleneckDetection(true);
+
+        // Simulate high resource usage
+        monitor->recordCPUUsage(95.0);
+        monitor->recordMemoryUsage(1000);
+
+        // Test bottleneck detection
+        auto bottlenecks = monitor->detectBottlenecks();
+        // Should detect bottlenecks based on high usage
+
+        auto critical_bottleneck = monitor->getMostCriticalBottleneck();
+        // Should return the most severe bottleneck
+
+        monitor->stopMonitoring();
+    }
+
+    void testPerformanceMonitorReporting() {
+        auto monitor = std::make_unique<PerformanceMonitor>();
+        monitor->startMonitoring();
+
+        // Generate some test data
+        monitor->recordCPUUsage(50.0);
+        monitor->recordMemoryUsage(200);
+
+        // Test basic report generation
+        QString basic_report = monitor->generateReport();
+        QVERIFY(!basic_report.isEmpty());
+        QVERIFY(basic_report.contains("Performance Report"));
+
+        // Test detailed report generation
+        QString detailed_report = monitor->generateDetailedReport();
+        QVERIFY(!detailed_report.isEmpty());
+        QVERIFY(detailed_report.contains("Detailed Performance Analysis"));
+
+        // Test JSON report generation
+        QJsonObject json_report = monitor->generateJSONReport();
+        QVERIFY(!json_report.isEmpty());
+        QVERIFY(json_report.contains("monitoring_enabled"));
+
+        monitor->stopMonitoring();
+    }
+
+    void testPerformanceMonitorMemoryProfiling() {
+        auto monitor = std::make_unique<PerformanceMonitor>();
+        monitor->startMonitoring();
+        monitor->enableMemoryProfiling(true);
+
+        // Test memory profile generation
+        QJsonObject memory_profile = monitor->getMemoryProfile();
+        QVERIFY(!memory_profile.isEmpty());
+        QVERIFY(memory_profile.contains("memory_profiling_enabled"));
+        QVERIFY(memory_profile["memory_profiling_enabled"].toBool() == true);
+
+        // Test garbage collection
+        monitor->forceGarbageCollection();
+
+        monitor->stopMonitoring();
+    }
+
+    void testPerformanceMonitorPredictiveModeling() {
+        auto monitor = std::make_unique<PerformanceMonitor>();
+        monitor->startMonitoring();
+        monitor->enablePredictiveModeling(true);
+
+        // Generate some historical data
+        for (int i = 0; i < 10; ++i) {
+            monitor->recordCPUUsage(20.0 + i * 2.0);
+            monitor->recordMemoryUsage(100 + i * 10);
+        }
+
+        // Test prediction methods
+        double next_response_time = monitor->predictNextResponseTime();
+        QVERIFY(next_response_time >= 0.0);
+
+        double memory_prediction = monitor->predictMemoryUsageIn(5);
+        QVERIFY(memory_prediction >= 0.0);
+
+        // Test prediction report
+        QJsonObject prediction_report = monitor->getPredictionReport();
+        QVERIFY(!prediction_report.isEmpty());
+        QVERIFY(prediction_report.contains("predictive_modeling_enabled"));
+
+        monitor->stopMonitoring();
+    }
+
+    // **New HotReloadManager Tests**
+    void testHotReloadManagerDependencyGraph() {
+        auto manager = std::make_unique<HotReloadManager>();
+
+        // Create test files with dependencies
+        QTemporaryFile main_file(temp_dir_->path() + "/main_XXXXXX.json");
+        QVERIFY(main_file.open());
+
+        QString main_content = R"({
+            "type": "QWidget",
+            "include": "component.json",
+            "properties": {
+                "windowTitle": "Main Window"
+            }
+        })";
+        main_file.write(main_content.toUtf8());
+        main_file.close();
+
+        QTemporaryFile component_file(temp_dir_->path() + "/component_XXXXXX.json");
+        QVERIFY(component_file.open());
+
+        QString component_content = R"({
+            "type": "QLabel",
+            "properties": {
+                "text": "Component Label"
+            }
+        })";
+        component_file.write(component_content.toUtf8());
+        component_file.close();
+
+        // Register files
+        auto main_widget = std::make_unique<QWidget>();
+        auto component_widget = std::make_unique<QWidget>();
+
+        manager->registerUIFile(main_file.fileName(), main_widget.get());
+        manager->registerUIFile(component_file.fileName(), component_widget.get());
+
+        // Test dependency graph building
+        manager->buildDependencyGraph();
+
+        // Test affected files detection
+        QStringList affected = manager->getAffectedFiles(component_file.fileName());
+        // Should include main_file since it depends on component_file
+
+        // Test cyclic dependency detection
+        bool has_cycle = manager->hasCyclicDependency(main_file.fileName());
+        QVERIFY(has_cycle == false); // Should not have cycles in this simple case
+
+        // Cleanup
+        manager->unregisterUIFile(main_file.fileName());
+        manager->unregisterUIFile(component_file.fileName());
+    }
+
+    void testHotReloadManagerThreadManagement() {
+        auto manager = std::make_unique<HotReloadManager>();
+
+        // Test thread pool functionality
+        QThread* thread = manager->getAvailableThread();
+        // Should return a valid thread or nullptr if no threads available
+
+        // Test async reload functionality
+        QTemporaryFile test_file(temp_dir_->path() + "/async_test_XXXXXX.json");
+        QVERIFY(test_file.open());
+
+        QString content = R"({
+            "type": "QWidget",
+            "properties": {
+                "windowTitle": "Async Test"
+            }
+        })";
+        test_file.write(content.toUtf8());
+        test_file.close();
+
+        auto widget = std::make_unique<QWidget>();
+        manager->registerUIFile(test_file.fileName(), widget.get());
+
+        // Test async reload (should not crash)
+        manager->performReloadAsync(test_file.fileName());
+
+        // Wait a bit for async operation
+        QTest::qWait(100);
+
+        // Cleanup
+        manager->unregisterUIFile(test_file.fileName());
+    }
+
+    void testHotReloadManagerPerformanceMeasurement() {
+        auto manager = std::make_unique<HotReloadManager>();
+
+        // Test performance measurement
+        bool test_executed = false;
+        auto test_function = [&test_executed]() {
+            test_executed = true;
+            QTest::qWait(10); // Simulate some work
+        };
+
+        ReloadMetrics metrics = manager->measureReloadPerformance(test_function);
+
+        QVERIFY(test_executed == true);
+        QVERIFY(metrics.success == true);
+        QVERIFY(metrics.total_time.count() >= 10); // Should be at least 10ms
+    }
+
+    void testHotReloadManagerRollbackPoints() {
+        auto manager = std::make_unique<HotReloadManager>();
+
+        // Create test file
+        QTemporaryFile test_file(temp_dir_->path() + "/rollback_test_XXXXXX.json");
+        QVERIFY(test_file.open());
+
+        QString content = R"({
+            "type": "QWidget",
+            "properties": {
+                "windowTitle": "Rollback Test"
+            }
+        })";
+        test_file.write(content.toUtf8());
+        test_file.close();
+
+        auto widget = std::make_unique<QWidget>();
+        manager->registerUIFile(test_file.fileName(), widget.get());
+
+        // Test rollback point creation
+        manager->createRollbackPoint(test_file.fileName());
+
+        // Test rollback
+        manager->rollbackToPoint(test_file.fileName());
+
+        // Test clearing rollback points
+        manager->clearRollbackPoints();
+
+        // Cleanup
+        manager->unregisterUIFile(test_file.fileName());
+    }
+
+    void testHotReloadManagerConfiguration() {
+        auto manager = std::make_unique<HotReloadManager>();
+
+        // Test configuration methods
+        manager->setPreloadStrategy(true);
+        manager->enableIncrementalReloading(true);
+        manager->enableParallelProcessing(true);
+        manager->enableSmartCaching(true);
+
+        // Test that manager is still functional after configuration
+        QVERIFY(manager->isEnabled() == true);
+
+        // Test disabling and re-enabling
+        manager->setEnabled(false);
+        QVERIFY(manager->isEnabled() == false);
+
+        manager->setEnabled(true);
+        QVERIFY(manager->isEnabled() == true);
+    }
+
 private:
     std::unique_ptr<QTemporaryDir> temp_dir_;
 };

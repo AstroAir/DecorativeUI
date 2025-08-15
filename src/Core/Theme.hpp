@@ -1,18 +1,18 @@
 // Core/Theme.hpp
 #pragma once
 
+#include <QApplication>
 #include <QColor>
 #include <QFont>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QPalette>
 #include <QString>
-#include <QJsonObject>
-#include <QJsonDocument>
-#include <QApplication>
-#include <unordered_map>
-#include <memory>
 #include <concepts>
-#include <string_view>
 #include <functional>
+#include <memory>
+#include <string_view>
+#include <unordered_map>
 
 #include "Concepts.hpp"
 
@@ -21,43 +21,43 @@ namespace DeclarativeUI::Core::Theme {
 // **Color palette with semantic naming**
 struct ColorPalette {
     // **Primary colors**
-    QColor primary{QRgb(0x2196F3)};           // Blue
-    QColor primary_variant{QRgb(0x1976D2)};   // Dark Blue
-    QColor secondary{QRgb(0xFF9800)};         // Orange
-    QColor secondary_variant{QRgb(0xF57C00)}; // Dark Orange
+    QColor primary{QRgb(0x2196F3)};            // Blue
+    QColor primary_variant{QRgb(0x1976D2)};    // Dark Blue
+    QColor secondary{QRgb(0xFF9800)};          // Orange
+    QColor secondary_variant{QRgb(0xF57C00)};  // Dark Orange
 
     // **Surface colors**
-    QColor background{QRgb(0xFAFAFA)};        // Light Gray
-    QColor surface{QRgb(0xFFFFFF)};           // White
-    QColor surface_variant{QRgb(0xF5F5F5)};   // Very Light Gray
+    QColor background{QRgb(0xFAFAFA)};       // Light Gray
+    QColor surface{QRgb(0xFFFFFF)};          // White
+    QColor surface_variant{QRgb(0xF5F5F5)};  // Very Light Gray
 
     // **Content colors**
-    QColor on_primary{QRgb(0xFFFFFF)};        // White
-    QColor on_secondary{QRgb(0x000000)};      // Black
-    QColor on_background{QRgb(0x212121)};     // Dark Gray
-    QColor on_surface{QRgb(0x212121)};        // Dark Gray
-    QColor on_surface_variant{QRgb(0x757575)}; // Medium Gray
+    QColor on_primary{QRgb(0xFFFFFF)};          // White
+    QColor on_secondary{QRgb(0x000000)};        // Black
+    QColor on_background{QRgb(0x212121)};       // Dark Gray
+    QColor on_surface{QRgb(0x212121)};          // Dark Gray
+    QColor on_surface_variant{QRgb(0x757575)};  // Medium Gray
 
     // **State colors**
-    QColor error{QRgb(0xF44336)};             // Red
-    QColor warning{QRgb(0xFF9800)};           // Orange
-    QColor success{QRgb(0x4CAF50)};           // Green
-    QColor info{QRgb(0x2196F3)};              // Blue
+    QColor error{QRgb(0xF44336)};    // Red
+    QColor warning{QRgb(0xFF9800)};  // Orange
+    QColor success{QRgb(0x4CAF50)};  // Green
+    QColor info{QRgb(0x2196F3)};     // Blue
 
     // **Interactive colors**
-    QColor hover{QRgb(0x1976D2)};             // Dark Blue
-    QColor pressed{QRgb(0x0D47A1)};           // Very Dark Blue
-    QColor focused{QRgb(0x2196F3)};           // Blue
-    QColor disabled{QRgb(0xBDBDBD)};          // Light Gray
+    QColor hover{QRgb(0x1976D2)};     // Dark Blue
+    QColor pressed{QRgb(0x0D47A1)};   // Very Dark Blue
+    QColor focused{QRgb(0x2196F3)};   // Blue
+    QColor disabled{QRgb(0xBDBDBD)};  // Light Gray
 
     // **Border and outline colors**
-    QColor outline{QRgb(0xE0E0E0)};           // Light Gray
-    QColor outline_variant{QRgb(0xBDBDBD)};   // Medium Light Gray
-    QColor divider{QRgb(0xE0E0E0)};           // Light Gray
+    QColor outline{QRgb(0xE0E0E0)};          // Light Gray
+    QColor outline_variant{QRgb(0xBDBDBD)};  // Medium Light Gray
+    QColor divider{QRgb(0xE0E0E0)};          // Light Gray
 
     // **Shadow colors**
-    QColor shadow{QRgb(0x000000)};            // Black
-    QColor shadow_light{QRgb(0x00000040)};    // Transparent Black
+    QColor shadow{QRgb(0x000000)};          // Black
+    QColor shadow_light{QRgb(0x00000040)};  // Transparent Black
 };
 
 // **Typography configuration**
@@ -113,13 +113,13 @@ struct Spacing {
     int base_unit{8};
 
     // **Spacing scale**
-    int xs{base_unit / 2};      // 4px
-    int sm{base_unit};          // 8px
-    int md{base_unit * 2};      // 16px
-    int lg{base_unit * 3};      // 24px
-    int xl{base_unit * 4};      // 32px
-    int xxl{base_unit * 6};     // 48px
-    int xxxl{base_unit * 8};    // 64px
+    int xs{base_unit / 2};    // 4px
+    int sm{base_unit};        // 8px
+    int md{base_unit * 2};    // 16px
+    int lg{base_unit * 3};    // 24px
+    int xl{base_unit * 4};    // 32px
+    int xxl{base_unit * 6};   // 48px
+    int xxxl{base_unit * 8};  // 64px
 
     // **Component-specific spacing**
     struct ComponentSpacing {
@@ -150,7 +150,8 @@ struct Shadows {
     QString sm{"0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)"};
     QString md{"0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)"};
     QString lg{"0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)"};
-    QString xl{"0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)"};
+    QString xl{
+        "0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)"};
     QString xxl{"0 25px 50px rgba(0, 0, 0, 0.25)"};
 };
 
@@ -237,7 +238,8 @@ public:
         }
 
         // Parse typography
-        if (auto typography = json["typography"].toObject(); !typography.isEmpty()) {
+        if (auto typography = json["typography"].toObject();
+            !typography.isEmpty()) {
             parseTypography(typography, config.typography);
         }
 
@@ -278,8 +280,8 @@ public:
     }
 
     // **Theme change notifications**
-    template<typename F>
-    requires Concepts::VoidCallback<F>
+    template <typename F>
+        requires Concepts::VoidCallback<F>
     void onThemeChanged(F&& callback) {
         theme_change_callbacks_.emplace_back(std::forward<F>(callback));
     }
@@ -321,9 +323,11 @@ public:
         return font;
     }
 
-    [[nodiscard]] QString generateStyleSheet(const QString& component_name) const {
+    [[nodiscard]] QString generateStyleSheet(
+        const QString& component_name) const {
         // Generate component-specific stylesheet based on current theme
-        // This is a simplified example - real implementation would be more comprehensive
+        // This is a simplified example - real implementation would be more
+        // comprehensive
         return QString(R"(
             %1 {
                 background-color: %2;
@@ -340,16 +344,17 @@ public:
             %1:pressed {
                 background-color: %10;
             }
-        )").arg(component_name)
-           .arg(current_theme_.colors.surface.name())
-           .arg(current_theme_.colors.on_surface.name())
-           .arg(current_theme_.colors.outline.name())
-           .arg(current_theme_.border_radius.md)
-           .arg(current_theme_.spacing.md)
-           .arg(current_theme_.typography.primary_font)
-           .arg(current_theme_.typography.sizes.body_medium)
-           .arg(current_theme_.colors.hover.name())
-           .arg(current_theme_.colors.pressed.name());
+        )")
+            .arg(component_name)
+            .arg(current_theme_.colors.surface.name())
+            .arg(current_theme_.colors.on_surface.name())
+            .arg(current_theme_.colors.outline.name())
+            .arg(current_theme_.border_radius.md)
+            .arg(current_theme_.spacing.md)
+            .arg(current_theme_.typography.primary_font)
+            .arg(current_theme_.typography.sizes.body_medium)
+            .arg(current_theme_.colors.hover.name())
+            .arg(current_theme_.colors.pressed.name());
     }
 
 private:
@@ -362,20 +367,27 @@ private:
             QPalette palette;
 
             // Set palette colors based on theme
-            palette.setColor(QPalette::Window, current_theme_.colors.background);
-            palette.setColor(QPalette::WindowText, current_theme_.colors.on_background);
+            palette.setColor(QPalette::Window,
+                             current_theme_.colors.background);
+            palette.setColor(QPalette::WindowText,
+                             current_theme_.colors.on_background);
             palette.setColor(QPalette::Base, current_theme_.colors.surface);
-            palette.setColor(QPalette::AlternateBase, current_theme_.colors.surface_variant);
+            palette.setColor(QPalette::AlternateBase,
+                             current_theme_.colors.surface_variant);
             palette.setColor(QPalette::Text, current_theme_.colors.on_surface);
             palette.setColor(QPalette::Button, current_theme_.colors.primary);
-            palette.setColor(QPalette::ButtonText, current_theme_.colors.on_primary);
-            palette.setColor(QPalette::Highlight, current_theme_.colors.primary);
-            palette.setColor(QPalette::HighlightedText, current_theme_.colors.on_primary);
+            palette.setColor(QPalette::ButtonText,
+                             current_theme_.colors.on_primary);
+            palette.setColor(QPalette::Highlight,
+                             current_theme_.colors.primary);
+            palette.setColor(QPalette::HighlightedText,
+                             current_theme_.colors.on_primary);
 
             app->setPalette(palette);
 
             // Set application font
-            QFont app_font = createFont(current_theme_.typography.sizes.body_medium);
+            QFont app_font =
+                createFont(current_theme_.typography.sizes.body_medium);
             app->setFont(app_font);
         }
     }
@@ -388,21 +400,28 @@ private:
 
     void parseColors(const QJsonObject& json, ColorPalette& colors) {
         // Parse color values from JSON
-        if (json.contains("primary")) colors.primary = QColor(json["primary"].toString());
-        if (json.contains("secondary")) colors.secondary = QColor(json["secondary"].toString());
-        if (json.contains("background")) colors.background = QColor(json["background"].toString());
-        if (json.contains("surface")) colors.surface = QColor(json["surface"].toString());
+        if (json.contains("primary"))
+            colors.primary = QColor(json["primary"].toString());
+        if (json.contains("secondary"))
+            colors.secondary = QColor(json["secondary"].toString());
+        if (json.contains("background"))
+            colors.background = QColor(json["background"].toString());
+        if (json.contains("surface"))
+            colors.surface = QColor(json["surface"].toString());
         // ... parse other colors
     }
 
     void parseTypography(const QJsonObject& json, Typography& typography) {
-        if (json.contains("primaryFont")) typography.primary_font = json["primaryFont"].toString();
-        if (json.contains("secondaryFont")) typography.secondary_font = json["secondaryFont"].toString();
+        if (json.contains("primaryFont"))
+            typography.primary_font = json["primaryFont"].toString();
+        if (json.contains("secondaryFont"))
+            typography.secondary_font = json["secondaryFont"].toString();
         // ... parse other typography settings
     }
 
     void parseSpacing(const QJsonObject& json, Spacing& spacing) {
-        if (json.contains("baseUnit")) spacing.base_unit = json["baseUnit"].toInt();
+        if (json.contains("baseUnit"))
+            spacing.base_unit = json["baseUnit"].toInt();
         // ... parse other spacing settings
     }
 
@@ -433,9 +452,7 @@ private:
 };
 
 // **Utility functions**
-[[nodiscard]] inline ThemeManager& theme() {
-    return ThemeManager::instance();
-}
+[[nodiscard]] inline ThemeManager& theme() { return ThemeManager::instance(); }
 
 [[nodiscard]] inline const ThemeConfig& currentTheme() {
     return ThemeManager::instance().getCurrentTheme();
@@ -531,7 +548,8 @@ public:
     }
 
     // **Register component for accessibility**
-    void registerComponent(QObject* component, const AccessibilityProperties& properties) {
+    void registerComponent(QObject* component,
+                           const AccessibilityProperties& properties) {
         if (component) {
             component_properties_[component] = properties;
             updateComponentAccessibility(component);
@@ -539,7 +557,8 @@ public:
     }
 
     // **Update accessibility properties**
-    void updateProperties(QObject* component, const AccessibilityProperties& properties) {
+    void updateProperties(QObject* component,
+                          const AccessibilityProperties& properties) {
         if (component && component_properties_.contains(component)) {
             component_properties_[component] = properties;
             updateComponentAccessibility(component);
@@ -547,8 +566,10 @@ public:
     }
 
     // **Get accessibility properties**
-    [[nodiscard]] std::optional<AccessibilityProperties> getProperties(QObject* component) const {
-        if (auto it = component_properties_.find(component); it != component_properties_.end()) {
+    [[nodiscard]] std::optional<AccessibilityProperties> getProperties(
+        QObject* component) const {
+        if (auto it = component_properties_.find(component);
+            it != component_properties_.end()) {
             return it->second;
         }
         return std::nullopt;
@@ -608,7 +629,8 @@ private:
     std::vector<std::pair<QString, int>> screen_reader_announcements_;
 
     void updateComponentAccessibility(QObject* component) {
-        if (!accessibility_enabled_ || !component) return;
+        if (!accessibility_enabled_ || !component)
+            return;
 
         const auto& props = component_properties_[component];
 
@@ -625,7 +647,8 @@ private:
             // Set focus policy for keyboard navigation
             if (keyboard_navigation_enabled_) {
                 widget->setFocusPolicy(Qt::TabFocus);
-                widget->setTabOrder(widget, nullptr); // Will be properly ordered by tab_index
+                widget->setTabOrder(
+                    widget, nullptr);  // Will be properly ordered by tab_index
             }
         }
     }
@@ -702,7 +725,8 @@ public:
         return *this;
     }
 
-    AccessibilityBuilder& range(double min_val, double max_val, double current_val, double step_val = 1.0) {
+    AccessibilityBuilder& range(double min_val, double max_val,
+                                double current_val, double step_val = 1.0) {
         properties_.min_value = min_val;
         properties_.max_value = max_val;
         properties_.current_value = current_val;
@@ -710,12 +734,11 @@ public:
         return *this;
     }
 
-    [[nodiscard]] AccessibilityProperties build() const {
-        return properties_;
-    }
+    [[nodiscard]] AccessibilityProperties build() const { return properties_; }
 
     void applyTo(QObject* component) {
-        AccessibilityManager::instance().registerComponent(component, properties_);
+        AccessibilityManager::instance().registerComponent(component,
+                                                           properties_);
     }
 
 private:

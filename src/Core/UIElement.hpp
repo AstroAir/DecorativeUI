@@ -1,42 +1,36 @@
 #pragma once
 
+#include <QColor>
 #include <QEasingCurve>
+#include <QFont>
 #include <QGraphicsDropShadowEffect>
 #include <QGraphicsEffect>
 #include <QGraphicsOpacityEffect>
 #include <QIcon>
+#include <QJsonObject>
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QObject>
 #include <QPixmap>
 #include <QPropertyAnimation>
-#include <QTimer>
-#include <QWidget>
-#include <QJsonObject>
-#include <QVariant>
-#include <QColor>
-#include <QFont>
-#include <QSize>
 #include <QRect>
+#include <QSize>
+#include <QTimer>
+#include <QVariant>
+#include <QWidget>
 
-#include <atomic>
+#include <array>
 #include <chrono>
 #include <functional>
-#include <future>
 #include <memory>
-#include <memory_resource>
+#include <type_traits>
 #include <unordered_map>
 #include <unordered_set>
 #include <variant>
-#include <shared_mutex>
-#include <thread>
-#include <array>
-#include <bitset>
 #include <vector>
-#include <type_traits>
 
-#include "../Exceptions/UIExceptions.hpp"
 #include "../Animation/AnimationEngine.hpp"
+#include "../Exceptions/UIExceptions.hpp"
 
 Q_DECLARE_METATYPE(std::function<void()>)
 
@@ -55,11 +49,10 @@ constexpr bool is_qt_widget_v = is_qt_widget<T>::value;
 template <typename T>
 struct has_meta_object {
     template <typename U>
-    static auto test(int) -> decltype(
-        std::declval<U>().metaObject(),
-        std::declval<U>().setProperty("", QVariant{}),
-        std::declval<U>().property(""),
-        std::true_type{});
+    static auto test(int)
+        -> decltype(std::declval<U>().metaObject(),
+                    std::declval<U>().setProperty("", QVariant{}),
+                    std::declval<U>().property(""), std::true_type{});
 
     template <typename>
     static std::false_type test(...);
@@ -92,37 +85,67 @@ struct AnimationConfig {
 
 private:
     // **Convert QEasingCurve::Type to Animation::EasingType**
-    static Animation::EasingType convertEasingType(QEasingCurve::Type qt_easing) {
+    static Animation::EasingType convertEasingType(
+        QEasingCurve::Type qt_easing) {
         switch (qt_easing) {
-            case QEasingCurve::Linear: return Animation::EasingType::Linear;
-            case QEasingCurve::InQuad: return Animation::EasingType::QuadIn;
-            case QEasingCurve::OutQuad: return Animation::EasingType::QuadOut;
-            case QEasingCurve::InOutQuad: return Animation::EasingType::QuadInOut;
-            case QEasingCurve::InCubic: return Animation::EasingType::CubicIn;
-            case QEasingCurve::OutCubic: return Animation::EasingType::CubicOut;
-            case QEasingCurve::InOutCubic: return Animation::EasingType::CubicInOut;
-            case QEasingCurve::InQuart: return Animation::EasingType::QuartIn;
-            case QEasingCurve::OutQuart: return Animation::EasingType::QuartOut;
-            case QEasingCurve::InOutQuart: return Animation::EasingType::QuartInOut;
-            case QEasingCurve::InSine: return Animation::EasingType::SineIn;
-            case QEasingCurve::OutSine: return Animation::EasingType::SineOut;
-            case QEasingCurve::InOutSine: return Animation::EasingType::SineInOut;
-            case QEasingCurve::InExpo: return Animation::EasingType::ExpoIn;
-            case QEasingCurve::OutExpo: return Animation::EasingType::ExpoOut;
-            case QEasingCurve::InOutExpo: return Animation::EasingType::ExpoInOut;
-            case QEasingCurve::InCirc: return Animation::EasingType::CircIn;
-            case QEasingCurve::OutCirc: return Animation::EasingType::CircOut;
-            case QEasingCurve::InOutCirc: return Animation::EasingType::CircInOut;
-            case QEasingCurve::InBack: return Animation::EasingType::BackIn;
-            case QEasingCurve::OutBack: return Animation::EasingType::BackOut;
-            case QEasingCurve::InOutBack: return Animation::EasingType::BackInOut;
-            case QEasingCurve::InElastic: return Animation::EasingType::ElasticIn;
-            case QEasingCurve::OutElastic: return Animation::EasingType::ElasticOut;
-            case QEasingCurve::InOutElastic: return Animation::EasingType::ElasticInOut;
-            case QEasingCurve::InBounce: return Animation::EasingType::BounceIn;
-            case QEasingCurve::OutBounce: return Animation::EasingType::BounceOut;
-            case QEasingCurve::InOutBounce: return Animation::EasingType::BounceInOut;
-            default: return Animation::EasingType::Linear;
+            case QEasingCurve::Linear:
+                return Animation::EasingType::Linear;
+            case QEasingCurve::InQuad:
+                return Animation::EasingType::QuadIn;
+            case QEasingCurve::OutQuad:
+                return Animation::EasingType::QuadOut;
+            case QEasingCurve::InOutQuad:
+                return Animation::EasingType::QuadInOut;
+            case QEasingCurve::InCubic:
+                return Animation::EasingType::CubicIn;
+            case QEasingCurve::OutCubic:
+                return Animation::EasingType::CubicOut;
+            case QEasingCurve::InOutCubic:
+                return Animation::EasingType::CubicInOut;
+            case QEasingCurve::InQuart:
+                return Animation::EasingType::QuartIn;
+            case QEasingCurve::OutQuart:
+                return Animation::EasingType::QuartOut;
+            case QEasingCurve::InOutQuart:
+                return Animation::EasingType::QuartInOut;
+            case QEasingCurve::InSine:
+                return Animation::EasingType::SineIn;
+            case QEasingCurve::OutSine:
+                return Animation::EasingType::SineOut;
+            case QEasingCurve::InOutSine:
+                return Animation::EasingType::SineInOut;
+            case QEasingCurve::InExpo:
+                return Animation::EasingType::ExpoIn;
+            case QEasingCurve::OutExpo:
+                return Animation::EasingType::ExpoOut;
+            case QEasingCurve::InOutExpo:
+                return Animation::EasingType::ExpoInOut;
+            case QEasingCurve::InCirc:
+                return Animation::EasingType::CircIn;
+            case QEasingCurve::OutCirc:
+                return Animation::EasingType::CircOut;
+            case QEasingCurve::InOutCirc:
+                return Animation::EasingType::CircInOut;
+            case QEasingCurve::InBack:
+                return Animation::EasingType::BackIn;
+            case QEasingCurve::OutBack:
+                return Animation::EasingType::BackOut;
+            case QEasingCurve::InOutBack:
+                return Animation::EasingType::BackInOut;
+            case QEasingCurve::InElastic:
+                return Animation::EasingType::ElasticIn;
+            case QEasingCurve::OutElastic:
+                return Animation::EasingType::ElasticOut;
+            case QEasingCurve::InOutElastic:
+                return Animation::EasingType::ElasticInOut;
+            case QEasingCurve::InBounce:
+                return Animation::EasingType::BounceIn;
+            case QEasingCurve::OutBounce:
+                return Animation::EasingType::BounceOut;
+            case QEasingCurve::InOutBounce:
+                return Animation::EasingType::BounceInOut;
+            default:
+                return Animation::EasingType::Linear;
         }
     }
 };
@@ -162,8 +185,6 @@ public:
     // **Modern C++ move semantics and RAII**
     UIElement(const UIElement &) = delete;
     UIElement &operator=(const UIElement &) = delete;
-    UIElement(UIElement &&) = default;
-    UIElement &operator=(UIElement &&) = default;
 
     // **Fluent interface for declarative syntax**
     template <typename T>
@@ -291,9 +312,9 @@ protected:
     void checkBreakpoints();
 
     // **Animation helpers - Using new Animation system**
-    std::shared_ptr<Animation::Animation> createAnimation(const QString &property,
-                                                         const QVariant &target_value,
-                                                         const AnimationConfig &config);
+    std::shared_ptr<Animation::Animation> createAnimation(
+        const QString &property, const QVariant &target_value,
+        const AnimationConfig &config);
     void setupAnimation(std::shared_ptr<Animation::Animation> animation,
                         const AnimationConfig &config);
 

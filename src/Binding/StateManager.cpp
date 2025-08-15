@@ -304,7 +304,40 @@ void StateManager::updateDependents(const QString& key) {
     if (it != dependents_.end()) {
         for (const auto& dependent : it->second) {
             qDebug() << "🔄 Updating dependent state:" << dependent;
-            // TODO: Trigger recomputation of dependent states
+
+            // Trigger recomputation of dependent states
+            auto dependentIt = state_data_.find(dependent);
+            if (dependentIt != state_data_.end()) {
+                // Check if this dependent state has a computed value function
+                auto computedIt = computed_values_.find(dependent);
+                if (computedIt != computed_values_.end()) {
+                    try {
+                        // Recompute the value using the stored function
+                        QVariant newValue = computedIt->second();
+                        QVariant oldValue = dependentIt->second;
+
+                        // Only update if the value actually changed
+                        if (newValue != oldValue) {
+                            dependentIt->second = newValue;
+
+                            // Emit change signal for the dependent state
+                            emit stateChanged(dependent, newValue);
+
+                            // Recursively update dependents of this dependent
+                            updateDependents(dependent);
+
+                            qDebug() << "✅ Dependent state updated:" << dependent
+                                     << "from" << oldValue << "to" << newValue;
+                        }
+                    } catch (const std::exception& e) {
+                        qWarning() << "❌ Error updating dependent state" << dependent << ":" << e.what();
+                    }
+                } else {
+                    // If no computed function, just emit a change notification
+                    // This allows manual dependent updates
+                    emit stateChanged(dependent, dependentIt->second);
+                }
+            }
         }
     }
 }

@@ -413,6 +413,10 @@ private:
         dependencies_;  ///< Map of state dependencies.
     std::unordered_map<QString, std::vector<QString>>
         dependents_;  ///< Map of state dependents.
+    std::unordered_map<QString, std::function<QVariant()>>
+        computed_values_;  ///< Map of computed value functions for dependent states.
+    std::unordered_map<QString, QVariant>
+        state_data_;  ///< Map of state keys to current values for quick access.
 
     bool batching_ = false;    ///< Whether batch update mode is active.
     bool debug_mode_ = false;  ///< Whether debug mode is enabled.

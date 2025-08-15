@@ -80,15 +80,65 @@ target_link_libraries(JSONTest
     Qt6::Test
 )
 
-# **Hot Reload Module Tests** (temporarily disabled due to API mismatches)
-# add_executable(HotReloadTest test_hot_reload.cpp)
-# target_link_libraries(HotReloadTest
-#     DeclarativeUI
-#     Components
-#     Qt6::Core
-#     Qt6::Widgets
-#     Qt6::Test
-# )
+# **Hot Reload Module Tests**
+add_executable(HotReloadTest test_hot_reload.cpp)
+target_link_libraries(HotReloadTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Advanced Hot Reload Tests**
+add_executable(HotReloadAdvancedTest test_hot_reload_advanced.cpp)
+target_link_libraries(HotReloadAdvancedTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Performance Monitor Advanced Tests**
+add_executable(PerformanceMonitorAdvancedTest test_performance_monitor_advanced.cpp)
+target_link_libraries(PerformanceMonitorAdvancedTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Hot Reload Manager Advanced Tests**
+add_executable(HotReloadManagerAdvancedTest test_hot_reload_manager_advanced.cpp)
+target_link_libraries(HotReloadManagerAdvancedTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **JSON Advanced Tests**
+add_executable(JSONAdvancedTest test_json_advanced.cpp)
+target_link_libraries(JSONAdvancedTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **HotReload JSON Integration Tests**
+add_executable(HotReloadJSONIntegrationTest test_hot_reload_json_integration.cpp)
+target_link_libraries(HotReloadJSONIntegrationTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
 
 # **Exception Handling Tests**
 add_executable(ExceptionsTest test_exceptions.cpp)
@@ -191,6 +241,16 @@ target_link_libraries(AccessibilityTest
     Qt6::Test
 )
 
+# **Cache Manager Tests**
+add_executable(CacheManagerTest CacheManagerTest.cpp)
+target_link_libraries(CacheManagerTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
 # **Set output directory for unit tests**
 set_target_properties(
     CoreTest
@@ -201,7 +261,12 @@ set_target_properties(
     StateManagerTest
     PropertyBindingTemplateTest
     JSONTest
-    # HotReloadTest
+    HotReloadTest
+    HotReloadAdvancedTest
+    PerformanceMonitorAdvancedTest
+    HotReloadManagerAdvancedTest
+    JSONAdvancedTest
+    HotReloadJSONIntegrationTest
     ExceptionsTest
     ThreadSafetyTest
     # ModernCppTest
@@ -212,6 +277,7 @@ set_target_properties(
     # ComponentUtilsTest
     # SmartPointersTest
     AccessibilityTest
+    CacheManagerTest
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests/unit
 )
@@ -225,7 +291,12 @@ add_dependencies(PropertyBindingTest CopyTestResources)
 add_dependencies(StateManagerTest CopyTestResources)
 add_dependencies(PropertyBindingTemplateTest CopyTestResources)
 add_dependencies(JSONTest CopyTestResources)
-# add_dependencies(HotReloadTest CopyTestResources)
+add_dependencies(HotReloadTest CopyTestResources)
+add_dependencies(HotReloadAdvancedTest CopyTestResources)
+add_dependencies(PerformanceMonitorAdvancedTest CopyTestResources)
+add_dependencies(HotReloadManagerAdvancedTest CopyTestResources)
+add_dependencies(JSONAdvancedTest CopyTestResources)
+add_dependencies(HotReloadJSONIntegrationTest CopyTestResources)
 add_dependencies(ExceptionsTest CopyTestResources)
 add_dependencies(ThreadSafetyTest CopyTestResources)
 # add_dependencies(ModernCppTest CopyTestResources)
@@ -236,6 +307,7 @@ add_dependencies(ThemeSystemTest CopyTestResources)
 # add_dependencies(ComponentUtilsTest CopyTestResources)
 # add_dependencies(SmartPointersTest CopyTestResources)
 add_dependencies(AccessibilityTest CopyTestResources)
+add_dependencies(CacheManagerTest CopyTestResources)
 
 # **Register tests with CTest**
 add_test(NAME CoreTest COMMAND CoreTest)
@@ -246,7 +318,12 @@ add_test(NAME PropertyBindingTest COMMAND PropertyBindingTest)
 add_test(NAME StateManagerTest COMMAND StateManagerTest)
 add_test(NAME PropertyBindingTemplateTest COMMAND PropertyBindingTemplateTest)
 add_test(NAME JSONTest COMMAND JSONTest)
-# add_test(NAME HotReloadTest COMMAND HotReloadTest)
+add_test(NAME HotReloadTest COMMAND HotReloadTest)
+add_test(NAME HotReloadAdvancedTest COMMAND HotReloadAdvancedTest)
+add_test(NAME PerformanceMonitorAdvancedTest COMMAND PerformanceMonitorAdvancedTest)
+add_test(NAME HotReloadManagerAdvancedTest COMMAND HotReloadManagerAdvancedTest)
+add_test(NAME JSONAdvancedTest COMMAND JSONAdvancedTest)
+add_test(NAME HotReloadJSONIntegrationTest COMMAND HotReloadJSONIntegrationTest)
 add_test(NAME ExceptionsTest COMMAND ExceptionsTest)
 add_test(NAME ThreadSafetyTest COMMAND ThreadSafetyTest)
 # add_test(NAME ModernCppTest COMMAND ModernCppTest)
@@ -257,3 +334,4 @@ add_test(NAME ThemeSystemTest COMMAND ThemeSystemTest)
 # add_test(NAME ComponentUtilsTest COMMAND ComponentUtilsTest)
 # add_test(NAME SmartPointersTest COMMAND SmartPointersTest)
 add_test(NAME AccessibilityTest COMMAND AccessibilityTest)
+add_test(NAME CacheManagerTest COMMAND CacheManagerTest)

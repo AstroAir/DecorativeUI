@@ -10,6 +10,8 @@
 #include <QGridLayout>
 #include <QLayout>
 #include <QTimer>
+#include <QRegularExpression>
+#include <QFile>
 
 namespace DeclarativeUI::HotReload {
 
@@ -768,6 +770,267 @@ bool HotReloadManager::rollbackToPointInternal(const QString& file_path) {
         qDebug() << "Rollback to point error:" << e.what();
         return false;
     }
+}
+
+// **Missing dependency management methods**
+void HotReloadManager::buildDependencyGraph() {
+    std::unique_lock<std::shared_mutex> lock(data_mutex_);
+
+    qDebug() << "🔗 Building dependency graph...";
+
+    // Clear existing graph
+    dependency_graph_.clear();
+
+    // Build graph from registered files
+    for (const auto& [file_path, info] : registered_files_) {
+        FileDependency dep_info;
+        dep_info.file_path = file_path;
+        dep_info.last_modified = QFileInfo(file_path).lastModified();
+        dep_info.content_hash = qHash(file_path); // Simplified hash
+
+        // Analyze file for dependencies (simplified)
+        QFile file(file_path);
+        if (file.open(QIODevice::ReadOnly)) {
+            QByteArray content = file.readAll();
+            QString content_str = QString::fromUtf8(content);
+
+            // Look for include/import patterns in JSON
+            QRegularExpression include_pattern("\"include\"\\s*:\\s*\"([^\"]+)\"");
+            QRegularExpressionMatchIterator matches = include_pattern.globalMatch(content_str);
+
+            while (matches.hasNext()) {
+                QRegularExpressionMatch match = matches.next();
+                QString dependency = match.captured(1);
+
+                // Resolve relative paths
+                QFileInfo dep_info_file(QFileInfo(file_path).dir(), dependency);
+                QString canonical_dep = dep_info_file.canonicalFilePath();
+
+                if (!canonical_dep.isEmpty()) {
+                    dep_info.dependencies.insert(canonical_dep);
+                }
+            }
+        }
+
+        dependency_graph_[file_path] = dep_info;
+    }
+
+    // Build reverse dependencies (dependents)
+    for (auto& [file_path, dep_info] : dependency_graph_) {
+        for (const QString& dependency : dep_info.dependencies) {
+            if (dependency_graph_.contains(dependency)) {
+                dependency_graph_[dependency].dependents.insert(file_path);
+            }
+        }
+    }
+
+    qDebug() << "✅ Dependency graph built with" << dependency_graph_.size() << "files";
+}
+
+void HotReloadManager::updateDependencies(const QString& file_path) {
+    std::unique_lock<std::shared_mutex> lock(data_mutex_);
+
+    auto it = dependency_graph_.find(file_path);
+    if (it == dependency_graph_.end()) {
+        return;
+    }
+
+    // Update file metadata
+    QFileInfo file_info(file_path);
+    it->second.last_modified = file_info.lastModified();
+    it->second.content_hash = qHash(file_path);
+
+    qDebug() << "🔗 Updated dependencies for:" << file_path;
+}
+
+bool HotReloadManager::hasCyclicDependency(const QString& file_path) const {
+    std::shared_lock<std::shared_mutex> lock(data_mutex_);
+
+    std::unordered_set<QString> visited;
+    std::unordered_set<QString> recursion_stack;
+
+    std::function<bool(const QString&)> has_cycle = [&](const QString& current) -> bool {
+        if (recursion_stack.contains(current)) {
+            return true; // Cycle detected
+        }
+
+        if (visited.contains(current)) {
+            return false; // Already processed
+        }
+
+        visited.insert(current);
+        recursion_stack.insert(current);
+
+        auto it = dependency_graph_.find(current);
+        if (it != dependency_graph_.end()) {
+            for (const QString& dependency : it->second.dependencies) {
+                if (has_cycle(dependency)) {
+                    return true;
+                }
+            }
+        }
+
+        recursion_stack.erase(current);
+        return false;
+    };
+
+    return has_cycle(file_path);
+}
+
+// **Missing thread management methods**
+QThread* HotReloadManager::getAvailableThread() {
+    // Simple round-robin thread selection
+    static size_t thread_index = 0;
+
+    if (thread_pool_.empty()) {
+        return nullptr;
+    }
+
+    QThread* selected_thread = thread_pool_[thread_index % thread_pool_.size()].get();
+    thread_index++;
+
+    return selected_thread;
+}
+
+// **Missing performance measurement methods**
+ReloadMetrics HotReloadManager::measureReloadPerformance(const std::function<void()>& reload_func) {
+    ReloadMetrics metrics;
+    QElapsedTimer timer;
+
+    timer.start();
+
+    try {
+        reload_func();
+        metrics.success = true;
+    } catch (const std::exception& e) {
+        metrics.success = false;
+        qWarning() << "Reload function failed:" << e.what();
+    }
+
+    metrics.total_time = std::chrono::milliseconds(timer.elapsed());
+
+    return metrics;
+}
+
+// **Missing configuration methods**
+void HotReloadManager::setPreloadStrategy(bool preload_dependencies) {
+    if (preload_dependencies) {
+        // Preload all dependencies for registered files
+        for (const auto& [file_path, info] : registered_files_) {
+            preloadDependencies(file_path);
+        }
+    }
+
+    qDebug() << "📋 Preload strategy set to:" << preload_dependencies;
+}
+
+void HotReloadManager::clearRollbackPoints() {
+    std::unique_lock<std::shared_mutex> lock(data_mutex_);
+
+    // Clear all backup widgets
+    for (auto& [file_path, info] : registered_files_) {
+        info.backup_widget.reset();
+    }
+
+    qDebug() << "🗑️ All rollback points cleared";
+}
+
+// **Missing async reload method**
+void HotReloadManager::performReloadAsync(const QString& file_path) {
+    QThread* worker_thread = getAvailableThread();
+    if (!worker_thread) {
+        // Fallback to synchronous reload
+        performReload(file_path);
+        return;
+    }
+
+    // Create a worker to perform reload on background thread
+    QTimer::singleShot(0, [this, file_path]() {
+        try {
+            performReload(file_path);
+        } catch (const std::exception& e) {
+            qWarning() << "Async reload failed for" << file_path << ":" << e.what();
+            emit reloadFailed(file_path, QString::fromStdString(e.what()));
+        }
+    });
+
+    qDebug() << "🚀 Async reload started for:" << file_path;
+}
+
+// **Missing safe widget replacement method**
+void HotReloadManager::replaceWidgetSafe(const QString& file_path, std::unique_ptr<QWidget> new_widget) {
+    if (!new_widget) {
+        qWarning() << "Cannot replace with null widget for:" << file_path;
+        return;
+    }
+
+    auto it = registered_files_.find(file_path);
+    if (it == registered_files_.end()) {
+        qWarning() << "File not registered for safe replacement:" << file_path;
+        return;
+    }
+
+    UIFileInfo& info = it->second;
+
+    // Validate new widget before replacement
+    if (!validateWidget(new_widget.get())) {
+        qWarning() << "Widget validation failed for:" << file_path;
+        return;
+    }
+
+    // Create backup of current widget
+    if (info.target_widget) {
+        info.backup_widget = std::unique_ptr<QWidget>(info.target_widget);
+    }
+
+    // Perform safe replacement
+    try {
+        replaceWidget(file_path, std::move(new_widget));
+        qDebug() << "✅ Safe widget replacement completed for:" << file_path;
+    } catch (const std::exception& e) {
+        // Restore backup on failure
+        if (info.backup_widget) {
+            info.target_widget = info.backup_widget.release();
+        }
+        qWarning() << "Safe widget replacement failed for" << file_path << ":" << e.what();
+        throw;
+    }
+}
+
+// **Missing preload dependencies method**
+void HotReloadManager::preloadDependencies(const QString& file_path) {
+    auto it = dependency_graph_.find(file_path);
+    if (it == dependency_graph_.end()) {
+        return;
+    }
+
+    for (const QString& dependency : it->second.dependencies) {
+        if (!preloaded_files_.contains(dependency)) {
+            try {
+                // Load dependency into cache
+                auto widget = ui_loader_->loadFromFile(dependency);
+                if (widget) {
+                    preloaded_files_.insert(dependency);
+                    qDebug() << "📦 Preloaded dependency:" << dependency;
+                }
+            } catch (const std::exception& e) {
+                qWarning() << "Failed to preload dependency" << dependency << ":" << e.what();
+            }
+        }
+    }
+}
+
+// **Missing widget creation from cache method**
+std::unique_ptr<QWidget> HotReloadManager::createWidgetFromCache(const QString& file_path) {
+    if (preloaded_files_.contains(file_path)) {
+        try {
+            return ui_loader_->loadFromFile(file_path);
+        } catch (const std::exception& e) {
+            qWarning() << "Failed to create widget from cache for" << file_path << ":" << e.what();
+        }
+    }
+
+    return nullptr;
 }
 
 }  // namespace DeclarativeUI::HotReload

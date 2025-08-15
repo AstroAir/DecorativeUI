@@ -53,13 +53,32 @@ CommandMetadata ButtonCommand::getMetadata() const {
 }
 
 QPushButton* ButtonCommand::findButton(const QString& name) {
+    if (name.isEmpty()) {
+        qWarning() << "ButtonCommand: Empty widget name provided";
+        return nullptr;
+    }
+
+    // First try to find by object name in all widgets
     for (auto* widget : QApplication::allWidgets()) {
         if (auto* button = qobject_cast<QPushButton*>(widget)) {
             if (button->objectName() == name) {
+                qDebug() << "Found button with name:" << name;
                 return button;
             }
         }
     }
+
+    // If not found, try to find by window title or text
+    for (auto* widget : QApplication::allWidgets()) {
+        if (auto* button = qobject_cast<QPushButton*>(widget)) {
+            if (button->text() == name) {
+                qDebug() << "Found button with text:" << name;
+                return button;
+            }
+        }
+    }
+
+    qWarning() << "ButtonCommand: No button found with name or text:" << name;
     return nullptr;
 }
 
@@ -424,8 +443,64 @@ QLabel* LabelCommand::findLabel(const QString& name) {
 // ============================================================================
 
 void registerComponentCommands() {
-    // This will be implemented when we integrate with the command system
-    qDebug() << "🔧 Component commands registered";
+    auto& factory = DeclarativeUI::Command::CommandFactory::instance();
+
+    qDebug() << "🔧 Registering component commands with factories";
+
+    // ========================================================================
+    // BUTTON COMPONENTS
+    // ========================================================================
+
+    // Register ButtonCommand with CommandFactory
+    factory.registerCommand("button", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        return std::make_unique<ButtonCommand>(context);
+    });
+
+    // Register CheckBoxCommand
+    factory.registerCommand("checkbox", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        return std::make_unique<CheckBoxCommand>(context);
+    });
+
+    // Register RadioButtonCommand
+    factory.registerCommand("radiobutton", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        return std::make_unique<RadioButtonCommand>(context);
+    });
+
+    // ========================================================================
+    // INPUT COMPONENTS
+    // ========================================================================
+
+    // Register SpinBoxCommand
+    factory.registerCommand("spinbox", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        return std::make_unique<SpinBoxCommand>(context);
+    });
+
+    // Register SliderCommand
+    factory.registerCommand("slider", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        return std::make_unique<SliderCommand>(context);
+    });
+
+    // Register ComboBoxCommand
+    factory.registerCommand("combobox", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        return std::make_unique<ComboBoxCommand>(context);
+    });
+
+    // Register LineEditCommand
+    factory.registerCommand("lineedit", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        return std::make_unique<LineEditCommand>(context);
+    });
+
+    // Register TextEditCommand
+    factory.registerCommand("textedit", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        return std::make_unique<TextEditCommand>(context);
+    });
+
+    // Register LabelCommand
+    factory.registerCommand("label", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        return std::make_unique<LabelCommand>(context);
+    });
+
+    qDebug() << "✅ Component commands registered successfully";
 }
 
 }  // namespace ComponentCommands

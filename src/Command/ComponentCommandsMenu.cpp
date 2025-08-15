@@ -112,11 +112,47 @@ CommandResult<QVariant> StatusBarCommand::execute(const CommandContext& context)
         statusBar->clearMessage();
         return CommandResult<QVariant>(QString("StatusBar message cleared successfully"));
     } else if (operation == "addWidget") {
-        // Note: Adding widgets requires more complex handling in real implementation
-        return CommandResult<QVariant>(QString("addWidget operation requires custom widget implementation"));
+        auto widgetName = context.getParameter<QString>("widgetName");
+        auto stretch = context.getParameter<int>("stretch");
+        if (context.hasParameter("widgetName")) {
+            // Find the widget to add by name
+            QWidget* widgetToAdd = nullptr;
+            for (auto* widget : QApplication::allWidgets()) {
+                if (widget->objectName() == widgetName) {
+                    widgetToAdd = widget;
+                    break;
+                }
+            }
+
+            if (widgetToAdd) {
+                int stretchValue = context.hasParameter("stretch") ? stretch : 0;
+                statusBar->addWidget(widgetToAdd, stretchValue);
+                return CommandResult<QVariant>(QString("Widget '%1' added to StatusBar successfully").arg(widgetName));
+            } else {
+                return CommandResult<QVariant>(QString("Widget '%1' not found for addWidget operation").arg(widgetName));
+            }
+        }
+        return CommandResult<QVariant>(QString("Missing widgetName parameter for addWidget operation"));
     } else if (operation == "removeWidget") {
-        // Note: Removing widgets requires more complex handling in real implementation
-        return CommandResult<QVariant>(QString("removeWidget operation requires custom widget implementation"));
+        auto widgetName = context.getParameter<QString>("widgetName");
+        if (context.hasParameter("widgetName")) {
+            // Find the widget to remove by name
+            QWidget* widgetToRemove = nullptr;
+            for (auto* widget : QApplication::allWidgets()) {
+                if (widget->objectName() == widgetName && widget->parent() == statusBar) {
+                    widgetToRemove = widget;
+                    break;
+                }
+            }
+
+            if (widgetToRemove) {
+                statusBar->removeWidget(widgetToRemove);
+                return CommandResult<QVariant>(QString("Widget '%1' removed from StatusBar successfully").arg(widgetName));
+            } else {
+                return CommandResult<QVariant>(QString("Widget '%1' not found in StatusBar for removeWidget operation").arg(widgetName));
+            }
+        }
+        return CommandResult<QVariant>(QString("Missing widgetName parameter for removeWidget operation"));
     }
 
     return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));

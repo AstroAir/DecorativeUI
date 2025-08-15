@@ -134,6 +134,33 @@ struct CacheStatistics {
 };
 
 /**
+ * @brief Non-atomic version of CacheStatistics for returning snapshots.
+ *
+ * This struct can be copied and moved, making it suitable for return values.
+ */
+struct CacheStatisticsSnapshot {
+    size_t total_requests{0}; /**< Total cache lookups. */
+    size_t cache_hits{0};     /**< Number of successful lookups. */
+    size_t cache_misses{0};   /**< Number of failed lookups. */
+    size_t evictions{0};      /**< Number of evicted entries. */
+    size_t total_memory_usage{
+        0}; /**< Total memory usage tracked for this cache. */
+    size_t max_memory_usage{
+        0}; /**< Observed max memory usage for this cache. */
+
+    /**
+     * @brief Compute the hit ratio as cache_hits / total_requests.
+     * @return Hit ratio in range [0.0, 1.0]. Returns 0.0 when no requests
+     * recorded.
+     */
+    double getHitRatio() const {
+        return total_requests > 0
+                   ? static_cast<double>(cache_hits) / total_requests
+                   : 0.0;
+    }
+};
+
+/**
  * @brief Generic in-memory cache with configurable size/memory limits and
  * eviction.
  *
@@ -260,7 +287,7 @@ public:
      * @name Statistics and monitoring
      * @{
      */
-    CacheStatistics getStatistics()
+    CacheStatisticsSnapshot getStatistics()
         const;           /**< Return a snapshot of current cache statistics. */
     size_t size() const; /**< Return current number of entries. */
     size_t memoryUsage()

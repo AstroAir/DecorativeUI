@@ -1,7 +1,14 @@
 // Core/UIElement.cpp
 #include "UIElement.hpp"
+
 #include <QApplication>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QMetaObject>
+#include <QPalette>
 #include <QTimer>
+
+#include <chrono>
 
 namespace DeclarativeUI::Core {
 
@@ -225,8 +232,9 @@ void UIElement::onAnimationFinished() {
 }
 
 // **Animation method implementations using new Animation system**
-UIElement &UIElement::animate(const QString &property, const QVariant &target_value,
-                             const AnimationConfig &config) {
+UIElement &UIElement::animate(const QString &property,
+                              const QVariant &target_value,
+                              const AnimationConfig &config) {
     if (!config.enabled || !widget_) {
         return *this;
     }
@@ -239,7 +247,8 @@ UIElement &UIElement::animate(const QString &property, const QVariant &target_va
             emit animationStarted(property);
         }
     } catch (const std::exception &e) {
-        qWarning() << "Failed to create animation for property" << property << ":" << e.what();
+        qWarning() << "Failed to create animation for property" << property
+                   << ":" << e.what();
     }
 
     return *this;
@@ -252,7 +261,8 @@ UIElement &UIElement::fadeIn(const AnimationConfig &config) {
 
     try {
         auto &engine = Animation::AnimationEngine::instance();
-        auto animation = engine.fadeIn(widget_.get(), static_cast<int>(config.duration.count()));
+        auto animation = engine.fadeIn(
+            widget_.get(), static_cast<int>(config.duration.count()));
 
         if (animation) {
             animations_["opacity"] = animation;
@@ -272,7 +282,8 @@ UIElement &UIElement::fadeOut(const AnimationConfig &config) {
 
     try {
         auto &engine = Animation::AnimationEngine::instance();
-        auto animation = engine.fadeOut(widget_.get(), static_cast<int>(config.duration.count()));
+        auto animation = engine.fadeOut(
+            widget_.get(), static_cast<int>(config.duration.count()));
 
         if (animation) {
             animations_["opacity"] = animation;
@@ -292,7 +303,8 @@ UIElement &UIElement::slideIn(const AnimationConfig &config) {
 
     try {
         auto &engine = Animation::AnimationEngine::instance();
-        auto animation = engine.slideIn(widget_.get(), "left", static_cast<int>(config.duration.count()));
+        auto animation = engine.slideIn(
+            widget_.get(), "left", static_cast<int>(config.duration.count()));
 
         if (animation) {
             animations_["position"] = animation;
@@ -312,7 +324,8 @@ UIElement &UIElement::slideOut(const AnimationConfig &config) {
 
     try {
         auto &engine = Animation::AnimationEngine::instance();
-        auto animation = engine.slideOut(widget_.get(), "right", static_cast<int>(config.duration.count()));
+        auto animation = engine.slideOut(
+            widget_.get(), "right", static_cast<int>(config.duration.count()));
 
         if (animation) {
             animations_["position"] = animation;
@@ -339,10 +352,10 @@ UIElement &UIElement::setOpacity(qreal opacity, const AnimationConfig &config) {
     try {
         auto &engine = Animation::AnimationEngine::instance();
         QVariant current_opacity = widget_->windowOpacity();
-        auto animation = engine.animateProperty(widget_.get(), "windowOpacity",
-                                              current_opacity, QVariant(opacity),
-                                              static_cast<int>(config.duration.count()),
-                                              config.toAnimationProperties().easing);
+        auto animation = engine.animateProperty(
+            widget_.get(), "windowOpacity", current_opacity, QVariant(opacity),
+            static_cast<int>(config.duration.count()),
+            config.toAnimationProperties().easing);
 
         if (animation) {
             animations_["windowOpacity"] = animation;
@@ -358,32 +371,34 @@ UIElement &UIElement::setOpacity(qreal opacity, const AnimationConfig &config) {
 }
 
 // **Animation helper implementations**
-std::shared_ptr<Animation::Animation> UIElement::createAnimation(const QString &property,
-                                                               const QVariant &target_value,
-                                                               const AnimationConfig &config) {
+std::shared_ptr<Animation::Animation> UIElement::createAnimation(
+    const QString &property, const QVariant &target_value,
+    const AnimationConfig &config) {
     if (!widget_) {
         return nullptr;
     }
 
     try {
         auto &engine = Animation::AnimationEngine::instance();
-        QVariant current_value = widget_->property(property.toUtf8().constData());
+        QVariant current_value =
+            widget_->property(property.toUtf8().constData());
 
-        auto animation = engine.animateProperty(widget_.get(), property,
-                                              current_value, target_value,
-                                              static_cast<int>(config.duration.count()),
-                                              config.toAnimationProperties().easing);
+        auto animation = engine.animateProperty(
+            widget_.get(), property, current_value, target_value,
+            static_cast<int>(config.duration.count()),
+            config.toAnimationProperties().easing);
 
         setupAnimation(animation, config);
         return animation;
     } catch (const std::exception &e) {
-        qWarning() << "Failed to create animation for property" << property << ":" << e.what();
+        qWarning() << "Failed to create animation for property" << property
+                   << ":" << e.what();
         return nullptr;
     }
 }
 
 void UIElement::setupAnimation(std::shared_ptr<Animation::Animation> animation,
-                              const AnimationConfig &config) {
+                               const AnimationConfig &config) {
     if (!animation) {
         return;
     }
@@ -393,10 +408,417 @@ void UIElement::setupAnimation(std::shared_ptr<Animation::Animation> animation,
         animation->setProperties(props);
 
         // Connect animation finished signal to our slot
-        connect(animation.get(), &Animation::Animation::finished,
-                this, &UIElement::onAnimationFinished);
+        connect(animation.get(), &Animation::Animation::finished, this,
+                &UIElement::onAnimationFinished);
     } catch (const std::exception &e) {
         qWarning() << "Failed to setup animation:" << e.what();
+    }
+}
+
+// **Validation implementation**
+void UIElement::addValidator(std::function<bool(const UIElement *)> validator) {
+    if (!validator) {
+        throw std::invalid_argument("Validator function cannot be null");
+    }
+
+    validators_.push_back(std::move(validator));
+}
+
+// **Theme support implementation**
+void UIElement::setTheme(const ThemeConfig &theme) {
+    theme_ = theme;
+
+    // Apply theme immediately if widget exists
+    if (widget_) {
+        applyTheme();
+    }
+
+    emit styleChanged();
+}
+
+void UIElement::applyTheme() {
+    if (!widget_) {
+        return;
+    }
+
+    try {
+        // Apply color palette
+        QPalette palette = widget_->palette();
+
+        // Set primary colors
+        palette.setColor(QPalette::Button, QColor(theme_.primary_color));
+        palette.setColor(QPalette::ButtonText, QColor(theme_.text_color));
+        palette.setColor(QPalette::Base, QColor(theme_.background_color));
+        palette.setColor(QPalette::Window, QColor(theme_.background_color));
+        palette.setColor(QPalette::WindowText, QColor(theme_.text_color));
+        palette.setColor(QPalette::Text, QColor(theme_.text_color));
+
+        // Set highlight colors
+        palette.setColor(QPalette::Highlight, QColor(theme_.primary_color));
+        palette.setColor(QPalette::HighlightedText,
+                         QColor(theme_.background_color));
+
+        widget_->setPalette(palette);
+
+        // Apply font if specified
+        if (!theme_.font_family.isEmpty()) {
+            QFont font(theme_.font_family, theme_.font_size);
+            widget_->setFont(font);
+        }
+
+        // Compile and apply stylesheet
+        compileStylesheet();
+
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to apply theme:" << e.what();
+    }
+}
+
+void UIElement::compileStylesheet() {
+    if (!widget_) {
+        return;
+    }
+
+    try {
+        QString stylesheet;
+
+        // Build stylesheet from theme
+        stylesheet += QString("QWidget { ");
+        stylesheet +=
+            QString("background-color: %1; ").arg(theme_.background_color);
+        stylesheet += QString("color: %1; ").arg(theme_.text_color);
+        stylesheet += QString("font-family: %1; ").arg(theme_.font_family);
+        stylesheet += QString("font-size: %1pt; ").arg(theme_.font_size);
+
+        // Add spacing and border
+        stylesheet += QString("padding: 8px; ");
+        stylesheet += QString("margin: 4px; ");
+        stylesheet +=
+            QString("border: 1px solid %1; ").arg(theme_.border_color);
+        stylesheet +=
+            QString("border-radius: %1px; ").arg(theme_.border_radius);
+
+        stylesheet += "} ";
+
+        // Button specific styles
+        stylesheet += QString("QPushButton { ");
+        stylesheet +=
+            QString("background-color: %1; ").arg(theme_.primary_color);
+        stylesheet += QString("color: %1; ").arg(theme_.background_color);
+        stylesheet += QString("border: none; ");
+        stylesheet += QString("padding: 8px 16px; ");
+        stylesheet +=
+            QString("border-radius: %1px; ").arg(theme_.border_radius);
+        stylesheet += "} ";
+
+        stylesheet += QString("QPushButton:hover { ");
+        stylesheet +=
+            QString("background-color: %1; ").arg(theme_.secondary_color);
+        stylesheet += "} ";
+
+        stylesheet += QString("QPushButton:pressed { ");
+        stylesheet +=
+            QString("background-color: %1; ").arg(theme_.border_color);
+        stylesheet += "} ";
+
+        // Apply the compiled stylesheet
+        widget_->setStyleSheet(stylesheet);
+
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to compile stylesheet:" << e.what();
+    }
+}
+
+// **Performance monitoring implementation**
+void UIElement::measurePerformance(std::function<void()> operation) {
+    if (!operation) {
+        return;
+    }
+
+    if (!performance_monitoring_enabled_) {
+        // Just execute without measuring if monitoring is disabled
+        operation();
+        return;
+    }
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    try {
+        operation();
+
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration =
+            std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+        // Update performance metrics
+        performance_metrics_.update_count++;
+        performance_metrics_.total_update_time += duration;
+        performance_metrics_.last_update_time = duration;
+
+        // Log if operation took too long (> 16ms for 60fps)
+        if (duration.count() > 16000) {
+            qWarning() << "Slow operation detected:" << duration.count()
+                       << "microseconds";
+        }
+
+    } catch (const std::exception &e) {
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration =
+            std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+        qWarning() << "Performance measurement failed after" << duration.count()
+                   << "microseconds:" << e.what();
+        throw;
+    }
+}
+
+// **Responsive design implementation**
+void UIElement::checkBreakpoints() {
+    if (!widget_ || !responsive_enabled_) {
+        return;
+    }
+
+    int width = widget_->width();
+
+    // Only emit signal if breakpoint actually changed
+    if (width != current_width_) {
+        current_width_ = width;
+        emit breakpointChanged(width);
+
+        // Apply responsive styles based on breakpoints
+        try {
+            QString responsive_class;
+
+            if (width < 576) {
+                responsive_class = "xs";
+            } else if (width < 768) {
+                responsive_class = "sm";
+            } else if (width < 992) {
+                responsive_class = "md";
+            } else if (width < 1200) {
+                responsive_class = "lg";
+            } else {
+                responsive_class = "xl";
+            }
+
+            // Set property for CSS-like responsive styling
+            widget_->setProperty("responsive-class", responsive_class);
+
+            // Recompile stylesheet with responsive styles
+            compileStylesheet();
+
+        } catch (const std::exception &e) {
+            qWarning() << "Failed to apply responsive styles:" << e.what();
+        }
+    }
+}
+
+// **Serialization implementation**
+QJsonObject UIElement::serialize() const {
+    QJsonObject json;
+
+    try {
+        // Serialize basic properties
+        QJsonObject properties_json;
+        for (const auto &[name, value] : properties_) {
+            std::visit(
+                [&](const auto &val) {
+                    using T = std::decay_t<decltype(val)>;
+
+                    if constexpr (std::is_same_v<T, QString>) {
+                        properties_json[name] = val;
+                    } else if constexpr (std::is_same_v<T, int>) {
+                        properties_json[name] = val;
+                    } else if constexpr (std::is_same_v<T, double>) {
+                        properties_json[name] = val;
+                    } else if constexpr (std::is_same_v<T, bool>) {
+                        properties_json[name] = val;
+                    } else if constexpr (std::is_same_v<T, QSize>) {
+                        QJsonObject size_obj;
+                        size_obj["width"] = val.width();
+                        size_obj["height"] = val.height();
+                        properties_json[name] = size_obj;
+                    } else if constexpr (std::is_same_v<T, QPoint>) {
+                        QJsonObject point_obj;
+                        point_obj["x"] = val.x();
+                        point_obj["y"] = val.y();
+                        properties_json[name] = point_obj;
+                    } else if constexpr (std::is_same_v<T, QColor>) {
+                        properties_json[name] = val.name();
+                    } else {
+                        // For other types, try to convert to string
+                        properties_json[name] = QString("Unsupported type");
+                    }
+                },
+                value);
+        }
+        json["properties"] = properties_json;
+
+        // Serialize theme information
+        QJsonObject theme_json;
+        theme_json["primary_color"] = theme_.primary_color;
+        theme_json["secondary_color"] = theme_.secondary_color;
+        theme_json["background_color"] = theme_.background_color;
+        theme_json["text_color"] = theme_.text_color;
+        theme_json["border_color"] = theme_.border_color;
+        theme_json["font_family"] = theme_.font_family;
+        theme_json["font_size"] = theme_.font_size;
+        theme_json["border_radius"] = theme_.border_radius;
+        json["theme"] = theme_json;
+
+        // Serialize widget information if available
+        if (widget_) {
+            QJsonObject widget_json;
+            widget_json["class_name"] =
+                QString(widget_->metaObject()->className());
+            widget_json["object_name"] = widget_->objectName();
+            widget_json["geometry"] =
+                QJsonObject{{"x", widget_->x()},
+                            {"y", widget_->y()},
+                            {"width", widget_->width()},
+                            {"height", widget_->height()}};
+            widget_json["visible"] = widget_->isVisible();
+            widget_json["enabled"] = widget_->isEnabled();
+            json["widget"] = widget_json;
+        }
+
+        // Serialize performance metrics
+        QJsonObject metrics_json;
+        metrics_json["last_update_time"] =
+            static_cast<qint64>(performance_metrics_.last_update_time.count());
+        metrics_json["total_update_time"] =
+            static_cast<qint64>(performance_metrics_.total_update_time.count());
+        metrics_json["update_count"] = performance_metrics_.update_count;
+        metrics_json["average_update_time"] =
+            performance_metrics_.average_update_time();
+        json["performance_metrics"] = metrics_json;
+
+        // Serialize configuration flags
+        QJsonObject config_json;
+        config_json["performance_monitoring_enabled"] =
+            performance_monitoring_enabled_;
+        config_json["responsive_enabled"] = responsive_enabled_;
+        config_json["current_width"] = current_width_;
+        json["configuration"] = config_json;
+
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to serialize UIElement:" << e.what();
+        // Return partial JSON with error information
+        json["error"] = QString("Serialization failed: %1").arg(e.what());
+    }
+
+    return json;
+}
+
+bool UIElement::deserialize(const QJsonObject &json) {
+    try {
+        // Check for serialization errors
+        if (json.contains("error")) {
+            qWarning() << "Cannot deserialize UIElement with error:"
+                       << json["error"].toString();
+            return false;
+        }
+
+        // Deserialize properties
+        if (json.contains("properties") && json["properties"].isObject()) {
+            QJsonObject properties_json = json["properties"].toObject();
+
+            for (auto it = properties_json.begin(); it != properties_json.end();
+                 ++it) {
+                const QString &name = it.key();
+                const QJsonValue &value = it.value();
+
+                if (value.isString()) {
+                    properties_[name] = PropertyValue{value.toString()};
+                } else if (value.isDouble()) {
+                    // Handle both int and double
+                    double val = value.toDouble();
+                    if (val == static_cast<int>(val)) {
+                        properties_[name] =
+                            PropertyValue{static_cast<int>(val)};
+                    } else {
+                        properties_[name] = PropertyValue{val};
+                    }
+                } else if (value.isBool()) {
+                    properties_[name] = PropertyValue{value.toBool()};
+                } else if (value.isObject()) {
+                    QJsonObject obj = value.toObject();
+
+                    // Try to deserialize as QSize
+                    if (obj.contains("width") && obj.contains("height")) {
+                        QSize size(obj["width"].toInt(), obj["height"].toInt());
+                        properties_[name] = PropertyValue{size};
+                    }
+                    // Try to deserialize as QPoint
+                    else if (obj.contains("x") && obj.contains("y")) {
+                        QPoint point(obj["x"].toInt(), obj["y"].toInt());
+                        properties_[name] = PropertyValue{point};
+                    }
+                }
+            }
+        }
+
+        // Deserialize theme
+        if (json.contains("theme") && json["theme"].isObject()) {
+            QJsonObject theme_json = json["theme"].toObject();
+
+            if (theme_json.contains("primary_color")) {
+                theme_.primary_color = theme_json["primary_color"].toString();
+            }
+            if (theme_json.contains("secondary_color")) {
+                theme_.secondary_color =
+                    theme_json["secondary_color"].toString();
+            }
+            if (theme_json.contains("background_color")) {
+                theme_.background_color =
+                    theme_json["background_color"].toString();
+            }
+            if (theme_json.contains("text_color")) {
+                theme_.text_color = theme_json["text_color"].toString();
+            }
+            if (theme_json.contains("border_color")) {
+                theme_.border_color = theme_json["border_color"].toString();
+            }
+            if (theme_json.contains("font_family")) {
+                theme_.font_family = theme_json["font_family"].toString();
+            }
+            if (theme_json.contains("font_size")) {
+                theme_.font_size = theme_json["font_size"].toInt();
+            }
+            if (theme_json.contains("border_radius")) {
+                theme_.border_radius = theme_json["border_radius"].toInt();
+            }
+        }
+
+        // Deserialize configuration
+        if (json.contains("configuration") &&
+            json["configuration"].isObject()) {
+            QJsonObject config_json = json["configuration"].toObject();
+
+            if (config_json.contains("performance_monitoring_enabled")) {
+                performance_monitoring_enabled_ =
+                    config_json["performance_monitoring_enabled"].toBool();
+            }
+            if (config_json.contains("responsive_enabled")) {
+                responsive_enabled_ =
+                    config_json["responsive_enabled"].toBool();
+            }
+            if (config_json.contains("current_width")) {
+                current_width_ = config_json["current_width"].toInt();
+            }
+        }
+
+        // Apply deserialized properties to widget if it exists
+        if (widget_) {
+            applyStoredProperties();
+            applyTheme();
+        }
+
+        return true;
+
+    } catch (const std::exception &e) {
+        qWarning() << "Failed to deserialize UIElement:" << e.what();
+        return false;
     }
 }
 
