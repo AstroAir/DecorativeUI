@@ -279,6 +279,27 @@ target_link_libraries(PerformanceProfilerWidgetTest
     Qt6::Test
 )
 
+# **JSON Extended Tests**
+add_executable(JSONExtendedTest test_json_extended.cpp)
+target_link_libraries(JSONExtendedTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
+# **Performance Comprehensive Tests**
+add_executable(PerformanceComprehensiveTest test_performance_comprehensive.cpp)
+target_link_libraries(PerformanceComprehensiveTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+    Qt6::Concurrent
+)
+
 # **Set output directory for unit tests**
 set_target_properties(
     CoreTest
@@ -342,6 +363,8 @@ add_dependencies(CacheManagerTest CopyTestResources)
 add_dependencies(DebuggingConsoleTest CopyTestResources)
 add_dependencies(BottleneckDetectorWidgetTest CopyTestResources)
 add_dependencies(PerformanceProfilerWidgetTest CopyTestResources)
+add_dependencies(JSONExtendedTest CopyTestResources)
+add_dependencies(PerformanceComprehensiveTest CopyTestResources)
 
 # **Register tests with CTest**
 add_test(NAME CoreTest COMMAND CoreTest)
@@ -372,3 +395,5 @@ add_test(NAME CacheManagerTest COMMAND CacheManagerTest)
 add_test(NAME DebuggingConsoleTest COMMAND DebuggingConsoleTest)
 add_test(NAME BottleneckDetectorWidgetTest COMMAND BottleneckDetectorWidgetTest)
 add_test(NAME PerformanceProfilerWidgetTest COMMAND PerformanceProfilerWidgetTest)
+add_test(NAME JSONExtendedTest COMMAND JSONExtendedTest)
+add_test(NAME PerformanceComprehensiveTest COMMAND PerformanceComprehensiveTest)
