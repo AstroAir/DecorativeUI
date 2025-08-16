@@ -312,8 +312,10 @@ private slots:
 
         // Note: The current implementation uses string matching which may not
         // perfectly match widgets, but we can test that the method doesn't crash
-        QVERIFY(widget1Bindings.size() >= 0);
-        QVERIFY(widget2Bindings.size() >= 0);
+        // size() returns unsigned, so >= 0 is always true - just verify method works
+        Q_UNUSED(widget1Bindings);
+        Q_UNUSED(widget2Bindings);
+        QVERIFY(true); // Test that getBindingsForWidget doesn't crash
 
         // Clean up
         manager->removeBinding(binding1);

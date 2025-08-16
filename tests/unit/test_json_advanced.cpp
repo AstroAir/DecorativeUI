@@ -207,7 +207,7 @@ private slots:
         
         bool is_valid = validator.validate(valid_ui);
         if (!is_valid) {
-            QStringList errors = validator.getValidationErrors();
+            QStringList errors = validator.getErrorMessages();
             for (const QString& error : errors) {
                 qDebug() << "Validation error:" << error;
             }

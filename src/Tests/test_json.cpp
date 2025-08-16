@@ -169,7 +169,7 @@ private slots:
 
     // **JSONValidator Tests**
     void testJSONValidatorBasicValidation() {
-        JSONValidator validator;
+        UIJSONValidator validator;
         
         QJsonObject valid_object;
         valid_object["name"] = "test";
@@ -178,12 +178,12 @@ private slots:
         bool is_valid = validator.validate(valid_object);
         QVERIFY(is_valid);
         
-        auto errors = validator.getValidationErrors();
+        auto errors = validator.getErrorMessages();
         QVERIFY(errors.isEmpty());
     }
 
     void testJSONValidatorWithSchema() {
-        JSONValidator validator;
+        UIJSONValidator validator;
         
         // Define a simple schema
         QJsonObject schema;
@@ -219,12 +219,12 @@ private slots:
         bool is_invalid = validator.validate(invalid_object);
         QVERIFY(!is_invalid);
         
-        auto errors = validator.getValidationErrors();
+        auto errors = validator.getErrorMessages();
         QVERIFY(!errors.isEmpty());
     }
 
     void testJSONValidatorCustomRules() {
-        JSONValidator validator;
+        UIJSONValidator validator;
         
         // Add custom validation rule
         validator.addCustomRule("positive_number", [](const QJsonValue& value) -> bool {
@@ -415,7 +415,7 @@ private slots:
     }
 
     void testJSONValidatorErrorReporting() {
-        JSONValidator validator;
+        UIJSONValidator validator;
         
         QJsonObject invalid_object;
         invalid_object["invalid_type"] = QJsonArray(); // Assuming this violates some rule
@@ -423,7 +423,7 @@ private slots:
         bool is_valid = validator.validate(invalid_object);
         
         if (!is_valid) {
-            auto errors = validator.getValidationErrors();
+            auto errors = validator.getErrorMessages();
             QVERIFY(!errors.isEmpty());
             
             for (const auto& error : errors) {
@@ -470,7 +470,7 @@ private slots:
     void testJSONWorkflowIntegration() {
         // Test complete workflow: Parse -> Validate -> Load UI
         JSONParser parser;
-        JSONValidator validator;
+        UIJSONValidator validator;
         JSONUILoader loader;
         
         QString complete_ui_json = R"({

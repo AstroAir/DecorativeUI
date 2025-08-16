@@ -1218,4 +1218,26 @@ double PerformanceMonitor::calculateSeasonalFactor(const std::vector<double> &da
     return overall_avg > 0.0 ? recent_avg / overall_avg : 1.0;
 }
 
+// **Missing method implementations**
+
+void PerformanceMonitor::setMemoryWarningThreshold(size_t threshold_mb) {
+    memory_warning_threshold_mb_.store(threshold_mb);
+    qDebug() << "Memory warning threshold set to:" << threshold_mb << "MB";
+}
+
+void PerformanceMonitor::setCPUWarningThreshold(double threshold_percent) {
+    cpu_warning_threshold_percent_.store(threshold_percent);
+    qDebug() << "CPU warning threshold set to:" << threshold_percent << "%";
+}
+
+void PerformanceMonitor::applyAutomaticOptimizations(bool enabled) {
+    automatic_optimizations_enabled_.store(enabled);
+    qDebug() << "Automatic optimizations" << (enabled ? "enabled" : "disabled");
+
+    if (enabled) {
+        // Trigger optimization analysis
+        optimizePerformance();
+    }
+}
+
 }  // namespace DeclarativeUI::HotReload
