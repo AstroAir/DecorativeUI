@@ -93,6 +93,12 @@ ctest --output-on-failure
 ctest -R "unit"             # Unit tests only
 ctest -R "integration"      # Integration tests only
 ctest -R "performance"      # Performance tests only
+
+# Run individual test executables directly
+cd build/tests/unit
+./JSONExtendedTest.exe              # JSON parsing and performance tests
+./PerformanceComprehensiveTest.exe  # Comprehensive performance benchmarks
+./HotReloadTest.exe                 # Hot reload functionality tests
 ```
 
 ## Build Verification
@@ -109,11 +115,15 @@ build/
 │   ├── 04-advanced-features/
 │   ├── 05-command-system/
 │   └── 06-applications/
-└── tests/                  # Test executables
-    ├── unit/
-    ├── command/
-    ├── integration/
-    └── performance/
+└── tests/                  # Test executables (24 total)
+    ├── unit/               # Unit tests
+    │   ├── JSONExtendedTest.exe
+    │   ├── PerformanceComprehensiveTest.exe
+    │   ├── HotReloadTest.exe
+    │   └── ... (21 more test executables)
+    ├── command/            # Command system tests
+    ├── integration/        # Integration tests
+    └── performance/        # Performance tests
 ```
 
 ## Troubleshooting
