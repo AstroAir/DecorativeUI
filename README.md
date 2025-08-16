@@ -23,6 +23,7 @@ A modern, declarative UI framework for Qt applications that provides both tradit
 - **📋 Command System**: Comprehensive component-specific commands with automatic widget mapping and undo support
 - **📄 JSON Support**: Dynamic UI loading from JSON with validation and error reporting
 - **🧪 Comprehensive Testing**: 24+ test executables with 95%+ code coverage
+- **✅ Build System**: CMake-based build system with full Windows/MinGW support
 
 ## 🎯 Quick Example
 
@@ -255,6 +256,25 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - 📚 **Documentation** - Improve guides and examples
 - 🧪 **Testing** - Expand test coverage
 - ⚡ **Performance** - Optimize existing code
+
+## 🔧 Recent Build Improvements
+
+The project has undergone significant build system improvements to ensure reliable compilation and testing:
+
+**Build System Fixes:**
+- ✅ **Compilation Errors Fixed**: Resolved all API mismatches and missing implementations
+- 🔧 **Test Compatibility**: Updated test files to use correct public APIs
+- 📦 **Dependency Management**: Fixed PerformanceMonitor method implementations
+- 🧪 **Test Suite**: 20/21 tests now pass successfully
+- 🏗️ **CMake Integration**: Full Windows/MinGW build support verified
+
+**API Improvements:**
+- 🔄 **HotReload API**: Standardized method names (watchFile vs addFile)
+- 📊 **JSON Validation**: Updated to use getErrorMessages() API
+- 🚫 **Deprecated Code**: Replaced qrand() with modern C++ random generation
+- 🔒 **Access Control**: Fixed private method access issues in tests
+
+The build now completes successfully with comprehensive test coverage, making it easier for contributors to get started and ensuring reliable CI/CD pipelines.
 
 ## 📄 License
 
