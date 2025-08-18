@@ -5,8 +5,8 @@
 #ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
 #ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
 
-#include "../../Binding/StateManager.hpp"
-#include "../../Command/Adapters/StateManagerAdapter.hpp"
+#include "Binding/StateManager.hpp"
+#include "Command/Adapters/StateManagerAdapter.hpp"
 #include "Command/CommandBuilder.hpp"
 
 using namespace DeclarativeUI::Command;
@@ -151,7 +151,7 @@ private:
     }
 };
 
-#include "state_integration_example.moc"
+#include "state-integration.moc"
 
 #endif  // DECLARATIVE_UI_ADAPTERS_ENABLED
 #endif  // DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED

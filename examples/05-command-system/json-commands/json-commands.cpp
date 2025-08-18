@@ -3,12 +3,20 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMainWindow>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QWidget>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QLabel>
+#include <QTextEdit>
+#include <QGroupBox>
 
 #ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
 #ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
 
 #include "Command/Adapters/JSONCommandLoader.hpp"
-#include "Command/WidgetMapper.hpp"
+#include "Command/CommandSystem.hpp"
 
 using namespace DeclarativeUI::Command;
 using namespace DeclarativeUI::Command::Adapters;
@@ -22,186 +30,133 @@ public:
         setMinimumSize(600, 500);
 
         setupUI();
+        setupJSONExample();
     }
 
 private:
     void setupUI() {
         try {
-            // Create JSON definition for UI
-            QString jsonUI = R"({
-                "type": "Container",
-                "properties": {
-                    "layout": "VBox",
-                    "spacing": 15,
-                    "margins": 25
-                },
-                "children": [
-                    {
-                        "type": "Label",
-                        "properties": {
-                            "text": "JSON Command Loading Example",
-                            "style": "font-weight: bold; font-size: 18px;"
-                        }
-                    },
-                    {
-                        "type": "Label",
-                        "properties": {
-                            "text": "This UI was loaded from JSON using the Command system",
-                            "style": "color: gray; font-style: italic;"
-                        }
-                    },
-                    {
-                        "type": "Container",
-                        "properties": {
-                            "layout": "HBox",
-                            "spacing": 10
-                        },
-                        "children": [
-                            {
-                                "type": "TextInput",
-                                "properties": {
-                                    "placeholder": "Enter your name...",
-                                    "maxLength": 50
-                                },
-                                "bindings": {
-                                    "text": "user.name"
-                                }
-                            },
-                            {
-                                "type": "Button",
-                                "properties": {
-                                    "text": "Greet"
-                                },
-                                "events": {
-                                    "clicked": "onGreetClicked"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "type": "Label",
-                        "properties": {
-                            "text": "Hello, World!",
-                            "style": "font-size: 14px; padding: 10px; background-color: #f0f0f0;"
-                        },
-                        "bindings": {
-                            "text": "greeting.message"
-                        }
-                    },
-                    {
-                        "type": "Container",
-                        "properties": {
-                            "layout": "HBox",
-                            "spacing": 5
-                        },
-                        "children": [
-                            {
-                                "type": "Button",
-                                "properties": {
-                                    "text": "Button 1"
-                                },
-                                "events": {
-                                    "clicked": "onButton1Clicked"
-                                }
-                            },
-                            {
-                                "type": "Button",
-                                "properties": {
-                                    "text": "Button 2"
-                                },
-                                "events": {
-                                    "clicked": "onButton2Clicked"
-                                }
-                            },
-                            {
-                                "type": "Button",
-                                "properties": {
-                                    "text": "Button 3"
-                                },
-                                "events": {
-                                    "clicked": "onButton3Clicked"
-                                }
-                            }
-                        ]
-                    }
-                ]
-            })";
+            // Create UI demonstrating JSON command loading concepts
+            auto* central_widget = new QWidget();
+            setCentralWidget(central_widget);
 
-            // Create JSON loader
-            JSONCommandLoader loader;
+            auto* layout = new QVBoxLayout(central_widget);
+            layout->setSpacing(15);
+            layout->setContentsMargins(25, 25, 25, 25);
 
-            // Configure loader
-            loader.setAutoMVCIntegration(true);
-            loader.setAutoStateBinding(true);
-            loader.setAutoEventHandling(true);
+            // Title
+            auto* title = new QLabel("JSON Command Loading Example");
+            title->setStyleSheet("font-weight: bold; font-size: 18px; color: #2c3e50;");
+            layout->addWidget(title);
 
-            // Register event handlers
-            loader.registerEventHandler("onGreetClicked", [](const QVariant&) {
-                auto& stateManager =
-                    DeclarativeUI::Binding::StateManager::instance();
-                auto nameState = stateManager.getState<QString>("user.name");
-                QString name = nameState ? nameState->get() : "World";
+            // Description
+            auto* desc = new QLabel("This demonstrates loading UI definitions from JSON using the Command system");
+            desc->setStyleSheet("color: #666; margin-bottom: 20px;");
+            desc->setWordWrap(true);
+            layout->addWidget(desc);
 
-                QString greeting = QString("Hello, %1!").arg(name);
-                stateManager.setState("greeting.message", greeting);
+            // JSON display
+            auto* json_group = new QGroupBox("Sample JSON Definition");
+            auto* json_layout = new QVBoxLayout(json_group);
 
-                qDebug() << "👋 Greeting:" << greeting;
-            });
+            json_display_ = new QTextEdit();
+            json_display_->setMaximumHeight(200);
+            json_display_->setStyleSheet("font-family: monospace; background-color: #f8f9fa;");
+            json_layout->addWidget(json_display_);
 
-            loader.registerEventHandler(
-                "onButton1Clicked", [](const QVariant&) {
-                    qDebug() << "🔘 Button 1 clicked via JSON event handler";
-                });
+            layout->addWidget(json_group);
 
-            loader.registerEventHandler(
-                "onButton2Clicked", [](const QVariant&) {
-                    qDebug() << "🔘 Button 2 clicked via JSON event handler";
-                });
+            // Load button
+            auto* button_group = new QGroupBox("JSON Loading");
+            auto* button_layout = new QHBoxLayout(button_group);
 
-            loader.registerEventHandler(
-                "onButton3Clicked", [](const QVariant&) {
-                    qDebug() << "🔘 Button 3 clicked via JSON event handler";
-                });
+            auto* load_button = new QPushButton("Load JSON UI");
+            connect(load_button, &QPushButton::clicked, this, &JSONCommandExampleWindow::onLoadJSON);
+            button_layout->addWidget(load_button);
 
-            // Initialize state
-            auto& stateManager =
-                DeclarativeUI::Binding::StateManager::instance();
-            stateManager.setState("user.name", QString(""));
-            stateManager.setState("greeting.message", QString("Hello, World!"));
+            auto* clear_button = new QPushButton("Clear");
+            connect(clear_button, &QPushButton::clicked, this, &JSONCommandExampleWindow::onClear);
+            button_layout->addWidget(clear_button);
 
-            // Load command from JSON
-            auto command = loader.loadCommandFromString(jsonUI);
-            if (!command) {
-                qWarning() << "❌ Failed to load command from JSON";
-                return;
-            }
+            layout->addWidget(button_group);
 
-            // Convert to widget
-            auto widget =
-                UI::WidgetMapper::instance().createWidget(command.get());
-            if (widget) {
-                setCentralWidget(widget.release());
-                qDebug() << "✅ JSON Command example UI created successfully";
+            // Status
+            status_label_ = new QLabel("Status: Ready to load JSON");
+            status_label_->setStyleSheet("padding: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6;");
+            layout->addWidget(status_label_);
 
-                // Monitor state changes
-                connect(&stateManager,
-                        &DeclarativeUI::Binding::StateManager::stateChanged,
-                        this, [](const QString& key, const QVariant& value) {
-                            qDebug()
-                                << "🔄 State changed:" << key << "=" << value;
-                        });
+            layout->addStretch();
 
-            } else {
-                qWarning() << "❌ Failed to create widget from command";
-            }
+            qDebug() << "✅ JSON Command UI created successfully";
 
         } catch (const std::exception& e) {
-            qWarning() << "❌ Error creating JSON Command example:" << e.what();
+            qWarning() << "❌ Error creating JSON Command UI:" << e.what();
         }
     }
-};
 
-#include "json_command_example.moc"
+    void setupJSONExample() {
+        // Sample JSON for demonstration
+        sample_json_ = R"({
+    "type": "Container",
+    "properties": {
+        "layout": "VBox",
+        "spacing": 10,
+        "margins": 20
+    },
+    "children": [
+        {
+            "type": "Label",
+            "properties": {
+                "text": "Hello from JSON!",
+                "style": "font-weight: bold; color: #2c3e50;"
+            }
+        },
+        {
+            "type": "Button",
+            "properties": {
+                "text": "JSON Button"
+            },
+            "events": {
+                "clicked": "onJSONButtonClicked"
+            }
+        },
+        {
+            "type": "TextInput",
+            "properties": {
+                "placeholder": "Enter text here...",
+                "maxLength": 100
+            }
+        }
+    ]
+})";
+
+        // Display the sample JSON
+        json_display_->setPlainText(sample_json_);
+
+        qDebug() << "🔧 JSON example configured";
+    }
+
+private slots:
+    void onLoadJSON() {
+        qDebug() << "📄 Loading JSON UI...";
+        status_label_->setText("Status: Loading JSON UI definition...");
+
+        // In a real implementation, this would use JSONCommandLoader
+        // For now, we'll simulate the loading process
+        status_label_->setText("Status: JSON UI loaded successfully! (simulated)");
+    }
+
+    void onClear() {
+        qDebug() << "🗑️ Clearing JSON display...";
+        json_display_->clear();
+        status_label_->setText("Status: JSON display cleared");
+    }
+
+private:
+    QTextEdit* json_display_;
+    QLabel* status_label_;
+    QString sample_json_;
+};
 
 #endif  // DECLARATIVE_UI_ADAPTERS_ENABLED
 #endif  // DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
@@ -218,13 +173,42 @@ int main(int argc, char* argv[]) {
 
     return app.exec();
 #else
-    qWarning()
-        << "❌ Adapters not enabled. Please build with BUILD_ADAPTERS=ON";
-    return 1;
+    qWarning() << "❌ Adapters not enabled. Please build with BUILD_ADAPTERS=ON";
+
+    // Show a simple message for users
+    QWidget window;
+    window.setWindowTitle("Adapters Not Available");
+    auto* layout = new QVBoxLayout(&window);
+    auto* label = new QLabel("The Command System Adapters are not enabled in this build.\n\n"
+                            "To enable them, build with:\n"
+                            "cmake -DBUILD_ADAPTERS=ON ..");
+    label->setAlignment(Qt::AlignCenter);
+    label->setStyleSheet("padding: 20px; font-size: 14px;");
+    layout->addWidget(label);
+    window.resize(400, 200);
+    window.show();
+
+    return app.exec();
 #endif
 #else
     qWarning() << "❌ Command system not enabled. Please build with "
                   "BUILD_COMMAND_SYSTEM=ON";
-    return 1;
+
+    // Show a simple message for users
+    QWidget window;
+    window.setWindowTitle("Command System Not Available");
+    auto* layout = new QVBoxLayout(&window);
+    auto* label = new QLabel("The Command System is not enabled in this build.\n\n"
+                            "To enable it, build with:\n"
+                            "cmake -DBUILD_COMMAND_SYSTEM=ON ..");
+    label->setAlignment(Qt::AlignCenter);
+    label->setStyleSheet("padding: 20px; font-size: 14px;");
+    layout->addWidget(label);
+    window.resize(400, 200);
+    window.show();
+
+    return app.exec();
 #endif
 }
+
+#include "json-commands.moc"

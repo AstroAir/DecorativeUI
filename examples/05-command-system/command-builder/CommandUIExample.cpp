@@ -1,225 +1,211 @@
-#include "CommandUIExample.hpp"
+/**
+ * @file CommandUIExample.cpp
+ * @brief Example demonstrating UI construction using Commands
+ */
+
 #include <QApplication>
-#include <QColorDialog>
 #include <QDebug>
+#include <QMainWindow>
+#include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QWidget>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QLabel>
+#include <QCheckBox>
+#include <QGroupBox>
 #include <QMenuBar>
 #include <QStatusBar>
-#include <QVBoxLayout>
 
-#include "../../Binding/StateManager.hpp"
-#include "../CommandEvents.hpp"
-#include "../MVCIntegration.hpp"
-#include "../WidgetMapper.hpp"
+#ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
 
-using namespace DeclarativeUI::Command::UI;
-using namespace DeclarativeUI::Command::UI::Examples;
+#include "Command/CommandBuilder.hpp"
+#include "Command/CommandSystem.hpp"
 
-CommandUIExample::CommandUIExample(QWidget* parent) : QMainWindow(parent) {
-    qDebug() << "🚀 CommandUIExample starting...";
+using namespace DeclarativeUI::Command;
 
-    setupUI();
-    setupStateManagement();
-    setupEventHandling();
-    createMenuBar();
-    createStatusBar();
+class CommandUIExample : public QMainWindow {
+    Q_OBJECT
 
-    qDebug() << "✅ CommandUIExample initialized successfully";
-}
+public:
+    CommandUIExample(QWidget* parent = nullptr) : QMainWindow(parent) {
+        qDebug() << "🚀 Command UI Example starting...";
 
-void CommandUIExample::setupUI() {
-    try {
-        // Create main container using CommandHierarchyBuilder
-        auto mainContainer =
-            CommandHierarchyBuilder("Container")
-                .layout("VBox")
-                .spacing(20)
-                .margins(20)
+        setupUI();
+        setupCommands();
+        setupEventHandling();
+        createMenuBar();
+        createStatusBar();
 
-                // Title
-                .addChild(
-                    "Label",
-                    [](CommandBuilder& label) {
-                        label.text("Command-based UI Architecture Examples")
-                            .style("font-weight", "bold")
-                            .style("font-size", "18px")
-                            .style("color", "#2c3e50");
-                    })
+        qDebug() << "✅ Command UI Example initialized successfully";
+    }
 
-                // Simple button example
-                .addContainer(
-                    "Container",
-                    [this](CommandHierarchyBuilder& section) {
-                        section.layout("VBox")
-                            .spacing(10)
-                            .addChild("Label",
-                                      [](CommandBuilder& label) {
-                                          label.text("1. Simple Button Example")
-                                              .style("font-weight", "bold")
-                                              .style("font-size", "14px");
-                                      })
-                            .addChild(SimpleButtonExample::create());
-                    })
+private:
 
-                // Form example
-                .addContainer("Container",
-                              [this](CommandHierarchyBuilder& section) {
-                                  section.layout("VBox")
-                                      .spacing(10)
-                                      .addChild(
-                                          "Label",
-                                          [](CommandBuilder& label) {
-                                              label.text("2. Form Example")
-                                                  .style("font-weight", "bold")
-                                                  .style("font-size", "14px");
-                                          })
-                                      .addChild(FormExample::create());
-                              })
+    void setupUI() {
+        try {
+            // Create UI demonstrating command-based construction concepts
+            auto* central_widget = new QWidget();
+            setCentralWidget(central_widget);
 
-                .build();
+            auto* layout = new QVBoxLayout(central_widget);
+            layout->setSpacing(15);
+            layout->setContentsMargins(25, 25, 25, 25);
 
-        main_container_ = mainContainer;
+            // Title
+            auto* title = new QLabel("Command-Based UI Construction");
+            title->setStyleSheet("font-weight: bold; font-size: 18px; color: #2c3e50;");
+            layout->addWidget(title);
 
-        // Convert to widget and set as central widget
-        auto widget =
-            WidgetMapper::instance().createWidget(mainContainer.get());
-        if (widget) {
-            setCentralWidget(widget.release());
-            qDebug() << "✅ Main UI created successfully";
-        } else {
-            qWarning() << "❌ Failed to create widget from command";
+            // Description
+            auto* desc = new QLabel("This demonstrates UI construction patterns using the Command system");
+            desc->setStyleSheet("color: #666; margin-bottom: 20px;");
+            desc->setWordWrap(true);
+            layout->addWidget(desc);
+
+            // Button container
+            auto* button_group = new QGroupBox("Command Buttons");
+            auto* button_layout = new QHBoxLayout(button_group);
+            button_layout->setSpacing(10);
+
+            auto* button1 = new QPushButton("Command Button 1");
+            connect(button1, &QPushButton::clicked, this, &CommandUIExample::onCommandButton1Clicked);
+            button_layout->addWidget(button1);
+
+            auto* button2 = new QPushButton("Command Button 2");
+            connect(button2, &QPushButton::clicked, this, &CommandUIExample::onCommandButton2Clicked);
+            button_layout->addWidget(button2);
+
+            layout->addWidget(button_group);
+
+            // Input section
+            auto* input_group = new QGroupBox("Command Input");
+            auto* input_layout = new QVBoxLayout(input_group);
+
+            input_ = new QLineEdit();
+            input_->setPlaceholderText("Enter text via Command pattern...");
+            connect(input_, &QLineEdit::textChanged, this, &CommandUIExample::onTextChanged);
+            input_layout->addWidget(input_);
+
+            layout->addWidget(input_group);
+
+            // Checkbox section
+            auto* check_group = new QGroupBox("Command Checkboxes");
+            auto* check_layout = new QVBoxLayout(check_group);
+            check_layout->setSpacing(5);
+
+            auto* checkbox1 = new QCheckBox("Command CheckBox 1");
+            checkbox1->setChecked(true);
+            connect(checkbox1, &QCheckBox::toggled, this, &CommandUIExample::onCheckBox1Toggled);
+            check_layout->addWidget(checkbox1);
+
+            auto* checkbox2 = new QCheckBox("Command CheckBox 2");
+            connect(checkbox2, &QCheckBox::toggled, this, &CommandUIExample::onCheckBox2Toggled);
+            check_layout->addWidget(checkbox2);
+
+            layout->addWidget(check_group);
+
+            layout->addStretch();
+
+            qDebug() << "✅ Command UI created successfully";
+
+        } catch (const std::exception& e) {
+            qWarning() << "❌ Error creating Command UI:" << e.what();
         }
-
-    } catch (const std::exception& e) {
-        qWarning() << "❌ Error creating UI:" << e.what();
     }
-}
 
-void CommandUIExample::setupStateManagement() {
-    auto& stateManager = DeclarativeUI::Binding::StateManager::instance();
+    void setupCommands() {
+        // Initialize command system
+        command_invoker_ = std::make_unique<CommandInvoker>();
+        qDebug() << "🔧 Commands configured";
+    }
 
-    // Initialize example states
-    stateManager.setState(COUNTER_STATE, 0);
-    stateManager.setState(FORM_DATA_STATE, QJsonObject{});
-    stateManager.setState(STATUS_STATE, QString("Ready"));
+    void setupEventHandling() {
+        qDebug() << "⚡ Event handling configured";
+    }
 
-    // Connect to state changes
-    connect(&stateManager, &DeclarativeUI::Binding::StateManager::stateChanged,
-            this, [this](const QString& key, const QVariant& value) {
-                qDebug() << "🔄 State changed:" << key << "=" << value;
+    void createMenuBar() {
+        auto* file_menu = menuBar()->addMenu("&File");
 
-                if (key == STATUS_STATE) {
-                    statusBar()->showMessage(value.toString());
-                }
-            });
+        auto* exit_action = file_menu->addAction("E&xit");
+        connect(exit_action, &QAction::triggered, this, &QWidget::close);
 
-    qDebug() << "🔧 State management configured";
-}
+        auto* examples_menu = menuBar()->addMenu("&Examples");
 
-void CommandUIExample::setupEventHandling() {
-    // Set up global event handling
-    auto& dispatcher = UI::CommandEventDispatcher::instance();
-
-    // Add global event interceptor for click events
-    dispatcher.addEventInterceptor(
-        UI::CommandEventType::Clicked, [this](const UI::CommandEvent& event) {
-            qDebug() << "🖱️ Global click interceptor - Command:"
-                     << event.getSource()->getCommandType();
+        auto* simple_action = examples_menu->addAction("&Simple Commands");
+        connect(simple_action, &QAction::triggered, [this]() {
+            statusBar()->showMessage("Simple Commands example selected", 2000);
         });
-
-    qDebug() << "⚡ Event handling configured";
-}
-
-void CommandUIExample::createMenuBar() {
-    auto* fileMenu = menuBar()->addMenu("&File");
-
-    auto* newAction = fileMenu->addAction("&New Example");
-    connect(newAction, &QAction::triggered, this,
-            &CommandUIExample::createSimpleButtonExample);
-
-    auto* exitAction = fileMenu->addAction("E&xit");
-    connect(exitAction, &QAction::triggered, this, &QWidget::close);
-
-    auto* examplesMenu = menuBar()->addMenu("&Examples");
-
-    auto* buttonAction = examplesMenu->addAction("Simple &Button");
-    connect(buttonAction, &QAction::triggered, this,
-            &CommandUIExample::createSimpleButtonExample);
-
-    auto* formAction = examplesMenu->addAction("&Form Example");
-    connect(formAction, &QAction::triggered, this,
-            &CommandUIExample::createFormExample);
-
-    auto* dataAction = examplesMenu->addAction("&Data Binding");
-    connect(dataAction, &QAction::triggered, this,
-            &CommandUIExample::createDataBindingExample);
-
-    auto* hierarchyAction = examplesMenu->addAction("&Hierarchical UI");
-    connect(hierarchyAction, &QAction::triggered, this,
-            &CommandUIExample::createHierarchicalExample);
-
-    auto* eventsAction = examplesMenu->addAction("&Event Handling");
-    connect(eventsAction, &QAction::triggered, this,
-            &CommandUIExample::createEventHandlingExample);
-
-    auto* customAction = examplesMenu->addAction("&Custom Command");
-    connect(customAction, &QAction::triggered, this,
-            &CommandUIExample::createCustomCommandExample);
-}
-
-void CommandUIExample::createStatusBar() {
-    statusBar()->showMessage("Command UI Example - Ready");
-}
-
-void CommandUIExample::createSimpleButtonExample() {
-    qDebug() << "🔨 Creating simple button example...";
-    button_example_ = SimpleButtonExample::create();
-}
-
-void CommandUIExample::createFormExample() {
-    qDebug() << "🔨 Creating form example...";
-    form_example_ = FormExample::create();
-}
-
-void CommandUIExample::createDataBindingExample() {
-    qDebug() << "🔨 Creating data binding example...";
-    data_binding_example_ = DataBindingExample::create();
-}
-
-void CommandUIExample::createHierarchicalExample() {
-    qDebug() << "🔨 Creating hierarchical example...";
-    // Implementation would create a complex nested UI structure
-}
-
-void CommandUIExample::createEventHandlingExample() {
-    qDebug() << "🔨 Creating event handling example...";
-    auto example = EventHandlingExample::create();
-    // Implementation would demonstrate advanced event handling
-}
-
-void CommandUIExample::createCustomCommandExample() {
-    qDebug() << "🔨 Creating custom command example...";
-    auto colorPicker = std::make_shared<CustomColorPickerCommand>();
-    // Implementation would demonstrate custom command usage
-}
-
-void CommandUIExample::onButtonClicked() {
-    auto& stateManager = DeclarativeUI::Binding::StateManager::instance();
-    auto counterState = stateManager.getState<int>(COUNTER_STATE);
-    if (counterState) {
-        int newValue = counterState->get() + 1;
-        stateManager.setState(COUNTER_STATE, newValue);
-        qDebug() << "🔢 Button clicked, counter:" << newValue;
     }
-}
 
-void CommandUIExample::onFormSubmitted() {
-    qDebug() << "📝 Form submitted";
-    statusBar()->showMessage("Form submitted successfully!", 3000);
-}
+    void createStatusBar() {
+        statusBar()->showMessage("Command UI Example - Ready");
+    }
 
-void CommandUIExample::onDataChanged(const QVariant& value) {
-    qDebug() << "📊 Data changed:" << value;
+private slots:
+
+    void onCommandButton1Clicked() {
+        qDebug() << "🖱️ Command Button 1 clicked!";
+        statusBar()->showMessage("Button 1 clicked via Command pattern", 2000);
+    }
+
+    void onCommandButton2Clicked() {
+        qDebug() << "🖱️ Command Button 2 clicked!";
+        statusBar()->showMessage("Button 2 clicked via Command pattern", 2000);
+    }
+
+    void onTextChanged(const QString& text) {
+        qDebug() << "📝 Command input changed:" << text;
+        statusBar()->showMessage(QString("Text length = %1 characters").arg(text.length()), 1000);
+    }
+
+    void onCheckBox1Toggled(bool checked) {
+        qDebug() << "☑️ Command CheckBox 1 toggled:" << checked;
+        statusBar()->showMessage(QString("CheckBox 1 is %1").arg(checked ? "checked" : "unchecked"), 2000);
+    }
+
+    void onCheckBox2Toggled(bool checked) {
+        qDebug() << "☑️ Command CheckBox 2 toggled:" << checked;
+        statusBar()->showMessage(QString("CheckBox 2 is %1").arg(checked ? "checked" : "unchecked"), 2000);
+    }
+
+private:
+    std::unique_ptr<CommandInvoker> command_invoker_;
+    QLineEdit* input_;
+};
+
+#endif  // DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
+
+int main(int argc, char* argv[]) {
+    QApplication app(argc, argv);
+
+#ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
+    CommandUIExample window;
+    window.setWindowTitle("DeclarativeUI - Command UI Example");
+    window.resize(500, 400);
+    window.show();
+
+    qDebug() << "🎯 Command UI Example running...";
+    return app.exec();
+#else
+    qWarning() << "❌ Command system not enabled. Please build with "
+                  "DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED.";
+
+    // Show a simple message for users
+    QWidget window;
+    window.setWindowTitle("Command System Not Available");
+    auto* layout = new QVBoxLayout(&window);
+    auto* label = new QLabel("The Command System is not enabled in this build.\n\n"
+                            "To enable it, build with:\n"
+                            "cmake -DBUILD_COMMAND_SYSTEM=ON ..");
+    label->setAlignment(Qt::AlignCenter);
+    label->setStyleSheet("padding: 20px; font-size: 14px;");
+    layout->addWidget(label);
+    window.resize(400, 200);
+    window.show();
+
+    return app.exec();
+#endif
 }
 
 #include "CommandUIExample.moc"

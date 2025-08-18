@@ -93,11 +93,8 @@ private:
 
 void ComponentTests::initTestCase() {
     // Initialize test environment
-    if (!QApplication::instance()) {
-        int argc = 0;
-        char* argv[] = {nullptr};
-        app = new QApplication(argc, argv);
-    }
+    // Note: QApplication is automatically managed by Qt test framework
+    app = static_cast<QApplication*>(qApp);  // Use existing application instance
 
     // Initialize error handling
     ErrorHandling::errorManager().addHandler(
@@ -109,10 +106,8 @@ void ComponentTests::initTestCase() {
 
 void ComponentTests::cleanupTestCase() {
     // Cleanup test environment
-    if (app) {
-        delete app;
-        app = nullptr;
-    }
+    // Note: QApplication cleanup is handled by Qt test framework
+    app = nullptr;
 }
 
 void ComponentTests::init() {

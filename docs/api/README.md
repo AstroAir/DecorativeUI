@@ -22,6 +22,24 @@ Foundation classes that provide the base functionality for all UI components.
 - Type-safe property system
 - Exception safety guarantees
 
+### [Animation Module](animation.md)
+
+High-performance animation system with GPU acceleration and flexible configuration.
+
+**Key Classes:**
+
+- **AnimationEngine** - Central animation management and coordination
+- **Animation** - Individual animation instances with advanced features
+- **AnimationGroup** - Sequential and parallel animation coordination
+- **AnimationPool** - Performance optimization through object pooling
+
+**Core Concepts:**
+
+- Object pooling for performance
+- 20+ built-in easing functions
+- Timeline-based keyframe animations
+- GPU acceleration support
+
 ### [JSON Support Module](json.md)
 
 Comprehensive JSON support for loading, parsing, validating, and managing UI definitions.
@@ -240,18 +258,23 @@ Each module documentation includes:
 ### By Functionality
 
 - **UI Creation**: [Core Module](core.md) → DeclarativeBuilder
+- **Animations**: [Animation Module](animation.md) → AnimationEngine
 - **JSON UIs**: [JSON Module](json.md) → JSONUILoader
 - **State Management**: [Binding Module](binding.md) → StateManager
 - **Hot Reload**: [Hot Reload Module](hot-reload.md) → HotReloadManager
 - **Commands**: [Command Module](command.md) → CommandSystem
 - **UI Components**: [Components Module](components.md) → Specific components
+- **Debugging**: [Debug Module](debug.md) → ProfilerDashboard
+- **Error Handling**: [Exceptions Module](exceptions.md) → UIException
 
 ### By Use Case
 
 - **Getting Started**: Start with [Core Module](core.md) and [Components Module](components.md)
 - **Rapid Prototyping**: Use [JSON Module](json.md) for data-driven UIs
-- **Development Workflow**: Set up [Hot Reload Module](hot-reload.md)
+- **Development Workflow**: Set up [Hot Reload Module](hot-reload.md) and [Debug Module](debug.md)
 - **Complex Applications**: Leverage [Binding Module](binding.md) and [Command Module](command.md)
+- **Smooth Animations**: Use [Animation Module](animation.md) for high-performance animations
+- **Error Handling**: Implement robust error handling with [Exceptions Module](exceptions.md)
 
 ### By Component Type
 
