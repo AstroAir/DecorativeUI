@@ -1,18 +1,22 @@
 #include "StateManager.hpp"
 
 #include <QDebug>
-#include <QTimer>
-#include <QMutexLocker>
+#include <QElapsedTimer>
+#include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
-#include <QFile>
-#include <QElapsedTimer>
+#include <QMutexLocker>
+#include <QTimer>
 #include <algorithm>
 
 namespace DeclarativeUI::Binding {
 
-StateManager &StateManager::instance() {
+// ============================================================================
+// STATEMANAGER IMPLEMENTATION
+// ============================================================================
+
+StateManager& StateManager::instance() {
     static StateManager instance;
     return instance;
 }
@@ -40,7 +44,7 @@ void StateManager::batchUpdate(std::function<void()> updates) {
 
         batching_ = false;
 
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         batching_ = false;
         qWarning() << "Batch update failed:" << e.what();
         throw;
@@ -70,10 +74,10 @@ void StateManager::processPendingUpdates() {
     qDebug() << "🔄 Processing" << pending_updates_.size()
              << "pending state updates";
 
-    for (const auto &update : pending_updates_) {
+    for (const auto& update : pending_updates_) {
         try {
             update();
-        } catch (const std::exception &e) {
+        } catch (const std::exception& e) {
             qWarning() << "Pending update failed:" << e.what();
         }
     }
@@ -122,36 +126,16 @@ void StateManager::enableHistory(const QString& key, int max_history_size) {
         auto& info = it->second;
         info.history_enabled = true;
         info.max_history_size = max_history_size;
-        info.history.clear();
 
-        // Add current state value as the first history entry
-        if (info.state) {
-            // Get current value and add to history
-            QVariant currentValue;
-            if (auto stringState = std::dynamic_pointer_cast<ReactiveProperty<QString>>(info.state)) {
-                currentValue = QVariant::fromValue(stringState->get());
-            } else if (auto intState = std::dynamic_pointer_cast<ReactiveProperty<int>>(info.state)) {
-                currentValue = QVariant::fromValue(intState->get());
-            } else if (auto doubleState = std::dynamic_pointer_cast<ReactiveProperty<double>>(info.state)) {
-                currentValue = QVariant::fromValue(doubleState->get());
-            } else if (auto boolState = std::dynamic_pointer_cast<ReactiveProperty<bool>>(info.state)) {
-                currentValue = QVariant::fromValue(boolState->get());
-            }
+        // Initialize history with current state value
+        initializeStateHistory(info, key);
 
-            if (currentValue.isValid()) {
-                info.history.push_back(currentValue);
-                info.history_position = 0;
-            } else {
-                info.history_position = -1;
-            }
-        } else {
-            info.history_position = -1;
-        }
-
-        qDebug() << "📝 History enabled for state:" << key << "with max size:" << max_history_size
+        qDebug() << "📝 History enabled for state:" << key
+                 << "with max size:" << max_history_size
                  << "initial position:" << info.history_position;
     } else {
-        qWarning() << "❌ Cannot enable history: State" << key << "does not exist";
+        qWarning() << "❌ Cannot enable history: State" << key
+                   << "does not exist";
     }
 }
 
@@ -180,7 +164,8 @@ bool StateManager::canRedo(const QString& key) const {
     QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end() && it->second.history_enabled) {
-        return it->second.history_position < static_cast<int>(it->second.history.size()) - 1;
+        return it->second.history_position <
+               static_cast<int>(it->second.history.size()) - 1;
     }
     return false;
 }
@@ -188,35 +173,30 @@ bool StateManager::canRedo(const QString& key) const {
 void StateManager::undo(const QString& key) {
     QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
-    if (it != states_.end() && it->second.history_enabled && it->second.history_position > 0) {
+    if (it != states_.end() && it->second.history_enabled &&
+        it->second.history_position > 0) {
         auto& info = it->second;
         info.history_position--;
 
-        if (info.history_position >= 0 && info.history_position < static_cast<int>(info.history.size())) {
+        if (validateHistoryPosition(info, info.history_position)) {
             auto value = info.history[info.history_position];
 
-            // For undo/redo, we need to bypass the normal setState mechanism
-            // to avoid adding the undo value back to history
-            if (value.canConvert<QString>()) {
-                if (auto reactive_state = std::dynamic_pointer_cast<ReactiveProperty<QString>>(info.state)) {
-                    reactive_state->set(value.toString());
-                }
-            } else if (value.canConvert<int>()) {
-                if (auto reactive_state = std::dynamic_pointer_cast<ReactiveProperty<int>>(info.state)) {
-                    reactive_state->set(value.toInt());
-                }
-            } else if (value.canConvert<double>()) {
-                if (auto reactive_state = std::dynamic_pointer_cast<ReactiveProperty<double>>(info.state)) {
-                    reactive_state->set(value.toDouble());
-                }
-            } else if (value.canConvert<bool>()) {
-                if (auto reactive_state = std::dynamic_pointer_cast<ReactiveProperty<bool>>(info.state)) {
-                    reactive_state->set(value.toBool());
-                }
+            // Apply the history value using helper function
+            if (applyHistoryValue(info, value, key)) {
+                emit stateChanged(key, value);
+                qDebug() << "↶ Undo applied to state:" << key
+                         << "to position:" << info.history_position;
+            } else {
+                // Revert position if application failed
+                info.history_position++;
+                qWarning() << "❌ Undo failed for state:" << key
+                           << "- reverting position";
             }
-
-            emit stateChanged(key, value);
-            qDebug() << "↶ Undo applied to state:" << key << "to position:" << info.history_position;
+        } else {
+            // Revert position if validation failed
+            info.history_position++;
+            qWarning() << "❌ Undo failed for state:" << key
+                       << "- invalid history position";
         }
     }
 }
@@ -225,47 +205,44 @@ void StateManager::redo(const QString& key) {
     QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end() && it->second.history_enabled &&
-        it->second.history_position < static_cast<int>(it->second.history.size()) - 1) {
+        it->second.history_position <
+            static_cast<int>(it->second.history.size()) - 1) {
         auto& info = it->second;
         info.history_position++;
 
-        if (info.history_position >= 0 && info.history_position < static_cast<int>(info.history.size())) {
+        if (validateHistoryPosition(info, info.history_position)) {
             auto value = info.history[info.history_position];
 
-            // For undo/redo, we need to bypass the normal setState mechanism
-            // to avoid adding the redo value back to history
-            if (value.canConvert<QString>()) {
-                if (auto reactive_state = std::dynamic_pointer_cast<ReactiveProperty<QString>>(info.state)) {
-                    reactive_state->set(value.toString());
-                }
-            } else if (value.canConvert<int>()) {
-                if (auto reactive_state = std::dynamic_pointer_cast<ReactiveProperty<int>>(info.state)) {
-                    reactive_state->set(value.toInt());
-                }
-            } else if (value.canConvert<double>()) {
-                if (auto reactive_state = std::dynamic_pointer_cast<ReactiveProperty<double>>(info.state)) {
-                    reactive_state->set(value.toDouble());
-                }
-            } else if (value.canConvert<bool>()) {
-                if (auto reactive_state = std::dynamic_pointer_cast<ReactiveProperty<bool>>(info.state)) {
-                    reactive_state->set(value.toBool());
-                }
+            // Apply the history value using helper function
+            if (applyHistoryValue(info, value, key)) {
+                emit stateChanged(key, value);
+                qDebug() << "↷ Redo applied to state:" << key
+                         << "to position:" << info.history_position;
+            } else {
+                // Revert position if application failed
+                info.history_position--;
+                qWarning() << "❌ Redo failed for state:" << key
+                           << "- reverting position";
             }
-
-            emit stateChanged(key, value);
-            qDebug() << "↷ Redo applied to state:" << key << "to position:" << info.history_position;
+        } else {
+            // Revert position if validation failed
+            info.history_position--;
+            qWarning() << "❌ Redo failed for state:" << key
+                       << "- invalid history position";
         }
     }
 }
 
-void StateManager::addDependency(const QString& key, const QString& depends_on) {
+void StateManager::addDependency(const QString& key,
+                                 const QString& depends_on) {
     QMutexLocker locker(&global_lock_);
     dependencies_[key].push_back(depends_on);
     dependents_[depends_on].push_back(key);
     qDebug() << "🔗 Dependency added:" << key << "depends on" << depends_on;
 }
 
-void StateManager::removeDependency(const QString& key, const QString& depends_on) {
+void StateManager::removeDependency(const QString& key,
+                                    const QString& depends_on) {
     QMutexLocker locker(&global_lock_);
 
     auto it = dependencies_.find(key);
@@ -285,7 +262,8 @@ void StateManager::removeDependency(const QString& key, const QString& depends_o
             deps.erase(keyIt);
         }
     }
-    qDebug() << "🔗❌ Dependency removed:" << key << "no longer depends on" << depends_on;
+    qDebug() << "🔗❌ Dependency removed:" << key << "no longer depends on"
+             << depends_on;
 }
 
 QStringList StateManager::getDependencies(const QString& key) const {
@@ -331,11 +309,13 @@ void StateManager::updateDependents(const QString& key) {
                             // Recursively update dependents of this dependent
                             updateDependents(dependent);
 
-                            qDebug() << "✅ Dependent state updated:" << dependent
-                                     << "from" << oldValue << "to" << newValue;
+                            qDebug()
+                                << "✅ Dependent state updated:" << dependent
+                                << "from" << oldValue << "to" << newValue;
                         }
                     } catch (const std::exception& e) {
-                        qWarning() << "❌ Error updating dependent state" << dependent << ":" << e.what();
+                        qWarning() << "❌ Error updating dependent state"
+                                   << dependent << ":" << e.what();
                     }
                 } else {
                     // If no computed function, just emit a change notification
@@ -360,7 +340,8 @@ void StateManager::addToHistory(const QString& key, const QVariant& value) {
 
         // Remove any redo history when adding new value
         if (info.history_position < static_cast<int>(info.history.size()) - 1) {
-            info.history.erase(info.history.begin() + info.history_position + 1, info.history.end());
+            info.history.erase(info.history.begin() + info.history_position + 1,
+                               info.history.end());
         }
 
         // Add new value to history
@@ -373,13 +354,16 @@ void StateManager::addToHistory(const QString& key, const QVariant& value) {
             info.history_position--;
         }
 
-        qDebug() << "📝 Added to history:" << key << "position:" << info.history_position << "size:" << info.history.size();
+        qDebug() << "📝 Added to history:" << key
+                 << "position:" << info.history_position
+                 << "size:" << info.history.size();
     }
 }
 
 void StateManager::enablePerformanceMonitoring(bool enabled) {
     performance_monitoring_ = enabled;
-    qDebug() << "⚡ Performance monitoring:" << (enabled ? "enabled" : "disabled");
+    qDebug() << "⚡ Performance monitoring:"
+             << (enabled ? "enabled" : "disabled");
 }
 
 QString StateManager::getPerformanceReport() const {
@@ -388,16 +372,16 @@ QString StateManager::getPerformanceReport() const {
     report += QString("States count: %1\n").arg(states_.size());
     report += QString("Dependencies count: %1\n").arg(dependencies_.size());
     report += QString("Debug mode: %1\n").arg(debug_mode_ ? "ON" : "OFF");
-    report += QString("Performance monitoring: %1\n").arg(performance_monitoring_ ? "ON" : "OFF");
+    report += QString("Performance monitoring: %1\n")
+                  .arg(performance_monitoring_ ? "ON" : "OFF");
     report += QString("Batching mode: %1\n").arg(batching_ ? "ON" : "OFF");
 
     // Add individual state information
     if (!states_.empty()) {
         report += "\nState Details:\n";
         for (const auto& [key, info] : states_) {
-            report += QString("- %1: %2 updates\n")
-                         .arg(key)
-                         .arg(info.update_count);
+            report +=
+                QString("- %1: %2 updates\n").arg(key).arg(info.update_count);
         }
     }
 
@@ -409,7 +393,8 @@ void StateManager::saveState(const QString& filename) const {
 
     QJsonObject rootObject;
     rootObject["version"] = "1.0";
-    rootObject["timestamp"] = QDateTime::currentDateTime().toString(Qt::ISODate);
+    rootObject["timestamp"] =
+        QDateTime::currentDateTime().toString(Qt::ISODate);
 
     QJsonObject statesObject;
 
@@ -515,7 +500,8 @@ void StateManager::loadState(const QString& filename) {
 
     // Load dependencies
     QJsonObject dependenciesObject = rootObject["dependencies"].toObject();
-    for (auto it = dependenciesObject.begin(); it != dependenciesObject.end(); ++it) {
+    for (auto it = dependenciesObject.begin(); it != dependenciesObject.end();
+         ++it) {
         QString key = it.key();
         QJsonArray depsArray = it.value().toArray();
 
@@ -529,17 +515,18 @@ void StateManager::loadState(const QString& filename) {
     qDebug() << "📂 State loaded from:" << filename;
 }
 
-void StateManager::logStateChange(const QString& key, const QVariant& oldValue, const QVariant& newValue) {
+void StateManager::logStateChange(const QString& key, const QVariant& oldValue,
+                                  const QVariant& newValue) {
     if (!debug_mode_) {
         return;
     }
 
     QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss.zzz");
     qDebug() << QString("[%1] State changed: %2 | %3 -> %4")
-                .arg(timestamp)
-                .arg(key)
-                .arg(oldValue.toString())
-                .arg(newValue.toString());
+                    .arg(timestamp)
+                    .arg(key)
+                    .arg(oldValue.toString())
+                    .arg(newValue.toString());
 }
 
 void StateManager::validateState(const QString& key, const QVariant& value) {
@@ -547,13 +534,18 @@ void StateManager::validateState(const QString& key, const QVariant& value) {
     auto it = states_.find(key);
     if (it != states_.end() && it->second.validator) {
         if (!it->second.validator(value)) {
-            qWarning() << "❌ Validation failed for state:" << key << "value:" << value;
-            throw std::invalid_argument(QString("Validation failed for state: %1").arg(key).toStdString());
+            qWarning() << "❌ Validation failed for state:" << key
+                       << "value:" << value;
+            throw std::invalid_argument(
+                QString("Validation failed for state: %1")
+                    .arg(key)
+                    .toStdString());
         }
     }
 }
 
-void StateManager::measurePerformance(const QString& key, std::function<void()> operation) {
+void StateManager::measurePerformance(const QString& key,
+                                      std::function<void()> operation) {
     if (!performance_monitoring_ || !operation) {
         if (operation) {
             operation();
@@ -568,29 +560,166 @@ void StateManager::measurePerformance(const QString& key, std::function<void()> 
         operation();
     } catch (...) {
         qint64 elapsed = timer.elapsed();
-        qWarning() << "⚡ Performance measurement failed for state:" << key << "time:" << elapsed << "ms";
+        qWarning() << "⚡ Performance measurement failed for state:" << key
+                   << "time:" << elapsed << "ms";
         throw;
     }
 
     qint64 elapsed = timer.elapsed();
 
     // Log performance if it exceeds threshold
-    const qint64 performanceThreshold = 10; // 10ms threshold
+    const qint64 performanceThreshold = 10;  // 10ms threshold
     if (elapsed > performanceThreshold) {
-        qWarning() << "⚡ Performance warning for state:" << key << "time:" << elapsed << "ms";
+        qWarning() << "⚡ Performance warning for state:" << key
+                   << "time:" << elapsed << "ms";
         emit performanceWarning(key, elapsed);
     }
 
     if (debug_mode_) {
-        qDebug() << "⚡ Performance measurement for state:" << key << "time:" << elapsed << "ms";
+        qDebug() << "⚡ Performance measurement for state:" << key
+                 << "time:" << elapsed << "ms";
     }
+}
+
+// ============================================================================
+// HELPER FUNCTION IMPLEMENTATIONS
+// ============================================================================
+
+QVariant StateManager::getCurrentStateValue(
+    const std::shared_ptr<ReactivePropertyBase>& state) {
+    if (!state) {
+        return QVariant();
+    }
+
+    // Try to cast to known types and extract values
+    if (auto stringState =
+            std::dynamic_pointer_cast<ReactiveProperty<QString>>(state)) {
+        return QVariant::fromValue(stringState->get());
+    } else if (auto intState =
+                   std::dynamic_pointer_cast<ReactiveProperty<int>>(state)) {
+        return QVariant::fromValue(intState->get());
+    } else if (auto doubleState =
+                   std::dynamic_pointer_cast<ReactiveProperty<double>>(state)) {
+        return QVariant::fromValue(doubleState->get());
+    } else if (auto boolState =
+                   std::dynamic_pointer_cast<ReactiveProperty<bool>>(state)) {
+        return QVariant::fromValue(boolState->get());
+    }
+
+    return QVariant();  // Unsupported type
+}
+
+bool StateManager::applyValueToState(
+    const std::shared_ptr<ReactivePropertyBase>& state, const QVariant& value) {
+    if (!state || !value.isValid()) {
+        return false;
+    }
+
+    // Try to apply value based on type
+    if (value.canConvert<QString>()) {
+        if (auto reactiveState =
+                std::dynamic_pointer_cast<ReactiveProperty<QString>>(state)) {
+            reactiveState->set(value.toString());
+            return true;
+        }
+    } else if (value.canConvert<int>()) {
+        if (auto reactiveState =
+                std::dynamic_pointer_cast<ReactiveProperty<int>>(state)) {
+            reactiveState->set(value.toInt());
+            return true;
+        }
+    } else if (value.canConvert<double>()) {
+        if (auto reactiveState =
+                std::dynamic_pointer_cast<ReactiveProperty<double>>(state)) {
+            reactiveState->set(value.toDouble());
+            return true;
+        }
+    } else if (value.canConvert<bool>()) {
+        if (auto reactiveState =
+                std::dynamic_pointer_cast<ReactiveProperty<bool>>(state)) {
+            reactiveState->set(value.toBool());
+            return true;
+        }
+    }
+
+    return false;  // Unsupported type or conversion failed
+}
+
+void StateManager::initializeStateHistory(StateInfo& info, const QString& key) {
+    info.history.clear();
+
+    if (info.state) {
+        // Cast QObject to ReactivePropertyBase
+        auto reactiveState =
+            std::dynamic_pointer_cast<ReactivePropertyBase>(info.state);
+        if (reactiveState) {
+            QVariant currentValue = getCurrentStateValue(reactiveState);
+            if (currentValue.isValid()) {
+                info.history.push_back(currentValue);
+                info.history_position = 0;
+                qDebug() << "📝 History initialized for state:" << key
+                         << "with current value:" << currentValue;
+            } else {
+                info.history_position = -1;
+                qDebug() << "⚠️ History initialized for state:" << key
+                         << "but current value is invalid";
+            }
+        } else {
+            info.history_position = -1;
+            qDebug() << "⚠️ History initialized for state:" << key
+                     << "but state is not ReactivePropertyBase";
+        }
+    } else {
+        info.history_position = -1;
+        qDebug() << "⚠️ History initialized for state:" << key
+                 << "but state is null";
+    }
+}
+
+bool StateManager::validateHistoryPosition(const StateInfo& info,
+                                           int position) const {
+    return position >= 0 && position < static_cast<int>(info.history.size());
+}
+
+bool StateManager::applyHistoryValue(const StateInfo& info,
+                                     const QVariant& value,
+                                     const QString& key) {
+    if (!info.state || !value.isValid()) {
+        qWarning() << "❌ Cannot apply history value for state:" << key
+                   << "- invalid state or value";
+        return false;
+    }
+
+    // Cast QObject to ReactivePropertyBase
+    auto reactiveState =
+        std::dynamic_pointer_cast<ReactivePropertyBase>(info.state);
+    if (!reactiveState) {
+        qWarning() << "❌ Cannot apply history value for state:" << key
+                   << "- state is not ReactivePropertyBase";
+        return false;
+    }
+
+    // Apply the value using the helper function
+    bool success = applyValueToState(reactiveState, value);
+    if (success) {
+        qDebug() << "✅ History value applied to state:" << key
+                 << "value:" << value;
+    } else {
+        qWarning() << "❌ Failed to apply history value to state:" << key
+                   << "value:" << value;
+    }
+
+    return success;
 }
 
 }  // namespace DeclarativeUI::Binding
 
-// **Template method implementations**
-template<typename T>
-void DeclarativeUI::Binding::StateManager::setValidator(const QString& key, std::function<bool(const T&)> validator) {
+// ============================================================================
+// TEMPLATE METHOD IMPLEMENTATIONS
+// ============================================================================
+template <typename T>
+void DeclarativeUI::Binding::StateManager::setValidator(
+    const QString& key, std::function<bool(const T&)> validator) {
     QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
     if (it != states_.end()) {
@@ -599,29 +728,30 @@ void DeclarativeUI::Binding::StateManager::setValidator(const QString& key, std:
             if (value.canConvert<T>()) {
                 return validator(value.value<T>());
             }
-            return false; // Invalid type
+            return false;  // Invalid type
         };
         qDebug() << "✅ Validator set for state:" << key;
     } else {
-        qWarning() << "❌ Cannot set validator: State" << key << "does not exist";
+        qWarning() << "❌ Cannot set validator: State" << key
+                   << "does not exist";
     }
 }
 
 // **Explicit template instantiations for common types**
 template std::shared_ptr<DeclarativeUI::Binding::ReactiveProperty<QString>>
-DeclarativeUI::Binding::StateManager::createState(const QString &key,
+DeclarativeUI::Binding::StateManager::createState(const QString& key,
                                                   QString initial_value);
 
 template std::shared_ptr<DeclarativeUI::Binding::ReactiveProperty<int>>
-DeclarativeUI::Binding::StateManager::createState(const QString &key,
+DeclarativeUI::Binding::StateManager::createState(const QString& key,
                                                   int initial_value);
 
 template std::shared_ptr<DeclarativeUI::Binding::ReactiveProperty<double>>
-DeclarativeUI::Binding::StateManager::createState(const QString &key,
+DeclarativeUI::Binding::StateManager::createState(const QString& key,
                                                   double initial_value);
 
 template std::shared_ptr<DeclarativeUI::Binding::ReactiveProperty<bool>>
-DeclarativeUI::Binding::StateManager::createState(const QString &key,
+DeclarativeUI::Binding::StateManager::createState(const QString& key,
                                                   bool initial_value);
 
 // **Template method instantiations**

@@ -414,7 +414,8 @@ private:
     std::unordered_map<QString, std::vector<QString>>
         dependents_;  ///< Map of state dependents.
     std::unordered_map<QString, std::function<QVariant()>>
-        computed_values_;  ///< Map of computed value functions for dependent states.
+        computed_values_;  ///< Map of computed value functions for dependent
+                           ///< states.
     std::unordered_map<QString, QVariant>
         state_data_;  ///< Map of state keys to current values for quick access.
 
@@ -455,6 +456,48 @@ private:
      */
     void measurePerformance(const QString& key,
                             std::function<void()> operation);
+
+    /**
+     * @brief Helper function to get current value from a reactive state.
+     * @param state Shared pointer to the reactive property base
+     * @return QVariant containing the current value
+     */
+    QVariant getCurrentStateValue(
+        const std::shared_ptr<ReactivePropertyBase>& state);
+
+    /**
+     * @brief Helper function to apply a value to a reactive state.
+     * @param state Shared pointer to the reactive property base
+     * @param value QVariant value to apply
+     * @return true if value was successfully applied
+     */
+    bool applyValueToState(const std::shared_ptr<ReactivePropertyBase>& state,
+                           const QVariant& value);
+
+    /**
+     * @brief Helper function to initialize history for a state.
+     * @param info Reference to the StateInfo to initialize
+     * @param key State key for logging purposes
+     */
+    void initializeStateHistory(StateInfo& info, const QString& key);
+
+    /**
+     * @brief Helper function to validate history position bounds.
+     * @param info Reference to the StateInfo to validate
+     * @param position Position to validate
+     * @return true if position is valid
+     */
+    bool validateHistoryPosition(const StateInfo& info, int position) const;
+
+    /**
+     * @brief Helper function to apply a history value to a state.
+     * @param info Reference to the StateInfo containing the state
+     * @param value QVariant value to apply
+     * @param key State key for logging purposes
+     * @return true if value was successfully applied
+     */
+    bool applyHistoryValue(const StateInfo& info, const QVariant& value,
+                           const QString& key);
 };
 
 // **Template implementations**
