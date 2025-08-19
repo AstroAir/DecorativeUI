@@ -355,6 +355,13 @@ public:
 
 private:
     QDateTimeEdit* findDateTimeEdit(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetDateTime(const CommandContext& context, QDateTimeEdit* widget);
+    CommandResult<QVariant> handleSetDateRange(const CommandContext& context, QDateTimeEdit* widget);
+    CommandResult<QVariant> handleSetTimeRange(const CommandContext& context, QDateTimeEdit* widget);
+    CommandResult<QVariant> handleSetDisplayFormat(const CommandContext& context, QDateTimeEdit* widget);
+
     QString widget_name_;
     QDateTime old_datetime_;
     QDateTime new_datetime_;
@@ -377,6 +384,13 @@ public:
 
 private:
     QProgressBar* findProgressBar(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetValue(const CommandContext& context, QProgressBar* widget);
+    CommandResult<QVariant> handleSetRange(const CommandContext& context, QProgressBar* widget);
+    CommandResult<QVariant> handleSetTextVisible(const CommandContext& context, QProgressBar* widget);
+    CommandResult<QVariant> handleReset(const CommandContext& context, QProgressBar* widget);
+
     QString widget_name_;
     int old_value_;
     int new_value_;

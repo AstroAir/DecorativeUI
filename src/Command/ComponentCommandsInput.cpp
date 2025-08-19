@@ -246,53 +246,34 @@ DateTimeEditCommand::DateTimeEditCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
 CommandResult<QVariant> DateTimeEditCommand::execute(const CommandContext& context) {
+    // Validate required parameters
+    auto validationResult = validateRequiredParameters(context, {"widget"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
-    if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
-    }
-
     auto* dateTimeEdit = findDateTimeEdit(widget_name);
     if (!dateTimeEdit) {
-        return CommandResult<QVariant>(QString("DateTimeEdit '%1' not found").arg(widget_name));
+        return createWidgetNotFoundError("DateTimeEdit", widget_name);
     }
 
+    // Store state for undo functionality
     widget_name_ = widget_name;
     old_datetime_ = dateTimeEdit->dateTime();
     operation_ = operation;
 
+    // Route to appropriate operation handler
     if (operation == "setDateTime" || operation.isEmpty()) {
-        auto datetime = context.getParameter<QDateTime>("datetime");
-        if (context.hasParameter("datetime")) {
-            new_datetime_ = datetime;
-            dateTimeEdit->setDateTime(datetime);
-            return CommandResult<QVariant>(QString("DateTimeEdit datetime set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing datetime parameter for setDateTime operation"));
+        return handleSetDateTime(context, dateTimeEdit);
     } else if (operation == "setDateRange") {
-        auto minDate = context.getParameter<QDate>("minDate");
-        auto maxDate = context.getParameter<QDate>("maxDate");
-        if (context.hasParameter("minDate") && context.hasParameter("maxDate")) {
-            dateTimeEdit->setDateRange(minDate, maxDate);
-            return CommandResult<QVariant>(QString("DateTimeEdit date range set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing minDate/maxDate parameters for setDateRange operation"));
+        return handleSetDateRange(context, dateTimeEdit);
     } else if (operation == "setTimeRange") {
-        auto minTime = context.getParameter<QTime>("minTime");
-        auto maxTime = context.getParameter<QTime>("maxTime");
-        if (context.hasParameter("minTime") && context.hasParameter("maxTime")) {
-            dateTimeEdit->setTimeRange(minTime, maxTime);
-            return CommandResult<QVariant>(QString("DateTimeEdit time range set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing minTime/maxTime parameters for setTimeRange operation"));
+        return handleSetTimeRange(context, dateTimeEdit);
     } else if (operation == "setDisplayFormat") {
-        auto format = context.getParameter<QString>("format");
-        if (context.hasParameter("format")) {
-            dateTimeEdit->setDisplayFormat(format);
-            return CommandResult<QVariant>(QString("DateTimeEdit display format set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing format parameter for setDisplayFormat operation"));
+        return handleSetDisplayFormat(context, dateTimeEdit);
     }
 
     return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
@@ -320,6 +301,51 @@ QDateTimeEdit* DateTimeEditCommand::findDateTimeEdit(const QString& name) {
     return findWidget<QDateTimeEdit>(name);
 }
 
+CommandResult<QVariant> DateTimeEditCommand::handleSetDateTime(const CommandContext& context, QDateTimeEdit* widget) {
+    if (!context.hasParameter("datetime")) {
+        return CommandResult<QVariant>(QString("Missing datetime parameter for setDateTime operation"));
+    }
+
+    auto datetime = context.getParameter<QDateTime>("datetime");
+    new_datetime_ = datetime;
+    widget->setDateTime(datetime);
+    return createSuccessResult("DateTimeEdit", "datetime set");
+}
+
+CommandResult<QVariant> DateTimeEditCommand::handleSetDateRange(const CommandContext& context, QDateTimeEdit* widget) {
+    auto validationResult = validateRequiredParameters(context, {"minDate", "maxDate"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
+    auto minDate = context.getParameter<QDate>("minDate");
+    auto maxDate = context.getParameter<QDate>("maxDate");
+    widget->setDateRange(minDate, maxDate);
+    return createSuccessResult("DateTimeEdit", "date range set");
+}
+
+CommandResult<QVariant> DateTimeEditCommand::handleSetTimeRange(const CommandContext& context, QDateTimeEdit* widget) {
+    auto validationResult = validateRequiredParameters(context, {"minTime", "maxTime"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
+    auto minTime = context.getParameter<QTime>("minTime");
+    auto maxTime = context.getParameter<QTime>("maxTime");
+    widget->setTimeRange(minTime, maxTime);
+    return createSuccessResult("DateTimeEdit", "time range set");
+}
+
+CommandResult<QVariant> DateTimeEditCommand::handleSetDisplayFormat(const CommandContext& context, QDateTimeEdit* widget) {
+    if (!context.hasParameter("format")) {
+        return CommandResult<QVariant>(QString("Missing format parameter for setDisplayFormat operation"));
+    }
+
+    auto format = context.getParameter<QString>("format");
+    widget->setDisplayFormat(format);
+    return createSuccessResult("DateTimeEdit", "display format set");
+}
+
 // ============================================================================
 // PROGRESS BAR COMPONENTS
 // ============================================================================
@@ -328,49 +354,34 @@ ProgressBarCommand::ProgressBarCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
 CommandResult<QVariant> ProgressBarCommand::execute(const CommandContext& context) {
+    // Validate required parameters
+    auto validationResult = validateRequiredParameters(context, {"widget"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
-    if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
-    }
-
     auto* progressBar = findProgressBar(widget_name);
     if (!progressBar) {
-        return CommandResult<QVariant>(QString("ProgressBar '%1' not found").arg(widget_name));
+        return createWidgetNotFoundError("ProgressBar", widget_name);
     }
 
+    // Store state for undo functionality
     widget_name_ = widget_name;
     old_value_ = progressBar->value();
     operation_ = operation;
 
+    // Route to appropriate operation handler
     if (operation == "setValue" || operation.isEmpty()) {
-        auto value = context.getParameter<int>("value");
-        if (context.hasParameter("value")) {
-            new_value_ = value;
-            progressBar->setValue(value);
-            return CommandResult<QVariant>(QString("ProgressBar value set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing value parameter for setValue operation"));
+        return handleSetValue(context, progressBar);
     } else if (operation == "setRange") {
-        auto min = context.getParameter<int>("min");
-        auto max = context.getParameter<int>("max");
-        if (context.hasParameter("min") && context.hasParameter("max")) {
-            progressBar->setRange(min, max);
-            return CommandResult<QVariant>(QString("ProgressBar range set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing min/max parameters for setRange operation"));
+        return handleSetRange(context, progressBar);
     } else if (operation == "setTextVisible") {
-        auto visible = context.getParameter<bool>("visible");
-        if (context.hasParameter("visible")) {
-            progressBar->setTextVisible(visible);
-            return CommandResult<QVariant>(QString("ProgressBar text visibility set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing visible parameter for setTextVisible operation"));
+        return handleSetTextVisible(context, progressBar);
     } else if (operation == "reset") {
-        progressBar->reset();
-        new_value_ = progressBar->value();
-        return CommandResult<QVariant>(QString("ProgressBar reset successfully"));
+        return handleReset(context, progressBar);
     }
 
     return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
@@ -396,6 +407,45 @@ CommandMetadata ProgressBarCommand::getMetadata() const {
 
 QProgressBar* ProgressBarCommand::findProgressBar(const QString& name) {
     return findWidget<QProgressBar>(name);
+}
+
+CommandResult<QVariant> ProgressBarCommand::handleSetValue(const CommandContext& context, QProgressBar* widget) {
+    if (!context.hasParameter("value")) {
+        return CommandResult<QVariant>(QString("Missing value parameter for setValue operation"));
+    }
+
+    auto value = context.getParameter<int>("value");
+    new_value_ = value;
+    widget->setValue(value);
+    return createSuccessResult("ProgressBar", "value set");
+}
+
+CommandResult<QVariant> ProgressBarCommand::handleSetRange(const CommandContext& context, QProgressBar* widget) {
+    auto validationResult = validateRequiredParameters(context, {"min", "max"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
+    auto min = context.getParameter<int>("min");
+    auto max = context.getParameter<int>("max");
+    widget->setRange(min, max);
+    return createSuccessResult("ProgressBar", "range set");
+}
+
+CommandResult<QVariant> ProgressBarCommand::handleSetTextVisible(const CommandContext& context, QProgressBar* widget) {
+    if (!context.hasParameter("visible")) {
+        return CommandResult<QVariant>(QString("Missing visible parameter for setTextVisible operation"));
+    }
+
+    auto visible = context.getParameter<bool>("visible");
+    widget->setTextVisible(visible);
+    return createSuccessResult("ProgressBar", "text visibility set");
+}
+
+CommandResult<QVariant> ProgressBarCommand::handleReset(const CommandContext& context, QProgressBar* widget) {
+    widget->reset();
+    new_value_ = widget->value();
+    return createSuccessResult("ProgressBar", "reset");
 }
 
 }  // namespace ComponentCommands
