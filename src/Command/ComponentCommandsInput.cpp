@@ -11,6 +11,30 @@ namespace Command {
 namespace ComponentCommands {
 
 // ============================================================================
+// COMMON HELPER FUNCTION IMPLEMENTATIONS
+// ============================================================================
+
+CommandResult<QVariant> validateRequiredParameters(const CommandContext& context,
+                                                   const QStringList& requiredParams) {
+    for (const QString& param : requiredParams) {
+        if (!context.hasParameter(param)) {
+            return CommandResult<QVariant>(QString("Missing required parameter: %1").arg(param));
+        }
+    }
+    return CommandResult<QVariant>(); // Empty result indicates success
+}
+
+CommandResult<QVariant> createWidgetNotFoundError(const QString& widgetType,
+                                                  const QString& widgetName) {
+    return CommandResult<QVariant>(QString("%1 '%2' not found").arg(widgetType, widgetName));
+}
+
+CommandResult<QVariant> createSuccessResult(const QString& widgetType,
+                                           const QString& operation) {
+    return CommandResult<QVariant>(QString("%1 %2 successful").arg(widgetType, operation));
+}
+
+// ============================================================================
 // DOUBLE SPINBOX COMPONENTS
 // ============================================================================
 
@@ -18,53 +42,36 @@ DoubleSpinBoxCommand::DoubleSpinBoxCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
 CommandResult<QVariant> DoubleSpinBoxCommand::execute(const CommandContext& context) {
+    // Validate required parameters
+    auto validationResult = validateRequiredParameters(context, {"widget"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
-    if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
-    }
-
     auto* doubleSpinBox = findDoubleSpinBox(widget_name);
     if (!doubleSpinBox) {
-        return CommandResult<QVariant>(QString("DoubleSpinBox '%1' not found").arg(widget_name));
+        return createWidgetNotFoundError("DoubleSpinBox", widget_name);
     }
 
+    // Store state for undo functionality
     widget_name_ = widget_name;
     old_value_ = doubleSpinBox->value();
     operation_ = operation;
 
+    // Route to appropriate operation handler
     if (operation == "setValue" || operation.isEmpty()) {
-        auto value = context.getParameter<double>("value");
-        if (context.hasParameter("value")) {
-            new_value_ = value;
-            doubleSpinBox->setValue(value);
-            return CommandResult<QVariant>(QString("DoubleSpinBox value set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing value parameter for setValue operation"));
+        return handleSetValue(context, doubleSpinBox);
     } else if (operation == "stepUp") {
-        doubleSpinBox->stepUp();
-        new_value_ = doubleSpinBox->value();
-        return CommandResult<QVariant>(QString("DoubleSpinBox stepped up successfully"));
+        return handleStepUp(context, doubleSpinBox);
     } else if (operation == "stepDown") {
-        doubleSpinBox->stepDown();
-        new_value_ = doubleSpinBox->value();
-        return CommandResult<QVariant>(QString("DoubleSpinBox stepped down successfully"));
+        return handleStepDown(context, doubleSpinBox);
     } else if (operation == "setRange") {
-        auto min = context.getParameter<double>("min");
-        auto max = context.getParameter<double>("max");
-        if (context.hasParameter("min") && context.hasParameter("max")) {
-            doubleSpinBox->setRange(min, max);
-            return CommandResult<QVariant>(QString("DoubleSpinBox range set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing min/max parameters for setRange operation"));
+        return handleSetRange(context, doubleSpinBox);
     } else if (operation == "setDecimals") {
-        auto decimals = context.getParameter<int>("decimals");
-        if (context.hasParameter("decimals")) {
-            doubleSpinBox->setDecimals(decimals);
-            return CommandResult<QVariant>(QString("DoubleSpinBox decimals set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing decimals parameter for setDecimals operation"));
+        return handleSetDecimals(context, doubleSpinBox);
     }
 
     return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
@@ -89,14 +96,52 @@ CommandMetadata DoubleSpinBoxCommand::getMetadata() const {
 }
 
 QDoubleSpinBox* DoubleSpinBoxCommand::findDoubleSpinBox(const QString& name) {
-    for (auto* widget : QApplication::allWidgets()) {
-        if (auto* doubleSpinBox = qobject_cast<QDoubleSpinBox*>(widget)) {
-            if (doubleSpinBox->objectName() == name) {
-                return doubleSpinBox;
-            }
-        }
+    return findWidget<QDoubleSpinBox>(name);
+}
+
+CommandResult<QVariant> DoubleSpinBoxCommand::handleSetValue(const CommandContext& context, QDoubleSpinBox* widget) {
+    if (!context.hasParameter("value")) {
+        return CommandResult<QVariant>(QString("Missing value parameter for setValue operation"));
     }
-    return nullptr;
+
+    auto value = context.getParameter<double>("value");
+    new_value_ = value;
+    widget->setValue(value);
+    return createSuccessResult("DoubleSpinBox", "value set");
+}
+
+CommandResult<QVariant> DoubleSpinBoxCommand::handleStepUp(const CommandContext& context, QDoubleSpinBox* widget) {
+    widget->stepUp();
+    new_value_ = widget->value();
+    return createSuccessResult("DoubleSpinBox", "stepped up");
+}
+
+CommandResult<QVariant> DoubleSpinBoxCommand::handleStepDown(const CommandContext& context, QDoubleSpinBox* widget) {
+    widget->stepDown();
+    new_value_ = widget->value();
+    return createSuccessResult("DoubleSpinBox", "stepped down");
+}
+
+CommandResult<QVariant> DoubleSpinBoxCommand::handleSetRange(const CommandContext& context, QDoubleSpinBox* widget) {
+    auto validationResult = validateRequiredParameters(context, {"min", "max"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
+    auto min = context.getParameter<double>("min");
+    auto max = context.getParameter<double>("max");
+    widget->setRange(min, max);
+    return createSuccessResult("DoubleSpinBox", "range set");
+}
+
+CommandResult<QVariant> DoubleSpinBoxCommand::handleSetDecimals(const CommandContext& context, QDoubleSpinBox* widget) {
+    if (!context.hasParameter("decimals")) {
+        return CommandResult<QVariant>(QString("Missing decimals parameter for setDecimals operation"));
+    }
+
+    auto decimals = context.getParameter<int>("decimals");
+    widget->setDecimals(decimals);
+    return createSuccessResult("DoubleSpinBox", "decimals set");
 }
 
 // ============================================================================
@@ -107,45 +152,32 @@ DialCommand::DialCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
 CommandResult<QVariant> DialCommand::execute(const CommandContext& context) {
+    // Validate required parameters
+    auto validationResult = validateRequiredParameters(context, {"widget"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
-    if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
-    }
-
     auto* dial = findDial(widget_name);
     if (!dial) {
-        return CommandResult<QVariant>(QString("Dial '%1' not found").arg(widget_name));
+        return createWidgetNotFoundError("Dial", widget_name);
     }
 
+    // Store state for undo functionality
     widget_name_ = widget_name;
     old_value_ = dial->value();
     operation_ = operation;
 
+    // Route to appropriate operation handler
     if (operation == "setValue" || operation.isEmpty()) {
-        auto value = context.getParameter<int>("value");
-        if (context.hasParameter("value")) {
-            new_value_ = value;
-            dial->setValue(value);
-            return CommandResult<QVariant>(QString("Dial value set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing value parameter for setValue operation"));
+        return handleSetValue(context, dial);
     } else if (operation == "setRange") {
-        auto min = context.getParameter<int>("min");
-        auto max = context.getParameter<int>("max");
-        if (context.hasParameter("min") && context.hasParameter("max")) {
-            dial->setRange(min, max);
-            return CommandResult<QVariant>(QString("Dial range set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing min/max parameters for setRange operation"));
+        return handleSetRange(context, dial);
     } else if (operation == "setNotchesVisible") {
-        auto visible = context.getParameter<bool>("visible");
-        if (context.hasParameter("visible")) {
-            dial->setNotchesVisible(visible);
-            return CommandResult<QVariant>(QString("Dial notches visibility set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing visible parameter for setNotchesVisible operation"));
+        return handleSetNotchesVisible(context, dial);
     }
 
     return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
@@ -170,14 +202,40 @@ CommandMetadata DialCommand::getMetadata() const {
 }
 
 QDial* DialCommand::findDial(const QString& name) {
-    for (auto* widget : QApplication::allWidgets()) {
-        if (auto* dial = qobject_cast<QDial*>(widget)) {
-            if (dial->objectName() == name) {
-                return dial;
-            }
-        }
+    return findWidget<QDial>(name);
+}
+
+CommandResult<QVariant> DialCommand::handleSetValue(const CommandContext& context, QDial* widget) {
+    if (!context.hasParameter("value")) {
+        return CommandResult<QVariant>(QString("Missing value parameter for setValue operation"));
     }
-    return nullptr;
+
+    auto value = context.getParameter<int>("value");
+    new_value_ = value;
+    widget->setValue(value);
+    return createSuccessResult("Dial", "value set");
+}
+
+CommandResult<QVariant> DialCommand::handleSetRange(const CommandContext& context, QDial* widget) {
+    auto validationResult = validateRequiredParameters(context, {"min", "max"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
+    auto min = context.getParameter<int>("min");
+    auto max = context.getParameter<int>("max");
+    widget->setRange(min, max);
+    return createSuccessResult("Dial", "range set");
+}
+
+CommandResult<QVariant> DialCommand::handleSetNotchesVisible(const CommandContext& context, QDial* widget) {
+    if (!context.hasParameter("visible")) {
+        return CommandResult<QVariant>(QString("Missing visible parameter for setNotchesVisible operation"));
+    }
+
+    auto visible = context.getParameter<bool>("visible");
+    widget->setNotchesVisible(visible);
+    return createSuccessResult("Dial", "notches visibility set");
 }
 
 // ============================================================================
@@ -259,14 +317,7 @@ CommandMetadata DateTimeEditCommand::getMetadata() const {
 }
 
 QDateTimeEdit* DateTimeEditCommand::findDateTimeEdit(const QString& name) {
-    for (auto* widget : QApplication::allWidgets()) {
-        if (auto* dateTimeEdit = qobject_cast<QDateTimeEdit*>(widget)) {
-            if (dateTimeEdit->objectName() == name) {
-                return dateTimeEdit;
-            }
-        }
-    }
-    return nullptr;
+    return findWidget<QDateTimeEdit>(name);
 }
 
 // ============================================================================
@@ -344,14 +395,7 @@ CommandMetadata ProgressBarCommand::getMetadata() const {
 }
 
 QProgressBar* ProgressBarCommand::findProgressBar(const QString& name) {
-    for (auto* widget : QApplication::allWidgets()) {
-        if (auto* progressBar = qobject_cast<QProgressBar*>(widget)) {
-            if (progressBar->objectName() == name) {
-                return progressBar;
-            }
-        }
-    }
-    return nullptr;
+    return findWidget<QProgressBar>(name);
 }
 
 }  // namespace ComponentCommands

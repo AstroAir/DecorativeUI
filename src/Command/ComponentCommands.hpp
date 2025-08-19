@@ -8,6 +8,7 @@
  * providing component-specific functionality beyond generic property setting.
  */
 
+#include <QApplication>
 #include <QWidget>
 #include <QPushButton>
 #include <QLabel>
@@ -49,6 +50,58 @@ namespace Command {
 namespace ComponentCommands {
 
 using namespace DeclarativeUI::Command;
+
+// ============================================================================
+// COMMON HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * @brief Generic template function to find a widget by name and type.
+ * @tparam T The widget type to search for (e.g., QDoubleSpinBox, QDial)
+ * @param name The object name of the widget to find
+ * @return Pointer to the widget if found, nullptr otherwise
+ *
+ * This template eliminates the need for separate findWidget functions
+ * in each command class, reducing code duplication significantly.
+ */
+template<typename T>
+T* findWidget(const QString& name) {
+    for (auto* widget : QApplication::allWidgets()) {
+        if (auto* typedWidget = qobject_cast<T*>(widget)) {
+            if (typedWidget->objectName() == name) {
+                return typedWidget;
+            }
+        }
+    }
+    return nullptr;
+}
+
+/**
+ * @brief Validates that required parameters exist in the command context.
+ * @param context The command context to validate
+ * @param requiredParams List of required parameter names
+ * @return CommandResult with error message if validation fails, empty result if success
+ */
+CommandResult<QVariant> validateRequiredParameters(const CommandContext& context,
+                                                   const QStringList& requiredParams);
+
+/**
+ * @brief Creates a standardized error result for missing widget.
+ * @param widgetType The type of widget (e.g., "DoubleSpinBox")
+ * @param widgetName The name of the widget that wasn't found
+ * @return CommandResult with formatted error message
+ */
+CommandResult<QVariant> createWidgetNotFoundError(const QString& widgetType,
+                                                  const QString& widgetName);
+
+/**
+ * @brief Creates a standardized success result.
+ * @param widgetType The type of widget (e.g., "DoubleSpinBox")
+ * @param operation The operation that was performed
+ * @return CommandResult with formatted success message
+ */
+CommandResult<QVariant> createSuccessResult(const QString& widgetType,
+                                           const QString& operation);
 
 // ============================================================================
 // BUTTON COMPONENTS
@@ -244,6 +297,14 @@ public:
 
 private:
     QDoubleSpinBox* findDoubleSpinBox(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetValue(const CommandContext& context, QDoubleSpinBox* widget);
+    CommandResult<QVariant> handleStepUp(const CommandContext& context, QDoubleSpinBox* widget);
+    CommandResult<QVariant> handleStepDown(const CommandContext& context, QDoubleSpinBox* widget);
+    CommandResult<QVariant> handleSetRange(const CommandContext& context, QDoubleSpinBox* widget);
+    CommandResult<QVariant> handleSetDecimals(const CommandContext& context, QDoubleSpinBox* widget);
+
     QString widget_name_;
     double old_value_;
     double new_value_;
@@ -266,6 +327,12 @@ public:
 
 private:
     QDial* findDial(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetValue(const CommandContext& context, QDial* widget);
+    CommandResult<QVariant> handleSetRange(const CommandContext& context, QDial* widget);
+    CommandResult<QVariant> handleSetNotchesVisible(const CommandContext& context, QDial* widget);
+
     QString widget_name_;
     int old_value_;
     int new_value_;
