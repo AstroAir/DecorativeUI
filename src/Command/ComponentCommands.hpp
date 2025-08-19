@@ -371,6 +371,10 @@ private:
 /**
  * @class ListViewCommand
  * @brief Specialized command for ListView components with model and selection operations.
+ *
+ * Refactored to improve maintainability by breaking down complex execute method
+ * into smaller, focused operation handlers with comprehensive documentation.
+ * Provides operations for item selection, addition, removal, and model management.
  */
 class ListViewCommand : public DeclarativeUI::Command::ICommand {
     Q_OBJECT
@@ -383,7 +387,19 @@ public:
     CommandMetadata getMetadata() const override;
 
 private:
+    // Widget finder and validation methods
     QListView* findListView(const QString& name);
+    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
+    CommandResult<QVariant> validateModelOperation(QAbstractItemModel* model, const QString& operation);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSelectItem(const CommandContext& context, QListView* listView);
+    CommandResult<QVariant> handleAddItem(const CommandContext& context, QListView* listView);
+    CommandResult<QVariant> handleRemoveItem(const CommandContext& context, QListView* listView);
+    CommandResult<QVariant> handleClearSelection(const CommandContext& context, QListView* listView);
+    CommandResult<QVariant> handleSetModel(const CommandContext& context, QListView* listView);
+
+    // State management for undo functionality
     QString widget_name_;
     QModelIndex old_index_;
     QModelIndex new_index_;
@@ -393,6 +409,10 @@ private:
 /**
  * @class TableViewCommand
  * @brief Specialized command for TableView components with model and selection operations.
+ *
+ * Refactored to improve maintainability by breaking down complex execute method
+ * into smaller, focused operation handlers with comprehensive documentation.
+ * Provides operations for cell/row/column selection, data manipulation, and model management.
  */
 class TableViewCommand : public DeclarativeUI::Command::ICommand {
     Q_OBJECT
@@ -405,7 +425,19 @@ public:
     CommandMetadata getMetadata() const override;
 
 private:
+    // Widget finder and validation methods
     QTableView* findTableView(const QString& name);
+    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
+    CommandResult<QVariant> validateModelOperation(QAbstractItemModel* model, const QString& operation);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSelectCell(const CommandContext& context, QTableView* tableView);
+    CommandResult<QVariant> handleSelectRow(const CommandContext& context, QTableView* tableView);
+    CommandResult<QVariant> handleSelectColumn(const CommandContext& context, QTableView* tableView);
+    CommandResult<QVariant> handleSetItemData(const CommandContext& context, QTableView* tableView);
+    CommandResult<QVariant> handleClearSelection(const CommandContext& context, QTableView* tableView);
+
+    // State management for undo functionality
     QString widget_name_;
     QModelIndex old_index_;
     QModelIndex new_index_;
@@ -415,6 +447,10 @@ private:
 /**
  * @class TreeViewCommand
  * @brief Specialized command for TreeView components with model and selection operations.
+ *
+ * Refactored to improve maintainability by breaking down complex execute method
+ * into smaller, focused operation handlers with comprehensive documentation.
+ * Provides operations for item selection, expansion/collapse, and hierarchical model management.
  */
 class TreeViewCommand : public DeclarativeUI::Command::ICommand {
     Q_OBJECT
@@ -427,7 +463,20 @@ public:
     CommandMetadata getMetadata() const override;
 
 private:
+    // Widget finder and validation methods
     QTreeView* findTreeView(const QString& name);
+    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
+    CommandResult<QVariant> validateModelOperation(QAbstractItemModel* model, const QString& operation);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSelectItem(const CommandContext& context, QTreeView* treeView);
+    CommandResult<QVariant> handleExpandItem(const CommandContext& context, QTreeView* treeView);
+    CommandResult<QVariant> handleCollapseItem(const CommandContext& context, QTreeView* treeView);
+    CommandResult<QVariant> handleExpandAll(const CommandContext& context, QTreeView* treeView);
+    CommandResult<QVariant> handleCollapseAll(const CommandContext& context, QTreeView* treeView);
+    CommandResult<QVariant> handleClearSelection(const CommandContext& context, QTreeView* treeView);
+
+    // State management for undo functionality
     QString widget_name_;
     QModelIndex old_index_;
     QModelIndex new_index_;
