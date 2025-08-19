@@ -417,6 +417,13 @@ public:
 
 private:
     QLCDNumber* findLCDNumber(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleDisplay(const CommandContext& context, QLCDNumber* widget);
+    CommandResult<QVariant> handleSetDigitCount(const CommandContext& context, QLCDNumber* widget);
+    CommandResult<QVariant> handleSetMode(const CommandContext& context, QLCDNumber* widget);
+    CommandResult<QVariant> handleSetSegmentStyle(const CommandContext& context, QLCDNumber* widget);
+
     QString widget_name_;
     double old_value_;
     double new_value_;
@@ -439,6 +446,12 @@ public:
 
 private:
     QCalendarWidget* findCalendar(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetSelectedDate(const CommandContext& context, QCalendarWidget* widget);
+    CommandResult<QVariant> handleSetDateRange(const CommandContext& context, QCalendarWidget* widget);
+    CommandResult<QVariant> handleSetGridVisible(const CommandContext& context, QCalendarWidget* widget);
+
     QString widget_name_;
     QDate old_date_;
     QDate new_date_;
