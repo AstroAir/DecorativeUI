@@ -14,7 +14,7 @@ class SpinBox : public Core::UIElement {
 public:
     explicit SpinBox(QObject* parent = nullptr);
 
-    // **Fluent interface for spin box**
+    // **Basic fluent interface (backward compatible)**
     SpinBox& minimum(int min);
     SpinBox& maximum(int max);
     SpinBox& value(int value);
@@ -28,6 +28,24 @@ public:
     SpinBox& onValueChanged(std::function<void(int)> handler);
     SpinBox& onTextChanged(std::function<void(const QString&)> handler);
     SpinBox& style(const QString& stylesheet);
+
+    // **Enhanced fluent interface**
+    SpinBox& tooltip(const QString& tooltip_text);
+    SpinBox& accessibleName(const QString& name);
+    SpinBox& accessibleDescription(const QString& description);
+    SpinBox& shortcut(const QKeySequence& shortcut);
+    SpinBox& required(bool required = true);
+    SpinBox& validator(std::function<bool(int)> validation_func);
+    SpinBox& range(int min, int max);
+    SpinBox& accelerated(bool enabled = true);
+    SpinBox& keyboardTracking(bool enabled = true);
+    SpinBox& correctionMode(QAbstractSpinBox::CorrectionMode mode);
+    SpinBox& buttonSymbols(QAbstractSpinBox::ButtonSymbols symbols);
+    SpinBox& alignment(Qt::Alignment alignment);
+    SpinBox& frame(bool enabled = true);
+    SpinBox& groupSeparator(bool enabled = true);
+    SpinBox& onValidationChanged(std::function<void(bool, const QString&)> handler);
+    SpinBox& onRangeChanged(std::function<void(int, int)> handler);
 
     void initialize() override;
 

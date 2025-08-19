@@ -14,6 +14,7 @@ add_subdirectory(03-components)
 add_subdirectory(04-advanced-features)
 add_subdirectory(05-command-system)
 add_subdirectory(06-applications)
+add_subdirectory(enhanced-components)
 
 # **Copy shared resources for examples**
 add_custom_target(CopyExampleResources ALL

@@ -15,7 +15,7 @@ class ToolButton : public Core::UIElement {
 public:
     explicit ToolButton(QObject* parent = nullptr);
 
-    // **Fluent interface for tool button**
+    // **Basic fluent interface (backward compatible)**
     ToolButton& text(const QString& text);
     ToolButton& icon(const QIcon& icon);
     ToolButton& iconSize(const QSize& size);
@@ -33,6 +33,30 @@ public:
     ToolButton& onToggled(std::function<void(bool)> handler);
     ToolButton& onTriggered(std::function<void(QAction*)> handler);
     ToolButton& style(const QString& stylesheet);
+
+    // **Enhanced fluent interface**
+    ToolButton& tooltip(const QString& tooltip_text);
+    ToolButton& accessibleName(const QString& name);
+    ToolButton& accessibleDescription(const QString& description);
+    ToolButton& shortcut(const QKeySequence& shortcut);
+    ToolButton& group(const QString& group_name);
+    ToolButton& exclusive(bool exclusive = true);
+    ToolButton& badge(const QString& badge_text, const QColor& badge_color = QColor("#e74c3c"));
+    ToolButton& notification(bool enabled = true, const QColor& color = QColor("#ff4444"));
+    ToolButton& dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    ToolButton& hoverEffect(bool enabled = true);
+    ToolButton& pressAnimation(bool enabled = true);
+    ToolButton& borderRadius(int radius);
+    ToolButton& customColors(const QColor& normal, const QColor& hover = QColor(), const QColor& pressed = QColor());
+    ToolButton& iconAnimation(bool enabled = true);
+    ToolButton& textAnimation(bool enabled = true);
+    ToolButton& onHover(std::function<void(bool)> hover_handler);
+    ToolButton& onFocus(std::function<void(bool)> focus_handler);
+    ToolButton& onDoubleClick(std::function<void()> double_click_handler);
+    ToolButton& onRightClick(std::function<void()> right_click_handler);
+    ToolButton& role(const QString& aria_role);
+    ToolButton& tabIndex(int index);
+    ToolButton& describedBy(const QString& element_id);
 
     void initialize() override;
     QString getText() const;

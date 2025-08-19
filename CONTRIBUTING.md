@@ -6,10 +6,12 @@ Thank you for your interest in contributing to DeclarativeUI! We welcome contrib
 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/DeclarativeUI.git
    cd DeclarativeUI
    ```
+
 3. **Set up development environment** (see [Development Setup](#development-setup))
 4. **Create a feature branch**: `git checkout -b feature/your-feature-name`
 5. **Make your changes** following our [coding standards](#coding-standards)
@@ -24,6 +26,7 @@ Thank you for your interest in contributing to DeclarativeUI! We welcome contrib
 - **CMake** 3.20 or higher
 - **C++20 compatible compiler** (GCC 10+, Clang 12+, MSVC 2019+)
 - **Git**
+- **Python 3.8+** (for pre-commit hooks and documentation)
 
 ### Build Instructions
 
@@ -36,6 +39,41 @@ cmake --build .
 # Run tests to verify setup
 ctest --output-on-failure
 ```
+
+### Pre-commit Setup (Recommended)
+
+We use pre-commit hooks to ensure code quality and consistency. After cloning the repository:
+
+```bash
+# Install Python dependencies (includes pre-commit)
+pip install -r requirements.txt
+
+# Install pre-commit hooks
+pre-commit install
+
+# Optionally, run on all files to check current state
+pre-commit run --all-files
+```
+
+**What the hooks do:**
+
+- Format C++ code with clang-format
+- Format CMake files with cmake-format
+- Remove trailing whitespace and fix line endings
+- Check for large files and merge conflicts
+- Run basic C++ static analysis (cppcheck)
+
+**Bypassing hooks (when necessary):**
+
+```bash
+# Skip all hooks for emergency commits
+git commit --no-verify -m "Emergency fix"
+
+# Skip specific hooks
+SKIP=clang-format,cppcheck git commit -m "Skip formatting"
+```
+
+For detailed pre-commit setup and troubleshooting, see our [Pre-commit Guide](docs/developer/pre-commit-guide.md).
 
 For detailed setup instructions, see our [Development Guide](docs/developer/contributing.md).
 
@@ -112,6 +150,7 @@ For detailed coding standards, see [docs/developer/contributing.md](docs/develop
 ## Recognition
 
 Contributors are recognized in:
+
 - CHANGELOG.md for their contributions
 - README.md contributors section
 - Release notes for significant contributions

@@ -163,4 +163,55 @@ void Label::clear() {
     }
 }
 
+QString Label::getSelectedText() const {
+    if (label_widget_) {
+        return label_widget_->selectedText();
+    }
+    return QString();
+}
+
+bool Label::hasSelection() const {
+    if (label_widget_) {
+        return label_widget_->hasSelectedText();
+    }
+    return false;
+}
+
+void Label::updateDynamicContent() {
+    // Enhanced dynamic content update
+    // Implementation would go here for dynamic content updates
+}
+
+// **Missing method implementations for enhanced Label**
+void Label::onTextChangedInternal() {
+    // Enhanced text change handling
+    if (text_changed_handler_) {
+        text_changed_handler_(getText());
+    }
+    emit textChanged(getText());
+}
+
+void Label::onSelectionChangedInternal() {
+    // Enhanced selection change handling
+    if (selection_handler_) {
+        selection_handler_(getSelectedText());
+    }
+    emit selectionChanged(getSelectedText());
+}
+
+void Label::onAnimationFinished() {
+    // Enhanced animation finished handling
+    emit animationFinished();
+}
+
+void Label::onUpdateTimer() {
+    // Enhanced update timer handling
+    updateDynamicContent();
+}
+
+void Label::onTypewriterTimer() {
+    // Enhanced typewriter timer handling
+    // Implementation would go here for typewriter effect
+}
+
 }  // namespace DeclarativeUI::Components

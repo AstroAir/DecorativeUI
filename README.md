@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
     cd DeclarativeUI
     build.bat
     build\examples\basic\HelloWorldExample.exe
-    ```
+```
 
 === "Linux"
     ```bash
@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
     cmake --preset default
     cmake --build --preset default
     ./build/examples/basic/HelloWorldExample
-    ```
+```
 
 === "macOS"
     ```bash
@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
     cmake --preset default
     cmake --build --preset default
     ./build/examples/basic/HelloWorldExample
-    ```
+```
 
 ## 📚 Documentation
 
@@ -203,6 +203,7 @@ ctest -R "HotReload"
 The hot reload system has been significantly enhanced with new capabilities:
 
 **PerformanceMonitor Enhancements:**
+
 - ⏸️ **Pause/Resume Monitoring**: Fine-grained control over monitoring lifecycle
 - 📊 **Real-time Analytics**: Sliding window analytics with trend calculation
 - 🔮 **Predictive Modeling**: Machine learning-based performance forecasting
@@ -211,6 +212,7 @@ The hot reload system has been significantly enhanced with new capabilities:
 - 📈 **Advanced Reporting**: Detailed reports with export to JSON/text formats
 
 **HotReloadManager Enhancements:**
+
 - 🔗 **Dependency Management**: Automatic dependency graph building and cycle detection
 - 🧵 **Thread Management**: Multi-threaded reload operations with thread pool
 - 📏 **Performance Measurement**: Built-in performance metrics collection
@@ -219,6 +221,7 @@ The hot reload system has been significantly enhanced with new capabilities:
 - 💾 **Smart Caching**: Widget caching and dependency preloading strategies
 
 **JSON Module Improvements:**
+
 - ✅ **Complete Implementation**: All declared methods now fully implemented
 - 🔧 **Build System**: Fixed CMakeLists.txt to include all source files
 - 📚 **Documentation**: Comprehensive README with usage examples
@@ -242,6 +245,35 @@ cmake --build . --target examples
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
+### Development Setup
+
+```bash
+# 1. Clone and build
+git clone https://github.com/DeclarativeUI/DeclarativeUI.git
+cd DeclarativeUI
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_EXAMPLES=ON -DBUILD_TESTS=ON
+cmake --build .
+
+# 2. Set up pre-commit hooks (recommended)
+pip install -r requirements.txt
+pre-commit install
+
+# 3. Run tests to verify setup
+ctest --output-on-failure
+```
+
+### Code Quality Tools
+
+We use pre-commit hooks to maintain code quality:
+
+- **clang-format**: Automatic C++ code formatting
+- **cmake-format**: CMake file formatting and linting
+- **cppcheck**: Static analysis for C++ code
+- **Basic checks**: Trailing whitespace, large files, merge conflicts
+
+To bypass hooks when necessary: `git commit --no-verify`
+
 ### Quick Contribution Steps
 
 1. Fork the repository
@@ -262,6 +294,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 The project has undergone significant build system improvements to ensure reliable compilation and testing:
 
 **Build System Fixes:**
+
 - ✅ **Compilation Errors Fixed**: Resolved all API mismatches and missing implementations
 - 🔧 **Test Compatibility**: Updated test files to use correct public APIs
 - 📦 **Dependency Management**: Fixed PerformanceMonitor method implementations
@@ -269,6 +302,7 @@ The project has undergone significant build system improvements to ensure reliab
 - 🏗️ **CMake Integration**: Full Windows/MinGW build support verified
 
 **API Improvements:**
+
 - 🔄 **HotReload API**: Standardized method names (watchFile vs addFile)
 - 📊 **JSON Validation**: Updated to use getErrorMessages() API
 - 🚫 **Deprecated Code**: Replaced qrand() with modern C++ random generation
@@ -281,16 +315,19 @@ The build now completes successfully with comprehensive test coverage, making it
 The test suite has been significantly expanded with advanced testing capabilities:
 
 **New Test Modules:**
+
 - 📊 **JSONExtendedTest**: Comprehensive JSON parsing, performance, and edge case testing
 - ⚡ **PerformanceComprehensiveTest**: Widget creation, memory, threading, and UI performance benchmarks
 - 🔍 **Advanced Error Handling**: Comprehensive error scenarios and recovery testing
 
 **Test Statistics:**
+
 - 📈 **Total Test Executables**: 24 comprehensive test suites
 - ✅ **Pass Rate**: 95%+ with expected failures for error handling validation
 - 🚀 **Performance Benchmarks**: Real-time performance metrics and stress testing
 
 **Performance Highlights:**
+
 - JSON parsing: 5000 items processed in 52ms
 - Widget creation: 1000 widgets created in 1ms
 - Memory operations: 10MB allocated/deallocated in <5ms

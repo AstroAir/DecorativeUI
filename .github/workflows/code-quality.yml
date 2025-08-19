@@ -7,10 +7,39 @@ on:
     branches: [ main, develop ]
 
 jobs:
+  pre-commit:
+    name: Pre-commit Hooks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed for pre-commit to work properly
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format-14 cppcheck cmake-format
+        # Make clang-format-14 available as clang-format
+        sudo ln -sf /usr/bin/clang-format-14 /usr/bin/clang-format
+
+    - name: Run pre-commit
+      uses: pre-commit/action@v3.0.0
+      with:
+        extra_args: --all-files --show-diff-on-failure
+      env:
+        SKIP: no-commit-to-branch  # Skip branch protection in CI
+
   clang-format:
     name: Code Formatting Check
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -27,7 +56,7 @@ jobs:
   clang-tidy:
     name: Static Analysis
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -54,7 +83,7 @@ jobs:
   cppcheck:
     name: Static Analysis (cppcheck)
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -73,7 +102,7 @@ jobs:
   documentation-check:
     name: Documentation Check
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -95,7 +124,7 @@ jobs:
       run: |
         # Install linkchecker
         pip install linkchecker
-        
+
         # Build docs and check links
         mkdocs build
         linkchecker site/ --check-extern
@@ -103,7 +132,7 @@ jobs:
   license-check:
     name: License Check
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4

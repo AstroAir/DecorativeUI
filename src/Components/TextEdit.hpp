@@ -7,10 +7,43 @@
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QTextEdit>
+#include <QSyntaxHighlighter>
+#include <QCompleter>
+#include <QTimer>
+#include <QPropertyAnimation>
+#include <QGraphicsDropShadowEffect>
+#include <QUndoStack>
+#include <QTextBrowser>
+#include <memory>
+#include <functional>
 
 #include "../Core/UIElement.hpp"
 
 namespace DeclarativeUI::Components {
+
+/**
+ * @brief Text validation result for enhanced text edit
+ */
+struct TextEditValidationResult {
+    bool is_valid;
+    QString error_message;
+    QString suggestion;
+    int error_position = -1;
+
+    TextEditValidationResult(bool valid = true, const QString& error = "", const QString& hint = "", int pos = -1)
+        : is_valid(valid), error_message(error), suggestion(hint), error_position(pos) {}
+};
+
+/**
+ * @brief Find and replace options
+ */
+struct FindReplaceOptions {
+    bool case_sensitive = false;
+    bool whole_words = false;
+    bool use_regex = false;
+    bool wrap_around = true;
+    bool backward = false;
+};
 
 class TextEdit : public Core::UIElement {
     Q_OBJECT
@@ -18,7 +51,7 @@ class TextEdit : public Core::UIElement {
 public:
     explicit TextEdit(QObject *parent = nullptr);
 
-    // **Fluent interface for text edit**
+    // **Basic fluent interface (backward compatible)**
     TextEdit &text(const QString &text);
     TextEdit &html(const QString &html);
     TextEdit &placeholder(const QString &placeholder);
@@ -38,6 +71,67 @@ public:
     TextEdit &onSelectionChanged(std::function<void()> handler);
     TextEdit &onCursorPositionChanged(std::function<void()> handler);
     TextEdit &style(const QString &stylesheet);
+
+    // **Enhanced fluent interface**
+    TextEdit &tooltip(const QString& tooltip_text);
+    TextEdit &accessibleName(const QString& name);
+    TextEdit &accessibleDescription(const QString& description);
+    TextEdit &shortcut(const QKeySequence& shortcut);
+
+    // **Validation**
+    TextEdit &required(bool required = true);
+    TextEdit &minLength(int min_length);
+    TextEdit &maxLength(int max_length);
+    TextEdit &validator(std::function<TextEditValidationResult(const QString&)> validation_func);
+    TextEdit &onValidationFailed(std::function<void(const QString&, int)> error_handler);
+    TextEdit &validateOnType(bool validate_while_typing = true);
+    TextEdit &validateOnFocus(bool validate_on_focus_lost = true);
+    TextEdit &spellCheck(bool enabled = true);
+    TextEdit &grammarCheck(bool enabled = true);
+
+    // **Auto-completion and suggestions**
+    TextEdit &autoComplete(const QStringList& completions);
+    TextEdit &autoCompleteMode(QCompleter::CompletionMode mode);
+    TextEdit &wordSuggestions(bool enabled = true);
+    TextEdit &customCompleter(QCompleter* completer);
+
+    // **Syntax highlighting and formatting**
+    TextEdit &syntaxHighlighter(QSyntaxHighlighter* highlighter);
+    TextEdit &language(const QString& language_name);
+    TextEdit &lineNumbers(bool enabled = true);
+    TextEdit &currentLineHighlight(bool enabled = true, const QColor& color = QColor(255, 255, 0, 50));
+    TextEdit &bracketMatching(bool enabled = true);
+    TextEdit &codeCompletion(bool enabled = true);
+    TextEdit &autoIndent(bool enabled = true);
+    TextEdit &tabsToSpaces(bool enabled = true, int spaces = 4);
+
+    // **Visual enhancements**
+    TextEdit &dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    TextEdit &hoverEffect(bool enabled = true);
+    TextEdit &focusAnimation(bool enabled = true);
+    TextEdit &borderRadius(int radius);
+    TextEdit &customColors(const QColor& background, const QColor& text = QColor(), const QColor& border = QColor());
+    TextEdit &margins(int left, int top, int right, int bottom);
+
+    // **Advanced features**
+    TextEdit &findReplace(bool enabled = true);
+    TextEdit &undoRedo(bool enabled = true);
+    TextEdit &autoSave(bool enabled = true, int interval_seconds = 30);
+    TextEdit &wordCount(bool enabled = true);
+    TextEdit &characterCount(bool enabled = true);
+    TextEdit &readingTime(bool enabled = true);
+    TextEdit &textStatistics(bool enabled = true);
+
+    // **Collaboration features**
+    TextEdit &trackChanges(bool enabled = true);
+    TextEdit &comments(bool enabled = true);
+    TextEdit &versionHistory(bool enabled = true);
+    TextEdit &collaborativeEditing(bool enabled = true);
+
+    // **Export and import**
+    TextEdit &supportedFormats(const QStringList& formats);
+    TextEdit &exportFormat(const QString& default_format);
+    TextEdit &importFormat(const QString& default_format);
 
     void initialize() override;
 

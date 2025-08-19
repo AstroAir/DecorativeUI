@@ -10,6 +10,24 @@
 #include <unordered_map>
 #include "../Exceptions/UIExceptions.hpp"
 
+// Forward declarations for Qt widget classes used in private methods
+class QLabel;
+class QPushButton;
+class QLineEdit;
+class QTextEdit;
+class QCheckBox;
+class QRadioButton;
+class QComboBox;
+class QSpinBox;
+class QDoubleSpinBox;
+class QSlider;
+class QProgressBar;
+class QGroupBox;
+class QFrame;
+class QScrollArea;
+class QTabWidget;
+class QSplitter;
+
 /**
  * @file ComponentRegistry.hpp
  * @brief Registry and factory utilities for creating QWidget-based components
@@ -212,6 +230,41 @@ private:
      * constructor and is not intended to be public.
      */
     void registerBuiltinComponents();
+
+    /**
+     * @brief Category-specific registration methods for better organization.
+     *
+     * These methods break down the large registerBuiltinComponents function
+     * into smaller, focused functions that handle specific widget categories.
+     */
+    void registerBasicWidgets();
+    void registerInputWidgets();
+    void registerNumericWidgets();
+    void registerDisplayWidgets();
+    void registerContainerWidgets();
+
+    /**
+     * @brief Property configuration helper methods.
+     *
+     * These methods extract the common property configuration logic
+     * to reduce code duplication and improve maintainability.
+     */
+    void configureLabelProperties(std::unique_ptr<QLabel>& label, const QJsonObject& config);
+    void configureButtonProperties(std::unique_ptr<QPushButton>& button, const QJsonObject& config);
+    void configureLineEditProperties(std::unique_ptr<QLineEdit>& lineEdit, const QJsonObject& config);
+    void configureTextEditProperties(std::unique_ptr<QTextEdit>& textEdit, const QJsonObject& config);
+    void configureCheckBoxProperties(std::unique_ptr<QCheckBox>& checkBox, const QJsonObject& config);
+    void configureRadioButtonProperties(std::unique_ptr<QRadioButton>& radioButton, const QJsonObject& config);
+    void configureComboBoxProperties(std::unique_ptr<QComboBox>& comboBox, const QJsonObject& config);
+    void configureSpinBoxProperties(std::unique_ptr<QSpinBox>& spinBox, const QJsonObject& config);
+    void configureDoubleSpinBoxProperties(std::unique_ptr<QDoubleSpinBox>& doubleSpinBox, const QJsonObject& config);
+    void configureSliderProperties(std::unique_ptr<QSlider>& slider, const QJsonObject& config);
+    void configureProgressBarProperties(std::unique_ptr<QProgressBar>& progressBar, const QJsonObject& config);
+    void configureGroupBoxProperties(std::unique_ptr<QGroupBox>& groupBox, const QJsonObject& config);
+    void configureFrameProperties(std::unique_ptr<QFrame>& frame, const QJsonObject& config);
+    void configureScrollAreaProperties(std::unique_ptr<QScrollArea>& scrollArea, const QJsonObject& config);
+    void configureTabWidgetProperties(std::unique_ptr<QTabWidget>& tabWidget, const QJsonObject& config);
+    void configureSplitterProperties(std::unique_ptr<QSplitter>& splitter, const QJsonObject& config);
 };
 
 /**

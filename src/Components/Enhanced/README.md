@@ -1,8 +1,10 @@
 # Enhanced Components System
 
-The Enhanced Components System provides a comprehensive set of enhancements for existing DeclarativeUI components, adding accessibility, validation, visual effects, and advanced functionality without modifying the core component implementations.
+The Enhanced Components System provides a comprehensive set of enhancements for existing DeclarativeUI components, adding accessibility, validation, visual effects, and advanced functionality.
 
 ## Overview
+
+As of the latest version, enhanced functionality has been integrated directly into the base components (Button, LineEdit, etc.). The ComponentEnhancer system remains available for composition-based enhancement of any Qt widget.
 
 The enhancement system uses composition and decoration patterns to layer additional functionality on top of existing components. This approach allows you to:
 
@@ -12,6 +14,44 @@ The enhancement system uses composition and decoration patterns to layer additio
 - Add keyboard shortcuts and navigation
 - Implement auto-completion and suggestions
 - Create responsive and interactive behaviors
+
+## Enhanced Base Components
+
+The base components now include all enhanced functionality:
+
+### Enhanced Button Features
+```cpp
+#include "Components/Button.hpp"
+using namespace DeclarativeUI::Components;
+
+auto button = std::make_unique<Button>();
+button->text("Save Document")
+      ->tooltip("Save the current document")
+      ->accessibleName("Save Button")
+      ->shortcut(QKeySequence::Save)
+      ->dropShadow(true)
+      ->hoverEffect(true)
+      ->borderRadius(8)
+      ->onClick([]() { /* save logic */ });
+button->initialize();
+```
+
+### Enhanced LineEdit Features
+```cpp
+#include "Components/LineEdit.hpp"
+using namespace DeclarativeUI::Components;
+
+auto email_field = std::make_unique<LineEdit>();
+email_field->placeholder("Enter your email")
+           ->tooltip("Email address for notifications")
+           ->accessibleName("Email Address")
+           ->required(true)
+           ->email(true)
+           ->autoComplete({"user@example.com", "admin@company.com"})
+           ->selectAllOnFocus(true)
+           ->borderRadius(4);
+email_field->initialize();
+```
 
 ## Key Features
 
@@ -60,7 +100,7 @@ using namespace DeclarativeUI::Components::Enhanced;
 auto button = new QPushButton("Click Me");
 
 // Enhance it with accessibility and visual effects
-ComponentEnhancer::enhance(button, 
+ComponentEnhancer::enhance(button,
     enhance()
         .accessibleName("Action Button")
         .tooltip("Click to perform action")
@@ -337,6 +377,6 @@ See the comprehensive example in `example/showcase/ComponentGallery.cpp` for det
 ## API Reference
 
 For complete API documentation, see the header files:
-- `ComponentEnhancer.hpp` - Main enhancement system
-- `ButtonEnhanced.hpp` - Enhanced button implementation
-- `LineEditEnhanced.hpp` - Enhanced line edit implementation
+- `ComponentEnhancer.hpp` - Composition-based enhancement system for any Qt widget
+- `../Button.hpp` - Enhanced button component with integrated advanced features
+- `../LineEdit.hpp` - Enhanced line edit component with integrated validation and formatting

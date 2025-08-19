@@ -190,6 +190,34 @@ coverage/
 .cache/
 cache/
 
+# Pre-commit cache
+.pre-commit-cache/
+
+# -----------------------------------------------------------------------------
+# Development Tools
+# -----------------------------------------------------------------------------
+
+# Pre-commit hooks cache
+.pre-commit-cache/
+
+# Python virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDE and editor files
+.vscode/settings.json
+.idea/
+*.sublime-*
+.vs/
+
 # -----------------------------------------------------------------------------
 # Project Specific
 # -----------------------------------------------------------------------------
