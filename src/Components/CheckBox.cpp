@@ -1,34 +1,35 @@
 // Components/CheckBox.cpp
 #include "CheckBox.hpp"
-#include "../Core/Theme.hpp"
+#include <QDebug>
 #include <QShortcut>
 #include <QToolTip>
-#include <QDebug>
+#include "../Core/Theme.hpp"
 
 namespace DeclarativeUI::Components {
 
 // **Static group management**
-QMap<QString, QList<CheckBox*>> CheckBox::named_groups_;
-QMap<QString, std::function<CheckBoxValidationResult(const QList<CheckBox*>&)>> CheckBox::group_validators_;
+QMap<QString, QList<CheckBox *>> CheckBox::named_groups_;
+QMap<QString,
+     std::function<CheckBoxValidationResult(const QList<CheckBox *> &)>>
+    CheckBox::group_validators_;
 
 // **Enhanced implementation**
 CheckBox::CheckBox(QObject *parent)
-    : UIElement(parent)
-    , checkbox_widget_(nullptr)
-    , button_group_(nullptr)
-    , required_(false)
-    , validate_on_change_(true)
-    , is_valid_(true)
-    , drop_shadow_enabled_(false)
-    , shadow_color_(QColor(0, 0, 0, 80))
-    , hover_effect_enabled_(true)
-    , check_animation_enabled_(true)
-    , border_radius_(4)
-    , disabled_state_(false)
-    , read_only_(false)
-    , tab_index_(-1)
-    , exclusive_group_(false)
-{
+    : UIElement(parent),
+      checkbox_widget_(nullptr),
+      button_group_(nullptr),
+      required_(false),
+      validate_on_change_(true),
+      is_valid_(true),
+      drop_shadow_enabled_(false),
+      shadow_color_(QColor(0, 0, 0, 80)),
+      hover_effect_enabled_(true),
+      check_animation_enabled_(true),
+      border_radius_(4),
+      disabled_state_(false),
+      read_only_(false),
+      tab_index_(-1),
+      exclusive_group_(false) {
     // Initialize with default accessibility role
     aria_role_ = "checkbox";
 }
@@ -61,32 +62,32 @@ CheckBox &CheckBox::style(const QString &stylesheet) {
 }
 
 // **Enhanced fluent interface**
-CheckBox &CheckBox::tooltip(const QString& tooltip_text) {
+CheckBox &CheckBox::tooltip(const QString &tooltip_text) {
     tooltip_text_ = tooltip_text;
     return *this;
 }
 
-CheckBox &CheckBox::accessibleName(const QString& name) {
+CheckBox &CheckBox::accessibleName(const QString &name) {
     accessible_name_ = name;
     return *this;
 }
 
-CheckBox &CheckBox::accessibleDescription(const QString& description) {
+CheckBox &CheckBox::accessibleDescription(const QString &description) {
     accessible_description_ = description;
     return *this;
 }
 
-CheckBox &CheckBox::shortcut(const QKeySequence& shortcut) {
+CheckBox &CheckBox::shortcut(const QKeySequence &shortcut) {
     shortcut_ = shortcut;
     return *this;
 }
 
-CheckBox &CheckBox::group(QButtonGroup* group) {
+CheckBox &CheckBox::group(QButtonGroup *group) {
     button_group_ = group;
     return *this;
 }
 
-CheckBox &CheckBox::groupName(const QString& group_name) {
+CheckBox &CheckBox::groupName(const QString &group_name) {
     group_name_ = group_name;
     return *this;
 }
@@ -97,12 +98,14 @@ CheckBox &CheckBox::required(bool required) {
     return *this;
 }
 
-CheckBox &CheckBox::validator(std::function<CheckBoxValidationResult(Qt::CheckState)> validation_func) {
+CheckBox &CheckBox::validator(
+    std::function<CheckBoxValidationResult(Qt::CheckState)> validation_func) {
     validation_func_ = std::move(validation_func);
     return *this;
 }
 
-CheckBox &CheckBox::onValidationFailed(std::function<void(const QString&)> error_handler) {
+CheckBox &CheckBox::onValidationFailed(
+    std::function<void(const QString &)> error_handler) {
     error_handler_ = std::move(error_handler);
     return *this;
 }
@@ -113,7 +116,7 @@ CheckBox &CheckBox::validateOnChange(bool validate_on_change) {
 }
 
 // **Visual enhancements**
-CheckBox &CheckBox::dropShadow(bool enabled, const QColor& color) {
+CheckBox &CheckBox::dropShadow(bool enabled, const QColor &color) {
     drop_shadow_enabled_ = enabled;
     shadow_color_ = color;
     return *this;
@@ -134,19 +137,20 @@ CheckBox &CheckBox::borderRadius(int radius) {
     return *this;
 }
 
-CheckBox &CheckBox::customColors(const QColor& checked_color, const QColor& unchecked_color) {
+CheckBox &CheckBox::customColors(const QColor &checked_color,
+                                 const QColor &unchecked_color) {
     checked_color_ = checked_color;
     unchecked_color_ = unchecked_color;
     return *this;
 }
 
-CheckBox &CheckBox::size(const QSize& size) {
+CheckBox &CheckBox::size(const QSize &size) {
     custom_size_ = size;
     return *this;
 }
 
 // **State management**
-CheckBox &CheckBox::disabled(bool disabled, const QString& reason) {
+CheckBox &CheckBox::disabled(bool disabled, const QString &reason) {
     disabled_state_ = disabled;
     disabled_reason_ = reason;
     return *this;
@@ -178,13 +182,14 @@ CheckBox &CheckBox::onRightClick(std::function<void()> right_click_handler) {
     return *this;
 }
 
-CheckBox &CheckBox::onValidationChanged(std::function<void(bool, const QString&)> validation_handler) {
+CheckBox &CheckBox::onValidationChanged(
+    std::function<void(bool, const QString &)> validation_handler) {
     validation_handler_ = std::move(validation_handler);
     return *this;
 }
 
 // **Accessibility**
-CheckBox &CheckBox::role(const QString& aria_role) {
+CheckBox &CheckBox::role(const QString &aria_role) {
     aria_role_ = aria_role;
     return *this;
 }
@@ -194,12 +199,12 @@ CheckBox &CheckBox::tabIndex(int index) {
     return *this;
 }
 
-CheckBox &CheckBox::describedBy(const QString& element_id) {
+CheckBox &CheckBox::describedBy(const QString &element_id) {
     described_by_ = element_id;
     return *this;
 }
 
-CheckBox &CheckBox::labelledBy(const QString& element_id) {
+CheckBox &CheckBox::labelledBy(const QString &element_id) {
     labelled_by_ = element_id;
     return *this;
 }
@@ -210,7 +215,9 @@ CheckBox &CheckBox::exclusiveGroup(bool exclusive) {
     return *this;
 }
 
-CheckBox &CheckBox::groupValidation(std::function<CheckBoxValidationResult(const QList<CheckBox*>&)> group_validator) {
+CheckBox &CheckBox::groupValidation(
+    std::function<CheckBoxValidationResult(const QList<CheckBox *> &)>
+        group_validator) {
     group_validator_ = std::move(group_validator);
     return *this;
 }
@@ -244,7 +251,7 @@ void CheckBox::initialize() {
 
             qDebug() << "Enhanced checkbox initialized successfully";
 
-        } catch (const std::exception& e) {
+        } catch (const std::exception &e) {
             qWarning() << "Failed to initialize enhanced checkbox:" << e.what();
         }
     }
@@ -271,17 +278,19 @@ void CheckBox::setCheckState(Qt::CheckState state) {
 }
 
 void CheckBox::setupAccessibility() {
-    auto* widget = getWidget();
-    if (!widget) return;
+    auto *widget = getWidget();
+    if (!widget)
+        return;
 
     // Set up accessibility using the existing AccessibilityManager
-    auto accessibility = Core::accessibilityFor()
-                        .name(accessible_name_.isEmpty() ? tooltip_text_ : accessible_name_)
-                        .description(accessible_description_)
-                        .helpText(tooltip_text_)
-                        .role(Core::AccessibilityRole::CheckBox)
-                        .enabled(!disabled_state_)
-                        .required(required_);
+    auto accessibility =
+        Core::accessibilityFor()
+            .name(accessible_name_.isEmpty() ? tooltip_text_ : accessible_name_)
+            .description(accessible_description_)
+            .helpText(tooltip_text_)
+            .role(Core::AccessibilityRole::CheckBox)
+            .enabled(!disabled_state_)
+            .required(required_);
 
     if (tab_index_ >= 0) {
         accessibility.tabIndex(tab_index_);
@@ -296,9 +305,9 @@ void CheckBox::setupAccessibility() {
 
     // Set up keyboard shortcut
     if (!shortcut_.isEmpty()) {
-        auto* shortcut_obj = new QShortcut(shortcut_, widget);
+        auto *shortcut_obj = new QShortcut(shortcut_, widget);
         connect(shortcut_obj, &QShortcut::activated, [this]() {
-            if (auto* checkbox = qobject_cast<QCheckBox*>(getWidget())) {
+            if (auto *checkbox = qobject_cast<QCheckBox *>(getWidget())) {
                 if (checkbox->isEnabled() && !read_only_) {
                     checkbox->toggle();
                 }
@@ -308,11 +317,13 @@ void CheckBox::setupAccessibility() {
 }
 
 void CheckBox::setupVisualEffects() {
-    auto* widget = getWidget();
-    if (!widget) return;
+    auto *widget = getWidget();
+    if (!widget)
+        return;
 
-    auto* checkbox = qobject_cast<QCheckBox*>(widget);
-    if (!checkbox) return;
+    auto *checkbox = qobject_cast<QCheckBox *>(widget);
+    if (!checkbox)
+        return;
 
     // Set up drop shadow
     if (drop_shadow_enabled_) {
@@ -325,7 +336,8 @@ void CheckBox::setupVisualEffects() {
 
     // Set up check animation
     if (check_animation_enabled_) {
-        check_animation_ = std::make_unique<QPropertyAnimation>(checkbox, "geometry");
+        check_animation_ =
+            std::make_unique<QPropertyAnimation>(checkbox, "geometry");
         check_animation_->setDuration(150);
         check_animation_->setEasingCurve(QEasingCurve::OutCubic);
     }
@@ -334,34 +346,36 @@ void CheckBox::setupVisualEffects() {
     QString style_sheet = checkbox->styleSheet();
 
     if (border_radius_ > 0) {
-        style_sheet += QString("QCheckBox::indicator { border-radius: %1px; }").arg(border_radius_);
+        style_sheet += QString("QCheckBox::indicator { border-radius: %1px; }")
+                           .arg(border_radius_);
     }
 
     if (checked_color_.isValid()) {
         style_sheet += QString(
-            "QCheckBox::indicator:checked { "
-            "background-color: %1; "
-            "border: 2px solid %1; "
-            "}"
-        ).arg(checked_color_.name());
+                           "QCheckBox::indicator:checked { "
+                           "background-color: %1; "
+                           "border: 2px solid %1; "
+                           "}")
+                           .arg(checked_color_.name());
     }
 
     if (unchecked_color_.isValid()) {
         style_sheet += QString(
-            "QCheckBox::indicator:unchecked { "
-            "background-color: %1; "
-            "border: 2px solid %1; "
-            "}"
-        ).arg(unchecked_color_.name());
+                           "QCheckBox::indicator:unchecked { "
+                           "background-color: %1; "
+                           "border: 2px solid %1; "
+                           "}")
+                           .arg(unchecked_color_.name());
     }
 
     if (custom_size_.isValid()) {
         style_sheet += QString(
-            "QCheckBox::indicator { "
-            "width: %1px; "
-            "height: %2px; "
-            "}"
-        ).arg(custom_size_.width()).arg(custom_size_.height());
+                           "QCheckBox::indicator { "
+                           "width: %1px; "
+                           "height: %2px; "
+                           "}")
+                           .arg(custom_size_.width())
+                           .arg(custom_size_.height());
     }
 
     if (!style_sheet.isEmpty()) {
@@ -370,14 +384,17 @@ void CheckBox::setupVisualEffects() {
 }
 
 void CheckBox::setupEventHandlers() {
-    auto* widget = getWidget();
-    if (!widget) return;
+    auto *widget = getWidget();
+    if (!widget)
+        return;
 
-    auto* checkbox = qobject_cast<QCheckBox*>(widget);
-    if (!checkbox) return;
+    auto *checkbox = qobject_cast<QCheckBox *>(widget);
+    if (!checkbox)
+        return;
 
     // Connect enhanced state change handler
-    connect(checkbox, &QCheckBox::checkStateChanged, this, &CheckBox::onStateChangedInternal);
+    connect(checkbox, &QCheckBox::checkStateChanged, this,
+            &CheckBox::onStateChangedInternal);
 
     // Install event filter for hover and other events
     checkbox->installEventFilter(this);
@@ -387,9 +404,11 @@ void CheckBox::setupValidation() {
     if (validation_func_ || required_ || group_validator_) {
         validation_timer_ = std::make_unique<QTimer>();
         validation_timer_->setSingleShot(true);
-        validation_timer_->setInterval(300); // Validate 300ms after last change
+        validation_timer_->setInterval(
+            300);  // Validate 300ms after last change
 
-        connect(validation_timer_.get(), &QTimer::timeout, this, &CheckBox::onValidationTimer);
+        connect(validation_timer_.get(), &QTimer::timeout, this,
+                &CheckBox::onValidationTimer);
     }
 }
 
@@ -411,11 +430,13 @@ void CheckBox::setupGroupManagement() {
 }
 
 void CheckBox::updateCheckBoxState() {
-    auto* widget = getWidget();
-    if (!widget) return;
+    auto *widget = getWidget();
+    if (!widget)
+        return;
 
-    auto* checkbox = qobject_cast<QCheckBox*>(widget);
-    if (!checkbox) return;
+    auto *checkbox = qobject_cast<QCheckBox *>(widget);
+    if (!checkbox)
+        return;
 
     // Update disabled state
     checkbox->setEnabled(!disabled_state_);
@@ -444,16 +465,17 @@ CheckBoxValidationResult CheckBox::validateState(Qt::CheckState state) const {
     return CheckBoxValidationResult(true);
 }
 
-void CheckBox::showValidationError(const QString& error) {
+void CheckBox::showValidationError(const QString &error) {
     validation_error_ = error;
 
     if (error_handler_) {
         error_handler_(error);
     } else {
         // Default error display
-        auto* widget = getWidget();
+        auto *widget = getWidget();
         if (widget) {
-            QToolTip::showText(widget->mapToGlobal(QPoint(0, widget->height())), error, widget);
+            QToolTip::showText(widget->mapToGlobal(QPoint(0, widget->height())),
+                               error, widget);
         }
     }
 
@@ -518,7 +540,7 @@ void CheckBox::onGroupValidation() {
     CheckBoxValidationResult result = group_validator(group_items);
 
     // Apply validation result to all items in group
-    for (auto* item : group_items) {
+    for (auto *item : group_items) {
         item->is_valid_ = result.is_valid;
         if (!result.is_valid) {
             item->showValidationError(result.error_message);
@@ -529,8 +551,8 @@ void CheckBox::onGroupValidation() {
     }
 
     // Emit group state changed signal
-    QList<CheckBox*> checked_items;
-    for (auto* item : group_items) {
+    QList<CheckBox *> checked_items;
+    for (auto *item : group_items) {
         if (item->isChecked()) {
             checked_items.append(item);
         }

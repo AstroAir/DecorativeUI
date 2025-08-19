@@ -72,10 +72,11 @@ int main(int argc, char* argv[]) {
 
 === "Windows"
     ```bat
-    git clone https://github.com/DeclarativeUI/DeclarativeUI.git
+    git clone <https://github.com/DeclarativeUI/DeclarativeUI.git>
     cd DeclarativeUI
     build.bat
     build\examples\basic\HelloWorldExample.exe
+
 ```
 
 === "Linux"
@@ -90,11 +91,12 @@ int main(int argc, char* argv[]) {
 === "macOS"
     ```bash
     brew install qt6
-    git clone https://github.com/DeclarativeUI/DeclarativeUI.git
+    git clone <https://github.com/DeclarativeUI/DeclarativeUI.git>
     cd DeclarativeUI
     cmake --preset default
     cmake --build --preset default
     ./build/examples/basic/HelloWorldExample
+
 ```
 
 ## 📚 Documentation

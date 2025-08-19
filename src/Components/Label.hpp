@@ -2,16 +2,16 @@
 #pragma once
 #include <QColor>
 #include <QFont>
+#include <QGraphicsDropShadowEffect>
 #include <QLabel>
 #include <QMovie>
 #include <QPixmap>
 #include <QPropertyAnimation>
-#include <QGraphicsDropShadowEffect>
-#include <QTimer>
-#include <QTextDocument>
 #include <QTextCursor>
-#include <memory>
+#include <QTextDocument>
+#include <QTimer>
 #include <functional>
+#include <memory>
 
 #include "../Core/UIElement.hpp"
 
@@ -59,27 +59,31 @@ public:
     Label &style(const QString &stylesheet);
 
     // **Enhanced fluent interface**
-    Label &tooltip(const QString& tooltip_text);
-    Label &accessibleName(const QString& name);
-    Label &accessibleDescription(const QString& description);
-    Label &shortcut(const QKeySequence& shortcut);
+    Label &tooltip(const QString &tooltip_text);
+    Label &accessibleName(const QString &name);
+    Label &accessibleDescription(const QString &description);
+    Label &shortcut(const QKeySequence &shortcut);
 
     // **Rich text and formatting**
     Label &richText(bool enabled = true);
-    Label &markdown(const QString& markdown_text);
-    Label &html(const QString& html_text);
+    Label &markdown(const QString &markdown_text);
+    Label &html(const QString &html_text);
     Label &textFormat(Qt::TextFormat format);
-    Label &formatting(const LabelFormatting& format);
-    Label &highlightText(const QString& text, const QColor& highlight_color = QColor(255, 255, 0, 100));
+    Label &formatting(const LabelFormatting &format);
+    Label &highlightText(const QString &text,
+                         const QColor &highlight_color = QColor(255, 255, 0,
+                                                                100));
     Label &textSelection(bool enabled = true);
     Label &copyable(bool enabled = true);
 
     // **Visual enhancements**
-    Label &dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    Label &dropShadow(bool enabled = true,
+                      const QColor &color = QColor(0, 0, 0, 80));
     Label &hoverEffect(bool enabled = true);
     Label &fadeAnimation(bool enabled = true);
-    Label &textShadow(const QColor& color, const QPoint& offset = QPoint(1, 1));
-    Label &gradient(const QColor& start, const QColor& end, Qt::Orientation orientation = Qt::Vertical);
+    Label &textShadow(const QColor &color, const QPoint &offset = QPoint(1, 1));
+    Label &gradient(const QColor &start, const QColor &end,
+                    Qt::Orientation orientation = Qt::Vertical);
     Label &opacity(qreal opacity);
 
     // **Interactive features**
@@ -87,10 +91,10 @@ public:
     Label &hoverable(bool enabled = true);
     Label &selectable(bool enabled = true);
     Label &draggable(bool enabled = true);
-    Label &contextMenu(QMenu* menu);
+    Label &contextMenu(QMenu *menu);
 
     // **Content management**
-    Label &placeholder(const QString& placeholder_text);
+    Label &placeholder(const QString &placeholder_text);
     Label &maxLength(int length);
     Label &elideMode(Qt::TextElideMode mode);
     Label &scaledContents(bool enabled = true);
@@ -101,14 +105,16 @@ public:
     Label &onDoubleClick(std::function<void()> double_click_handler);
     Label &onRightClick(std::function<void()> right_click_handler);
     Label &onHover(std::function<void(bool)> hover_handler);
-    Label &onTextChanged(std::function<void(const QString&)> text_changed_handler);
-    Label &onSelectionChanged(std::function<void(const QString&)> selection_handler);
+    Label &onTextChanged(
+        std::function<void(const QString &)> text_changed_handler);
+    Label &onSelectionChanged(
+        std::function<void(const QString &)> selection_handler);
 
     // **Accessibility**
-    Label &role(const QString& aria_role);
+    Label &role(const QString &aria_role);
     Label &tabIndex(int index);
-    Label &describedBy(const QString& element_id);
-    Label &labelFor(const QString& element_id);
+    Label &describedBy(const QString &element_id);
+    Label &labelFor(const QString &element_id);
 
     // **Animation and effects**
     Label &typewriterEffect(int delay_ms = 50);
@@ -118,8 +124,8 @@ public:
     Label &bounce(int duration_ms = 500);
 
     // **Data binding**
-    Label &bindToProperty(QObject* object, const QString& property_name);
-    Label &updateInterval(int milliseconds); // For dynamic content updates
+    Label &bindToProperty(QObject *object, const QString &property_name);
+    Label &updateInterval(int milliseconds);  // For dynamic content updates
 
     void initialize() override;
 
@@ -144,10 +150,10 @@ public:
     bool isAnimating() const;
 
 signals:
-    void textChanged(const QString& new_text);
-    void selectionChanged(const QString& selected_text);
+    void textChanged(const QString &new_text);
+    void selectionChanged(const QString &selected_text);
     void animationFinished();
-    void linkClicked(const QString& link);
+    void linkClicked(const QString &link);
 
 protected:
     void setupAccessibility();
@@ -156,8 +162,8 @@ protected:
     void setupInteractivity();
     void setupAnimations();
     void updateLabelState();
-    void applyFormatting(const LabelFormatting& format);
-    void startTypewriterEffect(const QString& text, int delay_ms);
+    void applyFormatting(const LabelFormatting &format);
+    void startTypewriterEffect(const QString &text, int delay_ms);
     void updateDynamicContent();
 
 private slots:
@@ -204,7 +210,7 @@ private:
     bool hoverable_enabled_;
     bool selectable_enabled_;
     bool draggable_enabled_;
-    QMenu* context_menu_;
+    QMenu *context_menu_;
 
     // **Content management**
     QString placeholder_text_;
@@ -218,8 +224,8 @@ private:
     std::function<void()> double_click_handler_;
     std::function<void()> right_click_handler_;
     std::function<void(bool)> hover_handler_;
-    std::function<void(const QString&)> text_changed_handler_;
-    std::function<void(const QString&)> selection_handler_;
+    std::function<void(const QString &)> text_changed_handler_;
+    std::function<void(const QString &)> selection_handler_;
 
     // **Accessibility**
     QString aria_role_;
@@ -234,7 +240,7 @@ private:
     int typewriter_position_;
 
     // **Data binding**
-    QObject* bound_object_;
+    QObject *bound_object_;
     QString bound_property_;
     int update_interval_;
 

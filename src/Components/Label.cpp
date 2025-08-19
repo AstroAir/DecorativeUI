@@ -4,8 +4,7 @@
 namespace DeclarativeUI::Components {
 
 // **Implementation**
-Label::Label(QObject *parent)
-    : UIElement(parent), label_widget_(nullptr) {}
+Label::Label(QObject *parent) : UIElement(parent), label_widget_(nullptr) {}
 
 Label &Label::text(const QString &text) {
     return static_cast<Label &>(setProperty("text", text));
@@ -75,14 +74,12 @@ Label &Label::linkActivation(bool enabled) {
     return static_cast<Label &>(setProperty("openExternalLinks", enabled));
 }
 
-Label &Label::onLinkActivated(
-    std::function<void(const QString &)> handler) {
+Label &Label::onLinkActivated(std::function<void(const QString &)> handler) {
     link_activated_handler_ = std::move(handler);
     return *this;
 }
 
-Label &Label::onLinkHovered(
-    std::function<void(const QString &)> handler) {
+Label &Label::onLinkHovered(std::function<void(const QString &)> handler) {
     link_hovered_handler_ = std::move(handler);
     return *this;
 }

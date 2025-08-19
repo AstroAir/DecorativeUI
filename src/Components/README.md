@@ -17,24 +17,28 @@ This directory contains all UI components organized by category:
 ## Key Features
 
 ### 🎨 **Fluent Interface Design**
+
 - Method chaining for readable, declarative code
 - Type-safe property configuration
 - Event handling with lambda support
 - CSS-like styling capabilities
 
 ### 🔗 **Reactive Integration**
+
 - Automatic property binding to state management
 - Real-time UI updates on data changes
 - Two-way data binding support
 - Computed property integration
 
 ### ⚡ **Modern C++20 Features**
+
 - RAII-based resource management
 - Exception safety guarantees
 - Template-based type safety
 - Smart pointer integration
 
 ### ✨ **Enhanced Component Features**
+
 - **Comprehensive Accessibility**: ARIA support, screen reader compatibility, keyboard navigation
 - **Advanced Validation**: Real-time validation with custom validators and error handling
 - **Visual Enhancements**: Drop shadows, hover effects, animations, and custom styling
@@ -47,6 +51,7 @@ This directory contains all UI components organized by category:
 - **Tooltip Integration**: Rich tooltips with accessibility support
 
 ### 🎭 **Animation Support**
+
 - Built-in animation methods (fadeIn, fadeOut, slideIn, etc.)
 - Integration with Animation module
 - Smooth transitions and effects
@@ -59,11 +64,13 @@ This directory contains all UI components organized by category:
 Interactive controls for user actions.
 
 **Available Components:**
+
 - **Button**: Enhanced push button with accessibility, validation, visual effects, and advanced features
 - **RadioButton**: Exclusive selection in groups
 - **ToolButton**: Toolbar-style button with icon support
 
 **Enhanced Button Features:**
+
 ```cpp
 auto button = std::make_unique<Components::Button>();
 button->text("Save Document")
@@ -84,6 +91,7 @@ button->text("Save Document")
 Form controls for data entry and user input.
 
 **Available Components:**
+
 - **LineEdit**: Enhanced single-line text input with validation, formatting, and accessibility
 - **CheckBox**: Boolean input with tri-state support
 - **ComboBox**: Dropdown selection lists
@@ -93,6 +101,7 @@ Form controls for data entry and user input.
 - **Dial**: Circular value selector
 
 **Enhanced LineEdit Example:**
+
 ```cpp
 auto emailEdit = std::make_unique<Components::LineEdit>();
 emailEdit->placeholder("Enter email address")
@@ -109,6 +118,7 @@ emailEdit->placeholder("Enter email address")
 ```
 
 **Enhanced CheckBox Example:**
+
 ```cpp
 auto termsCheckbox = std::make_unique<Components::CheckBox>();
 termsCheckbox->text("I agree to the terms and conditions")
@@ -124,6 +134,7 @@ termsCheckbox->text("I agree to the terms and conditions")
 ```
 
 **Enhanced Slider Example:**
+
 ```cpp
 auto volumeSlider = std::make_unique<Components::Slider>();
 volumeSlider->range(0, 100)
@@ -159,30 +170,35 @@ volumeSlider->range(0, 100)
 ### 🌟 **Universal Enhancement Features**
 
 #### **Accessibility Excellence**
+
 - **ARIA Support**: Proper roles, names, descriptions for screen readers
 - **Keyboard Navigation**: Full keyboard accessibility with custom shortcuts
 - **Tab Management**: Proper tab order and focus management
 - **Screen Reader Support**: Comprehensive compatibility with assistive technologies
 
 #### **Advanced Validation System**
+
 - **Real-time Validation**: Validation as users type or on focus change
 - **Custom Validators**: Support for complex custom validation logic
 - **Visual Feedback**: Clear visual indication of validation states
 - **Error Handling**: Comprehensive error messaging and user guidance
 
 #### **Visual Enhancement System**
+
 - **Modern Effects**: Drop shadows, hover effects, smooth animations
 - **Customizable Styling**: Border radius, custom colors, gradients
 - **Animation Support**: Smooth transitions and visual feedback
 - **Theme Integration**: Consistent with the existing theme system
 
 #### **State Management**
+
 - **Loading States**: Built-in loading indicators and states
 - **Disabled States**: Disabled states with explanatory reasons
 - **Validation States**: Clear indication of valid/invalid states
 - **Multi-state Support**: Components that support multiple states
 
 #### **Event System**
+
 - **Enhanced Events**: Hover, focus, double-click, right-click handlers
 - **Validation Events**: Real-time validation feedback
 - **State Change Events**: Comprehensive state change notifications
@@ -191,11 +207,13 @@ volumeSlider->range(0, 100)
 ### 🔧 **Implementation Status**
 
 #### **✅ Fully Implemented**
+
 - Button: Complete implementation with all enhanced features
 - LineEdit: Complete implementation with comprehensive validation
 - CheckBox: Complete implementation with group management
 
 #### **🔄 Header Enhanced (Implementation Ready)**
+
 - ComboBox: Enhanced header with method stubs
 - SpinBox: Enhanced header with validation framework
 - Label: Enhanced header with rich text support
@@ -205,6 +223,7 @@ volumeSlider->range(0, 100)
 - ToolButton: Enhanced header with toolbar features
 
 #### **📋 Next Phase Components**
+
 - RadioButton: Group management and validation
 - GroupBox: Container enhancements and accessibility
 - Frame: Visual enhancements and accessibility
@@ -216,6 +235,7 @@ volumeSlider->range(0, 100)
 Components for showing information and content.
 
 **Available Components:**
+
 - **Label**: Text and rich content display
 - **ProgressBar**: Progress indication with customizable appearance
 - **TextEdit**: Multi-line rich text editing
@@ -223,6 +243,7 @@ Components for showing information and content.
 - **LCDNumber**: Digital display for numeric values
 
 **Example Usage:**
+
 ```cpp
 auto label = std::make_unique<Components::Label>();
 label->text("Welcome to DeclarativeUI!")
@@ -237,6 +258,7 @@ label->text("Welcome to DeclarativeUI!")
 Layout and grouping widgets for organizing UI elements.
 
 **Available Components:**
+
 - **Container**: Generic container with layout management
 - **Layout**: Layout management utilities
 - **GroupBox**: Grouped controls with borders and titles
@@ -247,6 +269,7 @@ Layout and grouping widgets for organizing UI elements.
 - **Widget**: Basic widget container
 
 **Example Usage:**
+
 ```cpp
 auto container = std::make_unique<Components::Container>();
 container->layout<QVBoxLayout>([](auto& layout) {
@@ -266,6 +289,7 @@ container->layout<QVBoxLayout>([](auto& layout) {
 Complex components for data display and specialized functionality.
 
 **Available Components:**
+
 - **TableView**: Tabular data display with sorting and filtering
 - **TreeView**: Hierarchical data display
 - **ListView**: List-based data display
@@ -274,6 +298,7 @@ Complex components for data display and specialized functionality.
 - **Calendar**: Calendar widget for date selection
 
 **Example Usage:**
+
 ```cpp
 auto tableView = std::make_unique<Components::TableView>();
 tableView->setModel(myDataModel)
@@ -289,12 +314,14 @@ tableView->setModel(myDataModel)
 Modal dialogs and specialized choosers.
 
 **Available Components:**
+
 - **FileDialog**: File and directory selection
 - **ColorDialog**: Color picker dialog
 - **FontDialog**: Font selection dialog
 - **MessageBox**: Information and confirmation dialogs
 
 **Example Usage:**
+
 ```cpp
 auto fileDialog = std::make_unique<Components::FileDialog>();
 fileDialog->setFileMode(QFileDialog::ExistingFile)
@@ -309,6 +336,7 @@ fileDialog->setFileMode(QFileDialog::ExistingFile)
 Utility and specialized components.
 
 **Available Components:**
+
 - **ToolBar**: Application toolbar with actions
 - **StatusBar**: Application status bar
 - **DockWidget**: Dockable widget panels

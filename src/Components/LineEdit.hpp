@@ -1,18 +1,18 @@
 // Components/LineEdit.hpp
 #pragma once
-#include <QLineEdit>
-#include <QValidator>
-#include <QRegularExpressionValidator>
 #include <QCompleter>
-#include <QLabel>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
 #include <QPropertyAnimation>
+#include <QRegularExpressionValidator>
 #include <QTimer>
-#include <memory>
+#include <QValidator>
 #include <functional>
+#include <memory>
 
-#include "../Core/UIElement.hpp"
 #include "../Core/Theme.hpp"
+#include "../Core/UIElement.hpp"
 
 namespace DeclarativeUI::Components {
 
@@ -24,7 +24,8 @@ struct ValidationResult {
     QString error_message;
     QString suggestion;
 
-    ValidationResult(bool valid = true, const QString& error = "", const QString& hint = "")
+    ValidationResult(bool valid = true, const QString& error = "",
+                     const QString& hint = "")
         : is_valid(valid), error_message(error), suggestion(hint) {}
 };
 
@@ -57,11 +58,13 @@ public:
     // **Validation**
     LineEdit& required(bool required = true);
     LineEdit& minLength(int min_length);
-    LineEdit& pattern(const QString& regex_pattern, const QString& error_message = "");
+    LineEdit& pattern(const QString& regex_pattern,
+                      const QString& error_message = "");
     LineEdit& email(bool validate_email = true);
     LineEdit& url(bool validate_url = true);
     LineEdit& numeric(bool integers_only = false);
-    LineEdit& customValidator(std::function<ValidationResult(const QString&)> validator);
+    LineEdit& customValidator(
+        std::function<ValidationResult(const QString&)> validator);
     LineEdit& validateOnType(bool validate_while_typing = true);
     LineEdit& validateOnFocus(bool validate_on_focus_lost = true);
 
@@ -69,12 +72,13 @@ public:
     LineEdit& autoComplete(const QStringList& completions);
     LineEdit& autoCompleteMode(QCompleter::CompletionMode mode);
     LineEdit& suggestions(const QStringList& suggestions);
-    LineEdit& dynamicSuggestions(std::function<QStringList(const QString&)> provider);
+    LineEdit& dynamicSuggestions(
+        std::function<QStringList(const QString&)> provider);
 
     // **Visual enhancements**
     LineEdit& icon(const QIcon& icon, bool leading = true);
     LineEdit& clearButton(bool enabled = true);
-    LineEdit& showPasswordToggle(bool enabled = true); // For password fields
+    LineEdit& showPasswordToggle(bool enabled = true);  // For password fields
     LineEdit& borderColor(const QColor& color);
     LineEdit& focusColor(const QColor& color);
     LineEdit& errorColor(const QColor& color);
@@ -85,8 +89,10 @@ public:
     // **Input formatting**
     LineEdit& inputMask(const QString& mask);
     LineEdit& formatAsPhone(bool enabled = true);
-    LineEdit& formatAsCurrency(bool enabled = true, const QString& currency = "$");
-    LineEdit& formatAsDate(bool enabled = true, const QString& format = "yyyy-MM-dd");
+    LineEdit& formatAsCurrency(bool enabled = true,
+                               const QString& currency = "$");
+    LineEdit& formatAsDate(bool enabled = true,
+                           const QString& format = "yyyy-MM-dd");
     LineEdit& upperCase(bool enabled = true);
     LineEdit& lowerCase(bool enabled = true);
     LineEdit& titleCase(bool enabled = true);
@@ -99,7 +105,8 @@ public:
     LineEdit& undoRedo(bool enabled = true);
 
     // **Event handlers**
-    LineEdit& onValidationChanged(std::function<void(bool, const QString&)> handler);
+    LineEdit& onValidationChanged(
+        std::function<void(bool, const QString&)> handler);
     LineEdit& onSubmit(std::function<void(const QString&)> handler);
     LineEdit& onFocus(std::function<void(bool)> handler);
     LineEdit& onTextFormatted(std::function<void(const QString&)> handler);

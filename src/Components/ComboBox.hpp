@@ -1,15 +1,15 @@
 // Components/ComboBox.hpp
 #pragma once
+#include <QAbstractItemModel>
 #include <QComboBox>
 #include <QCompleter>
-#include <QAbstractItemModel>
-#include <QStandardItemModel>
-#include <QSortFilterProxyModel>
-#include <QPropertyAnimation>
 #include <QGraphicsDropShadowEffect>
+#include <QPropertyAnimation>
+#include <QSortFilterProxyModel>
+#include <QStandardItemModel>
 #include <QTimer>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include "../Core/UIElement.hpp"
 
@@ -23,7 +23,8 @@ struct ComboBoxValidationResult {
     QString error_message;
     QString suggestion;
 
-    ComboBoxValidationResult(bool valid = true, const QString& error = "", const QString& hint = "")
+    ComboBoxValidationResult(bool valid = true, const QString& error = "",
+                             const QString& hint = "")
         : is_valid(valid), error_message(error), suggestion(hint) {}
 };
 
@@ -55,11 +56,15 @@ public:
 
     // **Validation**
     ComboBox& required(bool required = true);
-    ComboBox& validator(std::function<ComboBoxValidationResult(const QString&, int)> validation_func);
-    ComboBox& onValidationFailed(std::function<void(const QString&)> error_handler);
+    ComboBox& validator(
+        std::function<ComboBoxValidationResult(const QString&, int)>
+            validation_func);
+    ComboBox& onValidationFailed(
+        std::function<void(const QString&)> error_handler);
     ComboBox& validateOnChange(bool validate_on_change = true);
     ComboBox& allowedValues(const QStringList& allowed_values);
-    ComboBox& customValidator(std::function<bool(const QString&)> custom_validator);
+    ComboBox& customValidator(
+        std::function<bool(const QString&)> custom_validator);
 
     // **Auto-completion and filtering**
     ComboBox& autoComplete(bool enabled = true);
@@ -69,14 +74,18 @@ public:
     ComboBox& caseSensitive(bool sensitive = false);
 
     // **Visual enhancements**
-    ComboBox& dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    ComboBox& dropShadow(bool enabled = true,
+                         const QColor& color = QColor(0, 0, 0, 80));
     ComboBox& hoverEffect(bool enabled = true);
     ComboBox& expandAnimation(bool enabled = true);
     ComboBox& borderRadius(int radius);
-    ComboBox& customColors(const QColor& background, const QColor& text = QColor(), const QColor& border = QColor());
+    ComboBox& customColors(const QColor& background,
+                           const QColor& text = QColor(),
+                           const QColor& border = QColor());
     ComboBox& iconSize(const QSize& size);
     ComboBox& itemIcon(int index, const QIcon& icon);
-    ComboBox& itemData(int index, const QVariant& data, int role = Qt::UserRole);
+    ComboBox& itemData(int index, const QVariant& data,
+                       int role = Qt::UserRole);
 
     // **State management**
     ComboBox& disabled(bool disabled, const QString& reason = "");
@@ -89,7 +98,8 @@ public:
     ComboBox& onFocus(std::function<void(bool)> focus_handler);
     ComboBox& onDropdownToggle(std::function<void(bool)> toggle_handler);
     ComboBox& onItemHighlighted(std::function<void(int)> highlight_handler);
-    ComboBox& onValidationChanged(std::function<void(bool, const QString&)> validation_handler);
+    ComboBox& onValidationChanged(
+        std::function<void(bool, const QString&)> validation_handler);
     ComboBox& onItemsChanged(std::function<void()> items_changed_handler);
 
     // **Accessibility**
@@ -115,7 +125,7 @@ public:
     bool isValid() const { return is_valid_; }
     QString getValidationError() const { return validation_error_; }
     QStringList getAllItems() const;
-    QStringList getSelectedItems() const; // For multi-select
+    QStringList getSelectedItems() const;  // For multi-select
     bool isLoading() const { return loading_state_; }
 
 signals:
@@ -132,7 +142,8 @@ protected:
     void setupAutoCompletion();
     void setupFiltering();
     void updateComboBoxState();
-    ComboBoxValidationResult validateSelection(const QString& text, int index) const;
+    ComboBoxValidationResult validateSelection(const QString& text,
+                                               int index) const;
     void showValidationError(const QString& error);
     void updateItems(const QString& filter_text = "");
     void animateDropdown(bool opening);
@@ -159,7 +170,8 @@ private:
 
     // **Validation**
     bool required_;
-    std::function<ComboBoxValidationResult(const QString&, int)> validation_func_;
+    std::function<ComboBoxValidationResult(const QString&, int)>
+        validation_func_;
     std::function<void(const QString&)> error_handler_;
     bool validate_on_change_;
     QStringList allowed_values_;

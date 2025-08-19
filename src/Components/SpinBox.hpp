@@ -3,7 +3,6 @@
 #include <QDoubleSpinBox>
 #include <QSpinBox>
 
-
 #include "../Core/UIElement.hpp"
 
 namespace DeclarativeUI::Components {
@@ -44,7 +43,8 @@ public:
     SpinBox& alignment(Qt::Alignment alignment);
     SpinBox& frame(bool enabled = true);
     SpinBox& groupSeparator(bool enabled = true);
-    SpinBox& onValidationChanged(std::function<void(bool, const QString&)> handler);
+    SpinBox& onValidationChanged(
+        std::function<void(bool, const QString&)> handler);
     SpinBox& onRangeChanged(std::function<void(int, int)> handler);
 
     void initialize() override;
@@ -75,11 +75,5 @@ private:
     std::function<void(int)> value_changed_handler_;
     std::function<void(const QString&)> text_changed_handler_;
 };
-
-
-
-
-
-
 
 }  // namespace DeclarativeUI::Components

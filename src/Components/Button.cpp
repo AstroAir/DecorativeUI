@@ -1,39 +1,38 @@
 // Components/Button.cpp
 #include "Button.hpp"
-#include "../Exceptions/UIExceptions.hpp"
 #include <QApplication>
-#include <QTime>
 #include <QDebug>
+#include <QTime>
+#include "../Exceptions/UIExceptions.hpp"
 
 namespace DeclarativeUI::Components {
 
 // **Implementation with exception safety and enhanced features**
 Button::Button(QObject* parent)
-    : UIElement(parent)
-    , button_widget_(nullptr)
-    , icon_position_(Qt::ToolButtonTextBesideIcon)
-    , icon_size_(16, 16)
-    , auto_repeat_enabled_(false)
-    , auto_repeat_initial_delay_(300)
-    , auto_repeat_delay_(100)
-    , checkable_(false)
-    , checked_(false)
-    , flat_(false)
-    , menu_(nullptr)
-    , drop_shadow_enabled_(false)
-    , shadow_color_(QColor(0, 0, 0, 80))
-    , hover_effect_enabled_(true)
-    , press_animation_enabled_(true)
-    , border_radius_(4)
-    , gradient_start_(QColor())
-    , gradient_end_(QColor())
-    , required_(false)
-    , loading_state_(false)
-    , disabled_state_(false)
-    , tab_index_(-1)
-    , progress_percentage_(0)
-    , current_state_(0)
-{
+    : UIElement(parent),
+      button_widget_(nullptr),
+      icon_position_(Qt::ToolButtonTextBesideIcon),
+      icon_size_(16, 16),
+      auto_repeat_enabled_(false),
+      auto_repeat_initial_delay_(300),
+      auto_repeat_delay_(100),
+      checkable_(false),
+      checked_(false),
+      flat_(false),
+      menu_(nullptr),
+      drop_shadow_enabled_(false),
+      shadow_color_(QColor(0, 0, 0, 80)),
+      hover_effect_enabled_(true),
+      press_animation_enabled_(true),
+      border_radius_(4),
+      gradient_start_(QColor()),
+      gradient_end_(QColor()),
+      required_(false),
+      loading_state_(false),
+      disabled_state_(false),
+      tab_index_(-1),
+      progress_percentage_(0),
+      current_state_(0) {
     // Initialize with default accessibility role
     aria_role_ = "button";
 }
@@ -151,7 +150,8 @@ Button& Button::validator(std::function<bool()> validation_func) {
     return *this;
 }
 
-Button& Button::onValidationFailed(std::function<void(const QString&)> error_handler) {
+Button& Button::onValidationFailed(
+    std::function<void(const QString&)> error_handler) {
     error_handler_ = std::move(error_handler);
     return *this;
 }
@@ -280,16 +280,18 @@ bool Button::isValid() const {
 
 void Button::setupAccessibility() {
     auto* widget = getWidget();
-    if (!widget) return;
+    if (!widget)
+        return;
 
     // Set up accessibility using the existing AccessibilityManager
-    auto accessibility = Core::Accessibility::accessibilityFor()
-                        .name(accessible_name_.isEmpty() ? tooltip_text_ : accessible_name_)
-                        .description(accessible_description_)
-                        .helpText(tooltip_text_)
-                        .role(Core::Accessibility::AccessibilityRole::Button)
-                        .enabled(!disabled_state_)
-                        .required(required_);
+    auto accessibility =
+        Core::Accessibility::accessibilityFor()
+            .name(accessible_name_.isEmpty() ? tooltip_text_ : accessible_name_)
+            .description(accessible_description_)
+            .helpText(tooltip_text_)
+            .role(Core::Accessibility::AccessibilityRole::Button)
+            .enabled(!disabled_state_)
+            .required(required_);
 
     if (tab_index_ >= 0) {
         accessibility.tabIndex(tab_index_);
@@ -317,10 +319,12 @@ void Button::setupAccessibility() {
 
 void Button::setupVisualEffects() {
     auto* widget = getWidget();
-    if (!widget) return;
+    if (!widget)
+        return;
 
     auto* button = qobject_cast<QPushButton*>(widget);
-    if (!button) return;
+    if (!button)
+        return;
 
     // Set up drop shadow
     if (drop_shadow_enabled_) {
@@ -333,7 +337,8 @@ void Button::setupVisualEffects() {
 
     // Set up press animation
     if (press_animation_enabled_) {
-        press_animation_ = std::make_unique<QPropertyAnimation>(button, "geometry");
+        press_animation_ =
+            std::make_unique<QPropertyAnimation>(button, "geometry");
         press_animation_->setDuration(100);
         press_animation_->setEasingCurve(QEasingCurve::OutCubic);
     }
@@ -354,16 +359,18 @@ void Button::setupVisualEffects() {
     QString style_sheet = button->styleSheet();
 
     if (border_radius_ > 0) {
-        style_sheet += QString("QPushButton { border-radius: %1px; }").arg(border_radius_);
+        style_sheet +=
+            QString("QPushButton { border-radius: %1px; }").arg(border_radius_);
     }
 
     if (gradient_start_.isValid() && gradient_end_.isValid()) {
-        style_sheet += QString(
-            "QPushButton { "
-            "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
-            "stop: 0 %1, stop: 1 %2); "
-            "}"
-        ).arg(gradient_start_.name(), gradient_end_.name());
+        style_sheet +=
+            QString(
+                "QPushButton { "
+                "background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, "
+                "stop: 0 %1, stop: 1 %2); "
+                "}")
+                .arg(gradient_start_.name(), gradient_end_.name());
     }
 
     if (!style_sheet.isEmpty()) {
@@ -373,10 +380,12 @@ void Button::setupVisualEffects() {
 
 void Button::setupEventHandlers() {
     auto* widget = getWidget();
-    if (!widget) return;
+    if (!widget)
+        return;
 
     auto* button = qobject_cast<QPushButton*>(widget);
-    if (!button) return;
+    if (!button)
+        return;
 
     // Install event filter for hover and other events
     button->installEventFilter(this);
@@ -387,7 +396,8 @@ void Button::setupEventHandlers() {
             static QTime last_click;
             QTime current_time = QTime::currentTime();
 
-            if (last_click.isValid() && last_click.msecsTo(current_time) < 500) {
+            if (last_click.isValid() &&
+                last_click.msecsTo(current_time) < 500) {
                 double_click_handler_();
             }
             last_click = current_time;
@@ -399,18 +409,22 @@ void Button::setupValidation() {
     if (validation_func_) {
         validation_timer_ = std::make_unique<QTimer>();
         validation_timer_->setSingleShot(true);
-        validation_timer_->setInterval(500); // Validate 500ms after last change
+        validation_timer_->setInterval(
+            500);  // Validate 500ms after last change
 
-        connect(validation_timer_.get(), &QTimer::timeout, this, &Button::onValidationCheck);
+        connect(validation_timer_.get(), &QTimer::timeout, this,
+                &Button::onValidationCheck);
     }
 }
 
 void Button::updateButtonState() {
     auto* widget = getWidget();
-    if (!widget) return;
+    if (!widget)
+        return;
 
     auto* button = qobject_cast<QPushButton*>(widget);
-    if (!button) return;
+    if (!button)
+        return;
 
     // Update loading state
     updateLoadingState();
@@ -428,14 +442,16 @@ void Button::updateButtonState() {
 
 void Button::updateLoadingState() {
     auto* button = qobject_cast<QPushButton*>(getWidget());
-    if (!button) return;
+    if (!button)
+        return;
 
     if (loading_state_) {
         if (original_text_.isEmpty()) {
             original_text_ = button->text();
         }
 
-        QString display_text = loading_text_.isEmpty() ? "Loading..." : loading_text_;
+        QString display_text =
+            loading_text_.isEmpty() ? "Loading..." : loading_text_;
         button->setText(display_text);
         button->setEnabled(false);
     } else {
@@ -450,10 +466,12 @@ void Button::updateLoadingState() {
 }
 
 void Button::updateMultiState() {
-    if (multi_states_.isEmpty()) return;
+    if (multi_states_.isEmpty())
+        return;
 
     auto* button = qobject_cast<QPushButton*>(getWidget());
-    if (!button) return;
+    if (!button)
+        return;
 
     if (current_state_ >= 0 && current_state_ < multi_states_.size()) {
         button->setText(multi_states_[current_state_]);
@@ -470,7 +488,8 @@ void Button::showValidationError(const QString& error) {
         // Default error display
         auto* widget = getWidget();
         if (widget) {
-            QToolTip::showText(widget->mapToGlobal(QPoint(0, widget->height())), error, widget);
+            QToolTip::showText(widget->mapToGlobal(QPoint(0, widget->height())),
+                               error, widget);
         }
     }
 

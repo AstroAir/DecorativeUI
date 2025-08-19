@@ -51,24 +51,29 @@ cmake --build . --target EnhancedComponentsDemo
 ## 📋 Demo Features
 
 ### **Input Components Section**
+
 - **Enhanced LineEdit**: Demonstrates placeholder text and basic validation
 - **Name Input**: Shows additional input field with validation
 
 ### **Selection Components Section**
+
 - **Enhanced CheckBox**: Terms agreement with validation
 - **Enhanced ComboBox**: Country selection with multiple options
 - **Enhanced Slider**: Age selection with value display
 
 ### **Visual Components Section**
+
 - **Enhanced ProgressBar**: Form completion progress indicator
 
 ### **Action Components Section**
+
 - **Submit Button**: Form submission with loading state simulation
 - **Reset Button**: Form reset functionality
 
 ## 🎯 Key Demonstrations
 
 ### **1. Real-time Validation**
+
 ```cpp
 emailEdit_->placeholder("Enter your email address")
          .tooltip("Email address for notifications")
@@ -82,6 +87,7 @@ emailEdit_->placeholder("Enter your email address")
 ```
 
 ### **2. Accessibility Support**
+
 ```cpp
 termsCheckbox_->text("I agree to the terms and conditions")
              .tooltip("You must agree to continue")
@@ -90,6 +96,7 @@ termsCheckbox_->text("I agree to the terms and conditions")
 ```
 
 ### **3. Visual Enhancements**
+
 ```cpp
 submitButton_->text("Submit Form")
             .dropShadow(true)
@@ -99,6 +106,7 @@ submitButton_->text("Submit Form")
 ```
 
 ### **4. State Management**
+
 ```cpp
 submitButton_->onClick([this]() {
     qDebug() << "Form submitted!";
@@ -113,6 +121,7 @@ submitButton_->onClick([this]() {
 ## 🔧 Implementation Notes
 
 ### **Fluent Interface Pattern**
+
 All enhanced components follow a consistent fluent interface pattern:
 
 ```cpp
@@ -123,9 +132,11 @@ component.basicProperty(value)
 ```
 
 ### **Backward Compatibility**
+
 All existing APIs remain unchanged. Enhanced features are opt-in through additional fluent methods.
 
 ### **Error Handling**
+
 Components include comprehensive error handling and validation with user-friendly feedback.
 
 ## 📚 Learning Path
@@ -138,6 +149,7 @@ Components include comprehensive error handling and validation with user-friendl
 ## 🎨 Customization
 
 ### **Themes and Styling**
+
 Enhanced components integrate with the DeclarativeUI theme system:
 
 ```cpp
@@ -147,6 +159,7 @@ component.customColors(background, text, border)
 ```
 
 ### **Validation**
+
 Custom validation functions can be added:
 
 ```cpp
@@ -156,13 +169,14 @@ component.validator([](const QString& value) {
 ```
 
 ### **Event Handling**
+
 Rich event system with multiple event types:
 
 ```cpp
 component.onHover([](bool hovering) { /* handle hover */ })
          .onFocus([](bool focused) { /* handle focus */ })
-         .onValidationChanged([](bool valid, const QString& error) { 
-             /* handle validation */ 
+         .onValidationChanged([](bool valid, const QString& error) {
+             /* handle validation */
          });
 ```
 

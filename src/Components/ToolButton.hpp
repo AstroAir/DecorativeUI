@@ -1,9 +1,9 @@
 // Components/ToolButton.hpp
 #pragma once
-#include <QToolButton>
 #include <QAction>
-#include <QMenu>
 #include <QIcon>
+#include <QMenu>
+#include <QToolButton>
 
 #include "../Core/UIElement.hpp"
 
@@ -41,13 +41,18 @@ public:
     ToolButton& shortcut(const QKeySequence& shortcut);
     ToolButton& group(const QString& group_name);
     ToolButton& exclusive(bool exclusive = true);
-    ToolButton& badge(const QString& badge_text, const QColor& badge_color = QColor("#e74c3c"));
-    ToolButton& notification(bool enabled = true, const QColor& color = QColor("#ff4444"));
-    ToolButton& dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    ToolButton& badge(const QString& badge_text,
+                      const QColor& badge_color = QColor("#e74c3c"));
+    ToolButton& notification(bool enabled = true,
+                             const QColor& color = QColor("#ff4444"));
+    ToolButton& dropShadow(bool enabled = true,
+                           const QColor& color = QColor(0, 0, 0, 80));
     ToolButton& hoverEffect(bool enabled = true);
     ToolButton& pressAnimation(bool enabled = true);
     ToolButton& borderRadius(int radius);
-    ToolButton& customColors(const QColor& normal, const QColor& hover = QColor(), const QColor& pressed = QColor());
+    ToolButton& customColors(const QColor& normal,
+                             const QColor& hover = QColor(),
+                             const QColor& pressed = QColor());
     ToolButton& iconAnimation(bool enabled = true);
     ToolButton& textAnimation(bool enabled = true);
     ToolButton& onHover(std::function<void(bool)> hover_handler);
@@ -77,7 +82,5 @@ private:
     std::function<void(bool)> toggled_handler_;
     std::function<void(QAction*)> triggered_handler_;
 };
-
-
 
 }  // namespace DeclarativeUI::Components

@@ -13,7 +13,6 @@
 #include <QVBoxLayout>
 #include <functional>
 
-
 #include "../Core/UIElement.hpp"
 
 namespace DeclarativeUI::Components {
@@ -51,7 +50,8 @@ public:
     GroupBox& setFormLayout();
     GroupBox& addWidget(QWidget* widget);
     GroupBox& addWidget(QWidget* widget, int row, int col);
-    GroupBox& addWidget(QWidget* widget, int row, int col, int rowSpan, int colSpan);
+    GroupBox& addWidget(QWidget* widget, int row, int col, int rowSpan,
+                        int colSpan);
     GroupBox& addRow(const QString& label, QWidget* field);
     GroupBox& addRow(QWidget* label, QWidget* field);
     GroupBox& addStretch(int stretch = 0);
@@ -81,21 +81,29 @@ public:
     // **Validation**
     GroupBox& required(bool required = true);
     GroupBox& validator(std::function<bool()> validation_func);
-    GroupBox& onValidationFailed(std::function<void(const QString&)> error_handler);
+    GroupBox& onValidationFailed(
+        std::function<void(const QString&)> error_handler);
     GroupBox& validateChildren(bool validate_children = true);
 
     // **Visual enhancements**
-    GroupBox& dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    GroupBox& dropShadow(bool enabled = true,
+                         const QColor& color = QColor(0, 0, 0, 80));
     GroupBox& hoverEffect(bool enabled = true);
     GroupBox& focusEffect(bool enabled = true);
-    GroupBox& customColors(const QColor& background, const QColor& border = QColor(), const QColor& title = QColor());
-    GroupBox& gradient(const QColor& start, const QColor& end, Qt::Orientation orientation = Qt::Vertical);
+    GroupBox& customColors(const QColor& background,
+                           const QColor& border = QColor(),
+                           const QColor& title = QColor());
+    GroupBox& gradient(const QColor& start, const QColor& end,
+                       Qt::Orientation orientation = Qt::Vertical);
 
     // **Advanced event handlers**
     GroupBox& onHover(std::function<void(bool)> hover_handler);
     GroupBox& onFocus(std::function<void(bool)> focus_handler);
-    GroupBox& onValidationChanged(std::function<void(bool, const QString&)> validation_handler);
-    GroupBox& onChildValidationChanged(std::function<void(QWidget*, bool, const QString&)> child_validation_handler);
+    GroupBox& onValidationChanged(
+        std::function<void(bool, const QString&)> validation_handler);
+    GroupBox& onChildValidationChanged(
+        std::function<void(QWidget*, bool, const QString&)>
+            child_validation_handler);
 
     // **Accessibility**
     GroupBox& role(const QString& aria_role);

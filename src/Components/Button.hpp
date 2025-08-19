@@ -1,18 +1,18 @@
 // Components/Button.hpp
 #pragma once
-#include <QIcon>
-#include <QPushButton>
-#include <QMenu>
-#include <QShortcut>
 #include <QGraphicsDropShadowEffect>
+#include <QIcon>
+#include <QMenu>
 #include <QPropertyAnimation>
+#include <QPushButton>
+#include <QShortcut>
 #include <QTimer>
 #include <QToolTip>
-#include <memory>
 #include <functional>
+#include <memory>
 
-#include "../Core/UIElement.hpp"
 #include "../Core/Theme.hpp"
+#include "../Core/UIElement.hpp"
 
 namespace DeclarativeUI::Components {
 
@@ -36,14 +36,16 @@ public:
     Button& shortcut(const QKeySequence& shortcut);
     Button& iconPosition(Qt::ToolButtonStyle position);
     Button& iconSize(const QSize& size);
-    Button& autoRepeat(bool enabled, int initial_delay = 300, int repeat_delay = 100);
+    Button& autoRepeat(bool enabled, int initial_delay = 300,
+                       int repeat_delay = 100);
     Button& checkable(bool checkable);
     Button& checked(bool checked);
     Button& flat(bool flat);
     Button& menu(QMenu* menu);
 
     // **Visual enhancements**
-    Button& dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    Button& dropShadow(bool enabled = true,
+                       const QColor& color = QColor(0, 0, 0, 80));
     Button& hoverEffect(bool enabled = true);
     Button& pressAnimation(bool enabled = true);
     Button& borderRadius(int radius);
@@ -51,7 +53,8 @@ public:
 
     // **Validation and error handling**
     Button& validator(std::function<bool()> validation_func);
-    Button& onValidationFailed(std::function<void(const QString&)> error_handler);
+    Button& onValidationFailed(
+        std::function<void(const QString&)> error_handler);
     Button& required(bool required = true);
 
     // **State management**
@@ -71,8 +74,9 @@ public:
     Button& describedBy(const QString& element_id);
 
     // **Advanced features**
-    Button& badge(const QString& badge_text, const QColor& badge_color = QColor("#e74c3c"));
-    Button& progress(int percentage); // For progress buttons
+    Button& badge(const QString& badge_text,
+                  const QColor& badge_color = QColor("#e74c3c"));
+    Button& progress(int percentage);  // For progress buttons
     Button& multiState(const QStringList& states, int current_state = 0);
 
     void initialize() override;

@@ -1,12 +1,12 @@
 // Components/CheckBox.hpp
 #pragma once
-#include <QCheckBox>
 #include <QButtonGroup>
-#include <QPropertyAnimation>
+#include <QCheckBox>
 #include <QGraphicsDropShadowEffect>
+#include <QPropertyAnimation>
 #include <QTimer>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include "../Core/UIElement.hpp"
 
@@ -20,7 +20,8 @@ struct CheckBoxValidationResult {
     QString error_message;
     QString suggestion;
 
-    CheckBoxValidationResult(bool valid = true, const QString& error = "", const QString& hint = "")
+    CheckBoxValidationResult(bool valid = true, const QString &error = "",
+                             const QString &hint = "")
         : is_valid(valid), error_message(error), suggestion(hint) {}
 };
 
@@ -39,29 +40,33 @@ public:
     CheckBox &style(const QString &stylesheet);
 
     // **Enhanced fluent interface**
-    CheckBox &tooltip(const QString& tooltip_text);
-    CheckBox &accessibleName(const QString& name);
-    CheckBox &accessibleDescription(const QString& description);
-    CheckBox &shortcut(const QKeySequence& shortcut);
-    CheckBox &group(QButtonGroup* group);
-    CheckBox &groupName(const QString& group_name);
+    CheckBox &tooltip(const QString &tooltip_text);
+    CheckBox &accessibleName(const QString &name);
+    CheckBox &accessibleDescription(const QString &description);
+    CheckBox &shortcut(const QKeySequence &shortcut);
+    CheckBox &group(QButtonGroup *group);
+    CheckBox &groupName(const QString &group_name);
 
     // **Validation**
     CheckBox &required(bool required = true);
-    CheckBox &validator(std::function<CheckBoxValidationResult(Qt::CheckState)> validation_func);
-    CheckBox &onValidationFailed(std::function<void(const QString&)> error_handler);
+    CheckBox &validator(std::function<CheckBoxValidationResult(Qt::CheckState)>
+                            validation_func);
+    CheckBox &onValidationFailed(
+        std::function<void(const QString &)> error_handler);
     CheckBox &validateOnChange(bool validate_on_change = true);
 
     // **Visual enhancements**
-    CheckBox &dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    CheckBox &dropShadow(bool enabled = true,
+                         const QColor &color = QColor(0, 0, 0, 80));
     CheckBox &hoverEffect(bool enabled = true);
     CheckBox &checkAnimation(bool enabled = true);
     CheckBox &borderRadius(int radius);
-    CheckBox &customColors(const QColor& checked_color, const QColor& unchecked_color = QColor());
-    CheckBox &size(const QSize& size);
+    CheckBox &customColors(const QColor &checked_color,
+                           const QColor &unchecked_color = QColor());
+    CheckBox &size(const QSize &size);
 
     // **State management**
-    CheckBox &disabled(bool disabled, const QString& reason = "");
+    CheckBox &disabled(bool disabled, const QString &reason = "");
     CheckBox &readOnly(bool readonly = true);
 
     // **Event handlers**
@@ -69,17 +74,20 @@ public:
     CheckBox &onFocus(std::function<void(bool)> focus_handler);
     CheckBox &onDoubleClick(std::function<void()> double_click_handler);
     CheckBox &onRightClick(std::function<void()> right_click_handler);
-    CheckBox &onValidationChanged(std::function<void(bool, const QString&)> validation_handler);
+    CheckBox &onValidationChanged(
+        std::function<void(bool, const QString &)> validation_handler);
 
     // **Accessibility**
-    CheckBox &role(const QString& aria_role);
+    CheckBox &role(const QString &aria_role);
     CheckBox &tabIndex(int index);
-    CheckBox &describedBy(const QString& element_id);
-    CheckBox &labelledBy(const QString& element_id);
+    CheckBox &describedBy(const QString &element_id);
+    CheckBox &labelledBy(const QString &element_id);
 
     // **Group management**
     CheckBox &exclusiveGroup(bool exclusive = true);
-    CheckBox &groupValidation(std::function<CheckBoxValidationResult(const QList<CheckBox*>&)> group_validator);
+    CheckBox &groupValidation(
+        std::function<CheckBoxValidationResult(const QList<CheckBox *> &)>
+            group_validator);
 
     void initialize() override;
     bool isChecked() const;
@@ -90,12 +98,13 @@ public:
     // **State queries**
     bool isValid() const { return is_valid_; }
     QString getValidationError() const { return validation_error_; }
-    QButtonGroup* getGroup() const { return button_group_; }
+    QButtonGroup *getGroup() const { return button_group_; }
     QString getGroupName() const { return group_name_; }
 
 signals:
-    void validationChanged(bool is_valid, const QString& error_message);
-    void groupStateChanged(const QString& group_name, const QList<CheckBox*>& checked_items);
+    void validationChanged(bool is_valid, const QString &error_message);
+    void groupStateChanged(const QString &group_name,
+                           const QList<CheckBox *> &checked_items);
 
 protected:
     void setupAccessibility();
@@ -105,7 +114,7 @@ protected:
     void setupGroupManagement();
     void updateCheckBoxState();
     CheckBoxValidationResult validateState(Qt::CheckState state) const;
-    void showValidationError(const QString& error);
+    void showValidationError(const QString &error);
     void animateCheck(bool checked);
 
 private slots:
@@ -123,13 +132,13 @@ private:
     QString accessible_name_;
     QString accessible_description_;
     QKeySequence shortcut_;
-    QButtonGroup* button_group_;
+    QButtonGroup *button_group_;
     QString group_name_;
 
     // **Validation**
     bool required_;
     std::function<CheckBoxValidationResult(Qt::CheckState)> validation_func_;
-    std::function<void(const QString&)> error_handler_;
+    std::function<void(const QString &)> error_handler_;
     bool validate_on_change_;
     QString validation_error_;
     bool is_valid_;
@@ -154,7 +163,7 @@ private:
     std::function<void(bool)> focus_handler_;
     std::function<void()> double_click_handler_;
     std::function<void()> right_click_handler_;
-    std::function<void(bool, const QString&)> validation_handler_;
+    std::function<void(bool, const QString &)> validation_handler_;
 
     // **Accessibility**
     QString aria_role_;
@@ -164,7 +173,8 @@ private:
 
     // **Group management**
     bool exclusive_group_;
-    std::function<CheckBoxValidationResult(const QList<CheckBox*>&)> group_validator_;
+    std::function<CheckBoxValidationResult(const QList<CheckBox *> &)>
+        group_validator_;
 
     // **Internal components**
     std::unique_ptr<QGraphicsDropShadowEffect> shadow_effect_;
@@ -172,8 +182,10 @@ private:
     std::unique_ptr<QTimer> validation_timer_;
 
     // **Static group management**
-    static QMap<QString, QList<CheckBox*>> named_groups_;
-    static QMap<QString, std::function<CheckBoxValidationResult(const QList<CheckBox*>&)>> group_validators_;
+    static QMap<QString, QList<CheckBox *>> named_groups_;
+    static QMap<QString, std::function<CheckBoxValidationResult(
+                             const QList<CheckBox *> &)>>
+        group_validators_;
 };
 
 }  // namespace DeclarativeUI::Components

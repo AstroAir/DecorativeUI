@@ -59,7 +59,7 @@ namespace DeclarativeUI::JSON {
  * @tparam T Callable type to validate.
  */
 template <typename T>
-concept ComponentFactoryConcept = requires(T t, const QJsonObject &config) {
+concept ComponentFactoryConcept = requires(T t, const QJsonObject& config) {
     { t(config) } -> std::convertible_to<std::unique_ptr<QWidget>>;
 };
 
@@ -83,7 +83,7 @@ public:
      * Implementations should throw a descriptive exception (from UIExceptions)
      * on error.
      */
-    virtual std::unique_ptr<QWidget> create(const QJsonObject &config) = 0;
+    virtual std::unique_ptr<QWidget> create(const QJsonObject& config) = 0;
 
     /**
      * @brief Returns a human-readable type name for the factory.
@@ -112,7 +112,7 @@ public:
      * std::unique_ptr<WidgetType>.
      */
     explicit ComponentFactoryImpl(
-        std::function<std::unique_ptr<WidgetType>(const QJsonObject &)> factory)
+        std::function<std::unique_ptr<WidgetType>(const QJsonObject&)> factory)
         : factory_(std::move(factory)) {}
 
     /**
@@ -120,7 +120,7 @@ public:
      * @param config Configuration passed to the concrete factory.
      * @return std::unique_ptr<QWidget> owning the created widget.
      */
-    std::unique_ptr<QWidget> create(const QJsonObject &config) override {
+    std::unique_ptr<QWidget> create(const QJsonObject& config) override {
         return factory_(config);
     }
 
@@ -136,7 +136,7 @@ public:
     }
 
 private:
-    std::function<std::unique_ptr<WidgetType>(const QJsonObject &)> factory_;
+    std::function<std::unique_ptr<WidgetType>(const QJsonObject&)> factory_;
 };
 
 /**
@@ -156,7 +156,7 @@ public:
      * @brief Get the singleton instance of the registry.
      * @return Reference to the global ComponentRegistry.
      */
-    static ComponentRegistry &instance();
+    static ComponentRegistry& instance();
 
     /**
      * @brief Register a factory that produces WidgetType instances.
@@ -174,9 +174,8 @@ public:
      */
     template <typename WidgetType>
     void registerComponent(
-        const QString &type_name,
-        std::function<std::unique_ptr<WidgetType>(const QJsonObject &)>
-            factory);
+        const QString& type_name,
+        std::function<std::unique_ptr<WidgetType>(const QJsonObject&)> factory);
 
     /**
      * @brief Create a component instance given its registered type name and
@@ -188,14 +187,14 @@ public:
      * registered or creation fails.
      */
     [[nodiscard]] std::unique_ptr<QWidget> createComponent(
-        const QString &type_name, const QJsonObject &config);
+        const QString& type_name, const QJsonObject& config);
 
     /**
      * @brief Check whether a component type is registered.
      * @param type_name Type name to query.
      * @return true if a factory is registered for type_name, false otherwise.
      */
-    [[nodiscard]] bool hasComponent(const QString &type_name) const noexcept;
+    [[nodiscard]] bool hasComponent(const QString& type_name) const noexcept;
 
     /**
      * @brief Retrieve a list of all registered component type names.
@@ -249,22 +248,39 @@ private:
      * These methods extract the common property configuration logic
      * to reduce code duplication and improve maintainability.
      */
-    void configureLabelProperties(std::unique_ptr<QLabel>& label, const QJsonObject& config);
-    void configureButtonProperties(std::unique_ptr<QPushButton>& button, const QJsonObject& config);
-    void configureLineEditProperties(std::unique_ptr<QLineEdit>& lineEdit, const QJsonObject& config);
-    void configureTextEditProperties(std::unique_ptr<QTextEdit>& textEdit, const QJsonObject& config);
-    void configureCheckBoxProperties(std::unique_ptr<QCheckBox>& checkBox, const QJsonObject& config);
-    void configureRadioButtonProperties(std::unique_ptr<QRadioButton>& radioButton, const QJsonObject& config);
-    void configureComboBoxProperties(std::unique_ptr<QComboBox>& comboBox, const QJsonObject& config);
-    void configureSpinBoxProperties(std::unique_ptr<QSpinBox>& spinBox, const QJsonObject& config);
-    void configureDoubleSpinBoxProperties(std::unique_ptr<QDoubleSpinBox>& doubleSpinBox, const QJsonObject& config);
-    void configureSliderProperties(std::unique_ptr<QSlider>& slider, const QJsonObject& config);
-    void configureProgressBarProperties(std::unique_ptr<QProgressBar>& progressBar, const QJsonObject& config);
-    void configureGroupBoxProperties(std::unique_ptr<QGroupBox>& groupBox, const QJsonObject& config);
-    void configureFrameProperties(std::unique_ptr<QFrame>& frame, const QJsonObject& config);
-    void configureScrollAreaProperties(std::unique_ptr<QScrollArea>& scrollArea, const QJsonObject& config);
-    void configureTabWidgetProperties(std::unique_ptr<QTabWidget>& tabWidget, const QJsonObject& config);
-    void configureSplitterProperties(std::unique_ptr<QSplitter>& splitter, const QJsonObject& config);
+    void configureLabelProperties(std::unique_ptr<QLabel>& label,
+                                  const QJsonObject& config);
+    void configureButtonProperties(std::unique_ptr<QPushButton>& button,
+                                   const QJsonObject& config);
+    void configureLineEditProperties(std::unique_ptr<QLineEdit>& lineEdit,
+                                     const QJsonObject& config);
+    void configureTextEditProperties(std::unique_ptr<QTextEdit>& textEdit,
+                                     const QJsonObject& config);
+    void configureCheckBoxProperties(std::unique_ptr<QCheckBox>& checkBox,
+                                     const QJsonObject& config);
+    void configureRadioButtonProperties(
+        std::unique_ptr<QRadioButton>& radioButton, const QJsonObject& config);
+    void configureComboBoxProperties(std::unique_ptr<QComboBox>& comboBox,
+                                     const QJsonObject& config);
+    void configureSpinBoxProperties(std::unique_ptr<QSpinBox>& spinBox,
+                                    const QJsonObject& config);
+    void configureDoubleSpinBoxProperties(
+        std::unique_ptr<QDoubleSpinBox>& doubleSpinBox,
+        const QJsonObject& config);
+    void configureSliderProperties(std::unique_ptr<QSlider>& slider,
+                                   const QJsonObject& config);
+    void configureProgressBarProperties(
+        std::unique_ptr<QProgressBar>& progressBar, const QJsonObject& config);
+    void configureGroupBoxProperties(std::unique_ptr<QGroupBox>& groupBox,
+                                     const QJsonObject& config);
+    void configureFrameProperties(std::unique_ptr<QFrame>& frame,
+                                  const QJsonObject& config);
+    void configureScrollAreaProperties(std::unique_ptr<QScrollArea>& scrollArea,
+                                       const QJsonObject& config);
+    void configureTabWidgetProperties(std::unique_ptr<QTabWidget>& tabWidget,
+                                      const QJsonObject& config);
+    void configureSplitterProperties(std::unique_ptr<QSplitter>& splitter,
+                                     const QJsonObject& config);
 };
 
 /**
@@ -281,8 +297,8 @@ private:
  */
 template <typename WidgetType>
 void ComponentRegistry::registerComponent(
-    const QString &type_name,
-    std::function<std::unique_ptr<WidgetType>(const QJsonObject &)> factory) {
+    const QString& type_name,
+    std::function<std::unique_ptr<WidgetType>(const QJsonObject&)> factory) {
     if (type_name.isEmpty()) {
         throw Exceptions::ComponentRegistrationException(
             "Empty component type name");
@@ -299,7 +315,7 @@ void ComponentRegistry::registerComponent(
                 std::move(factory));
 
         factories_[type_name] = std::move(component_factory);
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         throw Exceptions::ComponentRegistrationException(
             type_name.toStdString() + ": " + e.what());
     }

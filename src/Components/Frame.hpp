@@ -14,7 +14,8 @@ public:
     explicit Frame(QObject* parent = nullptr);
 
     // **Fluent interface for frame**
-    Frame& frameStyle(QFrame::Shape shape, QFrame::Shadow shadow = QFrame::Plain);
+    Frame& frameStyle(QFrame::Shape shape,
+                      QFrame::Shadow shadow = QFrame::Plain);
     Frame& frameShape(QFrame::Shape shape);
     Frame& frameShadow(QFrame::Shadow shadow);
     Frame& lineWidth(int width);
@@ -39,12 +40,15 @@ public:
     Frame& shortcut(const QKeySequence& shortcut);
 
     // **Visual enhancements**
-    Frame& dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    Frame& dropShadow(bool enabled = true,
+                      const QColor& color = QColor(0, 0, 0, 80));
     Frame& hoverEffect(bool enabled = true);
     Frame& focusEffect(bool enabled = true);
     Frame& borderRadius(int radius);
-    Frame& customColors(const QColor& background, const QColor& border = QColor());
-    Frame& gradient(const QColor& start, const QColor& end, Qt::Orientation orientation = Qt::Vertical);
+    Frame& customColors(const QColor& background,
+                        const QColor& border = QColor());
+    Frame& gradient(const QColor& start, const QColor& end,
+                    Qt::Orientation orientation = Qt::Vertical);
     Frame& opacity(qreal opacity);
 
     // **Interactive features**
@@ -77,7 +81,8 @@ public:
     // **Advanced layout management**
     Frame& autoLayout(bool enabled = true);
     Frame& layoutDirection(Qt::LayoutDirection direction);
-    Frame& sizePolicy(QSizePolicy::Policy horizontal, QSizePolicy::Policy vertical);
+    Frame& sizePolicy(QSizePolicy::Policy horizontal,
+                      QSizePolicy::Policy vertical);
     Frame& minimumSize(const QSize& size);
     Frame& maximumSize(const QSize& size);
     Frame& fixedSize(const QSize& size);
@@ -94,7 +99,5 @@ public:
 private:
     QFrame* frame_widget_;
 };
-
-
 
 }  // namespace DeclarativeUI::Components

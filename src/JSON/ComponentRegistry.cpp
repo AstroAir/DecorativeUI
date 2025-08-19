@@ -21,13 +21,13 @@
 
 namespace DeclarativeUI::JSON {
 
-ComponentRegistry &ComponentRegistry::instance() {
+ComponentRegistry& ComponentRegistry::instance() {
     static ComponentRegistry instance;
     return instance;
 }
 
 std::unique_ptr<QWidget> ComponentRegistry::createComponent(
-    const QString &type_name, const QJsonObject &config) {
+    const QString& type_name, const QJsonObject& config) {
     auto factory_it = factories_.find(type_name);
     if (factory_it == factories_.end()) {
         throw Exceptions::ComponentRegistrationException(
@@ -45,19 +45,19 @@ std::unique_ptr<QWidget> ComponentRegistry::createComponent(
 
         return widget;
 
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         throw Exceptions::ComponentCreationException(type_name.toStdString() +
                                                      ": " + e.what());
     }
 }
 
-bool ComponentRegistry::hasComponent(const QString &type_name) const noexcept {
+bool ComponentRegistry::hasComponent(const QString& type_name) const noexcept {
     return factories_.find(type_name) != factories_.end();
 }
 
 QStringList ComponentRegistry::getRegisteredTypes() const {
     QStringList types;
-    for (const auto &[type_name, factory] : factories_) {
+    for (const auto& [type_name, factory] : factories_) {
         types.append(type_name);
     }
     return types;
@@ -84,7 +84,7 @@ void ComponentRegistry::registerBuiltinComponents() {
         qDebug() << "✅ Registered" << factories_.size()
                  << "built-in components";
 
-    } catch (const std::exception &e) {
+    } catch (const std::exception& e) {
         qWarning() << "❌ Failed to register built-in components:" << e.what();
         throw Exceptions::ComponentRegistrationException(
             "Built-in component registration failed: " + std::string(e.what()));
@@ -93,72 +93,78 @@ void ComponentRegistry::registerBuiltinComponents() {
 
 void ComponentRegistry::registerBasicWidgets() {
     // Register basic widget components with minimal configuration
-    registerComponent<QWidget>("QWidget", [](const QJsonObject &) {
+    registerComponent<QWidget>("QWidget", [](const QJsonObject&) {
         return std::make_unique<QWidget>();
     });
 
-    registerComponent<QLabel>("QLabel", [this](const QJsonObject &config) {
+    registerComponent<QLabel>("QLabel", [this](const QJsonObject& config) {
         auto label = std::make_unique<QLabel>();
         configureLabelProperties(label, config);
         return label;
     });
 
-    registerComponent<QPushButton>("QPushButton", [this](const QJsonObject &config) {
-        auto button = std::make_unique<QPushButton>();
-        configureButtonProperties(button, config);
-        return button;
-    });
-
+    registerComponent<QPushButton>(
+        "QPushButton", [this](const QJsonObject& config) {
+            auto button = std::make_unique<QPushButton>();
+            configureButtonProperties(button, config);
+            return button;
+        });
 }
 
 void ComponentRegistry::registerInputWidgets() {
     // Register input widget components with their specific configurations
-    registerComponent<QLineEdit>("QLineEdit", [this](const QJsonObject &config) {
-        auto lineEdit = std::make_unique<QLineEdit>();
-        configureLineEditProperties(lineEdit, config);
-        return lineEdit;
-    });
+    registerComponent<QLineEdit>(
+        "QLineEdit", [this](const QJsonObject& config) {
+            auto lineEdit = std::make_unique<QLineEdit>();
+            configureLineEditProperties(lineEdit, config);
+            return lineEdit;
+        });
 
-    registerComponent<QTextEdit>("QTextEdit", [this](const QJsonObject &config) {
-        auto textEdit = std::make_unique<QTextEdit>();
-        configureTextEditProperties(textEdit, config);
-        return textEdit;
-    });
+    registerComponent<QTextEdit>(
+        "QTextEdit", [this](const QJsonObject& config) {
+            auto textEdit = std::make_unique<QTextEdit>();
+            configureTextEditProperties(textEdit, config);
+            return textEdit;
+        });
 
-    registerComponent<QCheckBox>("QCheckBox", [this](const QJsonObject &config) {
-        auto checkBox = std::make_unique<QCheckBox>();
-        configureCheckBoxProperties(checkBox, config);
-        return checkBox;
-    });
+    registerComponent<QCheckBox>(
+        "QCheckBox", [this](const QJsonObject& config) {
+            auto checkBox = std::make_unique<QCheckBox>();
+            configureCheckBoxProperties(checkBox, config);
+            return checkBox;
+        });
 
-    registerComponent<QRadioButton>("QRadioButton", [this](const QJsonObject &config) {
-        auto radioButton = std::make_unique<QRadioButton>();
-        configureRadioButtonProperties(radioButton, config);
-        return radioButton;
-    });
+    registerComponent<QRadioButton>(
+        "QRadioButton", [this](const QJsonObject& config) {
+            auto radioButton = std::make_unique<QRadioButton>();
+            configureRadioButtonProperties(radioButton, config);
+            return radioButton;
+        });
 
-    registerComponent<QComboBox>("QComboBox", [this](const QJsonObject &config) {
-        auto comboBox = std::make_unique<QComboBox>();
-        configureComboBoxProperties(comboBox, config);
-        return comboBox;
-    });
+    registerComponent<QComboBox>(
+        "QComboBox", [this](const QJsonObject& config) {
+            auto comboBox = std::make_unique<QComboBox>();
+            configureComboBoxProperties(comboBox, config);
+            return comboBox;
+        });
 }
 
 void ComponentRegistry::registerNumericWidgets() {
     // Register numeric input widget components
-    registerComponent<QSpinBox>("QSpinBox", [this](const QJsonObject &config) {
+    registerComponent<QSpinBox>("QSpinBox", [this](const QJsonObject& config) {
         auto spinBox = std::make_unique<QSpinBox>();
         configureSpinBoxProperties(spinBox, config);
         return spinBox;
     });
 
-    registerComponent<QDoubleSpinBox>("QDoubleSpinBox", [this](const QJsonObject &config) {
-        auto doubleSpinBox = std::make_unique<QDoubleSpinBox>();
-        configureDoubleSpinBoxProperties(doubleSpinBox, config);
-        return doubleSpinBox;
-    });
+    registerComponent<QDoubleSpinBox>(
+        "QDoubleSpinBox", [this](const QJsonObject& config) {
+            auto doubleSpinBox = std::make_unique<QDoubleSpinBox>();
+            configureDoubleSpinBoxProperties(doubleSpinBox, config);
+            return doubleSpinBox;
+        });
 
-    registerComponent<QSlider>("QSlider", [this](const QJsonObject &config) {
+    registerComponent<QSlider>("QSlider", [this](const QJsonObject& config) {
         auto slider = std::make_unique<QSlider>();
         configureSliderProperties(slider, config);
         return slider;
@@ -167,49 +173,56 @@ void ComponentRegistry::registerNumericWidgets() {
 
 void ComponentRegistry::registerDisplayWidgets() {
     // Register display widget components
-    registerComponent<QProgressBar>("QProgressBar", [this](const QJsonObject &config) {
-        auto progressBar = std::make_unique<QProgressBar>();
-        configureProgressBarProperties(progressBar, config);
-        return progressBar;
-    });
+    registerComponent<QProgressBar>(
+        "QProgressBar", [this](const QJsonObject& config) {
+            auto progressBar = std::make_unique<QProgressBar>();
+            configureProgressBarProperties(progressBar, config);
+            return progressBar;
+        });
 }
 
 void ComponentRegistry::registerContainerWidgets() {
     // Register container widget components
-    registerComponent<QGroupBox>("QGroupBox", [this](const QJsonObject &config) {
-        auto groupBox = std::make_unique<QGroupBox>();
-        configureGroupBoxProperties(groupBox, config);
-        return groupBox;
-    });
+    registerComponent<QGroupBox>(
+        "QGroupBox", [this](const QJsonObject& config) {
+            auto groupBox = std::make_unique<QGroupBox>();
+            configureGroupBoxProperties(groupBox, config);
+            return groupBox;
+        });
 
-    registerComponent<QFrame>("QFrame", [this](const QJsonObject &config) {
+    registerComponent<QFrame>("QFrame", [this](const QJsonObject& config) {
         auto frame = std::make_unique<QFrame>();
         configureFrameProperties(frame, config);
         return frame;
     });
 
-    registerComponent<QScrollArea>("QScrollArea", [this](const QJsonObject &config) {
-        auto scrollArea = std::make_unique<QScrollArea>();
-        configureScrollAreaProperties(scrollArea, config);
-        return scrollArea;
-    });
+    registerComponent<QScrollArea>(
+        "QScrollArea", [this](const QJsonObject& config) {
+            auto scrollArea = std::make_unique<QScrollArea>();
+            configureScrollAreaProperties(scrollArea, config);
+            return scrollArea;
+        });
 
-    registerComponent<QTabWidget>("QTabWidget", [this](const QJsonObject &config) {
-        auto tabWidget = std::make_unique<QTabWidget>();
-        configureTabWidgetProperties(tabWidget, config);
-        return tabWidget;
-    });
+    registerComponent<QTabWidget>(
+        "QTabWidget", [this](const QJsonObject& config) {
+            auto tabWidget = std::make_unique<QTabWidget>();
+            configureTabWidgetProperties(tabWidget, config);
+            return tabWidget;
+        });
 
-    registerComponent<QSplitter>("QSplitter", [this](const QJsonObject &config) {
-        auto splitter = std::make_unique<QSplitter>();
-        configureSplitterProperties(splitter, config);
-        return splitter;
-    });
+    registerComponent<QSplitter>(
+        "QSplitter", [this](const QJsonObject& config) {
+            auto splitter = std::make_unique<QSplitter>();
+            configureSplitterProperties(splitter, config);
+            return splitter;
+        });
 }
 
 // Property configuration helper methods implementation
-void ComponentRegistry::configureLabelProperties(std::unique_ptr<QLabel>& label, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureLabelProperties(std::unique_ptr<QLabel>& label,
+                                                 const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("text")) {
@@ -219,12 +232,15 @@ void ComponentRegistry::configureLabelProperties(std::unique_ptr<QLabel>& label,
         label->setWordWrap(props["wordWrap"].toBool());
     }
     if (props.contains("alignment")) {
-        label->setAlignment(static_cast<Qt::Alignment>(props["alignment"].toInt()));
+        label->setAlignment(
+            static_cast<Qt::Alignment>(props["alignment"].toInt()));
     }
 }
 
-void ComponentRegistry::configureButtonProperties(std::unique_ptr<QPushButton>& button, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureButtonProperties(
+    std::unique_ptr<QPushButton>& button, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("text")) {
@@ -238,8 +254,10 @@ void ComponentRegistry::configureButtonProperties(std::unique_ptr<QPushButton>& 
     }
 }
 
-void ComponentRegistry::configureLineEditProperties(std::unique_ptr<QLineEdit>& lineEdit, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureLineEditProperties(
+    std::unique_ptr<QLineEdit>& lineEdit, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("text")) {
@@ -256,8 +274,10 @@ void ComponentRegistry::configureLineEditProperties(std::unique_ptr<QLineEdit>& 
     }
 }
 
-void ComponentRegistry::configureTextEditProperties(std::unique_ptr<QTextEdit>& textEdit, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureTextEditProperties(
+    std::unique_ptr<QTextEdit>& textEdit, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("html")) {
@@ -270,8 +290,10 @@ void ComponentRegistry::configureTextEditProperties(std::unique_ptr<QTextEdit>& 
     }
 }
 
-void ComponentRegistry::configureCheckBoxProperties(std::unique_ptr<QCheckBox>& checkBox, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureCheckBoxProperties(
+    std::unique_ptr<QCheckBox>& checkBox, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("text")) {
@@ -285,8 +307,10 @@ void ComponentRegistry::configureCheckBoxProperties(std::unique_ptr<QCheckBox>& 
     }
 }
 
-void ComponentRegistry::configureRadioButtonProperties(std::unique_ptr<QRadioButton>& radioButton, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureRadioButtonProperties(
+    std::unique_ptr<QRadioButton>& radioButton, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("text")) {
@@ -297,13 +321,15 @@ void ComponentRegistry::configureRadioButtonProperties(std::unique_ptr<QRadioBut
     }
 }
 
-void ComponentRegistry::configureComboBoxProperties(std::unique_ptr<QComboBox>& comboBox, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureComboBoxProperties(
+    std::unique_ptr<QComboBox>& comboBox, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("items")) {
         QJsonArray items = props["items"].toArray();
-        for (const QJsonValue &item : items) {
+        for (const QJsonValue& item : items) {
             comboBox->addItem(item.toString());
         }
     }
@@ -315,8 +341,10 @@ void ComponentRegistry::configureComboBoxProperties(std::unique_ptr<QComboBox>& 
     }
 }
 
-void ComponentRegistry::configureSpinBoxProperties(std::unique_ptr<QSpinBox>& spinBox, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureSpinBoxProperties(
+    std::unique_ptr<QSpinBox>& spinBox, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("value")) {
@@ -339,8 +367,10 @@ void ComponentRegistry::configureSpinBoxProperties(std::unique_ptr<QSpinBox>& sp
     }
 }
 
-void ComponentRegistry::configureDoubleSpinBoxProperties(std::unique_ptr<QDoubleSpinBox>& doubleSpinBox, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureDoubleSpinBoxProperties(
+    std::unique_ptr<QDoubleSpinBox>& doubleSpinBox, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("value")) {
@@ -360,13 +390,16 @@ void ComponentRegistry::configureDoubleSpinBoxProperties(std::unique_ptr<QDouble
     }
 }
 
-void ComponentRegistry::configureSliderProperties(std::unique_ptr<QSlider>& slider, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureSliderProperties(
+    std::unique_ptr<QSlider>& slider, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("orientation")) {
         QString orientation = props["orientation"].toString().toLower();
-        slider->setOrientation(orientation == "vertical" ? Qt::Vertical : Qt::Horizontal);
+        slider->setOrientation(orientation == "vertical" ? Qt::Vertical
+                                                         : Qt::Horizontal);
     }
     if (props.contains("value")) {
         slider->setValue(props["value"].toInt());
@@ -385,8 +418,10 @@ void ComponentRegistry::configureSliderProperties(std::unique_ptr<QSlider>& slid
     }
 }
 
-void ComponentRegistry::configureProgressBarProperties(std::unique_ptr<QProgressBar>& progressBar, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureProgressBarProperties(
+    std::unique_ptr<QProgressBar>& progressBar, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("value")) {
@@ -406,8 +441,10 @@ void ComponentRegistry::configureProgressBarProperties(std::unique_ptr<QProgress
     }
 }
 
-void ComponentRegistry::configureGroupBoxProperties(std::unique_ptr<QGroupBox>& groupBox, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureGroupBoxProperties(
+    std::unique_ptr<QGroupBox>& groupBox, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("title")) {
@@ -421,8 +458,10 @@ void ComponentRegistry::configureGroupBoxProperties(std::unique_ptr<QGroupBox>& 
     }
 }
 
-void ComponentRegistry::configureFrameProperties(std::unique_ptr<QFrame>& frame, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureFrameProperties(std::unique_ptr<QFrame>& frame,
+                                                 const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("frameShape")) {
@@ -450,15 +489,18 @@ void ComponentRegistry::configureFrameProperties(std::unique_ptr<QFrame>& frame,
     }
 }
 
-void ComponentRegistry::configureScrollAreaProperties(std::unique_ptr<QScrollArea>& scrollArea, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureScrollAreaProperties(
+    std::unique_ptr<QScrollArea>& scrollArea, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("widgetResizable")) {
         scrollArea->setWidgetResizable(props["widgetResizable"].toBool());
     }
     if (props.contains("horizontalScrollBarPolicy")) {
-        QString policy = props["horizontalScrollBarPolicy"].toString().toLower();
+        QString policy =
+            props["horizontalScrollBarPolicy"].toString().toLower();
         if (policy == "alwayson") {
             scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
         } else if (policy == "alwaysoff") {
@@ -479,8 +521,10 @@ void ComponentRegistry::configureScrollAreaProperties(std::unique_ptr<QScrollAre
     }
 }
 
-void ComponentRegistry::configureTabWidgetProperties(std::unique_ptr<QTabWidget>& tabWidget, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureTabWidgetProperties(
+    std::unique_ptr<QTabWidget>& tabWidget, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("currentIndex")) {
@@ -506,13 +550,16 @@ void ComponentRegistry::configureTabWidgetProperties(std::unique_ptr<QTabWidget>
     }
 }
 
-void ComponentRegistry::configureSplitterProperties(std::unique_ptr<QSplitter>& splitter, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void ComponentRegistry::configureSplitterProperties(
+    std::unique_ptr<QSplitter>& splitter, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("orientation")) {
         QString orientation = props["orientation"].toString().toLower();
-        splitter->setOrientation(orientation == "vertical" ? Qt::Vertical : Qt::Horizontal);
+        splitter->setOrientation(orientation == "vertical" ? Qt::Vertical
+                                                           : Qt::Horizontal);
     }
     if (props.contains("childrenCollapsible")) {
         splitter->setChildrenCollapsible(props["childrenCollapsible"].toBool());

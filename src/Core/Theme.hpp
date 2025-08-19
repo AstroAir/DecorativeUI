@@ -465,7 +465,7 @@ namespace DeclarativeUI::Core::Accessibility {
 
 // **Accessibility roles**
 enum class AccessibilityRole {
-    Generic,      // Default/generic role
+    Generic,  // Default/generic role
     Button,
     CheckBox,
     ComboBox,
@@ -755,13 +755,13 @@ private:
 
 // **Bring accessibility types into Core namespace for convenience**
 namespace DeclarativeUI::Core {
-    using AccessibilityRole = Accessibility::AccessibilityRole;
-    using AccessibilityState = Accessibility::AccessibilityState;
-    using AccessibilityProperties = Accessibility::AccessibilityProperties;
-    using AccessibilityManager = Accessibility::AccessibilityManager;
-    using AccessibilityBuilder = Accessibility::AccessibilityBuilder;
+using AccessibilityRole = Accessibility::AccessibilityRole;
+using AccessibilityState = Accessibility::AccessibilityState;
+using AccessibilityProperties = Accessibility::AccessibilityProperties;
+using AccessibilityManager = Accessibility::AccessibilityManager;
+using AccessibilityBuilder = Accessibility::AccessibilityBuilder;
 
-    // **Convenience functions**
-    using Accessibility::accessibilityFor;
-    using Accessibility::accessibility;
-}
+// **Convenience functions**
+using Accessibility::accessibility;
+using Accessibility::accessibilityFor;
+}  // namespace DeclarativeUI::Core

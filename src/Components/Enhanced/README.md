@@ -20,6 +20,7 @@ The enhancement system uses composition and decoration patterns to layer additio
 The base components now include all enhanced functionality:
 
 ### Enhanced Button Features
+
 ```cpp
 #include "Components/Button.hpp"
 using namespace DeclarativeUI::Components;
@@ -37,6 +38,7 @@ button->initialize();
 ```
 
 ### Enhanced LineEdit Features
+
 ```cpp
 #include "Components/LineEdit.hpp"
 using namespace DeclarativeUI::Components;
@@ -56,12 +58,14 @@ email_field->initialize();
 ## Key Features
 
 ### 🔧 Non-Intrusive Enhancement
+
 - Works with existing components without modification
 - Uses composition pattern for clean separation
 - Maintains backward compatibility
 - Easy to apply and remove
 
 ### ♿ Comprehensive Accessibility
+
 - ARIA roles and properties
 - Screen reader support
 - Keyboard navigation
@@ -69,6 +73,7 @@ email_field->initialize();
 - Tooltip integration
 
 ### ✅ Advanced Validation
+
 - Real-time validation
 - Custom validation functions
 - Visual feedback
@@ -76,6 +81,7 @@ email_field->initialize();
 - Required field support
 
 ### 🎨 Visual Effects
+
 - Drop shadows
 - Hover effects
 - Focus indicators
@@ -83,6 +89,7 @@ email_field->initialize();
 - Animations
 
 ### ⌨️ Keyboard Support
+
 - Custom shortcuts
 - Tab navigation
 - Focus management
@@ -377,6 +384,7 @@ See the comprehensive example in `example/showcase/ComponentGallery.cpp` for det
 ## API Reference
 
 For complete API documentation, see the header files:
+
 - `ComponentEnhancer.hpp` - Composition-based enhancement system for any Qt widget
 - `../Button.hpp` - Enhanced button component with integrated advanced features
 - `../LineEdit.hpp` - Enhanced line edit component with integrated validation and formatting

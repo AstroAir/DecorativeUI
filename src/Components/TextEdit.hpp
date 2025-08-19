@@ -1,21 +1,21 @@
 #pragma once
 
 #include <QColor>
+#include <QCompleter>
 #include <QFont>
+#include <QGraphicsDropShadowEffect>
 #include <QPlainTextEdit>
+#include <QPropertyAnimation>
+#include <QSyntaxHighlighter>
+#include <QTextBrowser>
 #include <QTextCharFormat>
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QTextEdit>
-#include <QSyntaxHighlighter>
-#include <QCompleter>
 #include <QTimer>
-#include <QPropertyAnimation>
-#include <QGraphicsDropShadowEffect>
 #include <QUndoStack>
-#include <QTextBrowser>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include "../Core/UIElement.hpp"
 
@@ -30,8 +30,12 @@ struct TextEditValidationResult {
     QString suggestion;
     int error_position = -1;
 
-    TextEditValidationResult(bool valid = true, const QString& error = "", const QString& hint = "", int pos = -1)
-        : is_valid(valid), error_message(error), suggestion(hint), error_position(pos) {}
+    TextEditValidationResult(bool valid = true, const QString &error = "",
+                             const QString &hint = "", int pos = -1)
+        : is_valid(valid),
+          error_message(error),
+          suggestion(hint),
+          error_position(pos) {}
 };
 
 /**
@@ -73,44 +77,51 @@ public:
     TextEdit &style(const QString &stylesheet);
 
     // **Enhanced fluent interface**
-    TextEdit &tooltip(const QString& tooltip_text);
-    TextEdit &accessibleName(const QString& name);
-    TextEdit &accessibleDescription(const QString& description);
-    TextEdit &shortcut(const QKeySequence& shortcut);
+    TextEdit &tooltip(const QString &tooltip_text);
+    TextEdit &accessibleName(const QString &name);
+    TextEdit &accessibleDescription(const QString &description);
+    TextEdit &shortcut(const QKeySequence &shortcut);
 
     // **Validation**
     TextEdit &required(bool required = true);
     TextEdit &minLength(int min_length);
     TextEdit &maxLength(int max_length);
-    TextEdit &validator(std::function<TextEditValidationResult(const QString&)> validation_func);
-    TextEdit &onValidationFailed(std::function<void(const QString&, int)> error_handler);
+    TextEdit &validator(std::function<TextEditValidationResult(const QString &)>
+                            validation_func);
+    TextEdit &onValidationFailed(
+        std::function<void(const QString &, int)> error_handler);
     TextEdit &validateOnType(bool validate_while_typing = true);
     TextEdit &validateOnFocus(bool validate_on_focus_lost = true);
     TextEdit &spellCheck(bool enabled = true);
     TextEdit &grammarCheck(bool enabled = true);
 
     // **Auto-completion and suggestions**
-    TextEdit &autoComplete(const QStringList& completions);
+    TextEdit &autoComplete(const QStringList &completions);
     TextEdit &autoCompleteMode(QCompleter::CompletionMode mode);
     TextEdit &wordSuggestions(bool enabled = true);
-    TextEdit &customCompleter(QCompleter* completer);
+    TextEdit &customCompleter(QCompleter *completer);
 
     // **Syntax highlighting and formatting**
-    TextEdit &syntaxHighlighter(QSyntaxHighlighter* highlighter);
-    TextEdit &language(const QString& language_name);
+    TextEdit &syntaxHighlighter(QSyntaxHighlighter *highlighter);
+    TextEdit &language(const QString &language_name);
     TextEdit &lineNumbers(bool enabled = true);
-    TextEdit &currentLineHighlight(bool enabled = true, const QColor& color = QColor(255, 255, 0, 50));
+    TextEdit &currentLineHighlight(bool enabled = true,
+                                   const QColor &color = QColor(255, 255, 0,
+                                                                50));
     TextEdit &bracketMatching(bool enabled = true);
     TextEdit &codeCompletion(bool enabled = true);
     TextEdit &autoIndent(bool enabled = true);
     TextEdit &tabsToSpaces(bool enabled = true, int spaces = 4);
 
     // **Visual enhancements**
-    TextEdit &dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    TextEdit &dropShadow(bool enabled = true,
+                         const QColor &color = QColor(0, 0, 0, 80));
     TextEdit &hoverEffect(bool enabled = true);
     TextEdit &focusAnimation(bool enabled = true);
     TextEdit &borderRadius(int radius);
-    TextEdit &customColors(const QColor& background, const QColor& text = QColor(), const QColor& border = QColor());
+    TextEdit &customColors(const QColor &background,
+                           const QColor &text = QColor(),
+                           const QColor &border = QColor());
     TextEdit &margins(int left, int top, int right, int bottom);
 
     // **Advanced features**
@@ -129,9 +140,9 @@ public:
     TextEdit &collaborativeEditing(bool enabled = true);
 
     // **Export and import**
-    TextEdit &supportedFormats(const QStringList& formats);
-    TextEdit &exportFormat(const QString& default_format);
-    TextEdit &importFormat(const QString& default_format);
+    TextEdit &supportedFormats(const QStringList &formats);
+    TextEdit &exportFormat(const QString &default_format);
+    TextEdit &importFormat(const QString &default_format);
 
     void initialize() override;
 
@@ -205,19 +216,5 @@ private:
     std::function<void()> selection_changed_handler_;
     std::function<void()> cursor_position_changed_handler_;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }  // namespace DeclarativeUI::Components

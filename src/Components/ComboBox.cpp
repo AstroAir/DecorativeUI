@@ -38,8 +38,7 @@ ComboBox& ComboBox::maxVisibleItems(int maxItems) {
     return static_cast<ComboBox&>(setProperty("maxVisibleItems", maxItems));
 }
 
-ComboBox& ComboBox::onCurrentIndexChanged(
-    std::function<void(int)> handler) {
+ComboBox& ComboBox::onCurrentIndexChanged(std::function<void(int)> handler) {
     current_index_changed_handler_ = std::move(handler);
     return *this;
 }
@@ -74,11 +73,14 @@ void ComboBox::initialize() {
         const auto& properties = getProperties();
         for (const auto& [name, value] : properties) {
             if (name == "currentIndex") {
-                std::visit([this](const auto& val) {
-                    if constexpr (std::is_same_v<std::decay_t<decltype(val)>, int>) {
-                        combobox_widget_->setCurrentIndex(val);
-                    }
-                }, value);
+                std::visit(
+                    [this](const auto& val) {
+                        if constexpr (std::is_same_v<
+                                          std::decay_t<decltype(val)>, int>) {
+                            combobox_widget_->setCurrentIndex(val);
+                        }
+                    },
+                    value);
             }
         }
 
@@ -154,7 +156,8 @@ void ComboBox::onValidationTimer() {
 void ComboBox::onItemsUpdateTimer() {
     // Enhanced items update handling
     if (dynamic_items_provider_) {
-        QString current_text = combobox_widget_ ? combobox_widget_->currentText() : QString();
+        QString current_text =
+            combobox_widget_ ? combobox_widget_->currentText() : QString();
         updateItems(current_text);
     }
 }
@@ -181,7 +184,8 @@ ComboBox& ComboBox::borderRadius(int radius) {
     return *this;
 }
 
-ComboBox& ComboBox::customColors(const QColor& background, const QColor& text, const QColor& border) {
+ComboBox& ComboBox::customColors(const QColor& background, const QColor& text,
+                                 const QColor& border) {
     background_color_ = background;
     text_color_ = text;
     border_color_ = border;
@@ -232,7 +236,8 @@ ComboBox& ComboBox::loading(bool loading_state) {
     loading_state_ = loading_state;
     if (loading_state) {
         original_placeholder_ = placeholder_text_;
-        placeholder_text_ = loading_text_.isEmpty() ? "Loading..." : loading_text_;
+        placeholder_text_ =
+            loading_text_.isEmpty() ? "Loading..." : loading_text_;
     } else {
         placeholder_text_ = original_placeholder_;
     }
@@ -260,17 +265,20 @@ ComboBox& ComboBox::onDropdownToggle(std::function<void(bool)> toggle_handler) {
     return *this;
 }
 
-ComboBox& ComboBox::onItemHighlighted(std::function<void(int)> highlight_handler) {
+ComboBox& ComboBox::onItemHighlighted(
+    std::function<void(int)> highlight_handler) {
     item_highlighted_handler_ = std::move(highlight_handler);
     return *this;
 }
 
-ComboBox& ComboBox::onValidationChanged(std::function<void(bool, const QString&)> validation_handler) {
+ComboBox& ComboBox::onValidationChanged(
+    std::function<void(bool, const QString&)> validation_handler) {
     validation_handler_ = std::move(validation_handler);
     return *this;
 }
 
-ComboBox& ComboBox::onItemsChanged(std::function<void()> items_changed_handler) {
+ComboBox& ComboBox::onItemsChanged(
+    std::function<void()> items_changed_handler) {
     items_changed_handler_ = std::move(items_changed_handler);
     return *this;
 }
@@ -356,17 +364,21 @@ void ComboBox::updateItems(const QString& filter_text) {
     }
 }
 
-ComboBoxValidationResult ComboBox::validateSelection(const QString& text, int index) const {
+ComboBoxValidationResult ComboBox::validateSelection(const QString& text,
+                                                     int index) const {
     if (required_ && (text.isEmpty() || index < 0)) {
-        return ComboBoxValidationResult(false, "Selection is required", "Please select an option");
+        return ComboBoxValidationResult(false, "Selection is required",
+                                        "Please select an option");
     }
 
     if (!allowed_values_.isEmpty() && !allowed_values_.contains(text)) {
-        return ComboBoxValidationResult(false, "Invalid selection", "Please select from available options");
+        return ComboBoxValidationResult(false, "Invalid selection",
+                                        "Please select from available options");
     }
 
     if (custom_validator_ && !custom_validator_(text)) {
-        return ComboBoxValidationResult(false, "Custom validation failed", "Please check your selection");
+        return ComboBoxValidationResult(false, "Custom validation failed",
+                                        "Please check your selection");
     }
 
     if (validation_func_) {

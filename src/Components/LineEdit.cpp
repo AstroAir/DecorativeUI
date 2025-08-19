@@ -1,45 +1,44 @@
 // Components/LineEdit.cpp
 #include "LineEdit.hpp"
+#include <QDebug>
 #include <QRegularExpression>
 #include <QStringListModel>
-#include <QDebug>
 
 namespace DeclarativeUI::Components {
 
 // **Implementation with enhanced features**
 LineEdit::LineEdit(QObject* parent)
-    : UIElement(parent)
-    , line_edit_widget_(nullptr)
-    , required_(false)
-    , min_length_(0)
-    , validate_email_(false)
-    , validate_url_(false)
-    , validate_numeric_(false)
-    , integers_only_(false)
-    , validate_on_type_(true)
-    , validate_on_focus_(true)
-    , is_valid_(true)
-    , completion_mode_(QCompleter::PopupCompletion)
-    , icon_leading_(true)
-    , clear_button_enabled_(false)
-    , password_toggle_enabled_(false)
-    , border_radius_(4)
-    , padding_(8)
-    , format_phone_(false)
-    , format_currency_(false)
-    , currency_symbol_("$")
-    , format_date_(false)
-    , date_format_("yyyy-MM-dd")
-    , upper_case_(false)
-    , lower_case_(false)
-    , title_case_(false)
-    , select_all_on_focus_(false)
-    , clear_on_escape_(false)
-    , submit_on_enter_(false)
-    , debounce_delay_(0)
-    , undo_redo_enabled_(true)
-    , tab_index_(-1)
-{
+    : UIElement(parent),
+      line_edit_widget_(nullptr),
+      required_(false),
+      min_length_(0),
+      validate_email_(false),
+      validate_url_(false),
+      validate_numeric_(false),
+      integers_only_(false),
+      validate_on_type_(true),
+      validate_on_focus_(true),
+      is_valid_(true),
+      completion_mode_(QCompleter::PopupCompletion),
+      icon_leading_(true),
+      clear_button_enabled_(false),
+      password_toggle_enabled_(false),
+      border_radius_(4),
+      padding_(8),
+      format_phone_(false),
+      format_currency_(false),
+      currency_symbol_("$"),
+      format_date_(false),
+      date_format_("yyyy-MM-dd"),
+      upper_case_(false),
+      lower_case_(false),
+      title_case_(false),
+      select_all_on_focus_(false),
+      clear_on_escape_(false),
+      submit_on_enter_(false),
+      debounce_delay_(0),
+      undo_redo_enabled_(true),
+      tab_index_(-1) {
     // Initialize with default accessibility role
     aria_role_ = "textbox";
 }
@@ -71,14 +70,12 @@ LineEdit& LineEdit::echoMode(QLineEdit::EchoMode mode) {
         setProperty("echoMode", static_cast<int>(mode)));
 }
 
-LineEdit& LineEdit::onTextChanged(
-    std::function<void(const QString&)> handler) {
+LineEdit& LineEdit::onTextChanged(std::function<void(const QString&)> handler) {
     text_changed_handler_ = std::move(handler);
     return *this;
 }
 
-LineEdit& LineEdit::onTextEdited(
-    std::function<void(const QString&)> handler) {
+LineEdit& LineEdit::onTextEdited(std::function<void(const QString&)> handler) {
     text_edited_handler_ = std::move(handler);
     return *this;
 }
@@ -134,7 +131,8 @@ LineEdit& LineEdit::minLength(int min_length) {
     return *this;
 }
 
-LineEdit& LineEdit::pattern(const QString& regex_pattern, const QString& error_message) {
+LineEdit& LineEdit::pattern(const QString& regex_pattern,
+                            const QString& error_message) {
     regex_pattern_ = regex_pattern;
     pattern_error_ = error_message;
     return *this;
@@ -156,7 +154,8 @@ LineEdit& LineEdit::numeric(bool integers_only) {
     return *this;
 }
 
-LineEdit& LineEdit::customValidator(std::function<ValidationResult(const QString&)> validator) {
+LineEdit& LineEdit::customValidator(
+    std::function<ValidationResult(const QString&)> validator) {
     custom_validator_ = std::move(validator);
     return *this;
 }
@@ -187,7 +186,8 @@ LineEdit& LineEdit::suggestions(const QStringList& suggestions) {
     return *this;
 }
 
-LineEdit& LineEdit::dynamicSuggestions(std::function<QStringList(const QString&)> provider) {
+LineEdit& LineEdit::dynamicSuggestions(
+    std::function<QStringList(const QString&)> provider) {
     dynamic_suggestions_ = std::move(provider);
     return *this;
 }
@@ -304,7 +304,8 @@ LineEdit& LineEdit::undoRedo(bool enabled) {
 }
 
 // **Event handlers**
-LineEdit& LineEdit::onValidationChanged(std::function<void(bool, const QString&)> handler) {
+LineEdit& LineEdit::onValidationChanged(
+    std::function<void(bool, const QString&)> handler) {
     validation_handler_ = std::move(handler);
     return *this;
 }
@@ -319,7 +320,8 @@ LineEdit& LineEdit::onFocus(std::function<void(bool)> handler) {
     return *this;
 }
 
-LineEdit& LineEdit::onTextFormatted(std::function<void(const QString&)> handler) {
+LineEdit& LineEdit::onTextFormatted(
+    std::function<void(const QString&)> handler) {
     formatting_handler_ = std::move(handler);
     return *this;
 }
@@ -353,15 +355,17 @@ void LineEdit::initialize() {
 
             // Connect basic signals
             if (text_changed_handler_) {
-                connect(
-                    line_edit_widget_, &QLineEdit::textChanged, this,
-                    [this](const QString& text) { text_changed_handler_(text); });
+                connect(line_edit_widget_, &QLineEdit::textChanged, this,
+                        [this](const QString& text) {
+                            text_changed_handler_(text);
+                        });
             }
 
             if (text_edited_handler_) {
-                connect(
-                    line_edit_widget_, &QLineEdit::textEdited, this,
-                    [this](const QString& text) { text_edited_handler_(text); });
+                connect(line_edit_widget_, &QLineEdit::textEdited, this,
+                        [this](const QString& text) {
+                            text_edited_handler_(text);
+                        });
             }
 
             if (return_pressed_handler_) {
@@ -380,7 +384,8 @@ void LineEdit::initialize() {
             qDebug() << "Enhanced line edit initialized successfully";
 
         } catch (const std::exception& e) {
-            qWarning() << "Failed to initialize enhanced line edit:" << e.what();
+            qWarning() << "Failed to initialize enhanced line edit:"
+                       << e.what();
         }
     }
 }
@@ -406,17 +411,18 @@ QStringList LineEdit::getCurrentSuggestions() const {
     return suggestions_;
 }
 
-bool LineEdit::isValid() const {
-    return is_valid_;
-}
+bool LineEdit::isValid() const { return is_valid_; }
 
 void LineEdit::setupValidation() {
-    if (validate_on_type_ || validate_on_focus_ || custom_validator_ || required_) {
+    if (validate_on_type_ || validate_on_focus_ || custom_validator_ ||
+        required_) {
         validation_timer_ = std::make_unique<QTimer>();
         validation_timer_->setSingleShot(true);
-        validation_timer_->setInterval(300); // Validate 300ms after last change
+        validation_timer_->setInterval(
+            300);  // Validate 300ms after last change
 
-        connect(validation_timer_.get(), &QTimer::timeout, this, &LineEdit::onValidationTimer);
+        connect(validation_timer_.get(), &QTimer::timeout, this,
+                &LineEdit::onValidationTimer);
     }
 }
 
@@ -429,14 +435,16 @@ void LineEdit::setupAutoCompletion() {
 
         if (line_edit_widget_) {
             line_edit_widget_->setCompleter(completer_.get());
-            connect(completer_.get(), QOverload<const QString&>::of(&QCompleter::activated),
-                    this, &LineEdit::onSuggestionActivated);
+            connect(completer_.get(),
+                    QOverload<const QString&>::of(&QCompleter::activated), this,
+                    &LineEdit::onSuggestionActivated);
         }
     }
 }
 
 void LineEdit::setupVisualEffects() {
-    if (!line_edit_widget_) return;
+    if (!line_edit_widget_)
+        return;
 
     // Set up clear button
     if (clear_button_enabled_) {
@@ -447,7 +455,8 @@ void LineEdit::setupVisualEffects() {
     QString style_sheet = line_edit_widget_->styleSheet();
 
     if (border_radius_ > 0) {
-        style_sheet += QString("QLineEdit { border-radius: %1px; }").arg(border_radius_);
+        style_sheet +=
+            QString("QLineEdit { border-radius: %1px; }").arg(border_radius_);
     }
 
     if (padding_ > 0) {
@@ -455,11 +464,13 @@ void LineEdit::setupVisualEffects() {
     }
 
     if (border_color_.isValid()) {
-        style_sheet += QString("QLineEdit { border: 1px solid %1; }").arg(border_color_.name());
+        style_sheet += QString("QLineEdit { border: 1px solid %1; }")
+                           .arg(border_color_.name());
     }
 
     if (focus_color_.isValid()) {
-        style_sheet += QString("QLineEdit:focus { border-color: %1; }").arg(focus_color_.name());
+        style_sheet += QString("QLineEdit:focus { border-color: %1; }")
+                           .arg(focus_color_.name());
     }
 
     if (!style_sheet.isEmpty()) {
@@ -468,17 +479,20 @@ void LineEdit::setupVisualEffects() {
 
     // Set up border animation
     if (focus_color_.isValid()) {
-        border_animation_ = std::make_unique<QPropertyAnimation>(line_edit_widget_, "styleSheet");
+        border_animation_ = std::make_unique<QPropertyAnimation>(
+            line_edit_widget_, "styleSheet");
         border_animation_->setDuration(200);
         border_animation_->setEasingCurve(QEasingCurve::OutCubic);
     }
 }
 
 void LineEdit::setupEventHandlers() {
-    if (!line_edit_widget_) return;
+    if (!line_edit_widget_)
+        return;
 
     // Connect enhanced text change handler
-    connect(line_edit_widget_, &QLineEdit::textChanged, this, &LineEdit::onTextChangedInternal);
+    connect(line_edit_widget_, &QLineEdit::textChanged, this,
+            &LineEdit::onTextChangedInternal);
 
     // Install event filter for focus events
     line_edit_widget_->installEventFilter(this);
@@ -493,15 +507,17 @@ void LineEdit::setupEventHandlers() {
 
 void LineEdit::setupAccessibility() {
     auto* widget = getWidget();
-    if (!widget) return;
+    if (!widget)
+        return;
 
     // Set up accessibility using the existing AccessibilityManager
-    auto accessibility = Core::Accessibility::accessibilityFor()
-                        .name(accessible_name_.isEmpty() ? label_text_ : accessible_name_)
-                        .description(accessible_description_)
-                        .helpText(help_text_.isEmpty() ? tooltip_text_ : help_text_)
-                        .role(Core::Accessibility::AccessibilityRole::TextEdit)
-                        .required(required_);
+    auto accessibility =
+        Core::Accessibility::accessibilityFor()
+            .name(accessible_name_.isEmpty() ? label_text_ : accessible_name_)
+            .description(accessible_description_)
+            .helpText(help_text_.isEmpty() ? tooltip_text_ : help_text_)
+            .role(Core::Accessibility::AccessibilityRole::TextEdit)
+            .required(required_);
 
     if (tab_index_ >= 0) {
         accessibility.tabIndex(tab_index_);
@@ -516,7 +532,8 @@ void LineEdit::setupAccessibility() {
 }
 
 void LineEdit::setupFormatting() {
-    if (!line_edit_widget_) return;
+    if (!line_edit_widget_)
+        return;
 
     // Set input mask if specified
     if (!input_mask_.isEmpty()) {
@@ -537,22 +554,27 @@ ValidationResult LineEdit::validateText(const QString& text) const {
 
     // Check minimum length
     if (min_length_ > 0 && text.length() < min_length_) {
-        return ValidationResult(false, QString("Minimum length is %1 characters").arg(min_length_));
+        return ValidationResult(
+            false, QString("Minimum length is %1 characters").arg(min_length_));
     }
 
     // Check pattern
     if (!regex_pattern_.isEmpty()) {
         QRegularExpression regex(regex_pattern_);
         if (!regex.match(text).hasMatch()) {
-            return ValidationResult(false, pattern_error_.isEmpty() ? "Invalid format" : pattern_error_);
+            return ValidationResult(false, pattern_error_.isEmpty()
+                                               ? "Invalid format"
+                                               : pattern_error_);
         }
     }
 
     // Check email
     if (validate_email_) {
-        QRegularExpression email_regex(R"([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})");
+        QRegularExpression email_regex(
+            R"([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})");
         if (!email_regex.match(text).hasMatch()) {
-            return ValidationResult(false, "Please enter a valid email address");
+            return ValidationResult(false,
+                                    "Please enter a valid email address");
         }
     }
 
@@ -617,7 +639,8 @@ void LineEdit::updateSuggestions(const QString& text) {
         suggestions_ = dynamic_suggestions_(text);
 
         if (completer_) {
-            completer_->setModel(new QStringListModel(suggestions_, completer_.get()));
+            completer_->setModel(
+                new QStringListModel(suggestions_, completer_.get()));
         }
     }
 }
@@ -643,9 +666,9 @@ QString LineEdit::applyFormatting(const QString& text) const {
         digits.remove(QRegularExpression("[^0-9]"));
         if (digits.length() >= 10) {
             formatted = QString("(%1) %2-%3")
-                       .arg(digits.mid(0, 3))
-                       .arg(digits.mid(3, 3))
-                       .arg(digits.mid(6, 4));
+                            .arg(digits.mid(0, 3))
+                            .arg(digits.mid(3, 3))
+                            .arg(digits.mid(6, 4));
         }
     }
 
@@ -653,7 +676,8 @@ QString LineEdit::applyFormatting(const QString& text) const {
         bool ok;
         double value = formatted.toDouble(&ok);
         if (ok) {
-            formatted = QString("%1%2").arg(currency_symbol_).arg(value, 0, 'f', 2);
+            formatted =
+                QString("%1%2").arg(currency_symbol_).arg(value, 0, 'f', 2);
         }
     }
 
@@ -668,7 +692,8 @@ void LineEdit::animateBorder(const QColor& color) {
         // Update border color in stylesheet
         QRegularExpression border_regex("border-color:\\s*[^;]+;");
         if (border_regex.match(target_style).hasMatch()) {
-            target_style.replace(border_regex, QString("border-color: %1;").arg(color.name()));
+            target_style.replace(
+                border_regex, QString("border-color: %1;").arg(color.name()));
         } else {
             target_style += QString("border-color: %1;").arg(color.name());
         }

@@ -1,12 +1,12 @@
 // Components/ProgressBar.hpp
 #pragma once
+#include <QGraphicsDropShadowEffect>
+#include <QLabel>
 #include <QProgressBar>
 #include <QPropertyAnimation>
-#include <QGraphicsDropShadowEffect>
 #include <QTimer>
-#include <QLabel>
-#include <memory>
 #include <functional>
+#include <memory>
 
 #include "../Core/UIElement.hpp"
 
@@ -46,14 +46,18 @@ public:
     ProgressBar& accessibleDescription(const QString& description);
 
     // **Visual enhancements**
-    ProgressBar& dropShadow(bool enabled = true, const QColor& color = QColor(0, 0, 0, 80));
+    ProgressBar& dropShadow(bool enabled = true,
+                            const QColor& color = QColor(0, 0, 0, 80));
     ProgressBar& animation(bool enabled = true);
     ProgressBar& smoothProgress(bool enabled = true);
     ProgressBar& borderRadius(int radius);
-    ProgressBar& customColors(const QColor& fill, const QColor& background = QColor(), const QColor& text = QColor());
+    ProgressBar& customColors(const QColor& fill,
+                              const QColor& background = QColor(),
+                              const QColor& text = QColor());
     ProgressBar& gradient(const QColor& start, const QColor& end);
     ProgressBar& stripes(bool enabled = true, bool animated = true);
-    ProgressBar& glow(bool enabled = true, const QColor& color = QColor(255, 255, 255, 100));
+    ProgressBar& glow(bool enabled = true,
+                      const QColor& color = QColor(255, 255, 255, 100));
 
     // **State management**
     ProgressBar& state(ProgressState progress_state);
@@ -74,7 +78,8 @@ public:
     // **Advanced features**
     ProgressBar& segments(int segment_count);
     ProgressBar& segmentSpacing(int spacing);
-    ProgressBar& multiProgress(const QList<int>& values, const QList<QColor>& colors = {});
+    ProgressBar& multiProgress(const QList<int>& values,
+                               const QList<QColor>& colors = {});
     ProgressBar& threshold(int value, const QColor& color = QColor(255, 0, 0));
     ProgressBar& milestones(const QList<int>& milestone_values);
 
@@ -106,7 +111,5 @@ public:
 private:
     QProgressBar* progress_bar_widget_;
 };
-
-
 
 }  // namespace DeclarativeUI::Components

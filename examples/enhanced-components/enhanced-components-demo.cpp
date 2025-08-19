@@ -2,7 +2,8 @@
  * @file enhanced-components-demo.cpp
  * @brief Comprehensive demonstration of enhanced DeclarativeUI components
  *
- * This example showcases the advanced features of enhanced components including:
+ * This example showcases the advanced features of enhanced components
+ * including:
  * - Accessibility support
  * - Validation systems
  * - Visual enhancements
@@ -11,25 +12,25 @@
  */
 
 #include <QApplication>
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QDebug>
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QDebug>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <memory>
 
 // Enhanced Components
 #include "../../src/Components/Button.hpp"
-#include "../../src/Components/LineEdit.hpp"
 #include "../../src/Components/CheckBox.hpp"
 #include "../../src/Components/ComboBox.hpp"
-#include "../../src/Components/Slider.hpp"
+#include "../../src/Components/Frame.hpp"
+#include "../../src/Components/GroupBox.hpp"
+#include "../../src/Components/LineEdit.hpp"
 #include "../../src/Components/ProgressBar.hpp"
 #include "../../src/Components/RadioButton.hpp"
-#include "../../src/Components/GroupBox.hpp"
-#include "../../src/Components/Frame.hpp"
+#include "../../src/Components/Slider.hpp"
 
 using namespace DeclarativeUI::Components;
 
@@ -59,18 +60,24 @@ private slots:
         }
 
         // Update submit button state
-        submitButton_->disabled(!allValid, allValid ? "" : "Please fix validation errors");
+        submitButton_->disabled(!allValid,
+                                allValid ? "" : "Please fix validation errors");
 
         // Update progress
         int progress = 0;
-        if (emailEdit_->isValid()) progress += 25;
-        if (!nameEdit_->getText().isEmpty()) progress += 25;
-        if (termsCheckbox_->isValid()) progress += 25;
-        if (ageSlider_->getValue() > 0) progress += 25;
+        if (emailEdit_->isValid())
+            progress += 25;
+        if (!nameEdit_->getText().isEmpty())
+            progress += 25;
+        if (termsCheckbox_->isValid())
+            progress += 25;
+        if (ageSlider_->getValue() > 0)
+            progress += 25;
 
         formProgress_->setValue(progress);
 
-        qDebug() << "Form validation changed. Valid:" << allValid << "Progress:" << progress;
+        qDebug() << "Form validation changed. Valid:" << allValid
+                 << "Progress:" << progress;
     }
 
 private:
@@ -126,7 +133,8 @@ private:
         // Enhanced ComboBox
         layout->addWidget(new QLabel("Country:"), 1, 0);
         countryCombo_ = std::make_unique<ComboBox>();
-        countryCombo_->items({"United States", "Canada", "United Kingdom", "Australia", "Germany", "France"});
+        countryCombo_->items({"United States", "Canada", "United Kingdom",
+                              "Australia", "Germany", "France"});
         countryCombo_->initialize();
         layout->addWidget(countryCombo_->getWidget(), 1, 1);
 
@@ -212,7 +220,7 @@ private:
     std::unique_ptr<Button> resetButton_;
 };
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
     // Set application properties
