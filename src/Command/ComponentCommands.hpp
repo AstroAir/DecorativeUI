@@ -586,6 +586,9 @@ private:
 /**
  * @class MenuBarCommand
  * @brief Specialized command for MenuBar components.
+ *
+ * Refactored to improve maintainability by breaking down complex execute method
+ * into smaller, focused operation handlers with reduced cyclomatic complexity.
  */
 class MenuBarCommand : public DeclarativeUI::Command::ICommand {
     Q_OBJECT
@@ -596,12 +599,24 @@ public:
     CommandMetadata getMetadata() const override;
 
 private:
+    // Widget finder method
     QMenuBar* findMenuBar(const QString& name);
+
+    // Parameter validation helper
+    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleAddMenu(const CommandContext& context, QMenuBar* menuBar);
+    CommandResult<QVariant> handleRemoveMenu(const CommandContext& context, QMenuBar* menuBar);
+    CommandResult<QVariant> handleSetNativeMenuBar(const CommandContext& context, QMenuBar* menuBar);
 };
 
 /**
  * @class StatusBarCommand
  * @brief Specialized command for StatusBar components.
+ *
+ * Refactored to improve maintainability by breaking down complex execute method
+ * into smaller, focused operation handlers with reduced cyclomatic complexity.
  */
 class StatusBarCommand : public DeclarativeUI::Command::ICommand {
     Q_OBJECT
@@ -612,7 +627,18 @@ public:
     CommandMetadata getMetadata() const override;
 
 private:
+    // Widget finder methods
     QStatusBar* findStatusBar(const QString& name);
+    QWidget* findWidgetByName(const QString& name, QWidget* parent = nullptr);
+
+    // Parameter validation helper
+    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleShowMessage(const CommandContext& context, QStatusBar* statusBar);
+    CommandResult<QVariant> handleClearMessage(const CommandContext& context, QStatusBar* statusBar);
+    CommandResult<QVariant> handleAddWidget(const CommandContext& context, QStatusBar* statusBar);
+    CommandResult<QVariant> handleRemoveWidget(const CommandContext& context, QStatusBar* statusBar);
 };
 
 /**
