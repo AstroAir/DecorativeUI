@@ -20,13 +20,15 @@ CommandResult<QVariant> ToolBarCommand::execute(const CommandContext& context) {
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
-    if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
+    // Validate required parameters
+    auto validationResult = validateRequiredParameters(context, {"widget"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
     }
 
     auto* toolBar = findToolBar(widget_name);
     if (!toolBar) {
-        return CommandResult<QVariant>(QString("ToolBar '%1' not found").arg(widget_name));
+        return createWidgetNotFoundError("ToolBar", widget_name);
     }
 
     widget_name_ = widget_name;
@@ -93,14 +95,7 @@ CommandMetadata ToolBarCommand::getMetadata() const {
 }
 
 QToolBar* ToolBarCommand::findToolBar(const QString& name) {
-    for (auto* widget : QApplication::allWidgets()) {
-        if (auto* toolBar = qobject_cast<QToolBar*>(widget)) {
-            if (toolBar->objectName() == name) {
-                return toolBar;
-            }
-        }
-    }
-    return nullptr;
+    return findWidget<QToolBar>(name);
 }
 
 // ============================================================================
@@ -114,13 +109,15 @@ CommandResult<QVariant> ToolButtonCommand::execute(const CommandContext& context
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
-    if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
+    // Validate required parameters
+    auto validationResult = validateRequiredParameters(context, {"widget"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
     }
 
     auto* toolButton = findToolButton(widget_name);
     if (!toolButton) {
-        return CommandResult<QVariant>(QString("ToolButton '%1' not found").arg(widget_name));
+        return createWidgetNotFoundError("ToolButton", widget_name);
     }
 
     widget_name_ = widget_name;
@@ -173,14 +170,7 @@ CommandMetadata ToolButtonCommand::getMetadata() const {
 }
 
 QToolButton* ToolButtonCommand::findToolButton(const QString& name) {
-    for (auto* widget : QApplication::allWidgets()) {
-        if (auto* toolButton = qobject_cast<QToolButton*>(widget)) {
-            if (toolButton->objectName() == name) {
-                return toolButton;
-            }
-        }
-    }
-    return nullptr;
+    return findWidget<QToolButton>(name);
 }
 
 }  // namespace ComponentCommands
