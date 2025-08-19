@@ -16,44 +16,32 @@ SplitterCommand::SplitterCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
 CommandResult<QVariant> SplitterCommand::execute(const CommandContext& context) {
+    // Validate required parameters
+    auto validationResult = validateRequiredParameters(context, {"widget"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
-    if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
-    }
-
     auto* splitter = findSplitter(widget_name);
     if (!splitter) {
-        return CommandResult<QVariant>(QString("Splitter '%1' not found").arg(widget_name));
+        return createWidgetNotFoundError("Splitter", widget_name);
     }
 
+    // Store state for undo functionality
     widget_name_ = widget_name;
     old_sizes_ = splitter->sizes();
     operation_ = operation;
 
+    // Route to appropriate operation handler
     if (operation == "setSizes" || operation.isEmpty()) {
-        auto sizes = context.getParameter<QList<int>>("sizes");
-        if (context.hasParameter("sizes")) {
-            new_sizes_ = sizes;
-            splitter->setSizes(sizes);
-            return CommandResult<QVariant>(QString("Splitter sizes set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing sizes parameter for setSizes operation"));
+        return handleSetSizes(context, splitter);
     } else if (operation == "setOrientation") {
-        auto orientation = context.getParameter<int>("orientation");
-        if (context.hasParameter("orientation")) {
-            splitter->setOrientation(static_cast<Qt::Orientation>(orientation));
-            return CommandResult<QVariant>(QString("Splitter orientation set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing orientation parameter for setOrientation operation"));
+        return handleSetOrientation(context, splitter);
     } else if (operation == "setChildrenCollapsible") {
-        auto collapsible = context.getParameter<bool>("collapsible");
-        if (context.hasParameter("collapsible")) {
-            splitter->setChildrenCollapsible(collapsible);
-            return CommandResult<QVariant>(QString("Splitter children collapsible set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing collapsible parameter for setChildrenCollapsible operation"));
+        return handleSetChildrenCollapsible(context, splitter);
     }
 
     return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
@@ -80,14 +68,38 @@ CommandMetadata SplitterCommand::getMetadata() const {
 }
 
 QSplitter* SplitterCommand::findSplitter(const QString& name) {
-    for (auto* widget : QApplication::allWidgets()) {
-        if (auto* splitter = qobject_cast<QSplitter*>(widget)) {
-            if (splitter->objectName() == name) {
-                return splitter;
-            }
-        }
+    return findWidget<QSplitter>(name);
+}
+
+CommandResult<QVariant> SplitterCommand::handleSetSizes(const CommandContext& context, QSplitter* widget) {
+    if (!context.hasParameter("sizes")) {
+        return CommandResult<QVariant>(QString("Missing sizes parameter for setSizes operation"));
     }
-    return nullptr;
+
+    auto sizes = context.getParameter<QList<int>>("sizes");
+    new_sizes_ = sizes;
+    widget->setSizes(sizes);
+    return createSuccessResult("Splitter", "sizes set");
+}
+
+CommandResult<QVariant> SplitterCommand::handleSetOrientation(const CommandContext& context, QSplitter* widget) {
+    if (!context.hasParameter("orientation")) {
+        return CommandResult<QVariant>(QString("Missing orientation parameter for setOrientation operation"));
+    }
+
+    auto orientation = context.getParameter<int>("orientation");
+    widget->setOrientation(static_cast<Qt::Orientation>(orientation));
+    return createSuccessResult("Splitter", "orientation set");
+}
+
+CommandResult<QVariant> SplitterCommand::handleSetChildrenCollapsible(const CommandContext& context, QSplitter* widget) {
+    if (!context.hasParameter("collapsible")) {
+        return CommandResult<QVariant>(QString("Missing collapsible parameter for setChildrenCollapsible operation"));
+    }
+
+    auto collapsible = context.getParameter<bool>("collapsible");
+    widget->setChildrenCollapsible(collapsible);
+    return createSuccessResult("Splitter", "children collapsible set");
 }
 
 // ============================================================================
@@ -98,43 +110,32 @@ DockWidgetCommand::DockWidgetCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
 CommandResult<QVariant> DockWidgetCommand::execute(const CommandContext& context) {
+    // Validate required parameters
+    auto validationResult = validateRequiredParameters(context, {"widget"});
+    if (!validationResult.isSuccess()) {
+        return validationResult;
+    }
+
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
-    if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
-    }
-
     auto* dockWidget = findDockWidget(widget_name);
     if (!dockWidget) {
-        return CommandResult<QVariant>(QString("DockWidget '%1' not found").arg(widget_name));
+        return createWidgetNotFoundError("DockWidget", widget_name);
     }
 
+    // Store state for undo functionality
     widget_name_ = widget_name;
     old_floating_ = dockWidget->isFloating();
     operation_ = operation;
 
+    // Route to appropriate operation handler
     if (operation == "setFloating" || operation.isEmpty()) {
-        auto floating = context.getParameter<bool>("floating");
-        if (context.hasParameter("floating")) {
-            dockWidget->setFloating(floating);
-            return CommandResult<QVariant>(QString("DockWidget floating state set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing floating parameter for setFloating operation"));
+        return handleSetFloating(context, dockWidget);
     } else if (operation == "setAllowedAreas") {
-        auto areas = context.getParameter<int>("areas");
-        if (context.hasParameter("areas")) {
-            dockWidget->setAllowedAreas(static_cast<Qt::DockWidgetAreas>(areas));
-            return CommandResult<QVariant>(QString("DockWidget allowed areas set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing areas parameter for setAllowedAreas operation"));
+        return handleSetAllowedAreas(context, dockWidget);
     } else if (operation == "setFeatures") {
-        auto features = context.getParameter<int>("features");
-        if (context.hasParameter("features")) {
-            dockWidget->setFeatures(static_cast<QDockWidget::DockWidgetFeatures>(features));
-            return CommandResult<QVariant>(QString("DockWidget features set successfully"));
-        }
-        return CommandResult<QVariant>(QString("Missing features parameter for setFeatures operation"));
+        return handleSetFeatures(context, dockWidget);
     }
 
     return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
@@ -161,14 +162,37 @@ CommandMetadata DockWidgetCommand::getMetadata() const {
 }
 
 QDockWidget* DockWidgetCommand::findDockWidget(const QString& name) {
-    for (auto* widget : QApplication::allWidgets()) {
-        if (auto* dockWidget = qobject_cast<QDockWidget*>(widget)) {
-            if (dockWidget->objectName() == name) {
-                return dockWidget;
-            }
-        }
+    return findWidget<QDockWidget>(name);
+}
+
+CommandResult<QVariant> DockWidgetCommand::handleSetFloating(const CommandContext& context, QDockWidget* widget) {
+    if (!context.hasParameter("floating")) {
+        return CommandResult<QVariant>(QString("Missing floating parameter for setFloating operation"));
     }
-    return nullptr;
+
+    auto floating = context.getParameter<bool>("floating");
+    widget->setFloating(floating);
+    return createSuccessResult("DockWidget", "floating state set");
+}
+
+CommandResult<QVariant> DockWidgetCommand::handleSetAllowedAreas(const CommandContext& context, QDockWidget* widget) {
+    if (!context.hasParameter("areas")) {
+        return CommandResult<QVariant>(QString("Missing areas parameter for setAllowedAreas operation"));
+    }
+
+    auto areas = context.getParameter<int>("areas");
+    widget->setAllowedAreas(static_cast<Qt::DockWidgetAreas>(areas));
+    return createSuccessResult("DockWidget", "allowed areas set");
+}
+
+CommandResult<QVariant> DockWidgetCommand::handleSetFeatures(const CommandContext& context, QDockWidget* widget) {
+    if (!context.hasParameter("features")) {
+        return CommandResult<QVariant>(QString("Missing features parameter for setFeatures operation"));
+    }
+
+    auto features = context.getParameter<int>("features");
+    widget->setFeatures(static_cast<QDockWidget::DockWidgetFeatures>(features));
+    return createSuccessResult("DockWidget", "features set");
 }
 
 }  // namespace ComponentCommands

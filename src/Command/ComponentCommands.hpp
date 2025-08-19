@@ -695,6 +695,12 @@ public:
 
 private:
     QSplitter* findSplitter(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetSizes(const CommandContext& context, QSplitter* widget);
+    CommandResult<QVariant> handleSetOrientation(const CommandContext& context, QSplitter* widget);
+    CommandResult<QVariant> handleSetChildrenCollapsible(const CommandContext& context, QSplitter* widget);
+
     QString widget_name_;
     QList<int> old_sizes_;
     QList<int> new_sizes_;
@@ -717,6 +723,12 @@ public:
 
 private:
     QDockWidget* findDockWidget(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetFloating(const CommandContext& context, QDockWidget* widget);
+    CommandResult<QVariant> handleSetAllowedAreas(const CommandContext& context, QDockWidget* widget);
+    CommandResult<QVariant> handleSetFeatures(const CommandContext& context, QDockWidget* widget);
+
     QString widget_name_;
     bool old_floating_;
     QString operation_;
