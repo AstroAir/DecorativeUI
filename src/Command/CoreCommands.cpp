@@ -1,9 +1,9 @@
 #include "CoreCommands.hpp"
 #include <QDebug>
+#include <QGridLayout>
+#include <QHBoxLayout>
 #include <QIcon>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGridLayout>
 
 namespace DeclarativeUI::Command::UI {
 
@@ -16,19 +16,18 @@ ButtonCommand::ButtonCommand(QObject* parent) : BaseUICommand(parent) {
     getState()->setProperty("checked", false);
     getState()->setProperty("icon", QString());
     getState()->setProperty("toolTip", QString());
-    
+
     qDebug() << "🔘 ButtonCommand created";
 }
 
 UICommandMetadata ButtonCommand::getMetadata() const {
-    UICommandMetadata metadata("Button", "QPushButton", "Button", "A clickable button control");
+    UICommandMetadata metadata("Button", "QPushButton", "Button",
+                               "A clickable button control");
     metadata.supported_events = {"clicked", "toggled"};
-    metadata.default_properties = {
-        {"text", "Button"},
-        {"enabled", true},
-        {"checkable", false},
-        {"checked", false}
-    };
+    metadata.default_properties = {{"text", "Button"},
+                                   {"enabled", true},
+                                   {"checkable", false},
+                                   {"checked", false}};
     return metadata;
 }
 
@@ -98,14 +97,14 @@ ButtonCommand& ButtonCommand::onToggled(std::function<void(bool)> handler) {
 
 void ButtonCommand::onWidgetCreated(QWidget* widget) {
     BaseUICommand::onWidgetCreated(widget);
-    
+
     if (auto* button = qobject_cast<QPushButton*>(widget)) {
         // Connect button signals to command events
         connect(button, &QPushButton::clicked, this, [this]() {
             emit clicked();
             handleEvent("clicked");
         });
-        
+
         connect(button, &QPushButton::toggled, this, [this](bool checked) {
             getState()->setProperty("checked", checked);
             emit toggled(checked);
@@ -116,14 +115,14 @@ void ButtonCommand::onWidgetCreated(QWidget* widget) {
 
 void ButtonCommand::syncToWidget() {
     BaseUICommand::syncToWidget();
-    
+
     if (auto* button = qobject_cast<QPushButton*>(getWidget())) {
         button->setText(getText());
         button->setEnabled(isEnabled());
         button->setCheckable(isCheckable());
         button->setChecked(isChecked());
         button->setToolTip(getToolTip());
-        
+
         QString iconPath = getIcon();
         if (!iconPath.isEmpty()) {
             button->setIcon(QIcon(iconPath));
@@ -141,13 +140,14 @@ void ButtonCommand::syncFromWidget() {
     }
 }
 
-void ButtonCommand::handleEvent(const QString& eventType, const QVariant& eventData) {
+void ButtonCommand::handleEvent(const QString& eventType,
+                                const QVariant& eventData) {
     if (eventType == "clicked" && click_handler_) {
         click_handler_();
     } else if (eventType == "toggled" && toggle_handler_) {
         toggle_handler_(eventData.toBool());
     }
-    
+
     BaseUICommand::handleEvent(eventType, eventData);
 }
 
@@ -155,20 +155,21 @@ void ButtonCommand::handleEvent(const QString& eventType, const QVariant& eventD
 LabelCommand::LabelCommand(QObject* parent) : BaseUICommand(parent) {
     // Set up default properties
     getState()->setProperty("text", QString("Label"));
-    getState()->setProperty("alignment", static_cast<int>(Qt::AlignLeft | Qt::AlignVCenter));
+    getState()->setProperty("alignment",
+                            static_cast<int>(Qt::AlignLeft | Qt::AlignVCenter));
     getState()->setProperty("wordWrap", false);
     getState()->setProperty("pixmap", QString());
-    
+
     qDebug() << "🏷️ LabelCommand created";
 }
 
 UICommandMetadata LabelCommand::getMetadata() const {
-    UICommandMetadata metadata("Label", "QLabel", "Label", "A text or image display control");
+    UICommandMetadata metadata("Label", "QLabel", "Label",
+                               "A text or image display control");
     metadata.default_properties = {
         {"text", "Label"},
         {"alignment", static_cast<int>(Qt::AlignLeft | Qt::AlignVCenter)},
-        {"wordWrap", false}
-    };
+        {"wordWrap", false}};
     return metadata;
 }
 
@@ -187,7 +188,8 @@ LabelCommand& LabelCommand::setAlignment(int alignment) {
 }
 
 int LabelCommand::getAlignment() const {
-    return getState()->getProperty<int>("alignment", static_cast<int>(Qt::AlignLeft | Qt::AlignVCenter));
+    return getState()->getProperty<int>(
+        "alignment", static_cast<int>(Qt::AlignLeft | Qt::AlignVCenter));
 }
 
 LabelCommand& LabelCommand::setWordWrap(bool wrap) {
@@ -215,12 +217,12 @@ void LabelCommand::onWidgetCreated(QWidget* widget) {
 
 void LabelCommand::syncToWidget() {
     BaseUICommand::syncToWidget();
-    
+
     if (auto* label = qobject_cast<QLabel*>(getWidget())) {
         label->setText(getText());
         label->setAlignment(static_cast<Qt::Alignment>(getAlignment()));
         label->setWordWrap(getWordWrap());
-        
+
         QString pixmapPath = getPixmap();
         if (!pixmapPath.isEmpty()) {
             label->setPixmap(QPixmap(pixmapPath));
@@ -236,19 +238,19 @@ TextInputCommand::TextInputCommand(QObject* parent) : BaseUICommand(parent) {
     getState()->setProperty("readOnly", false);
     getState()->setProperty("maxLength", 32767);
     getState()->setProperty("echoMode", static_cast<int>(QLineEdit::Normal));
-    
+
     qDebug() << "📝 TextInputCommand created";
 }
 
 UICommandMetadata TextInputCommand::getMetadata() const {
-    UICommandMetadata metadata("TextInput", "QLineEdit", "Text Input", "A single-line text input control");
-    metadata.supported_events = {"textChanged", "returnPressed", "editingFinished"};
-    metadata.default_properties = {
-        {"text", ""},
-        {"placeholder", ""},
-        {"readOnly", false},
-        {"maxLength", 32767}
-    };
+    UICommandMetadata metadata("TextInput", "QLineEdit", "Text Input",
+                               "A single-line text input control");
+    metadata.supported_events = {"textChanged", "returnPressed",
+                                 "editingFinished"};
+    metadata.default_properties = {{"text", ""},
+                                   {"placeholder", ""},
+                                   {"readOnly", false},
+                                   {"maxLength", 32767}};
     return metadata;
 }
 
@@ -294,40 +296,45 @@ TextInputCommand& TextInputCommand::setEchoMode(int mode) {
 }
 
 int TextInputCommand::getEchoMode() const {
-    return getState()->getProperty<int>("echoMode", static_cast<int>(QLineEdit::Normal));
+    return getState()->getProperty<int>("echoMode",
+                                        static_cast<int>(QLineEdit::Normal));
 }
 
-TextInputCommand& TextInputCommand::onTextChanged(std::function<void(const QString&)> handler) {
+TextInputCommand& TextInputCommand::onTextChanged(
+    std::function<void(const QString&)> handler) {
     text_changed_handler_ = handler;
     return *this;
 }
 
-TextInputCommand& TextInputCommand::onReturnPressed(std::function<void()> handler) {
+TextInputCommand& TextInputCommand::onReturnPressed(
+    std::function<void()> handler) {
     return_pressed_handler_ = handler;
     return *this;
 }
 
-TextInputCommand& TextInputCommand::onEditingFinished(std::function<void()> handler) {
+TextInputCommand& TextInputCommand::onEditingFinished(
+    std::function<void()> handler) {
     editing_finished_handler_ = handler;
     return *this;
 }
 
 void TextInputCommand::onWidgetCreated(QWidget* widget) {
     BaseUICommand::onWidgetCreated(widget);
-    
+
     if (auto* lineEdit = qobject_cast<QLineEdit*>(widget)) {
         // Connect line edit signals to command events
-        connect(lineEdit, &QLineEdit::textChanged, this, [this](const QString& text) {
-            getState()->setProperty("text", text);
-            emit textChanged(text);
-            handleEvent("textChanged", text);
-        });
-        
+        connect(lineEdit, &QLineEdit::textChanged, this,
+                [this](const QString& text) {
+                    getState()->setProperty("text", text);
+                    emit textChanged(text);
+                    handleEvent("textChanged", text);
+                });
+
         connect(lineEdit, &QLineEdit::returnPressed, this, [this]() {
             emit returnPressed();
             handleEvent("returnPressed");
         });
-        
+
         connect(lineEdit, &QLineEdit::editingFinished, this, [this]() {
             emit editingFinished();
             handleEvent("editingFinished");
@@ -337,7 +344,7 @@ void TextInputCommand::onWidgetCreated(QWidget* widget) {
 
 void TextInputCommand::syncToWidget() {
     BaseUICommand::syncToWidget();
-    
+
     if (auto* lineEdit = qobject_cast<QLineEdit*>(getWidget())) {
         lineEdit->setText(getText());
         lineEdit->setPlaceholderText(getPlaceholder());
@@ -353,11 +360,13 @@ void TextInputCommand::syncFromWidget() {
         getState()->setProperty("placeholder", lineEdit->placeholderText());
         getState()->setProperty("readOnly", lineEdit->isReadOnly());
         getState()->setProperty("maxLength", lineEdit->maxLength());
-        getState()->setProperty("echoMode", static_cast<int>(lineEdit->echoMode()));
+        getState()->setProperty("echoMode",
+                                static_cast<int>(lineEdit->echoMode()));
     }
 }
 
-void TextInputCommand::handleEvent(const QString& eventType, const QVariant& eventData) {
+void TextInputCommand::handleEvent(const QString& eventType,
+                                   const QVariant& eventData) {
     if (eventType == "textChanged" && text_changed_handler_) {
         text_changed_handler_(eventData.toString());
     } else if (eventType == "returnPressed" && return_pressed_handler_) {
@@ -365,7 +374,7 @@ void TextInputCommand::handleEvent(const QString& eventType, const QVariant& eve
     } else if (eventType == "editingFinished" && editing_finished_handler_) {
         editing_finished_handler_();
     }
-    
+
     BaseUICommand::handleEvent(eventType, eventData);
 }
 
@@ -383,14 +392,13 @@ MenuItemCommand::MenuItemCommand(QObject* parent) : BaseUICommand(parent) {
 }
 
 UICommandMetadata MenuItemCommand::getMetadata() const {
-    UICommandMetadata metadata("MenuItem", "QAction", "Menu Item", "A menu item or action control");
+    UICommandMetadata metadata("MenuItem", "QAction", "Menu Item",
+                               "A menu item or action control");
     metadata.supported_events = {"triggered", "toggled"};
-    metadata.default_properties = {
-        {"text", "Menu Item"},
-        {"checkable", false},
-        {"checked", false},
-        {"separator", false}
-    };
+    metadata.default_properties = {{"text", "Menu Item"},
+                                   {"checkable", false},
+                                   {"checked", false},
+                                   {"separator", false}};
     return metadata;
 }
 
@@ -502,9 +510,7 @@ void MenuItemCommand::syncFromWidget() {
     }
 }
 
-QAction* MenuItemCommand::getAction() const {
-    return action_;
-}
+QAction* MenuItemCommand::getAction() const { return action_; }
 
 void MenuItemCommand::setAction(QAction* action) {
     if (action_ != action) {
@@ -516,7 +522,8 @@ void MenuItemCommand::setAction(QAction* action) {
     }
 }
 
-void MenuItemCommand::handleEvent(const QString& eventType, const QVariant& eventData) {
+void MenuItemCommand::handleEvent(const QString& eventType,
+                                  const QVariant& eventData) {
     if (eventType == "triggered" && triggered_handler_) {
         triggered_handler_();
     } else if (eventType == "toggled" && toggled_handler_) {
@@ -540,15 +547,11 @@ ContainerCommand::ContainerCommand(QObject* parent) : BaseUICommand(parent) {
 }
 
 UICommandMetadata ContainerCommand::getMetadata() const {
-    UICommandMetadata metadata("Container", "QWidget", "Container", "A container widget that holds other controls");
-    metadata.default_properties = {
-        {"layout", "VBox"},
-        {"spacing", 6},
-        {"marginLeft", 9},
-        {"marginTop", 9},
-        {"marginRight", 9},
-        {"marginBottom", 9}
-    };
+    UICommandMetadata metadata("Container", "QWidget", "Container",
+                               "A container widget that holds other controls");
+    metadata.default_properties = {{"layout", "VBox"}, {"spacing", 6},
+                                   {"marginLeft", 9},  {"marginTop", 9},
+                                   {"marginRight", 9}, {"marginBottom", 9}};
     return metadata;
 }
 
@@ -570,7 +573,8 @@ int ContainerCommand::getSpacing() const {
     return getState()->getProperty<int>("spacing", 6);
 }
 
-ContainerCommand& ContainerCommand::setMargins(int left, int top, int right, int bottom) {
+ContainerCommand& ContainerCommand::setMargins(int left, int top, int right,
+                                               int bottom) {
     getState()->setProperty("marginLeft", left);
     getState()->setProperty("marginTop", top);
     getState()->setProperty("marginRight", right);
@@ -582,13 +586,15 @@ ContainerCommand& ContainerCommand::setMargins(int margin) {
     return setMargins(margin, margin, margin, margin);
 }
 
-ContainerCommand& ContainerCommand::addChild(std::shared_ptr<BaseUICommand> child) {
+ContainerCommand& ContainerCommand::addChild(
+    std::shared_ptr<BaseUICommand> child) {
     BaseUICommand::addChild(child);
     addChildWidget(child);
     return *this;
 }
 
-ContainerCommand& ContainerCommand::removeChild(std::shared_ptr<BaseUICommand> child) {
+ContainerCommand& ContainerCommand::removeChild(
+    std::shared_ptr<BaseUICommand> child) {
     removeChildWidget(child);
     BaseUICommand::removeChild(child);
     return *this;
@@ -632,8 +638,7 @@ void ContainerCommand::setupLayout() {
             getState()->getProperty<int>("marginLeft", 9),
             getState()->getProperty<int>("marginTop", 9),
             getState()->getProperty<int>("marginRight", 9),
-            getState()->getProperty<int>("marginBottom", 9)
-        );
+            getState()->getProperty<int>("marginBottom", 9));
 
         widget->setLayout(layout);
     }
@@ -693,9 +698,13 @@ void registerCoreCommands() {
     mapper.registerMapping<QWidget>("Container");
 
     // MenuItemCommand requires special handling since it uses QAction
-    factory.registerCommand("MenuItem", []() -> std::shared_ptr<BaseUICommand> {
-        return std::make_shared<MenuItemCommand>();
-    }, UICommandMetadata("MenuItem", "QAction", "Menu Item", "A menu item or action control"));
+    factory.registerCommand(
+        "MenuItem",
+        []() -> std::shared_ptr<BaseUICommand> {
+            return std::make_shared<MenuItemCommand>();
+        },
+        UICommandMetadata("MenuItem", "QAction", "Menu Item",
+                          "A menu item or action control"));
 
     qDebug() << "✅ Core UI commands registered successfully";
 }

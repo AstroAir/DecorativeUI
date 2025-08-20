@@ -20,7 +20,7 @@ namespace DeclarativeUI::Animation {
         Q_OBJECT
     public:
         static AnimationEngine& instance();
-        
+
         // Animation creation methods...
     };
 }
@@ -33,42 +33,48 @@ namespace DeclarativeUI::Animation {
 ```cpp
 std::shared_ptr<Animation> createAnimation();
 ```
+
 Creates a new animation instance with object pooling optimization.
 
 ```cpp
 std::shared_ptr<AnimationGroup> createAnimationGroup(AnimationGroup::GroupType type);
 ```
+
 Creates an animation group for sequential or parallel animation coordination.
 
 #### Convenience Animation Methods
 
 ```cpp
 std::shared_ptr<Animation> animateProperty(
-    QObject* object, 
+    QObject* object,
     const QString& property,
-    const QVariant& start_value, 
+    const QVariant& start_value,
     const QVariant& end_value,
-    int duration_ms = 1000, 
+    int duration_ms = 1000,
     EasingType easing = EasingType::Linear
 );
 ```
+
 Animates a property of any QObject with automatic interpolation.
 
 ```cpp
 std::shared_ptr<Animation> fadeIn(QWidget* widget, int duration_ms = 500);
 std::shared_ptr<Animation> fadeOut(QWidget* widget, int duration_ms = 500);
 ```
+
 Convenience methods for opacity animations.
 
 ```cpp
 std::shared_ptr<Animation> slideIn(QWidget* widget, const QString& direction, int duration_ms = 500);
 std::shared_ptr<Animation> slideOut(QWidget* widget, const QString& direction, int duration_ms = 500);
 ```
+
 Slide animations with directional support ("left", "right", "up", "down").
 
 ```cpp
 std::shared_ptr<Animation> scaleAnimation(QWidget* widget, double from_scale, double to_scale, int duration_ms = 500);
 ```
+
 Scale transformation animations.
 
 #### Global Control
@@ -78,6 +84,7 @@ void pauseAllAnimations();
 void resumeAllAnimations();
 void stopAllAnimations();
 ```
+
 Global animation lifecycle control.
 
 #### Performance Optimization
@@ -88,6 +95,7 @@ void setGlobalPlaybackRate(double rate);
 void enableAnimationPooling(bool enabled);
 void setMaxConcurrentAnimations(int max_count);
 ```
+
 Performance tuning and optimization settings.
 
 #### Monitoring
@@ -97,6 +105,7 @@ QJsonObject getPerformanceMetrics() const;
 int getActiveAnimationCount() const;
 double getAverageFrameRate() const;
 ```
+
 Performance monitoring and metrics collection.
 
 ### Signals
@@ -118,21 +127,25 @@ Individual animation instance with comprehensive configuration options.
 ```cpp
 void setTarget(QObject* object, const QString& property_name);
 ```
+
 Sets the target object and property for animation.
 
 ```cpp
 void setValues(const QVariant& start_value, const QVariant& end_value);
 ```
+
 Defines the animation value range.
 
 ```cpp
 void setProperties(const AnimationProperties& properties);
 ```
+
 Applies comprehensive animation configuration.
 
 ```cpp
 void setCustomSetter(std::function<void(const QVariant&)> setter);
 ```
+
 Sets a custom function for applying animation values.
 
 #### Timeline Support
@@ -141,6 +154,7 @@ Sets a custom function for applying animation values.
 template<typename T>
 void setTimeline(const AnimationTimeline<T>& timeline);
 ```
+
 Applies keyframe-based timeline animation.
 
 #### Control
@@ -152,6 +166,7 @@ void pause();
 void resume();
 void restart();
 ```
+
 Animation lifecycle control.
 
 #### State Queries
@@ -249,7 +264,7 @@ struct AnimationTarget {
     QVariant start_value;
     QVariant end_value;
     std::function<void(const QVariant&)> custom_setter;
-    
+
     bool isValid() const;
 };
 ```
@@ -262,7 +277,7 @@ struct Keyframe {
     double time_ratio;  // 0.0 to 1.0
     T value;
     EasingType easing = EasingType::Linear;
-    
+
     Keyframe(double time, const T& val, EasingType ease = EasingType::Linear);
 };
 ```
@@ -321,7 +336,7 @@ enum class AnimationState {
 auto& engine = AnimationEngine::instance();
 
 auto animation = engine.animateProperty(
-    widget, "opacity", 
+    widget, "opacity",
     0.0, 1.0,           // From transparent to opaque
     500,                // 500ms duration
     EasingType::CubicOut
@@ -364,9 +379,9 @@ auto animation = engine.createAnimation();
 animation->setCustomSetter([widget](const QVariant& value) {
     double progress = value.toDouble();
     widget->setGeometry(
-        static_cast<int>(100 * progress), 
+        static_cast<int>(100 * progress),
         static_cast<int>(50 * progress),
-        widget->width(), 
+        widget->width(),
         widget->height()
     );
 });

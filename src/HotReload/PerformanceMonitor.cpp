@@ -1,10 +1,10 @@
 #include "PerformanceMonitor.hpp"
 
 #include <QDebug>
-#include <QStringList>
 #include <QFile>
-#include <QTextStream>
 #include <QJsonDocument>
+#include <QStringList>
+#include <QTextStream>
 #include <algorithm>
 
 namespace DeclarativeUI::HotReload {
@@ -146,7 +146,8 @@ void PerformanceMonitor::recordMemoryUsage(size_t memory_mb) {
     // Check memory warning threshold
     if (memory_mb > memory_warning_threshold_mb_.load()) {
         emit memoryWarning(memory_mb);
-        qWarning() << "⚠️ Memory usage warning:" << memory_mb << "MB exceeds threshold";
+        qWarning() << "⚠️ Memory usage warning:" << memory_mb
+                   << "MB exceeds threshold";
     }
 
     qDebug() << "📊 Recorded memory usage:" << memory_mb << "MB";
@@ -167,7 +168,8 @@ void PerformanceMonitor::recordCPUUsage(double cpu_percent) {
     // Check CPU warning threshold
     if (cpu_percent > cpu_warning_threshold_percent_.load()) {
         emit cpuWarning(cpu_percent);
-        qWarning() << "⚠️ CPU usage warning:" << cpu_percent << "% exceeds threshold";
+        qWarning() << "⚠️ CPU usage warning:" << cpu_percent
+                   << "% exceeds threshold";
     }
 
     qDebug() << "📊 Recorded CPU usage:" << cpu_percent << "%";
@@ -522,8 +524,8 @@ QJsonObject PerformanceMonitor::getPredictionReport() const {
 
         // Add model accuracy metrics
         QJsonObject accuracy;
-        accuracy["response_time_accuracy"] = 0.85; // Placeholder
-        accuracy["memory_prediction_accuracy"] = 0.78; // Placeholder
+        accuracy["response_time_accuracy"] = 0.85;      // Placeholder
+        accuracy["memory_prediction_accuracy"] = 0.78;  // Placeholder
         report["model_accuracy"] = accuracy;
     }
 
@@ -805,9 +807,12 @@ QJsonObject PerformanceMonitor::getMemoryProfile() const {
 
     QJsonObject profile;
     profile["memory_profiling_enabled"] = memory_profiling_enabled_.load();
-    profile["current_memory_usage_mb"] = static_cast<qint64>(getCurrentMemoryUsage());
-    profile["baseline_memory_usage_mb"] = static_cast<qint64>(baseline_memory_usage_);
-    profile["peak_memory_usage_mb"] = static_cast<qint64>(peak_memory_usage_.load());
+    profile["current_memory_usage_mb"] =
+        static_cast<qint64>(getCurrentMemoryUsage());
+    profile["baseline_memory_usage_mb"] =
+        static_cast<qint64>(baseline_memory_usage_);
+    profile["peak_memory_usage_mb"] =
+        static_cast<qint64>(peak_memory_usage_.load());
 
     // Add memory snapshots
     QJsonArray snapshots;
@@ -825,7 +830,7 @@ void PerformanceMonitor::forceGarbageCollection() {
     // Clear old memory snapshots
     if (memory_snapshots_.size() > 100) {
         memory_snapshots_.erase(memory_snapshots_.begin(),
-                               memory_snapshots_.begin() + 50);
+                                memory_snapshots_.begin() + 50);
     }
 
     // Trigger Qt's garbage collection if available
@@ -852,7 +857,8 @@ void PerformanceMonitor::analyzeMemoryLeaks() {
         size_t old_avg = 0;
 
         // Calculate average of last 5 snapshots
-        for (size_t i = memory_snapshots_.size() - 5; i < memory_snapshots_.size(); ++i) {
+        for (size_t i = memory_snapshots_.size() - 5;
+             i < memory_snapshots_.size(); ++i) {
             recent_avg += memory_snapshots_[i];
         }
         recent_avg /= 5;
@@ -876,7 +882,9 @@ QString PerformanceMonitor::formatDuration(qint64 milliseconds) const {
     if (milliseconds < 1000) {
         return QString("%1ms").arg(milliseconds);
     } else if (milliseconds < 60000) {
-        return QString("%1.%2s").arg(milliseconds / 1000).arg((milliseconds % 1000) / 100);
+        return QString("%1.%2s")
+            .arg(milliseconds / 1000)
+            .arg((milliseconds % 1000) / 100);
     } else {
         qint64 minutes = milliseconds / 60000;
         qint64 seconds = (milliseconds % 60000) / 1000;
@@ -896,7 +904,8 @@ QString PerformanceMonitor::formatMemorySize(size_t bytes) const {
     }
 }
 
-QJsonObject PerformanceMonitor::metricsToJson(const AdvancedPerformanceMetrics &metrics) const {
+QJsonObject PerformanceMonitor::metricsToJson(
+    const AdvancedPerformanceMetrics &metrics) const {
     QJsonObject json;
     json["reload_time_ms"] = metrics.reload_time_ms;
     json["file_load_time_ms"] = metrics.file_load_time_ms;
@@ -928,13 +937,13 @@ BottleneckInfo PerformanceMonitor::detectCPUBottleneck() const {
     if (current_cpu > cpu_warning_threshold_percent_.load()) {
         bottleneck.component_name = "CPU";
         bottleneck.bottleneck_type = "CPU";
-        bottleneck.severity_score = calculateBottleneckSeverity("CPU", current_cpu);
-        bottleneck.description = QString("High CPU usage detected: %1%").arg(current_cpu);
+        bottleneck.severity_score =
+            calculateBottleneckSeverity("CPU", current_cpu);
+        bottleneck.description =
+            QString("High CPU usage detected: %1%").arg(current_cpu);
         bottleneck.recommendations = QStringList{
-            "Optimize CPU-intensive operations",
-            "Enable background processing",
-            "Consider caching frequently computed values"
-        };
+            "Optimize CPU-intensive operations", "Enable background processing",
+            "Consider caching frequently computed values"};
         bottleneck.detected_at = QDateTime::currentDateTime();
     }
 
@@ -948,13 +957,13 @@ BottleneckInfo PerformanceMonitor::detectMemoryBottleneck() const {
     if (current_memory > memory_warning_threshold_mb_.load()) {
         bottleneck.component_name = "Memory";
         bottleneck.bottleneck_type = "Memory";
-        bottleneck.severity_score = calculateBottleneckSeverity("Memory", current_memory);
-        bottleneck.description = QString("High memory usage detected: %1 MB").arg(current_memory);
-        bottleneck.recommendations = QStringList{
-            "Reduce memory footprint",
-            "Implement memory pooling",
-            "Clear unused caches"
-        };
+        bottleneck.severity_score =
+            calculateBottleneckSeverity("Memory", current_memory);
+        bottleneck.description =
+            QString("High memory usage detected: %1 MB").arg(current_memory);
+        bottleneck.recommendations =
+            QStringList{"Reduce memory footprint", "Implement memory pooling",
+                        "Clear unused caches"};
         bottleneck.detected_at = QDateTime::currentDateTime();
     }
 
@@ -967,16 +976,17 @@ BottleneckInfo PerformanceMonitor::detectIOBottleneck() const {
     // Simple I/O bottleneck detection based on average reload times
     if (!metrics_history_.empty()) {
         auto avg_metrics = calculateAverageFromHistory(metrics_history_);
-        if (avg_metrics.file_load_time_ms > 500) { // 500ms threshold
+        if (avg_metrics.file_load_time_ms > 500) {  // 500ms threshold
             bottleneck.component_name = "I/O";
             bottleneck.bottleneck_type = "I/O";
-            bottleneck.severity_score = calculateBottleneckSeverity("I/O", avg_metrics.file_load_time_ms);
-            bottleneck.description = QString("Slow file I/O detected: %1ms average").arg(avg_metrics.file_load_time_ms);
-            bottleneck.recommendations = QStringList{
-                "Use SSD storage",
-                "Implement file caching",
-                "Optimize file access patterns"
-            };
+            bottleneck.severity_score = calculateBottleneckSeverity(
+                "I/O", avg_metrics.file_load_time_ms);
+            bottleneck.description =
+                QString("Slow file I/O detected: %1ms average")
+                    .arg(avg_metrics.file_load_time_ms);
+            bottleneck.recommendations =
+                QStringList{"Use SSD storage", "Implement file caching",
+                            "Optimize file access patterns"};
             bottleneck.detected_at = QDateTime::currentDateTime();
         }
     }
@@ -984,7 +994,8 @@ BottleneckInfo PerformanceMonitor::detectIOBottleneck() const {
     return bottleneck;
 }
 
-double PerformanceMonitor::calculateBottleneckSeverity(const QString &type, double value) const {
+double PerformanceMonitor::calculateBottleneckSeverity(const QString &type,
+                                                       double value) const {
     if (type == "CPU") {
         // CPU severity: 0-100% maps to 0-100 severity
         return std::min(100.0, value);
@@ -993,7 +1004,8 @@ double PerformanceMonitor::calculateBottleneckSeverity(const QString &type, doub
         double threshold = memory_warning_threshold_mb_.load();
         return std::min(100.0, (value / threshold) * 50.0);
     } else if (type == "I/O") {
-        // I/O severity based on time (500ms = 50 severity, 1000ms = 100 severity)
+        // I/O severity based on time (500ms = 50 severity, 1000ms = 100
+        // severity)
         return std::min(100.0, (value / 500.0) * 50.0);
     }
 
@@ -1002,42 +1014,49 @@ double PerformanceMonitor::calculateBottleneckSeverity(const QString &type, doub
 
 // **Missing reporting methods**
 QString PerformanceMonitor::generateDetailedReport() const {
-    QString report = generateReport(); // Start with basic report
+    QString report = generateReport();  // Start with basic report
 
     report += "\n=== Detailed Performance Analysis ===\n\n";
 
     // Add memory analysis
     report += QString("Memory Analysis:\n");
-    report += QString("- Current Usage: %1\n").arg(formatMemorySize(getCurrentMemoryUsage() * 1024 * 1024));
-    report += QString("- Peak Usage: %1\n").arg(formatMemorySize(static_cast<size_t>(peak_memory_usage_.load()) * 1024 * 1024));
-    report += QString("- Baseline Usage: %1\n").arg(formatMemorySize(baseline_memory_usage_ * 1024 * 1024));
+    report += QString("- Current Usage: %1\n")
+                  .arg(formatMemorySize(getCurrentMemoryUsage() * 1024 * 1024));
+    report +=
+        QString("- Peak Usage: %1\n")
+            .arg(formatMemorySize(
+                static_cast<size_t>(peak_memory_usage_.load()) * 1024 * 1024));
+    report += QString("- Baseline Usage: %1\n")
+                  .arg(formatMemorySize(baseline_memory_usage_ * 1024 * 1024));
 
     // Add CPU analysis
     report += QString("\nCPU Analysis:\n");
     report += QString("- Peak CPU Usage: %1%\n").arg(peak_cpu_usage_.load());
-    report += QString("- CPU Warning Threshold: %1%\n").arg(cpu_warning_threshold_percent_.load());
+    report += QString("- CPU Warning Threshold: %1%\n")
+                  .arg(cpu_warning_threshold_percent_.load());
 
     // Add bottleneck analysis
     auto bottlenecks = detectBottlenecks();
     if (!bottlenecks.empty()) {
-        report += QString("\nBottlenecks Detected (%1):\n").arg(bottlenecks.size());
-        for (const auto& bottleneck : bottlenecks) {
+        report +=
+            QString("\nBottlenecks Detected (%1):\n").arg(bottlenecks.size());
+        for (const auto &bottleneck : bottlenecks) {
             report += QString("- %1: %2 (Severity: %3)\n")
-                        .arg(bottleneck.bottleneck_type)
-                        .arg(bottleneck.description)
-                        .arg(bottleneck.severity_score);
+                          .arg(bottleneck.bottleneck_type)
+                          .arg(bottleneck.description)
+                          .arg(bottleneck.severity_score);
         }
     }
 
     // Add file-specific metrics
     if (!file_metrics_.empty()) {
         report += QString("\nFile-Specific Performance:\n");
-        for (const auto& [file_path, metrics_list] : file_metrics_) {
+        for (const auto &[file_path, metrics_list] : file_metrics_) {
             if (!metrics_list.empty()) {
                 auto avg = calculateAverageFromHistory(metrics_list);
                 report += QString("- %1: %2 (avg)\n")
-                            .arg(file_path)
-                            .arg(formatDuration(avg.total_time_ms));
+                              .arg(file_path)
+                              .arg(formatDuration(avg.total_time_ms));
             }
         }
     }
@@ -1068,7 +1087,8 @@ void PerformanceMonitor::exportReportToFile(const QString &file_path) const {
 }
 
 // **Missing analytics helper methods**
-void PerformanceMonitor::updateRealTimeAnalytics(const AdvancedPerformanceMetrics &metrics) {
+void PerformanceMonitor::updateRealTimeAnalytics(
+    const AdvancedPerformanceMetrics &metrics) {
     if (!real_time_analytics_enabled_.load() || !analytics_data_) {
         return;
     }
@@ -1076,16 +1096,20 @@ void PerformanceMonitor::updateRealTimeAnalytics(const AdvancedPerformanceMetric
     std::unique_lock<std::shared_mutex> lock(data_mutex_);
 
     // Update analytics vectors
-    analytics_data_->response_times.push_back(static_cast<double>(metrics.total_time_ms));
-    analytics_data_->memory_usage.push_back(static_cast<double>(metrics.memory_peak_mb));
+    analytics_data_->response_times.push_back(
+        static_cast<double>(metrics.total_time_ms));
+    analytics_data_->memory_usage.push_back(
+        static_cast<double>(metrics.memory_peak_mb));
     analytics_data_->cpu_usage.push_back(metrics.cpu_usage_percent);
 
     // Keep vectors limited in size
     if (analytics_data_->response_times.size() > 100) {
-        analytics_data_->response_times.erase(analytics_data_->response_times.begin());
+        analytics_data_->response_times.erase(
+            analytics_data_->response_times.begin());
     }
     if (analytics_data_->memory_usage.size() > 100) {
-        analytics_data_->memory_usage.erase(analytics_data_->memory_usage.begin());
+        analytics_data_->memory_usage.erase(
+            analytics_data_->memory_usage.begin());
     }
     if (analytics_data_->cpu_usage.size() > 100) {
         analytics_data_->cpu_usage.erase(analytics_data_->cpu_usage.begin());
@@ -1097,14 +1121,19 @@ void PerformanceMonitor::updateRealTimeAnalytics(const AdvancedPerformanceMetric
     for (double value : analytics_data_->response_times) {
         sum += value;
     }
-    double avg = analytics_data_->response_times.empty() ? 0.0 : sum / analytics_data_->response_times.size();
+    double avg = analytics_data_->response_times.empty()
+                     ? 0.0
+                     : sum / analytics_data_->response_times.size();
     analytics_data_->average_response_time.store(avg);
-    analytics_data_->peak_memory_usage.store(std::max(analytics_data_->peak_memory_usage.load(), static_cast<double>(metrics.memory_peak_mb)));
+    analytics_data_->peak_memory_usage.store(
+        std::max(analytics_data_->peak_memory_usage.load(),
+                 static_cast<double>(metrics.memory_peak_mb)));
 
     qDebug() << "📊 Real-time analytics updated with new metrics";
 }
 
-void PerformanceMonitor::updateAnalyticsWindow(std::queue<double> &window, double value) {
+void PerformanceMonitor::updateAnalyticsWindow(std::queue<double> &window,
+                                               double value) {
     window.push(value);
 
     // Keep window size limited (e.g., last 50 values)
@@ -1113,13 +1142,14 @@ void PerformanceMonitor::updateAnalyticsWindow(std::queue<double> &window, doubl
     }
 }
 
-double PerformanceMonitor::calculateTrend(const std::queue<double> &window) const {
+double PerformanceMonitor::calculateTrend(
+    const std::queue<double> &window) const {
     if (window.empty()) {
         return 0.0;
     }
 
     double sum = 0.0;
-    std::queue<double> temp_window = window; // Copy for iteration
+    std::queue<double> temp_window = window;  // Copy for iteration
 
     while (!temp_window.empty()) {
         sum += temp_window.front();
@@ -1129,10 +1159,9 @@ double PerformanceMonitor::calculateTrend(const std::queue<double> &window) cons
     return sum / static_cast<double>(window.size());
 }
 
-
-
 // **Missing predictive modeling helper methods**
-void PerformanceMonitor::updatePredictiveModels(const AdvancedPerformanceMetrics &metrics) {
+void PerformanceMonitor::updatePredictiveModels(
+    const AdvancedPerformanceMetrics &metrics) {
     if (!predictive_modeling_enabled_.load()) {
         return;
     }
@@ -1141,32 +1170,39 @@ void PerformanceMonitor::updatePredictiveModels(const AdvancedPerformanceMetrics
 
     // Update response time model
     if (!predictive_models_["response_time"]) {
-        predictive_models_["response_time"] = std::make_unique<PredictiveModel>();
+        predictive_models_["response_time"] =
+            std::make_unique<PredictiveModel>();
     }
-    auto& response_model = predictive_models_["response_time"];
-    response_model->historical_data.push_back(static_cast<double>(metrics.total_time_ms));
+    auto &response_model = predictive_models_["response_time"];
+    response_model->historical_data.push_back(
+        static_cast<double>(metrics.total_time_ms));
     if (response_model->historical_data.size() > 100) {
-        response_model->historical_data.erase(response_model->historical_data.begin());
+        response_model->historical_data.erase(
+            response_model->historical_data.begin());
     }
     trainModel(*response_model, response_model->historical_data);
 
     // Update memory usage model
     if (!predictive_models_["memory_usage"]) {
-        predictive_models_["memory_usage"] = std::make_unique<PredictiveModel>();
+        predictive_models_["memory_usage"] =
+            std::make_unique<PredictiveModel>();
     }
-    auto& memory_model = predictive_models_["memory_usage"];
-    memory_model->historical_data.push_back(static_cast<double>(metrics.memory_peak_mb));
+    auto &memory_model = predictive_models_["memory_usage"];
+    memory_model->historical_data.push_back(
+        static_cast<double>(metrics.memory_peak_mb));
     if (memory_model->historical_data.size() > 100) {
-        memory_model->historical_data.erase(memory_model->historical_data.begin());
+        memory_model->historical_data.erase(
+            memory_model->historical_data.begin());
     }
     trainModel(*memory_model, memory_model->historical_data);
 
     qDebug() << "🔮 Predictive models updated";
 }
 
-void PerformanceMonitor::trainModel(PredictiveModel &model, const std::vector<double> &data) {
+void PerformanceMonitor::trainModel(PredictiveModel &model,
+                                    const std::vector<double> &data) {
     if (data.size() < 3) {
-        return; // Need at least 3 data points
+        return;  // Need at least 3 data points
     }
 
     // Simple linear trend calculation
@@ -1195,9 +1231,10 @@ void PerformanceMonitor::trainModel(PredictiveModel &model, const std::vector<do
     model.last_update = QDateTime::currentDateTime();
 }
 
-double PerformanceMonitor::calculateSeasonalFactor(const std::vector<double> &data) const {
+double PerformanceMonitor::calculateSeasonalFactor(
+    const std::vector<double> &data) const {
     if (data.size() < 4) {
-        return 1.0; // No seasonal adjustment
+        return 1.0;  // No seasonal adjustment
     }
 
     // Simple seasonal factor: ratio of recent values to overall average

@@ -23,7 +23,7 @@ namespace DeclarativeUI::Exceptions {
         explicit UIException(std::string message);
         UIException(std::string message, std::string context);
         UIException(std::string message, std::string context, std::string suggestion);
-        
+
         // Fluent interface and access methods...
     };
 }
@@ -45,6 +45,7 @@ UIException(std::string message, std::string context, std::string suggestion);
 UIException& withContext(const std::string& context);
 UIException& withSuggestion(const std::string& suggestion);
 ```
+
 Adds context information and suggestions using method chaining.
 
 ##### Access Methods
@@ -67,7 +68,7 @@ class ComponentCreationException : public UIException {
 public:
     explicit ComponentCreationException(const std::string& component_type);
     ComponentCreationException(const std::string& component_type, const std::string& reason);
-    
+
     const std::string& getComponentType() const noexcept;
 };
 ```
@@ -79,7 +80,7 @@ class ComponentRegistrationException : public UIException {
 public:
     explicit ComponentRegistrationException(const std::string& component_name);
     ComponentRegistrationException(const std::string& component_name, const std::string& reason);
-    
+
     const std::string& getComponentName() const noexcept;
 };
 ```
@@ -91,7 +92,7 @@ class InitializationException : public UIException {
 public:
     explicit InitializationException(const std::string& component_name);
     InitializationException(const std::string& component_name, const std::string& reason);
-    
+
     const std::string& getComponentName() const noexcept;
 };
 ```
@@ -105,7 +106,7 @@ class PropertyBindingException : public UIException {
 public:
     explicit PropertyBindingException(const std::string& property_name);
     PropertyBindingException(const std::string& property_name, const std::string& reason);
-    
+
     const std::string& getPropertyName() const noexcept;
 };
 ```
@@ -117,7 +118,7 @@ class StateManagementException : public UIException {
 public:
     explicit StateManagementException(const std::string& state_key);
     StateManagementException(const std::string& state_key, const std::string& reason);
-    
+
     const std::string& getStateKey() const noexcept;
 };
 ```
@@ -131,7 +132,7 @@ class LayoutException : public UIException {
 public:
     explicit LayoutException(const std::string& layout_error);
     LayoutException(const std::string& layout_type, const std::string& error_details);
-    
+
     const std::string& getLayoutType() const noexcept;
 };
 ```
@@ -143,7 +144,7 @@ class StyleException : public UIException {
 public:
     explicit StyleException(const std::string& style_error);
     StyleException(const std::string& selector, const std::string& style_error);
-    
+
     const std::string& getSelector() const noexcept;
 };
 ```
@@ -157,7 +158,7 @@ class JSONParsingException : public UIException {
 public:
     explicit JSONParsingException(const std::string& file_path, const std::string& error);
     JSONParsingException(const std::string& file_path, const std::string& error, int line, int column);
-    
+
     const std::string& getFilePath() const noexcept;
     int getLineNumber() const noexcept;
     int getColumnNumber() const noexcept;
@@ -173,7 +174,7 @@ public:
     explicit JSONValidationException(const std::string& validation_error);
     JSONValidationException(const std::string& validation_error, const std::string& json_path);
     JSONValidationException(const std::vector<std::string>& validation_errors);
-    
+
     const std::string& getJsonPath() const noexcept;
     const std::vector<std::string>& getValidationErrors() const noexcept;
     bool hasMultipleErrors() const noexcept;
@@ -187,7 +188,7 @@ class ConfigurationException : public UIException {
 public:
     explicit ConfigurationException(const std::string& config_error);
     ConfigurationException(const std::string& config_key, const std::string& config_error);
-    
+
     const std::string& getConfigKey() const noexcept;
 };
 ```
@@ -201,7 +202,7 @@ class HotReloadException : public UIException {
 public:
     explicit HotReloadException(const std::string& reload_error);
     HotReloadException(const std::string& file_path, const std::string& reload_error);
-    
+
     const std::string& getFilePath() const noexcept;
 };
 ```
@@ -213,7 +214,7 @@ class FileWatchException : public UIException {
 public:
     explicit FileWatchException(const std::string& file_path);
     FileWatchException(const std::string& file_path, const std::string& reason);
-    
+
     const std::string& getFilePath() const noexcept;
 };
 ```
@@ -227,7 +228,7 @@ class ResourceLoadException : public UIException {
 public:
     explicit ResourceLoadException(const std::string& resource_path);
     ResourceLoadException(const std::string& resource_path, const std::string& reason);
-    
+
     const std::string& getResourcePath() const noexcept;
 };
 ```
@@ -240,7 +241,7 @@ public:
     explicit NetworkException(const std::string& network_error);
     NetworkException(const std::string& url, const std::string& network_error);
     NetworkException(const std::string& url, int status_code, const std::string& network_error);
-    
+
     const std::string& getUrl() const noexcept;
     int getStatusCode() const noexcept;
     bool hasStatusCode() const noexcept;
@@ -256,7 +257,7 @@ class RuntimeException : public UIException {
 public:
     explicit RuntimeException(const std::string& runtime_error);
     RuntimeException(const std::string& operation, const std::string& runtime_error);
-    
+
     const std::string& getOperation() const noexcept;
 };
 ```
@@ -268,7 +269,7 @@ class ConcurrencyException : public UIException {
 public:
     explicit ConcurrencyException(const std::string& concurrency_error);
     ConcurrencyException(const std::string& thread_context, const std::string& concurrency_error);
-    
+
     const std::string& getThreadContext() const noexcept;
 };
 ```
@@ -282,10 +283,10 @@ namespace ExceptionUtils {
     class ExceptionChain : public UIException {
     public:
         explicit ExceptionChain(const std::string& primary_message);
-        
+
         ExceptionChain& addException(std::unique_ptr<UIException> exception);
         ExceptionChain& addException(const UIException& exception);
-        
+
         const std::vector<std::unique_ptr<UIException>>& getChainedExceptions() const noexcept;
         size_t getExceptionCount() const noexcept;
     };
@@ -394,10 +395,10 @@ QJsonObject parseConfigFile(const QString& filePath) {
     if (!file.open(QIODevice::ReadOnly)) {
         throw ResourceLoadException(filePath.toStdString(), "Cannot open file for reading");
     }
-    
+
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &parseError);
-    
+
     if (parseError.error != QJsonParseError::NoError) {
         throw JSONParsingException(
             filePath.toStdString(),
@@ -405,7 +406,7 @@ QJsonObject parseConfigFile(const QString& filePath) {
             parseError.offset
         );
     }
-    
+
     return doc.object();
 }
 ```
@@ -415,19 +416,19 @@ QJsonObject parseConfigFile(const QString& filePath) {
 ```cpp
 void complexOperation() {
     ExceptionUtils::ExceptionChain errors("Multiple errors occurred during operation");
-    
+
     try {
         loadConfiguration();
     } catch (const JSONParsingException& e) {
         errors.addException(std::make_unique<JSONParsingException>(e));
     }
-    
+
     try {
         initializeComponents();
     } catch (const ComponentCreationException& e) {
         errors.addException(std::make_unique<ComponentCreationException>(e));
     }
-    
+
     if (errors.getExceptionCount() > 0) {
         throw errors;
     }
@@ -479,7 +480,7 @@ try {
         qCritical() << "Critical error:" << e.what();
         initiateGracefulShutdown();
     }
-    
+
     // Log the exception
     ExceptionUtils::logException(e, "WARNING");
 }

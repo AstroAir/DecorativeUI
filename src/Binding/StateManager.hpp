@@ -442,6 +442,36 @@ private:
      */
     void addToHistory(const QString& key, const QVariant& value);
 
+    // Helper methods to reduce complexity in main functions
+    bool validateUndoOperation(const QString& key, StateInfo& info) const;
+    bool validateRedoOperation(const QString& key, StateInfo& info) const;
+    void performUndoOperation(StateInfo& info, const QString& key);
+    void performRedoOperation(StateInfo& info, const QString& key);
+
+    void updateComputedDependents(const QString& key);
+    void updateManualDependents(const QString& key);
+
+    // Helper methods for updateComputedDependents to reduce complexity
+    void updateSingleComputedDependent(const QString& dependent);
+    bool shouldUpdateComputedValue(const QVariant& newValue,
+                                   const QVariant& oldValue) const;
+    void applyComputedValueUpdate(const QString& dependent,
+                                  const QVariant& newValue,
+                                  const QVariant& oldValue);
+
+    QJsonObject createStateDataJson() const;
+    QJsonObject createDependenciesJson() const;
+    QJsonObject convertVariantToJson(const QVariant& value) const;
+    bool writeJsonToFile(const QJsonObject& rootObject,
+                         const QString& filename) const;
+
+    // Helper methods for loadState function to reduce complexity
+    QJsonObject readStateFile(const QString& filename) const;
+    bool validateStateFileVersion(const QJsonObject& rootObject) const;
+    void loadStateData(const QJsonObject& statesObject);
+    void loadStateDependencies(const QJsonObject& dependenciesObject);
+    QVariant parseStateValue(const QJsonObject& stateEntry) const;
+
     /**
      * @brief Validates a state value using the registered validator.
      * @param key State key.

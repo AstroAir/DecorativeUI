@@ -5,6 +5,7 @@ This directory contains all examples for the DeclarativeUI project, organized by
 ## 🎯 Quick Start
 
 **New to DeclarativeUI?** Start here:
+
 1. **01-getting-started/hello-world/** - Your first DeclarativeUI app
 2. **01-getting-started/basic-ui/** - Learn basic components
 3. **02-fundamentals/state-management/** - Understand reactive state
@@ -94,6 +95,7 @@ cmake --build . --config Release
 ## 📚 Learning Path
 
 ### 🌱 Beginner (Start Here)
+
 **Goal:** Get familiar with DeclarativeUI basics
 
 1. **01-getting-started/hello-world/** - Create your first app
@@ -104,6 +106,7 @@ cmake --build . --config Release
 **Time:** 2-4 hours
 
 ### 🏗️ Intermediate
+
 **Goal:** Master core concepts and components
 
 1. **02-fundamentals/property-binding/** - Reactive connections
@@ -116,6 +119,7 @@ cmake --build . --config Release
 **Time:** 4-8 hours
 
 ### 🚀 Advanced
+
 **Goal:** Explore advanced features and patterns
 
 1. **04-advanced-features/reactive-state/** - Advanced reactive patterns
@@ -128,6 +132,7 @@ cmake --build . --config Release
 **Time:** 8-16 hours
 
 ### 🎯 Expert
+
 **Goal:** Build production-ready applications
 
 1. **06-applications/form-example/** - Form handling
@@ -140,6 +145,7 @@ cmake --build . --config Release
 ## 🎨 Example Categories
 
 ### 🌱 01-getting-started
+
 Perfect for absolute beginners. These examples use minimal code and focus on single concepts.
 
 - **Difficulty:** ⭐☆☆☆☆
@@ -147,6 +153,7 @@ Perfect for absolute beginners. These examples use minimal code and focus on sin
 - **Focus:** Getting familiar with DeclarativeUI
 
 ### 🏗️ 02-fundamentals
+
 Core concepts that every DeclarativeUI developer should understand.
 
 - **Difficulty:** ⭐⭐⭐☆☆
@@ -154,6 +161,7 @@ Core concepts that every DeclarativeUI developer should understand.
 - **Focus:** State management, property binding, JSON UI
 
 ### 🧩 03-components
+
 Comprehensive showcase of UI components and layout patterns.
 
 - **Difficulty:** ⭐⭐⭐☆☆
@@ -161,6 +169,7 @@ Comprehensive showcase of UI components and layout patterns.
 - **Focus:** UI components, layouts, styling
 
 ### 🚀 04-advanced-features
+
 Advanced DeclarativeUI features for sophisticated applications.
 
 - **Difficulty:** ⭐⭐⭐⭐☆
@@ -168,6 +177,7 @@ Advanced DeclarativeUI features for sophisticated applications.
 - **Focus:** Hot reload, reactive state, performance
 
 ### ⚡ 05-command-system (Experimental)
+
 Command-based architecture patterns. Some examples currently disabled.
 
 - **Difficulty:** ⭐⭐⭐⭐⭐
@@ -175,6 +185,7 @@ Command-based architecture patterns. Some examples currently disabled.
 - **Focus:** Command patterns, MVVM architecture
 
 ### 📱 06-applications
+
 Complete sample applications demonstrating real-world usage.
 
 - **Difficulty:** ⭐⭐⭐⭐☆
@@ -184,24 +195,28 @@ Complete sample applications demonstrating real-world usage.
 ## 🛠️ Key Concepts Demonstrated
 
 ### State Management
+
 - **Property binding** - Reactive connections between components
 - **Reactive updates** - Automatic UI synchronization
 - **State synchronization** - Keeping data consistent
 - **Event-driven updates** - Responding to user actions
 
 ### UI Construction
+
 - **Declarative UI building** - Describe what you want, not how
 - **Component composition** - Building complex UIs from simple parts
 - **Layout management** - Organizing UI elements effectively
 - **Dynamic UI creation** - Creating UI at runtime
 
 ### Command System
+
 - **Command-based architecture** - Encapsulating operations as objects
 - **Builder patterns** - Fluent interfaces for complex operations
 - **Integration patterns** - Connecting different system parts
 - **JSON-driven UI** - Creating UI from configuration
 
 ### Hot Reload
+
 - **File watching** - Monitoring file system changes
 - **Dynamic reloading** - Updating running applications
 - **Performance monitoring** - Measuring and optimizing performance
@@ -210,6 +225,7 @@ Complete sample applications demonstrating real-world usage.
 ## 📋 Adding New Examples
 
 ### Basic Example
+
 1. Choose appropriate category (01-06)
 2. Create subdirectory with descriptive kebab-case name
 3. Add source files and README.md
@@ -217,6 +233,7 @@ Complete sample applications demonstrating real-world usage.
 5. Test and document
 
 ### Application Example
+
 1. Create subdirectory in `06-applications/`
 2. Include comprehensive README.md
 3. Demonstrate multiple DeclarativeUI features
@@ -226,6 +243,7 @@ Complete sample applications demonstrating real-world usage.
 ## 📦 Dependencies
 
 Examples depend on:
+
 - **DeclarativeUI library** - Core framework
 - **Components library** - UI component implementations
 - **Qt6::Core** - Qt core functionality
@@ -235,6 +253,7 @@ Examples depend on:
 ## 📁 Resources
 
 Examples use resources from:
+
 - **shared/json/** - JSON UI definitions
 - **shared/assets/** - Images and other assets
 - **shared/common/** - Shared utilities and helpers
@@ -244,16 +263,19 @@ Resources are automatically copied to build directory during build.
 ## 🔧 Troubleshooting
 
 ### Build Issues
+
 - **Qt6 not found:** Ensure Qt6 is installed and in PATH
 - **DeclarativeUI not found:** Build DeclarativeUI library first
 - **CMake errors:** Check CMake version (3.16+ required)
 
 ### Runtime Issues
+
 - **Missing libraries:** Check library paths and dependencies
 - **Resource not found:** Verify resources are copied to build directory
 - **Crashes:** Check console output for error messages
 
 ### Performance Issues
+
 - **Slow startup:** Check for expensive initialization
 - **UI lag:** Profile using performance example
 - **Memory leaks:** Use memory profiling tools
@@ -261,18 +283,21 @@ Resources are automatically copied to build directory during build.
 ## 🤝 Contributing
 
 ### Adding Examples
+
 1. Follow existing naming conventions
 2. Include comprehensive documentation
 3. Test on multiple platforms
 4. Follow code style guidelines
 
 ### Improving Documentation
+
 1. Keep README files up to date
 2. Add clear learning objectives
 3. Include troubleshooting information
 4. Provide context and background
 
 ### Reporting Issues
+
 1. Use GitHub issues for bug reports
 2. Include minimal reproduction case
 3. Specify platform and Qt version

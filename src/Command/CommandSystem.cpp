@@ -25,22 +25,32 @@ template <typename T>
 CommandResult<T>::CommandResult() = default;
 
 template <typename T>
-CommandResult<T>::CommandResult(const T& result) : result_(result), success_(true) {}
+CommandResult<T>::CommandResult(const T& result)
+    : result_(result), success_(true) {}
 
 template <typename T>
-CommandResult<T>::CommandResult(const QString& error) : error_(error), success_(false) {}
+CommandResult<T>::CommandResult(const QString& error)
+    : error_(error), success_(false) {}
 
 template <typename T>
-bool CommandResult<T>::isSuccess() const { return success_; }
+bool CommandResult<T>::isSuccess() const {
+    return success_;
+}
 
 template <typename T>
-bool CommandResult<T>::isError() const { return !success_; }
+bool CommandResult<T>::isError() const {
+    return !success_;
+}
 
 template <typename T>
-const T& CommandResult<T>::getResult() const { return result_; }
+const T& CommandResult<T>::getResult() const {
+    return result_;
+}
 
 template <typename T>
-const QString& CommandResult<T>::getError() const { return error_; }
+const QString& CommandResult<T>::getError() const {
+    return error_;
+}
 
 template <typename T>
 QJsonObject CommandResult<T>::toJson() const {
@@ -103,18 +113,16 @@ CommandResult<QVariant> ICommand::redo(const CommandContext& context) {
     return CommandResult<QVariant>(QString("Redo not implemented"));
 }
 
-bool ICommand::canExecute(const CommandContext& context) const {
-    return true;
-}
+bool ICommand::canExecute(const CommandContext& context) const { return true; }
 
 bool ICommand::canUndo(const CommandContext& context) const { return false; }
 bool ICommand::canRedo(const CommandContext& context) const { return false; }
 
 void ICommand::onBeforeExecute(const CommandContext& context) {}
 void ICommand::onAfterExecute(const CommandContext& context,
-                            const CommandResult<QVariant>& result) {}
+                              const CommandResult<QVariant>& result) {}
 void ICommand::onError(const CommandContext& context,
-                     const CommandError& error) {}
+                       const CommandError& error) {}
 
 CommandState ICommand::getState() const { return state_; }
 void ICommand::setState(CommandState state) {
@@ -124,8 +132,12 @@ void ICommand::setState(CommandState state) {
 
 const ICommand::ExecutionStats& ICommand::getStats() const { return stats_; }
 
-void ICommand::updateProgress(int percentage) { emit progressUpdated(percentage); }
-void ICommand::updateMessage(const QString& message) { emit messageUpdated(message); }
+void ICommand::updateProgress(int percentage) {
+    emit progressUpdated(percentage);
+}
+void ICommand::updateMessage(const QString& message) {
+    emit messageUpdated(message);
+}
 
 // AsyncCommand implementation
 AsyncCommand::AsyncCommand(QObject* parent) : ICommand(parent) {}
@@ -137,9 +149,11 @@ CommandResult<QVariant> AsyncCommand::execute(const CommandContext& context) {
 }
 
 // TransactionalCommand implementation
-TransactionalCommand::TransactionalCommand(QObject* parent) : ICommand(parent) {}
+TransactionalCommand::TransactionalCommand(QObject* parent)
+    : ICommand(parent) {}
 
-CommandResult<QVariant> TransactionalCommand::execute(const CommandContext& context) {
+CommandResult<QVariant> TransactionalCommand::execute(
+    const CommandContext& context) {
     try {
         beginTransaction(context);
         auto result = executeTransactional(context);
@@ -163,7 +177,8 @@ void CompositeCommand::addCommand(std::unique_ptr<ICommand> command) {
     commands_.push_back(std::move(command));
 }
 
-CommandResult<QVariant> CompositeCommand::execute(const CommandContext& context) {
+CommandResult<QVariant> CompositeCommand::execute(
+    const CommandContext& context) {
     QVariantList results;
 
     for (auto& command : commands_) {
@@ -188,7 +203,8 @@ CommandMetadata CompositeCommand::getMetadata() const {
                            "Executes multiple commands as a single unit");
 }
 
-CommandResult<QVariant> CompositeCommand::rollbackCommands(const CommandContext& context) {
+CommandResult<QVariant> CompositeCommand::rollbackCommands(
+    const CommandContext& context) {
     // Undo commands in reverse order
     for (auto it = commands_.rbegin(); it != commands_.rend(); ++it) {
         (*it)->undo(context);
@@ -240,7 +256,7 @@ CommandInvoker::CommandInvoker(QObject* parent) : QObject(parent) {
 }
 
 CommandResult<QVariant> CommandInvoker::execute(const QString& command_name,
-                                const CommandContext& context) {
+                                                const CommandContext& context) {
     return executeInternal(command_name, context, ExecutionMode::Synchronous);
 }
 
@@ -253,16 +269,16 @@ QFuture<CommandResult<QVariant>> CommandInvoker::executeAsync(
         });
 }
 
-void CommandInvoker::executeDeferred(
-    const QString& command_name, const CommandContext& context,
-    std::chrono::milliseconds delay) {
+void CommandInvoker::executeDeferred(const QString& command_name,
+                                     const CommandContext& context,
+                                     std::chrono::milliseconds delay) {
     QTimer::singleShot(delay, [this, command_name, context]() {
         executeInternal(command_name, context, ExecutionMode::Deferred);
     });
 }
 
 void CommandInvoker::executeBatch(const std::vector<QString>& command_names,
-                  const CommandContext& context) {
+                                  const CommandContext& context) {
     for (const auto& name : command_names) {
         batch_queue_.push({name, context});
     }
@@ -280,7 +296,8 @@ void CommandInvoker::cancelCommand(const QUuid& command_id) {
     }
 }
 
-std::vector<std::pair<QUuid, CommandState>> CommandInvoker::getRunningCommands() const {
+std::vector<std::pair<QUuid, CommandState>> CommandInvoker::getRunningCommands()
+    const {
     std::vector<std::pair<QUuid, CommandState>> result;
     for (const auto& [id, command] : running_commands_) {
         result.emplace_back(id, command->getState());
@@ -298,10 +315,11 @@ void CommandInvoker::processBatch() {
     }
 }
 
-CommandResult<QVariant> CommandInvoker::executeInternal(const QString& command_name,
-                                        const CommandContext& context,
-                                        ExecutionMode mode) {
-    auto command = CommandFactory::instance().createCommand(command_name, context);
+CommandResult<QVariant> CommandInvoker::executeInternal(
+    const QString& command_name, const CommandContext& context,
+    ExecutionMode mode) {
+    auto command =
+        CommandFactory::instance().createCommand(command_name, context);
     if (!command) {
         return CommandResult<QVariant>(
             QString("Command '%1' not found").arg(command_name));
@@ -331,8 +349,8 @@ CommandResult<QVariant> CommandInvoker::executeInternal(const QString& command_n
 
         // Track execution time for potential metrics
         [[maybe_unused]] auto duration =
-            std::chrono::duration_cast<std::chrono::milliseconds>(
-                end_time - start_time);
+            std::chrono::duration_cast<std::chrono::milliseconds>(end_time -
+                                                                  start_time);
 
         if (result.isSuccess()) {
             cmd_ptr->setState(CommandState::Completed);
@@ -351,8 +369,8 @@ CommandResult<QVariant> CommandInvoker::executeInternal(const QString& command_n
 
     } catch (const std::exception& e) {
         cmd_ptr->setState(CommandState::Failed);
-        auto error = CommandError(
-            QString("Command execution failed: %1").arg(e.what()));
+        auto error =
+            CommandError(QString("Command execution failed: %1").arg(e.what()));
         emit commandFailed(command_name, error);
 
         {
@@ -378,11 +396,14 @@ CommandManager::CommandManager() = default;
 
 CommandInvoker& CommandManager::getInvoker() { return invoker_; }
 
-void CommandManager::addInterceptor(std::unique_ptr<CommandInterceptor> interceptor) {
+void CommandManager::addInterceptor(
+    std::unique_ptr<CommandInterceptor> interceptor) {
     interceptors_.push_back(std::move(interceptor));
 }
 
-void CommandManager::enableCommandHistory(bool enabled) { history_enabled_ = enabled; }
+void CommandManager::enableCommandHistory(bool enabled) {
+    history_enabled_ = enabled;
+}
 bool CommandManager::canUndo() const { return !command_history_.empty(); }
 bool CommandManager::canRedo() const { return !redo_stack_.empty(); }
 
@@ -404,7 +425,9 @@ void CommandManager::redo() {
     }
 }
 
-void CommandManager::enableAuditTrail(bool enabled) { audit_enabled_ = enabled; }
+void CommandManager::enableAuditTrail(bool enabled) {
+    audit_enabled_ = enabled;
+}
 QJsonArray CommandManager::getAuditTrail() const { return audit_trail_; }
 
 }  // namespace DeclarativeUI::Command

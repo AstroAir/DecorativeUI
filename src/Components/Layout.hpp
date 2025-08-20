@@ -38,8 +38,13 @@ private:
     int spacing_ = -1;
     QMargins margins_;
     Qt::Alignment alignment_ = Qt::Alignment();
+
+    // Helper methods to reduce complexity in initialize()
+    void createLayoutByType();
+    void configureLayoutProperties();
+    void addWidgetsToGridLayout(QGridLayout *grid);
+    void addWidgetsToBoxLayout(QBoxLayout *box);
+    void attachLayoutToWidget();
 };
-
-
 
 }  // namespace DeclarativeUI::Components

@@ -8,7 +8,6 @@
 #include <QStandardItemModel>
 #include <QTreeView>
 
-
 #include "../Core/UIElement.hpp"
 
 namespace DeclarativeUI::Components {
@@ -84,7 +83,5 @@ private:
     void setupDefaultModel();
     void connectModelSignals();
 };
-
-
 
 }  // namespace DeclarativeUI::Components

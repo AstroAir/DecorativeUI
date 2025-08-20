@@ -97,12 +97,14 @@ ButtonGroup& ButtonGroup::exclusive(bool exclusive) {
     return *this;
 }
 
-ButtonGroup& ButtonGroup::onButtonClicked(std::function<void(QAbstractButton*)> handler) {
+ButtonGroup& ButtonGroup::onButtonClicked(
+    std::function<void(QAbstractButton*)> handler) {
     button_clicked_handler_ = std::move(handler);
     return *this;
 }
 
-ButtonGroup& ButtonGroup::onButtonToggled(std::function<void(QAbstractButton*, bool)> handler) {
+ButtonGroup& ButtonGroup::onButtonToggled(
+    std::function<void(QAbstractButton*, bool)> handler) {
     button_toggled_handler_ = std::move(handler);
     return *this;
 }
@@ -118,12 +120,18 @@ void ButtonGroup::initialize() {
 
         // Connect signals
         if (button_clicked_handler_) {
-            connect(button_group_, QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked),
-                    this, [this](QAbstractButton* button) { button_clicked_handler_(button); });
+            connect(
+                button_group_,
+                QOverload<QAbstractButton*>::of(&QButtonGroup::buttonClicked),
+                this, [this](QAbstractButton* button) {
+                    button_clicked_handler_(button);
+                });
         }
 
         if (button_toggled_handler_) {
-            connect(button_group_, QOverload<QAbstractButton*, bool>::of(&QButtonGroup::buttonToggled),
+            connect(button_group_,
+                    QOverload<QAbstractButton*, bool>::of(
+                        &QButtonGroup::buttonToggled),
                     this, [this](QAbstractButton* button, bool checked) {
                         button_toggled_handler_(button, checked);
                     });

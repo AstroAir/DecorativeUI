@@ -464,6 +464,17 @@ private:
     bool validateArrayStructure(const QJsonArray &arr,
                                 JSONParsingContext &context);
 
+    // Helper methods for reducing complexity in processJsonObject
+    QJsonValue processSpecialKey(const QString &key, const QJsonValue &value,
+                                 JSONParsingContext &context);
+    QJsonValue processReferenceKey(const QJsonValue &value,
+                                   JSONParsingContext &context);
+    QJsonValue processIncludeKey(const QJsonValue &value,
+                                 JSONParsingContext &context);
+    QJsonValue processTypeKey(const QJsonValue &value,
+                              JSONParsingContext &context);
+    void mergeObjectIntoResult(const QJsonObject &source, QJsonObject &result);
+
     // Comment and trailing-comma preprocessing
     QString preprocessJson(const QString &json_string);
     QString removeComments(const QString &json_string);

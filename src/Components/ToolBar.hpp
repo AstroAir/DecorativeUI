@@ -1,9 +1,9 @@
 // Components/ToolBar.hpp
 #pragma once
-#include <QToolBar>
 #include <QAction>
-#include <QWidget>
 #include <QIcon>
+#include <QToolBar>
+#include <QWidget>
 
 #include "../Core/UIElement.hpp"
 
@@ -26,7 +26,8 @@ public:
     ToolBar& floating(bool floating);
     ToolBar& addAction(QAction* action);
     ToolBar& addAction(const QString& text, std::function<void()> handler);
-    ToolBar& addAction(const QIcon& icon, const QString& text, std::function<void()> handler);
+    ToolBar& addAction(const QIcon& icon, const QString& text,
+                       std::function<void()> handler);
     ToolBar& addSeparator();
     ToolBar& addWidget(QWidget* widget);
     ToolBar& insertAction(QAction* before, QAction* action);
@@ -36,10 +37,12 @@ public:
     ToolBar& clear();
     ToolBar& onActionTriggered(std::function<void(QAction*)> handler);
     ToolBar& onMovableChanged(std::function<void(bool)> handler);
-    ToolBar& onAllowedAreasChanged(std::function<void(Qt::ToolBarAreas)> handler);
+    ToolBar& onAllowedAreasChanged(
+        std::function<void(Qt::ToolBarAreas)> handler);
     ToolBar& onOrientationChanged(std::function<void(Qt::Orientation)> handler);
     ToolBar& onIconSizeChanged(std::function<void(const QSize&)> handler);
-    ToolBar& onToolButtonStyleChanged(std::function<void(Qt::ToolButtonStyle)> handler);
+    ToolBar& onToolButtonStyleChanged(
+        std::function<void(Qt::ToolButtonStyle)> handler);
     ToolBar& onTopLevelChanged(std::function<void(bool)> handler);
     ToolBar& onVisibilityChanged(std::function<void(bool)> handler);
     ToolBar& style(const QString& stylesheet);
@@ -65,9 +68,5 @@ private:
     std::function<void(bool)> top_level_changed_handler_;
     std::function<void(bool)> visibility_changed_handler_;
 };
-
-
-
-
 
 }  // namespace DeclarativeUI::Components

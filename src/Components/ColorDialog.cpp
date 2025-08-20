@@ -12,19 +12,22 @@ ColorDialog& ColorDialog::currentColor(const QColor& color) {
 }
 
 ColorDialog& ColorDialog::options(QColorDialog::ColorDialogOptions options) {
-    return static_cast<ColorDialog&>(setProperty("options", static_cast<int>(options)));
+    return static_cast<ColorDialog&>(
+        setProperty("options", static_cast<int>(options)));
 }
 
 ColorDialog& ColorDialog::windowTitle(const QString& title) {
     return static_cast<ColorDialog&>(setProperty("windowTitle", title));
 }
 
-ColorDialog& ColorDialog::onColorSelected(std::function<void(const QColor&)> handler) {
+ColorDialog& ColorDialog::onColorSelected(
+    std::function<void(const QColor&)> handler) {
     color_selected_handler_ = std::move(handler);
     return *this;
 }
 
-ColorDialog& ColorDialog::onCurrentColorChanged(std::function<void(const QColor&)> handler) {
+ColorDialog& ColorDialog::onCurrentColorChanged(
+    std::function<void(const QColor&)> handler) {
     current_color_changed_handler_ = std::move(handler);
     return *this;
 }
@@ -37,18 +40,23 @@ void ColorDialog::initialize() {
         // Connect signals
         if (color_selected_handler_) {
             connect(color_dialog_widget_, &QColorDialog::colorSelected, this,
-                    [this](const QColor& color) { color_selected_handler_(color); });
+                    [this](const QColor& color) {
+                        color_selected_handler_(color);
+                    });
         }
 
         if (current_color_changed_handler_) {
-            connect(color_dialog_widget_, &QColorDialog::currentColorChanged, this,
-                    [this](const QColor& color) { current_color_changed_handler_(color); });
+            connect(color_dialog_widget_, &QColorDialog::currentColorChanged,
+                    this, [this](const QColor& color) {
+                        current_color_changed_handler_(color);
+                    });
         }
     }
 }
 
 int ColorDialog::exec() {
-    return color_dialog_widget_ ? color_dialog_widget_->exec() : QDialog::Rejected;
+    return color_dialog_widget_ ? color_dialog_widget_->exec()
+                                : QDialog::Rejected;
 }
 
 void ColorDialog::show() {
@@ -70,11 +78,13 @@ void ColorDialog::reject() {
 }
 
 QColor ColorDialog::selectedColor() const {
-    return color_dialog_widget_ ? color_dialog_widget_->selectedColor() : QColor();
+    return color_dialog_widget_ ? color_dialog_widget_->selectedColor()
+                                : QColor();
 }
 
 QColor ColorDialog::getCurrentColor() const {
-    return color_dialog_widget_ ? color_dialog_widget_->currentColor() : QColor();
+    return color_dialog_widget_ ? color_dialog_widget_->currentColor()
+                                : QColor();
 }
 
 void ColorDialog::setCurrentColor(const QColor& color) {
@@ -84,8 +94,9 @@ void ColorDialog::setCurrentColor(const QColor& color) {
 }
 
 // **Static convenience methods**
-QColor ColorDialog::getColor(const QColor& initial, QWidget* parent, 
-                           const QString& title, QColorDialog::ColorDialogOptions options) {
+QColor ColorDialog::getColor(const QColor& initial, QWidget* parent,
+                             const QString& title,
+                             QColorDialog::ColorDialogOptions options) {
     return QColorDialog::getColor(initial, parent, title, options);
 }
 

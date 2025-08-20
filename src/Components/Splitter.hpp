@@ -39,6 +39,4 @@ private:
     std::function<void(int, int)> splitter_moved_handler_;
 };
 
-
-
 }  // namespace DeclarativeUI::Components

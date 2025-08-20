@@ -23,6 +23,7 @@ High-performance file and directory change detection with advanced features:
 - Adaptive heuristics to tune debounce intervals based on change frequency
 
 **Key Features:**
+
 - Cross-platform file system monitoring
 - Adaptive debouncing based on change frequency
 - Memory and performance optimization
@@ -39,6 +40,7 @@ Central manager coordinating hot-reload lifecycle for JSON-driven UI:
 - Expose configuration setters for debounce, concurrency, memory limits
 
 **Key Features:**
+
 - **Dependency Management**: Automatic dependency graph building and cycle detection
 - **Thread Management**: Multi-threaded reload operations with thread pool
 - **Performance Measurement**: Built-in performance metrics collection
@@ -47,6 +49,7 @@ Central manager coordinating hot-reload lifecycle for JSON-driven UI:
 - **Smart Caching**: Widget caching and preloading strategies
 
 **Recently Implemented Methods:**
+
 - `buildDependencyGraph()`: Analyzes JSON files for dependencies
 - `updateDependencies()`: Updates dependency metadata
 - `hasCyclicDependency()`: Detects circular dependencies
@@ -70,6 +73,7 @@ Comprehensive performance monitoring, analytics and optimization for hot-reload 
 - Automated optimization hooks and performance callbacks
 
 **Key Features:**
+
 - **Real-time Analytics**: Sliding window analytics with trend calculation
 - **Predictive Modeling**: Simple forecasting for response times and memory usage
 - **Bottleneck Detection**: Automatic detection of CPU, memory, and I/O bottlenecks
@@ -78,6 +82,7 @@ Comprehensive performance monitoring, analytics and optimization for hot-reload 
 - **Comprehensive Reporting**: Text, JSON, and detailed report generation
 
 **Recently Implemented Methods:**
+
 - `pauseMonitoring()` / `resumeMonitoring()`: Monitoring lifecycle control
 - `recordMemoryUsage()` / `recordCPUUsage()`: Resource usage tracking
 - `getPredictionReport()`: Predictive modeling results
@@ -172,6 +177,7 @@ QStringList affected = manager->getAffectedFiles("ui/component.json");
 ## Thread Safety
 
 All components are designed for concurrent use:
+
 - Internal mutable containers are guarded by shared_mutex
 - Atomic primitives are used for counters updated from hot paths
 - Signal emission adheres to Qt threading rules
@@ -185,10 +191,12 @@ All components are designed for concurrent use:
 ## Testing
 
 Comprehensive unit tests are available in `tests/unit/`:
+
 - `test_hot_reload.cpp`: Basic functionality tests
 - `test_hot_reload_advanced.cpp`: Advanced feature tests
 
 Run tests with:
+
 ```bash
 cd build
 ctest -R HotReload

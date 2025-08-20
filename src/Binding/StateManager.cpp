@@ -1,3 +1,24 @@
+/**
+ * @file StateManager.cpp
+ * @brief Implementation of the reactive state management system for
+ * DeclarativeUI
+ *
+ * This file provides a comprehensive state management solution with:
+ * - Type-safe reactive properties with automatic change notifications
+ * - Computed properties with dependency tracking
+ * - Undo/redo functionality with configurable history
+ * - Batch updates for performance optimization
+ * - State persistence and loading
+ * - Thread-safe operations with recursive mutex protection
+ * - Performance monitoring and debugging capabilities
+ *
+ * The implementation emphasizes maintainable code with low cyclomatic
+ * complexity by breaking down complex operations into focused helper functions.
+ *
+ * @author DeclarativeUI Team
+ * @version 1.0
+ */
+
 #include "StateManager.hpp"
 
 #include <QDebug>
@@ -173,63 +194,18 @@ bool StateManager::canRedo(const QString& key) const {
 void StateManager::undo(const QString& key) {
     QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
-    if (it != states_.end() && it->second.history_enabled &&
-        it->second.history_position > 0) {
-        auto& info = it->second;
-        info.history_position--;
 
-        if (validateHistoryPosition(info, info.history_position)) {
-            auto value = info.history[info.history_position];
-
-            // Apply the history value using helper function
-            if (applyHistoryValue(info, value, key)) {
-                emit stateChanged(key, value);
-                qDebug() << "↶ Undo applied to state:" << key
-                         << "to position:" << info.history_position;
-            } else {
-                // Revert position if application failed
-                info.history_position++;
-                qWarning() << "❌ Undo failed for state:" << key
-                           << "- reverting position";
-            }
-        } else {
-            // Revert position if validation failed
-            info.history_position++;
-            qWarning() << "❌ Undo failed for state:" << key
-                       << "- invalid history position";
-        }
+    if (it != states_.end() && validateUndoOperation(key, it->second)) {
+        performUndoOperation(it->second, key);
     }
 }
 
 void StateManager::redo(const QString& key) {
     QMutexLocker locker(&global_lock_);
     auto it = states_.find(key);
-    if (it != states_.end() && it->second.history_enabled &&
-        it->second.history_position <
-            static_cast<int>(it->second.history.size()) - 1) {
-        auto& info = it->second;
-        info.history_position++;
 
-        if (validateHistoryPosition(info, info.history_position)) {
-            auto value = info.history[info.history_position];
-
-            // Apply the history value using helper function
-            if (applyHistoryValue(info, value, key)) {
-                emit stateChanged(key, value);
-                qDebug() << "↷ Redo applied to state:" << key
-                         << "to position:" << info.history_position;
-            } else {
-                // Revert position if application failed
-                info.history_position--;
-                qWarning() << "❌ Redo failed for state:" << key
-                           << "- reverting position";
-            }
-        } else {
-            // Revert position if validation failed
-            info.history_position--;
-            qWarning() << "❌ Redo failed for state:" << key
-                       << "- invalid history position";
-        }
+    if (it != states_.end() && validateRedoOperation(key, it->second)) {
+        performRedoOperation(it->second, key);
     }
 }
 
@@ -285,45 +261,11 @@ void StateManager::updateDependents(const QString& key) {
 
     auto it = dependents_.find(key);
     if (it != dependents_.end()) {
-        for (const auto& dependent : it->second) {
-            qDebug() << "🔄 Updating dependent state:" << dependent;
+        // Update computed dependents (with functions)
+        updateComputedDependents(key);
 
-            // Trigger recomputation of dependent states
-            auto dependentIt = state_data_.find(dependent);
-            if (dependentIt != state_data_.end()) {
-                // Check if this dependent state has a computed value function
-                auto computedIt = computed_values_.find(dependent);
-                if (computedIt != computed_values_.end()) {
-                    try {
-                        // Recompute the value using the stored function
-                        QVariant newValue = computedIt->second();
-                        QVariant oldValue = dependentIt->second;
-
-                        // Only update if the value actually changed
-                        if (newValue != oldValue) {
-                            dependentIt->second = newValue;
-
-                            // Emit change signal for the dependent state
-                            emit stateChanged(dependent, newValue);
-
-                            // Recursively update dependents of this dependent
-                            updateDependents(dependent);
-
-                            qDebug()
-                                << "✅ Dependent state updated:" << dependent
-                                << "from" << oldValue << "to" << newValue;
-                        }
-                    } catch (const std::exception& e) {
-                        qWarning() << "❌ Error updating dependent state"
-                                   << dependent << ":" << e.what();
-                    }
-                } else {
-                    // If no computed function, just emit a change notification
-                    // This allows manual dependent updates
-                    emit stateChanged(dependent, dependentIt->second);
-                }
-            }
-        }
+        // Update manual dependents (without functions)
+        updateManualDependents(key);
     }
 }
 
@@ -391,69 +333,60 @@ QString StateManager::getPerformanceReport() const {
 void StateManager::saveState(const QString& filename) const {
     QMutexLocker locker(&global_lock_);
 
+    // Create root JSON object with metadata
     QJsonObject rootObject;
     rootObject["version"] = "1.0";
     rootObject["timestamp"] =
         QDateTime::currentDateTime().toString(Qt::ISODate);
 
-    QJsonObject statesObject;
-
-    // Save state data
-    for (const auto& [key, value] : state_data_) {
-        QJsonObject stateEntry;
-
-        // Convert QVariant to JSON-compatible format
-        if (value.canConvert<QString>()) {
-            stateEntry["value"] = value.toString();
-            stateEntry["type"] = "QString";
-        } else if (value.canConvert<int>()) {
-            stateEntry["value"] = value.toInt();
-            stateEntry["type"] = "int";
-        } else if (value.canConvert<double>()) {
-            stateEntry["value"] = value.toDouble();
-            stateEntry["type"] = "double";
-        } else if (value.canConvert<bool>()) {
-            stateEntry["value"] = value.toBool();
-            stateEntry["type"] = "bool";
-        } else {
-            // Fallback to string representation
-            stateEntry["value"] = value.toString();
-            stateEntry["type"] = "QString";
-        }
-
-        statesObject[key] = stateEntry;
-    }
-
-    rootObject["states"] = statesObject;
-
-    // Save dependencies
-    QJsonObject dependenciesObject;
-    for (const auto& [key, deps] : dependencies_) {
-        QJsonArray depsArray;
-        for (const auto& dep : deps) {
-            depsArray.append(dep);
-        }
-        dependenciesObject[key] = depsArray;
-    }
-    rootObject["dependencies"] = dependenciesObject;
+    // Add state data and dependencies
+    rootObject["states"] = createStateDataJson();
+    rootObject["dependencies"] = createDependenciesJson();
 
     // Write to file
-    QJsonDocument doc(rootObject);
-    QFile file(filename);
-    if (file.open(QIODevice::WriteOnly)) {
-        file.write(doc.toJson());
-        file.close();
-        qDebug() << "💾 State saved to:" << filename;
-    } else {
+    if (!writeJsonToFile(rootObject, filename)) {
         qWarning() << "❌ Failed to save state to:" << filename;
     }
 }
 
+/**
+ * @brief Loads state data from a JSON file
+ * @param filename Path to the state file to load
+ *
+ * This function handles file reading, JSON parsing, version validation,
+ * and state restoration in a structured manner.
+ */
 void StateManager::loadState(const QString& filename) {
+    // **Read and parse JSON file**
+    QJsonObject rootObject = readStateFile(filename);
+    if (rootObject.isEmpty()) {
+        return;  // Error already logged in readStateFile
+    }
+
+    // **Validate file version**
+    if (!validateStateFileVersion(rootObject)) {
+        return;  // Error already logged in validateStateFileVersion
+    }
+
+    QMutexLocker locker(&global_lock_);
+
+    // **Load state data and dependencies**
+    loadStateData(rootObject["states"].toObject());
+    loadStateDependencies(rootObject["dependencies"].toObject());
+
+    qDebug() << "📂 State loaded from:" << filename;
+}
+
+/**
+ * @brief Reads and parses a state file into a JSON object
+ * @param filename Path to the state file
+ * @return Parsed JSON object or empty object on error
+ */
+QJsonObject StateManager::readStateFile(const QString& filename) const {
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning() << "❌ Failed to load state from:" << filename;
-        return;
+        return QJsonObject();
     }
 
     QByteArray data = file.readAll();
@@ -464,42 +397,46 @@ void StateManager::loadState(const QString& filename) {
 
     if (error.error != QJsonParseError::NoError) {
         qWarning() << "❌ JSON parse error:" << error.errorString();
-        return;
+        return QJsonObject();
     }
 
-    QJsonObject rootObject = doc.object();
-    QString version = rootObject["version"].toString();
+    return doc.object();
+}
 
+/**
+ * @brief Validates the version of a state file
+ * @param rootObject The root JSON object from the state file
+ * @return true if version is supported, false otherwise
+ */
+bool StateManager::validateStateFileVersion(
+    const QJsonObject& rootObject) const {
+    QString version = rootObject["version"].toString();
     if (version != "1.0") {
         qWarning() << "❌ Unsupported state file version:" << version;
-        return;
+        return false;
     }
+    return true;
+}
 
-    QMutexLocker locker(&global_lock_);
-
-    // Load states
-    QJsonObject statesObject = rootObject["states"].toObject();
+/**
+ * @brief Loads state data from a JSON object
+ * @param statesObject JSON object containing state data
+ */
+void StateManager::loadStateData(const QJsonObject& statesObject) {
     for (auto it = statesObject.begin(); it != statesObject.end(); ++it) {
         QString key = it.key();
         QJsonObject stateEntry = it.value().toObject();
-        QString type = stateEntry["type"].toString();
-
-        QVariant value;
-        if (type == "QString") {
-            value = stateEntry["value"].toString();
-        } else if (type == "int") {
-            value = stateEntry["value"].toInt();
-        } else if (type == "double") {
-            value = stateEntry["value"].toDouble();
-        } else if (type == "bool") {
-            value = stateEntry["value"].toBool();
-        }
-
+        QVariant value = parseStateValue(stateEntry);
         state_data_[key] = value;
     }
+}
 
-    // Load dependencies
-    QJsonObject dependenciesObject = rootObject["dependencies"].toObject();
+/**
+ * @brief Loads state dependencies from a JSON object
+ * @param dependenciesObject JSON object containing dependency data
+ */
+void StateManager::loadStateDependencies(
+    const QJsonObject& dependenciesObject) {
     for (auto it = dependenciesObject.begin(); it != dependenciesObject.end();
          ++it) {
         QString key = it.key();
@@ -511,8 +448,27 @@ void StateManager::loadState(const QString& filename) {
         }
         dependencies_[key] = deps;
     }
+}
 
-    qDebug() << "📂 State loaded from:" << filename;
+/**
+ * @brief Parses a state value from a JSON state entry
+ * @param stateEntry JSON object containing type and value information
+ * @return Parsed QVariant value
+ */
+QVariant StateManager::parseStateValue(const QJsonObject& stateEntry) const {
+    QString type = stateEntry["type"].toString();
+
+    if (type == "QString") {
+        return stateEntry["value"].toString();
+    } else if (type == "int") {
+        return stateEntry["value"].toInt();
+    } else if (type == "double") {
+        return stateEntry["value"].toDouble();
+    } else if (type == "bool") {
+        return stateEntry["value"].toBool();
+    }
+
+    return QVariant();  // Return invalid variant for unknown types
 }
 
 void StateManager::logStateChange(const QString& key, const QVariant& oldValue,
@@ -710,6 +666,237 @@ bool StateManager::applyHistoryValue(const StateInfo& info,
     }
 
     return success;
+}
+
+// ============================================================================
+// REFACTORED HELPER METHODS FOR REDUCED COMPLEXITY
+// ============================================================================
+
+bool StateManager::validateUndoOperation(const QString& key,
+                                         StateInfo& info) const {
+    return info.history_enabled && info.history_position > 0;
+}
+
+bool StateManager::validateRedoOperation(const QString& key,
+                                         StateInfo& info) const {
+    return info.history_enabled &&
+           info.history_position < static_cast<int>(info.history.size()) - 1;
+}
+
+void StateManager::performUndoOperation(StateInfo& info, const QString& key) {
+    info.history_position--;
+
+    if (validateHistoryPosition(info, info.history_position)) {
+        auto value = info.history[info.history_position];
+
+        // Apply the history value using helper function
+        if (applyHistoryValue(info, value, key)) {
+            emit stateChanged(key, value);
+            qDebug() << "↶ Undo applied to state:" << key
+                     << "to position:" << info.history_position;
+        } else {
+            // Revert position if application failed
+            info.history_position++;
+            qWarning() << "❌ Undo failed for state:" << key
+                       << "- reverting position";
+        }
+    } else {
+        // Revert position if validation failed
+        info.history_position++;
+        qWarning() << "❌ Undo failed for state:" << key
+                   << "- invalid history position";
+    }
+}
+
+void StateManager::performRedoOperation(StateInfo& info, const QString& key) {
+    info.history_position++;
+
+    if (validateHistoryPosition(info, info.history_position)) {
+        auto value = info.history[info.history_position];
+
+        // Apply the history value using helper function
+        if (applyHistoryValue(info, value, key)) {
+            emit stateChanged(key, value);
+            qDebug() << "↷ Redo applied to state:" << key
+                     << "to position:" << info.history_position;
+        } else {
+            // Revert position if application failed
+            info.history_position--;
+            qWarning() << "❌ Redo failed for state:" << key
+                       << "- reverting position";
+        }
+    } else {
+        // Revert position if validation failed
+        info.history_position--;
+        qWarning() << "❌ Redo failed for state:" << key
+                   << "- invalid history position";
+    }
+}
+
+/**
+ * @brief Updates computed dependent states when a dependency changes
+ * @param key The key of the state that changed
+ *
+ * This function processes all computed dependents of the changed state,
+ * recomputing their values and triggering cascading updates.
+ */
+void StateManager::updateComputedDependents(const QString& key) {
+    auto it = dependents_.find(key);
+    if (it == dependents_.end())
+        return;
+
+    for (const auto& dependent : it->second) {
+        updateSingleComputedDependent(dependent);
+    }
+}
+
+/**
+ * @brief Updates a single computed dependent state
+ * @param dependent The key of the dependent state to update
+ */
+void StateManager::updateSingleComputedDependent(const QString& dependent) {
+    qDebug() << "🔄 Updating computed dependent state:" << dependent;
+
+    auto dependentIt = state_data_.find(dependent);
+    if (dependentIt == state_data_.end()) {
+        return;
+    }
+
+    auto computedIt = computed_values_.find(dependent);
+    if (computedIt == computed_values_.end()) {
+        return;  // Not a computed state
+    }
+
+    try {
+        QVariant newValue = computedIt->second();
+        QVariant oldValue = dependentIt->second;
+
+        if (shouldUpdateComputedValue(newValue, oldValue)) {
+            applyComputedValueUpdate(dependent, newValue, oldValue);
+        }
+    } catch (const std::exception& e) {
+        qWarning() << "❌ Error updating computed dependent state" << dependent
+                   << ":" << e.what();
+    }
+}
+
+/**
+ * @brief Checks if a computed value should be updated
+ * @param newValue The newly computed value
+ * @param oldValue The current value
+ * @return true if the value should be updated, false otherwise
+ */
+bool StateManager::shouldUpdateComputedValue(const QVariant& newValue,
+                                             const QVariant& oldValue) const {
+    return newValue != oldValue;
+}
+
+/**
+ * @brief Applies a computed value update and triggers cascading updates
+ * @param dependent The key of the dependent state
+ * @param newValue The new computed value
+ * @param oldValue The previous value
+ */
+void StateManager::applyComputedValueUpdate(const QString& dependent,
+                                            const QVariant& newValue,
+                                            const QVariant& oldValue) {
+    // Update the state data
+    state_data_[dependent] = newValue;
+
+    // Emit change signal for the dependent state
+    emit stateChanged(dependent, newValue);
+
+    // Recursively update dependents of this dependent
+    updateDependents(dependent);
+
+    qDebug() << "✅ Computed dependent state updated:" << dependent << "from"
+             << oldValue << "to" << newValue;
+}
+
+void StateManager::updateManualDependents(const QString& key) {
+    auto it = dependents_.find(key);
+    if (it == dependents_.end())
+        return;
+
+    for (const auto& dependent : it->second) {
+        // Trigger recomputation of dependent states
+        auto dependentIt = state_data_.find(dependent);
+        if (dependentIt != state_data_.end()) {
+            // Check if this dependent state has no computed value function
+            auto computedIt = computed_values_.find(dependent);
+            if (computedIt == computed_values_.end()) {
+                // If no computed function, just emit a change notification
+                // This allows manual dependent updates
+                emit stateChanged(dependent, dependentIt->second);
+                qDebug() << "🔄 Manual dependent state notified:" << dependent;
+            }
+        }
+    }
+}
+
+QJsonObject StateManager::createStateDataJson() const {
+    QJsonObject statesObject;
+
+    // Save state data
+    for (const auto& [key, value] : state_data_) {
+        statesObject[key] = convertVariantToJson(value);
+    }
+
+    return statesObject;
+}
+
+QJsonObject StateManager::createDependenciesJson() const {
+    QJsonObject dependenciesObject;
+
+    for (const auto& [key, deps] : dependencies_) {
+        QJsonArray depsArray;
+        for (const auto& dep : deps) {
+            depsArray.append(dep);
+        }
+        dependenciesObject[key] = depsArray;
+    }
+
+    return dependenciesObject;
+}
+
+QJsonObject StateManager::convertVariantToJson(const QVariant& value) const {
+    QJsonObject stateEntry;
+
+    // Convert QVariant to JSON-compatible format
+    if (value.canConvert<QString>()) {
+        stateEntry["value"] = value.toString();
+        stateEntry["type"] = "QString";
+    } else if (value.canConvert<int>()) {
+        stateEntry["value"] = value.toInt();
+        stateEntry["type"] = "int";
+    } else if (value.canConvert<double>()) {
+        stateEntry["value"] = value.toDouble();
+        stateEntry["type"] = "double";
+    } else if (value.canConvert<bool>()) {
+        stateEntry["value"] = value.toBool();
+        stateEntry["type"] = "bool";
+    } else {
+        // Fallback to string representation
+        stateEntry["value"] = value.toString();
+        stateEntry["type"] = "QString";
+    }
+
+    return stateEntry;
+}
+
+bool StateManager::writeJsonToFile(const QJsonObject& rootObject,
+                                   const QString& filename) const {
+    QJsonDocument doc(rootObject);
+    QFile file(filename);
+
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(doc.toJson());
+        file.close();
+        qDebug() << "💾 State saved to:" << filename;
+        return true;
+    }
+
+    return false;
 }
 
 }  // namespace DeclarativeUI::Binding

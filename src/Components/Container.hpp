@@ -25,6 +25,4 @@ private:
     QLayout *layout_ = nullptr;
 };
 
-
-
 }  // namespace DeclarativeUI::Components

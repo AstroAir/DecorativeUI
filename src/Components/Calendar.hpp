@@ -1,10 +1,10 @@
 // Components/Calendar.hpp
 #pragma once
 #include <QCalendarWidget>
-#include <QDate>
-#include <QTextCharFormat>
-#include <QLocale>
 #include <QColor>
+#include <QDate>
+#include <QLocale>
+#include <QTextCharFormat>
 
 #include "../Core/UIElement.hpp"
 
@@ -25,8 +25,10 @@ public:
     Calendar& navigationBarVisible(bool visible);
     Calendar& dateEditEnabled(bool enabled);
     Calendar& dateEditAcceptDelay(int delay);
-    Calendar& verticalHeaderFormat(QCalendarWidget::VerticalHeaderFormat format);
-    Calendar& horizontalHeaderFormat(QCalendarWidget::HorizontalHeaderFormat format);
+    Calendar& verticalHeaderFormat(
+        QCalendarWidget::VerticalHeaderFormat format);
+    Calendar& horizontalHeaderFormat(
+        QCalendarWidget::HorizontalHeaderFormat format);
     Calendar& selectionMode(QCalendarWidget::SelectionMode mode);
     Calendar& onSelectionChanged(std::function<void()> handler);
     Calendar& onClicked(std::function<void(const QDate&)> handler);
@@ -36,7 +38,8 @@ public:
 
     // **Enhanced Calendar Features**
     Calendar& locale(const QLocale& locale);
-    Calendar& weekdayTextFormat(Qt::DayOfWeek dayOfWeek, const QTextCharFormat& format);
+    Calendar& weekdayTextFormat(Qt::DayOfWeek dayOfWeek,
+                                const QTextCharFormat& format);
     Calendar& dateTextFormat(const QDate& date, const QTextCharFormat& format);
     Calendar& headerTextFormat(const QTextCharFormat& format);
     Calendar& setDateRange(const QDate& min, const QDate& max);
@@ -44,7 +47,8 @@ public:
     Calendar& showWeekNumbers(bool show);
     Calendar& enableMultiSelection(bool enable);
     Calendar& selectedDates(const QList<QDate>& dates);
-    Calendar& addSpecialDate(const QDate& date, const QString& tooltip = QString());
+    Calendar& addSpecialDate(const QDate& date,
+                             const QString& tooltip = QString());
     Calendar& removeSpecialDate(const QDate& date);
     Calendar& setHolidays(const QList<QDate>& holidays);
     Calendar& onDateHovered(std::function<void(const QDate&)> handler);
@@ -80,11 +84,5 @@ private:
     bool multi_selection_enabled_;
     bool highlight_today_enabled_;
 };
-
-
-
-
-
-
 
 }  // namespace DeclarativeUI::Components

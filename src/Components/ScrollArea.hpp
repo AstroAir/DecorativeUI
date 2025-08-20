@@ -20,7 +20,8 @@ public:
     ScrollArea& verticalScrollBarPolicy(Qt::ScrollBarPolicy policy);
     ScrollArea& alignment(Qt::Alignment alignment);
     ScrollArea& ensureVisible(int x, int y, int xmargin = 50, int ymargin = 50);
-    ScrollArea& ensureWidgetVisible(QWidget* childWidget, int xmargin = 50, int ymargin = 50);
+    ScrollArea& ensureWidgetVisible(QWidget* childWidget, int xmargin = 50,
+                                    int ymargin = 50);
     ScrollArea& style(const QString& stylesheet);
 
     void initialize() override;
@@ -35,7 +36,5 @@ public:
 private:
     QScrollArea* scroll_area_widget_;
 };
-
-
 
 }  // namespace DeclarativeUI::Components

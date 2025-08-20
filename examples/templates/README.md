@@ -9,10 +9,12 @@ This directory contains templates for creating new DeclarativeUI examples. These
 **Use for:** Simple examples demonstrating specific concepts or features
 
 **Includes:**
+
 - `example-template.cpp` - Basic example structure
 - `README.md` - Documentation template
 
 **Best for:**
+
 - Single concept demonstrations
 - Component showcases
 - Feature introductions
@@ -23,10 +25,12 @@ This directory contains templates for creating new DeclarativeUI examples. These
 **Use for:** Complete applications demonstrating real-world usage
 
 **Includes:**
+
 - `application-template.cpp` - Full application structure with menus, status bar, etc.
 - `README.md` - Comprehensive application documentation template
 
 **Best for:**
+
 - Complete sample applications
 - Complex feature demonstrations
 - Architecture pattern examples
@@ -37,11 +41,13 @@ This directory contains templates for creating new DeclarativeUI examples. These
 ### Creating a Basic Example
 
 1. **Copy the template:**
+
    ```bash
    cp -r templates/basic-example-template/ [category]/[example-name]/
    ```
 
 2. **Rename files:**
+
    ```bash
    cd [category]/[example-name]/
    mv example-template.cpp [example-name].cpp
@@ -64,11 +70,13 @@ This directory contains templates for creating new DeclarativeUI examples. These
 ### Creating an Application Example
 
 1. **Copy the template:**
+
    ```bash
    cp -r templates/application-template/ 06-applications/[app-name]/
    ```
 
 2. **Rename files:**
+
    ```bash
    cd 06-applications/[app-name]/
    mv application-template.cpp [app-name].cpp
@@ -92,6 +100,7 @@ This directory contains templates for creating new DeclarativeUI examples. These
 ## Template Guidelines
 
 ### Code Style
+
 - Use modern C++ features (C++17 or later)
 - Follow Qt naming conventions
 - Use `std::unique_ptr` for widget ownership where appropriate
@@ -99,6 +108,7 @@ This directory contains templates for creating new DeclarativeUI examples. These
 - Handle errors gracefully
 
 ### Documentation Style
+
 - Start with a clear, concise description
 - List prerequisites and difficulty level
 - Explain key concepts thoroughly
@@ -106,6 +116,7 @@ This directory contains templates for creating new DeclarativeUI examples. These
 - Include troubleshooting information
 
 ### File Organization
+
 - Keep examples self-contained
 - Use descriptive file names (kebab-case)
 - Include all necessary resources
@@ -118,6 +129,7 @@ This directory contains templates for creating new DeclarativeUI examples. These
 If you need a template for a specific type of example:
 
 1. **Create template directory:**
+
    ```bash
    mkdir templates/[template-name]/
    ```
@@ -162,6 +174,7 @@ If you need a template for a specific type of example:
 ## Common Placeholders
 
 ### Code Templates
+
 - `[Example Name]` - Human-readable example name
 - `[Brief description]` - Short description of what the example does
 - `[Concept 1]`, `[Concept 2]`, etc. - Key concepts demonstrated
@@ -169,6 +182,7 @@ If you need a template for a specific type of example:
 - `TODO:` comments - Areas requiring customization
 
 ### Documentation Templates
+
 - `[Example Name]` - Example title
 - `[Brief description]` - Example description
 - `[Category name]` - Example category
@@ -181,6 +195,7 @@ If you need a template for a specific type of example:
 Before submitting a new example created from a template:
 
 ### Code Quality
+
 - [ ] All placeholders replaced with actual content
 - [ ] Code compiles without warnings
 - [ ] Example runs correctly
@@ -188,6 +203,7 @@ Before submitting a new example created from a template:
 - [ ] Code follows project style guidelines
 
 ### Documentation
+
 - [ ] README.md completed with all sections
 - [ ] Prerequisites clearly stated
 - [ ] Learning objectives defined
@@ -195,12 +211,14 @@ Before submitting a new example created from a template:
 - [ ] Troubleshooting information included
 
 ### Integration
+
 - [ ] Added to appropriate CMakeLists.txt
 - [ ] Category README.md updated
 - [ ] Example tested in build system
 - [ ] All dependencies documented
 
 ### Testing
+
 - [ ] Example tested on target platforms
 - [ ] Edge cases considered
 - [ ] Performance acceptable

@@ -1,31 +1,33 @@
 #include "SpecializedCommands.hpp"
-#include <QDebug>
 #include <QButtonGroup>
+#include <QDebug>
 #include <QIcon>
 
 namespace DeclarativeUI::Command::UI {
 
 // **RadioButtonCommand implementation**
-RadioButtonCommand::RadioButtonCommand(QObject* parent) : ButtonCommand(parent) {
+RadioButtonCommand::RadioButtonCommand(QObject* parent)
+    : ButtonCommand(parent) {
     // Override default properties for radio button
     getState()->setProperty("text", QString("Radio Button"));
-    getState()->setProperty("checkable", true);  // Radio buttons are always checkable
+    getState()->setProperty("checkable",
+                            true);  // Radio buttons are always checkable
     getState()->setProperty("autoExclusive", true);
     getState()->setProperty("buttonGroup", QString());
-    
+
     qDebug() << "🔘 RadioButtonCommand created";
 }
 
 UICommandMetadata RadioButtonCommand::getMetadata() const {
-    UICommandMetadata metadata("RadioButton", "QRadioButton", "Radio Button", "A radio button control for exclusive selection");
+    UICommandMetadata metadata(
+        "RadioButton", "QRadioButton", "Radio Button",
+        "A radio button control for exclusive selection");
     metadata.supported_events = {"clicked", "toggled"};
-    metadata.default_properties = {
-        {"text", "Radio Button"},
-        {"enabled", true},
-        {"checkable", true},
-        {"checked", false},
-        {"autoExclusive", true}
-    };
+    metadata.default_properties = {{"text", "Radio Button"},
+                                   {"enabled", true},
+                                   {"checkable", true},
+                                   {"checked", false},
+                                   {"autoExclusive", true}};
     return metadata;
 }
 
@@ -38,7 +40,8 @@ bool RadioButtonCommand::isAutoExclusive() const {
     return getState()->getProperty<bool>("autoExclusive", true);
 }
 
-RadioButtonCommand& RadioButtonCommand::setButtonGroup(const QString& groupName) {
+RadioButtonCommand& RadioButtonCommand::setButtonGroup(
+    const QString& groupName) {
     getState()->setProperty("buttonGroup", groupName);
     return *this;
 }
@@ -54,7 +57,7 @@ void RadioButtonCommand::onWidgetCreated(QWidget* widget) {
 
 void RadioButtonCommand::syncToWidget() {
     ButtonCommand::syncToWidget();
-    
+
     if (auto* radioButton = qobject_cast<QRadioButton*>(getWidget())) {
         radioButton->setAutoExclusive(isAutoExclusive());
         setupRadioButtonBehavior();
@@ -63,7 +66,7 @@ void RadioButtonCommand::syncToWidget() {
 
 void RadioButtonCommand::syncFromWidget() {
     ButtonCommand::syncFromWidget();
-    
+
     if (auto* radioButton = qobject_cast<QRadioButton*>(getWidget())) {
         getState()->setProperty("autoExclusive", radioButton->autoExclusive());
     }
@@ -74,7 +77,7 @@ void RadioButtonCommand::setupRadioButtonBehavior() {
     if (!radioButton) {
         return;
     }
-    
+
     // Handle button group if specified
     QString groupName = getButtonGroup();
     if (!groupName.isEmpty()) {
@@ -88,24 +91,22 @@ void RadioButtonCommand::setupRadioButtonBehavior() {
 CheckBoxCommand::CheckBoxCommand(QObject* parent) : ButtonCommand(parent) {
     // Override default properties for checkbox
     getState()->setProperty("text", QString("Check Box"));
-    getState()->setProperty("checkable", true);  // Checkboxes are always checkable
+    getState()->setProperty("checkable",
+                            true);  // Checkboxes are always checkable
     getState()->setProperty("tristate", false);
     getState()->setProperty("checkState", static_cast<int>(Qt::Unchecked));
-    
+
     qDebug() << "☑️ CheckBoxCommand created";
 }
 
 UICommandMetadata CheckBoxCommand::getMetadata() const {
-    UICommandMetadata metadata("CheckBox", "QCheckBox", "Check Box", "A checkbox control for multiple selection");
+    UICommandMetadata metadata("CheckBox", "QCheckBox", "Check Box",
+                               "A checkbox control for multiple selection");
     metadata.supported_events = {"clicked", "toggled", "stateChanged"};
     metadata.default_properties = {
-        {"text", "Check Box"},
-        {"enabled", true},
-        {"checkable", true},
-        {"checked", false},
-        {"tristate", false},
-        {"checkState", static_cast<int>(Qt::Unchecked)}
-    };
+        {"text", "Check Box"}, {"enabled", true},
+        {"checkable", true},   {"checked", false},
+        {"tristate", false},   {"checkState", static_cast<int>(Qt::Unchecked)}};
     return metadata;
 }
 
@@ -126,31 +127,35 @@ CheckBoxCommand& CheckBoxCommand::setCheckState(int state) {
 }
 
 int CheckBoxCommand::getCheckState() const {
-    return getState()->getProperty<int>("checkState", static_cast<int>(Qt::Unchecked));
+    return getState()->getProperty<int>("checkState",
+                                        static_cast<int>(Qt::Unchecked));
 }
 
-CheckBoxCommand& CheckBoxCommand::onStateChanged(std::function<void(int)> handler) {
+CheckBoxCommand& CheckBoxCommand::onStateChanged(
+    std::function<void(int)> handler) {
     state_changed_handler_ = handler;
     return *this;
 }
 
 void CheckBoxCommand::onWidgetCreated(QWidget* widget) {
     ButtonCommand::onWidgetCreated(widget);
-    
+
     if (auto* checkBox = qobject_cast<QCheckBox*>(widget)) {
         // Connect checkbox-specific signals
-        connect(checkBox, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState state) {
-            getState()->setProperty("checkState", static_cast<int>(state));
-            getState()->setProperty("checked", state == Qt::Checked);
-            emit stateChanged(static_cast<int>(state));
-            handleEvent("stateChanged", static_cast<int>(state));
-        });
+        connect(checkBox, &QCheckBox::checkStateChanged, this,
+                [this](Qt::CheckState state) {
+                    getState()->setProperty("checkState",
+                                            static_cast<int>(state));
+                    getState()->setProperty("checked", state == Qt::Checked);
+                    emit stateChanged(static_cast<int>(state));
+                    handleEvent("stateChanged", static_cast<int>(state));
+                });
     }
 }
 
 void CheckBoxCommand::syncToWidget() {
     ButtonCommand::syncToWidget();
-    
+
     if (auto* checkBox = qobject_cast<QCheckBox*>(getWidget())) {
         checkBox->setTristate(isTristate());
         checkBox->setCheckState(static_cast<Qt::CheckState>(getCheckState()));
@@ -159,49 +164,50 @@ void CheckBoxCommand::syncToWidget() {
 
 void CheckBoxCommand::syncFromWidget() {
     ButtonCommand::syncFromWidget();
-    
+
     if (auto* checkBox = qobject_cast<QCheckBox*>(getWidget())) {
         getState()->setProperty("tristate", checkBox->isTristate());
-        getState()->setProperty("checkState", static_cast<int>(checkBox->checkState()));
+        getState()->setProperty("checkState",
+                                static_cast<int>(checkBox->checkState()));
     }
 }
 
-void CheckBoxCommand::handleEvent(const QString& eventType, const QVariant& eventData) {
+void CheckBoxCommand::handleEvent(const QString& eventType,
+                                  const QVariant& eventData) {
     if (eventType == "stateChanged" && state_changed_handler_) {
         state_changed_handler_(eventData.toInt());
     }
-    
+
     ButtonCommand::handleEvent(eventType, eventData);
 }
 
 // **ToggleButtonCommand implementation**
-ToggleButtonCommand::ToggleButtonCommand(QObject* parent) : ButtonCommand(parent) {
+ToggleButtonCommand::ToggleButtonCommand(QObject* parent)
+    : ButtonCommand(parent) {
     // Override default properties for toggle button
     getState()->setProperty("text", QString("Toggle"));
-    getState()->setProperty("checkable", true);  // Toggle buttons are always checkable
+    getState()->setProperty("checkable",
+                            true);  // Toggle buttons are always checkable
     getState()->setProperty("checkedText", QString("On"));
     getState()->setProperty("uncheckedText", QString("Off"));
     getState()->setProperty("checkedIcon", QString());
     getState()->setProperty("uncheckedIcon", QString());
-    
+
     qDebug() << "🔄 ToggleButtonCommand created";
 }
 
 UICommandMetadata ToggleButtonCommand::getMetadata() const {
-    UICommandMetadata metadata("ToggleButton", "QPushButton", "Toggle Button", "A button that toggles between two states");
+    UICommandMetadata metadata("ToggleButton", "QPushButton", "Toggle Button",
+                               "A button that toggles between two states");
     metadata.supported_events = {"clicked", "toggled"};
     metadata.default_properties = {
-        {"text", "Toggle"},
-        {"enabled", true},
-        {"checkable", true},
-        {"checked", false},
-        {"checkedText", "On"},
-        {"uncheckedText", "Off"}
-    };
+        {"text", "Toggle"}, {"enabled", true},     {"checkable", true},
+        {"checked", false}, {"checkedText", "On"}, {"uncheckedText", "Off"}};
     return metadata;
 }
 
-ToggleButtonCommand& ToggleButtonCommand::setToggleText(const QString& checkedText, const QString& uncheckedText) {
+ToggleButtonCommand& ToggleButtonCommand::setToggleText(
+    const QString& checkedText, const QString& uncheckedText) {
     getState()->setProperty("checkedText", checkedText);
     getState()->setProperty("uncheckedText", uncheckedText);
     updateToggleAppearance();
@@ -216,7 +222,8 @@ QString ToggleButtonCommand::getUncheckedText() const {
     return getState()->getProperty<QString>("uncheckedText", "Off");
 }
 
-ToggleButtonCommand& ToggleButtonCommand::setToggleIcon(const QString& checkedIcon, const QString& uncheckedIcon) {
+ToggleButtonCommand& ToggleButtonCommand::setToggleIcon(
+    const QString& checkedIcon, const QString& uncheckedIcon) {
     getState()->setProperty("checkedIcon", checkedIcon);
     getState()->setProperty("uncheckedIcon", uncheckedIcon);
     updateToggleAppearance();
@@ -241,11 +248,12 @@ void ToggleButtonCommand::syncToWidget() {
     updateToggleAppearance();
 }
 
-void ToggleButtonCommand::handleEvent(const QString& eventType, const QVariant& eventData) {
+void ToggleButtonCommand::handleEvent(const QString& eventType,
+                                      const QVariant& eventData) {
     if (eventType == "toggled") {
         updateToggleAppearance();
     }
-    
+
     ButtonCommand::handleEvent(eventType, eventData);
 }
 
@@ -254,14 +262,14 @@ void ToggleButtonCommand::updateToggleAppearance() {
     if (!button) {
         return;
     }
-    
+
     bool checked = isChecked();
-    
+
     // Update text based on state
     QString text = checked ? getCheckedText() : getUncheckedText();
     button->setText(text);
     getState()->setProperty("text", text);
-    
+
     // Update icon based on state
     QString iconPath = checked ? getCheckedIcon() : getUncheckedIcon();
     if (!iconPath.isEmpty()) {
@@ -274,16 +282,19 @@ void ToggleButtonCommand::updateToggleAppearance() {
 ToolButtonCommand::ToolButtonCommand(QObject* parent) : ButtonCommand(parent) {
     // Override default properties for tool button
     getState()->setProperty("text", QString("Tool"));
-    getState()->setProperty("toolButtonStyle", static_cast<int>(Qt::ToolButtonIconOnly));
+    getState()->setProperty("toolButtonStyle",
+                            static_cast<int>(Qt::ToolButtonIconOnly));
     getState()->setProperty("arrowType", static_cast<int>(Qt::NoArrow));
-    getState()->setProperty("popupMode", static_cast<int>(QToolButton::DelayedPopup));
+    getState()->setProperty("popupMode",
+                            static_cast<int>(QToolButton::DelayedPopup));
     getState()->setProperty("autoRaise", true);
-    
+
     qDebug() << "🔧 ToolButtonCommand created";
 }
 
 UICommandMetadata ToolButtonCommand::getMetadata() const {
-    UICommandMetadata metadata("ToolButton", "QToolButton", "Tool Button", "A tool button control for toolbars");
+    UICommandMetadata metadata("ToolButton", "QToolButton", "Tool Button",
+                               "A tool button control for toolbars");
     metadata.supported_events = {"clicked", "toggled"};
     metadata.default_properties = {
         {"text", "Tool"},
@@ -291,8 +302,7 @@ UICommandMetadata ToolButtonCommand::getMetadata() const {
         {"checkable", false},
         {"checked", false},
         {"toolButtonStyle", static_cast<int>(Qt::ToolButtonIconOnly)},
-        {"autoRaise", true}
-    };
+        {"autoRaise", true}};
     return metadata;
 }
 
@@ -302,7 +312,8 @@ ToolButtonCommand& ToolButtonCommand::setToolButtonStyle(int style) {
 }
 
 int ToolButtonCommand::getToolButtonStyle() const {
-    return getState()->getProperty<int>("toolButtonStyle", static_cast<int>(Qt::ToolButtonIconOnly));
+    return getState()->getProperty<int>(
+        "toolButtonStyle", static_cast<int>(Qt::ToolButtonIconOnly));
 }
 
 ToolButtonCommand& ToolButtonCommand::setArrowType(int arrowType) {
@@ -311,7 +322,8 @@ ToolButtonCommand& ToolButtonCommand::setArrowType(int arrowType) {
 }
 
 int ToolButtonCommand::getArrowType() const {
-    return getState()->getProperty<int>("arrowType", static_cast<int>(Qt::NoArrow));
+    return getState()->getProperty<int>("arrowType",
+                                        static_cast<int>(Qt::NoArrow));
 }
 
 ToolButtonCommand& ToolButtonCommand::setPopupMode(int mode) {
@@ -320,7 +332,8 @@ ToolButtonCommand& ToolButtonCommand::setPopupMode(int mode) {
 }
 
 int ToolButtonCommand::getPopupMode() const {
-    return getState()->getProperty<int>("popupMode", static_cast<int>(QToolButton::DelayedPopup));
+    return getState()->getProperty<int>(
+        "popupMode", static_cast<int>(QToolButton::DelayedPopup));
 }
 
 ToolButtonCommand& ToolButtonCommand::setAutoRaise(bool autoRaise) {
@@ -338,22 +351,27 @@ void ToolButtonCommand::onWidgetCreated(QWidget* widget) {
 
 void ToolButtonCommand::syncToWidget() {
     ButtonCommand::syncToWidget();
-    
+
     if (auto* toolButton = qobject_cast<QToolButton*>(getWidget())) {
-        toolButton->setToolButtonStyle(static_cast<Qt::ToolButtonStyle>(getToolButtonStyle()));
+        toolButton->setToolButtonStyle(
+            static_cast<Qt::ToolButtonStyle>(getToolButtonStyle()));
         toolButton->setArrowType(static_cast<Qt::ArrowType>(getArrowType()));
-        toolButton->setPopupMode(static_cast<QToolButton::ToolButtonPopupMode>(getPopupMode()));
+        toolButton->setPopupMode(
+            static_cast<QToolButton::ToolButtonPopupMode>(getPopupMode()));
         toolButton->setAutoRaise(isAutoRaise());
     }
 }
 
 void ToolButtonCommand::syncFromWidget() {
     ButtonCommand::syncFromWidget();
-    
+
     if (auto* toolButton = qobject_cast<QToolButton*>(getWidget())) {
-        getState()->setProperty("toolButtonStyle", static_cast<int>(toolButton->toolButtonStyle()));
-        getState()->setProperty("arrowType", static_cast<int>(toolButton->arrowType()));
-        getState()->setProperty("popupMode", static_cast<int>(toolButton->popupMode()));
+        getState()->setProperty(
+            "toolButtonStyle", static_cast<int>(toolButton->toolButtonStyle()));
+        getState()->setProperty("arrowType",
+                                static_cast<int>(toolButton->arrowType()));
+        getState()->setProperty("popupMode",
+                                static_cast<int>(toolButton->popupMode()));
         getState()->setProperty("autoRaise", toolButton->autoRaise());
     }
 }
@@ -372,14 +390,11 @@ SpinBoxCommand::SpinBoxCommand(QObject* parent) : BaseUICommand(parent) {
 }
 
 UICommandMetadata SpinBoxCommand::getMetadata() const {
-    UICommandMetadata metadata("SpinBox", "QSpinBox", "Spin Box", "A numeric input control with spin buttons");
+    UICommandMetadata metadata("SpinBox", "QSpinBox", "Spin Box",
+                               "A numeric input control with spin buttons");
     metadata.supported_events = {"valueChanged"};
     metadata.default_properties = {
-        {"value", 0},
-        {"minimum", 0},
-        {"maximum", 99},
-        {"singleStep", 1}
-    };
+        {"value", 0}, {"minimum", 0}, {"maximum", 99}, {"singleStep", 1}};
     return metadata;
 }
 
@@ -443,7 +458,8 @@ QString SpinBoxCommand::getSuffix() const {
     return getState()->getProperty<QString>("suffix");
 }
 
-SpinBoxCommand& SpinBoxCommand::onValueChanged(std::function<void(int)> handler) {
+SpinBoxCommand& SpinBoxCommand::onValueChanged(
+    std::function<void(int)> handler) {
     value_changed_handler_ = handler;
     return *this;
 }
@@ -453,11 +469,12 @@ void SpinBoxCommand::onWidgetCreated(QWidget* widget) {
 
     if (auto* spinBox = qobject_cast<QSpinBox*>(widget)) {
         // Connect spinbox signals to command events
-        connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, [this](int value) {
-            getState()->setProperty("value", value);
-            emit valueChanged(value);
-            handleEvent("valueChanged", value);
-        });
+        connect(spinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+                [this](int value) {
+                    getState()->setProperty("value", value);
+                    emit valueChanged(value);
+                    handleEvent("valueChanged", value);
+                });
     }
 }
 
@@ -485,7 +502,8 @@ void SpinBoxCommand::syncFromWidget() {
     }
 }
 
-void SpinBoxCommand::handleEvent(const QString& eventType, const QVariant& eventData) {
+void SpinBoxCommand::handleEvent(const QString& eventType,
+                                 const QVariant& eventData) {
     if (eventType == "valueChanged" && value_changed_handler_) {
         value_changed_handler_(eventData.toInt());
     }
@@ -507,14 +525,15 @@ SliderCommand::SliderCommand(QObject* parent) : BaseUICommand(parent) {
 }
 
 UICommandMetadata SliderCommand::getMetadata() const {
-    UICommandMetadata metadata("Slider", "QSlider", "Slider", "A slider control for value selection");
-    metadata.supported_events = {"valueChanged", "sliderPressed", "sliderReleased"};
+    UICommandMetadata metadata("Slider", "QSlider", "Slider",
+                               "A slider control for value selection");
+    metadata.supported_events = {"valueChanged", "sliderPressed",
+                                 "sliderReleased"};
     metadata.default_properties = {
         {"value", 0},
         {"minimum", 0},
         {"maximum", 99},
-        {"orientation", static_cast<int>(Qt::Horizontal)}
-    };
+        {"orientation", static_cast<int>(Qt::Horizontal)}};
     return metadata;
 }
 
@@ -557,7 +576,8 @@ SliderCommand& SliderCommand::setOrientation(int orientation) {
 }
 
 int SliderCommand::getOrientation() const {
-    return getState()->getProperty<int>("orientation", static_cast<int>(Qt::Horizontal));
+    return getState()->getProperty<int>("orientation",
+                                        static_cast<int>(Qt::Horizontal));
 }
 
 SliderCommand& SliderCommand::setTickPosition(int position) {
@@ -566,7 +586,8 @@ SliderCommand& SliderCommand::setTickPosition(int position) {
 }
 
 int SliderCommand::getTickPosition() const {
-    return getState()->getProperty<int>("tickPosition", static_cast<int>(QSlider::NoTicks));
+    return getState()->getProperty<int>("tickPosition",
+                                        static_cast<int>(QSlider::NoTicks));
 }
 
 SliderCommand& SliderCommand::setTickInterval(int interval) {
@@ -624,7 +645,8 @@ void SliderCommand::syncToWidget() {
         slider->setMaximum(getMaximum());
         slider->setValue(getValue());
         slider->setOrientation(static_cast<Qt::Orientation>(getOrientation()));
-        slider->setTickPosition(static_cast<QSlider::TickPosition>(getTickPosition()));
+        slider->setTickPosition(
+            static_cast<QSlider::TickPosition>(getTickPosition()));
         slider->setTickInterval(getTickInterval());
     }
 }
@@ -634,13 +656,16 @@ void SliderCommand::syncFromWidget() {
         getState()->setProperty("value", slider->value());
         getState()->setProperty("minimum", slider->minimum());
         getState()->setProperty("maximum", slider->maximum());
-        getState()->setProperty("orientation", static_cast<int>(slider->orientation()));
-        getState()->setProperty("tickPosition", static_cast<int>(slider->tickPosition()));
+        getState()->setProperty("orientation",
+                                static_cast<int>(slider->orientation()));
+        getState()->setProperty("tickPosition",
+                                static_cast<int>(slider->tickPosition()));
         getState()->setProperty("tickInterval", slider->tickInterval());
     }
 }
 
-void SliderCommand::handleEvent(const QString& eventType, const QVariant& eventData) {
+void SliderCommand::handleEvent(const QString& eventType,
+                                const QVariant& eventData) {
     if (eventType == "valueChanged" && value_changed_handler_) {
         value_changed_handler_(eventData.toInt());
     } else if (eventType == "sliderPressed" && slider_pressed_handler_) {
@@ -653,7 +678,8 @@ void SliderCommand::handleEvent(const QString& eventType, const QVariant& eventD
 }
 
 // **ProgressBarCommand implementation**
-ProgressBarCommand::ProgressBarCommand(QObject* parent) : BaseUICommand(parent) {
+ProgressBarCommand::ProgressBarCommand(QObject* parent)
+    : BaseUICommand(parent) {
     // Set up default properties
     getState()->setProperty("value", 0);
     getState()->setProperty("minimum", 0);
@@ -666,15 +692,15 @@ ProgressBarCommand::ProgressBarCommand(QObject* parent) : BaseUICommand(parent) 
 }
 
 UICommandMetadata ProgressBarCommand::getMetadata() const {
-    UICommandMetadata metadata("ProgressBar", "QProgressBar", "Progress Bar", "A progress indicator control");
+    UICommandMetadata metadata("ProgressBar", "QProgressBar", "Progress Bar",
+                               "A progress indicator control");
     metadata.default_properties = {
         {"value", 0},
         {"minimum", 0},
         {"maximum", 100},
         {"format", "%p%"},
         {"textVisible", true},
-        {"orientation", static_cast<int>(Qt::Horizontal)}
-    };
+        {"orientation", static_cast<int>(Qt::Horizontal)}};
     return metadata;
 }
 
@@ -735,7 +761,8 @@ ProgressBarCommand& ProgressBarCommand::setOrientation(int orientation) {
 }
 
 int ProgressBarCommand::getOrientation() const {
-    return getState()->getProperty<int>("orientation", static_cast<int>(Qt::Horizontal));
+    return getState()->getProperty<int>("orientation",
+                                        static_cast<int>(Qt::Horizontal));
 }
 
 void ProgressBarCommand::onWidgetCreated(QWidget* widget) {
@@ -752,7 +779,8 @@ void ProgressBarCommand::syncToWidget() {
         progressBar->setValue(getValue());
         progressBar->setFormat(getFormat());
         progressBar->setTextVisible(isTextVisible());
-        progressBar->setOrientation(static_cast<Qt::Orientation>(getOrientation()));
+        progressBar->setOrientation(
+            static_cast<Qt::Orientation>(getOrientation()));
     }
 }
 

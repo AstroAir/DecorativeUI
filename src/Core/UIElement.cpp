@@ -1,4 +1,23 @@
-// Core/UIElement.cpp
+/**
+ * @file UIElement.cpp
+ * @brief Implementation of the core UIElement class for DeclarativeUI
+ *
+ * This file provides the foundation for all UI components in the DeclarativeUI
+ * framework, including:
+ * - Property management with type-safe storage and binding
+ * - Animation support with fluent interface
+ * - Theme configuration and styling
+ * - Performance monitoring and responsive design
+ * - Serialization and deserialization capabilities
+ * - Validation and error handling
+ *
+ * The implementation emphasizes maintainable code with low cyclomatic
+ * complexity by breaking down complex operations into focused helper functions.
+ *
+ * @author DeclarativeUI Team
+ * @version 1.0
+ */
+
 #include "UIElement.hpp"
 
 #include <QApplication>
@@ -710,109 +729,28 @@ QJsonObject UIElement::serialize() const {
     return json;
 }
 
+/**
+ * @brief Deserializes UIElement from JSON object
+ * @param json The JSON object containing serialized data
+ * @return true if deserialization was successful, false otherwise
+ *
+ * This function coordinates the deserialization process by delegating
+ * to specialized helper functions for different data sections.
+ */
 bool UIElement::deserialize(const QJsonObject &json) {
     try {
-        // Check for serialization errors
-        if (json.contains("error")) {
-            qWarning() << "Cannot deserialize UIElement with error:"
-                       << json["error"].toString();
+        // **Check for serialization errors**
+        if (!validateDeserializationInput(json)) {
             return false;
         }
 
-        // Deserialize properties
-        if (json.contains("properties") && json["properties"].isObject()) {
-            QJsonObject properties_json = json["properties"].toObject();
+        // **Deserialize different sections**
+        deserializeProperties(json);
+        deserializeTheme(json);
+        deserializeConfiguration(json);
 
-            for (auto it = properties_json.begin(); it != properties_json.end();
-                 ++it) {
-                const QString &name = it.key();
-                const QJsonValue &value = it.value();
-
-                if (value.isString()) {
-                    properties_[name] = PropertyValue{value.toString()};
-                } else if (value.isDouble()) {
-                    // Handle both int and double
-                    double val = value.toDouble();
-                    if (val == static_cast<int>(val)) {
-                        properties_[name] =
-                            PropertyValue{static_cast<int>(val)};
-                    } else {
-                        properties_[name] = PropertyValue{val};
-                    }
-                } else if (value.isBool()) {
-                    properties_[name] = PropertyValue{value.toBool()};
-                } else if (value.isObject()) {
-                    QJsonObject obj = value.toObject();
-
-                    // Try to deserialize as QSize
-                    if (obj.contains("width") && obj.contains("height")) {
-                        QSize size(obj["width"].toInt(), obj["height"].toInt());
-                        properties_[name] = PropertyValue{size};
-                    }
-                    // Try to deserialize as QPoint
-                    else if (obj.contains("x") && obj.contains("y")) {
-                        QPoint point(obj["x"].toInt(), obj["y"].toInt());
-                        properties_[name] = PropertyValue{point};
-                    }
-                }
-            }
-        }
-
-        // Deserialize theme
-        if (json.contains("theme") && json["theme"].isObject()) {
-            QJsonObject theme_json = json["theme"].toObject();
-
-            if (theme_json.contains("primary_color")) {
-                theme_.primary_color = theme_json["primary_color"].toString();
-            }
-            if (theme_json.contains("secondary_color")) {
-                theme_.secondary_color =
-                    theme_json["secondary_color"].toString();
-            }
-            if (theme_json.contains("background_color")) {
-                theme_.background_color =
-                    theme_json["background_color"].toString();
-            }
-            if (theme_json.contains("text_color")) {
-                theme_.text_color = theme_json["text_color"].toString();
-            }
-            if (theme_json.contains("border_color")) {
-                theme_.border_color = theme_json["border_color"].toString();
-            }
-            if (theme_json.contains("font_family")) {
-                theme_.font_family = theme_json["font_family"].toString();
-            }
-            if (theme_json.contains("font_size")) {
-                theme_.font_size = theme_json["font_size"].toInt();
-            }
-            if (theme_json.contains("border_radius")) {
-                theme_.border_radius = theme_json["border_radius"].toInt();
-            }
-        }
-
-        // Deserialize configuration
-        if (json.contains("configuration") &&
-            json["configuration"].isObject()) {
-            QJsonObject config_json = json["configuration"].toObject();
-
-            if (config_json.contains("performance_monitoring_enabled")) {
-                performance_monitoring_enabled_ =
-                    config_json["performance_monitoring_enabled"].toBool();
-            }
-            if (config_json.contains("responsive_enabled")) {
-                responsive_enabled_ =
-                    config_json["responsive_enabled"].toBool();
-            }
-            if (config_json.contains("current_width")) {
-                current_width_ = config_json["current_width"].toInt();
-            }
-        }
-
-        // Apply deserialized properties to widget if it exists
-        if (widget_) {
-            applyStoredProperties();
-            applyTheme();
-        }
+        // **Apply deserialized data to widget**
+        applyDeserializedData();
 
         return true;
 
@@ -820,6 +758,145 @@ bool UIElement::deserialize(const QJsonObject &json) {
         qWarning() << "Failed to deserialize UIElement:" << e.what();
         return false;
     }
+}
+
+// **Deserialization helper method implementations**
+
+/**
+ * @brief Validates the input JSON object for deserialization
+ * @param json The JSON object to validate
+ * @return true if the input is valid, false otherwise
+ */
+bool UIElement::validateDeserializationInput(const QJsonObject &json) const {
+    if (json.contains("error")) {
+        qWarning() << "Cannot deserialize UIElement with error:"
+                   << json["error"].toString();
+        return false;
+    }
+    return true;
+}
+
+/**
+ * @brief Deserializes properties from JSON object
+ * @param json The JSON object containing properties data
+ */
+void UIElement::deserializeProperties(const QJsonObject &json) {
+    if (!json.contains("properties") || !json["properties"].isObject()) {
+        return;
+    }
+
+    QJsonObject properties_json = json["properties"].toObject();
+    for (auto it = properties_json.begin(); it != properties_json.end(); ++it) {
+        const QString &name = it.key();
+        const QJsonValue &value = it.value();
+        properties_[name] = parsePropertyValue(value);
+    }
+}
+
+/**
+ * @brief Deserializes theme configuration from JSON object
+ * @param json The JSON object containing theme data
+ */
+void UIElement::deserializeTheme(const QJsonObject &json) {
+    if (!json.contains("theme") || !json["theme"].isObject()) {
+        return;
+    }
+
+    QJsonObject theme_json = json["theme"].toObject();
+
+    // **Helper lambda to safely extract string values**
+    auto extractString = [&theme_json](const QString &key, QString &target) {
+        if (theme_json.contains(key)) {
+            target = theme_json[key].toString();
+        }
+    };
+
+    // **Helper lambda to safely extract integer values**
+    auto extractInt = [&theme_json](const QString &key, int &target) {
+        if (theme_json.contains(key)) {
+            target = theme_json[key].toInt();
+        }
+    };
+
+    // **Extract theme properties**
+    extractString("primary_color", theme_.primary_color);
+    extractString("secondary_color", theme_.secondary_color);
+    extractString("background_color", theme_.background_color);
+    extractString("text_color", theme_.text_color);
+    extractString("border_color", theme_.border_color);
+    extractString("font_family", theme_.font_family);
+    extractInt("font_size", theme_.font_size);
+    extractInt("border_radius", theme_.border_radius);
+}
+
+/**
+ * @brief Deserializes configuration settings from JSON object
+ * @param json The JSON object containing configuration data
+ */
+void UIElement::deserializeConfiguration(const QJsonObject &json) {
+    if (!json.contains("configuration") || !json["configuration"].isObject()) {
+        return;
+    }
+
+    QJsonObject config_json = json["configuration"].toObject();
+
+    if (config_json.contains("performance_monitoring_enabled")) {
+        performance_monitoring_enabled_ =
+            config_json["performance_monitoring_enabled"].toBool();
+    }
+    if (config_json.contains("responsive_enabled")) {
+        responsive_enabled_ = config_json["responsive_enabled"].toBool();
+    }
+    if (config_json.contains("current_width")) {
+        current_width_ = config_json["current_width"].toInt();
+    }
+}
+
+/**
+ * @brief Applies deserialized data to the widget
+ */
+void UIElement::applyDeserializedData() {
+    if (widget_) {
+        applyStoredProperties();
+        applyTheme();
+    }
+}
+
+/**
+ * @brief Parses a JSON value into a PropertyValue
+ * @param value The JSON value to parse
+ * @return Parsed PropertyValue
+ */
+PropertyValue UIElement::parsePropertyValue(const QJsonValue &value) const {
+    if (value.isString()) {
+        return PropertyValue{value.toString()};
+    } else if (value.isDouble()) {
+        double val = value.toDouble();
+        // **Handle both int and double**
+        if (val == static_cast<int>(val)) {
+            return PropertyValue{static_cast<int>(val)};
+        } else {
+            return PropertyValue{val};
+        }
+    } else if (value.isBool()) {
+        return PropertyValue{value.toBool()};
+    } else if (value.isObject()) {
+        QJsonObject obj = value.toObject();
+
+        // **Try to deserialize as QSize**
+        if (obj.contains("width") && obj.contains("height")) {
+            QSize size(obj["width"].toInt(), obj["height"].toInt());
+            return PropertyValue{size};
+        }
+        // **Try to deserialize as QPoint**
+        else if (obj.contains("x") && obj.contains("y")) {
+            QPoint point(obj["x"].toInt(), obj["y"].toInt());
+            return PropertyValue{point};
+        }
+    }
+
+    // **Return default PropertyValue for unsupported types**
+    return PropertyValue{QString("Unsupported type")};
 }
 
 }  // namespace DeclarativeUI::Core

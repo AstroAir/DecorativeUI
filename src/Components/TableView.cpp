@@ -18,8 +18,7 @@ TableView& TableView::selectionBehavior(
         setProperty("selectionBehavior", static_cast<int>(behavior)));
 }
 
-TableView& TableView::selectionMode(
-    QAbstractItemView::SelectionMode mode) {
+TableView& TableView::selectionMode(QAbstractItemView::SelectionMode mode) {
     return static_cast<TableView&>(
         setProperty("selectionMode", static_cast<int>(mode)));
 }
@@ -70,8 +69,7 @@ TableView& TableView::verticalHeaderStretchLastSection(bool stretch) {
         setProperty("verticalHeaderStretchLastSection", stretch));
 }
 
-TableView& TableView::onCellClicked(
-    std::function<void(int, int)> handler) {
+TableView& TableView::onCellClicked(std::function<void(int, int)> handler) {
     cell_clicked_handler_ = std::move(handler);
     return *this;
 }
@@ -110,12 +108,14 @@ void TableView::initialize() {
         if (cell_double_clicked_handler_) {
             connect(table_widget_, &QTableView::doubleClicked, this,
                     [this](const QModelIndex& index) {
-                        cell_double_clicked_handler_(index.row(), index.column());
+                        cell_double_clicked_handler_(index.row(),
+                                                     index.column());
                     });
         }
 
         if (selection_changed_handler_) {
-            connect(table_widget_->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+            connect(table_widget_->selectionModel(),
+                    &QItemSelectionModel::selectionChanged, this,
                     [this]() { selection_changed_handler_(); });
         }
 

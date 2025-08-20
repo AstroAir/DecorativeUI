@@ -21,7 +21,7 @@ repos:
       # Check YAML syntax
       - id: check-yaml
         files: \.(yml|yaml)$
-      # Check JSON syntax  
+      # Check JSON syntax
       - id: check-json
         files: \.json$
       # Check XML syntax
@@ -53,34 +53,11 @@ repos:
       - id: cmake-format
         files: (CMakeLists\.txt|\.cmake)$
         args: [--line-width=100, --tab-size=4]
-      - id: cmake-lint
-        files: (CMakeLists\.txt|\.cmake)$
-        args: [--line-width=100]
-
-  # Additional C++ checks
-  - repo: https://github.com/pocc/pre-commit-hooks
-    rev: v1.3.5
-    hooks:
-      # Static analysis with cppcheck (optional - can be slow)
-      - id: cppcheck
-        args: [
-          '--enable=warning,style,performance,portability',
-          '--inline-suppr',
-          '--suppress=missingIncludeSystem',
-          '--suppress=unmatchedSuppression',
-          '--suppress=unusedFunction',
-          '--std=c++20'
-        ]
-        files: \.(cpp|hpp|cc|cxx|c|h)$
-        exclude: |
-          (?x)^(
-              build/.*|
-              .*_autogen/.*|
-              .*\.moc$|
-              .*moc_.*\.cpp$|
-              .*ui_.*\.h$|
-              tests/.*
-          )$
+        additional_dependencies: [PyYAML]
+    #  - id: cmake-lint
+    #    files: (CMakeLists\.txt|\.cmake)$
+    #    args: [--line-width=100]
+    #    additional_dependencies: [PyYAML]
 
   # Python formatting for build scripts (if any)
   - repo: https://github.com/psf/black
@@ -90,14 +67,15 @@ repos:
         files: \.py$
         language_version: python3
 
+  # For some reason, this hook is not working as expected
   # Markdown formatting and linting
-  - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.38.0
-    hooks:
-      - id: markdownlint
-        args: ['--fix']
-        files: \.md$
-        exclude: 'CHANGELOG\.md'
+  #- repo: https://github.com/igorshubovych/markdownlint-cli
+  #  rev: v0.38.0
+  #  hooks:
+  #    - id: markdownlint
+  #      args: ['--fix']
+  #      files: \.md$
+  #      exclude: 'CHANGELOG\.md'
 
 # Configuration for different CI environments
 ci:

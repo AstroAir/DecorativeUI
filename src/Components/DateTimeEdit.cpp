@@ -86,21 +86,25 @@ DateTimeEdit& DateTimeEdit::setReadOnly(bool readOnly) {
 }
 
 // **Event Handlers**
-DateTimeEdit& DateTimeEdit::onDateTimeChanged(std::function<void(const QDateTime&)> handler) {
+DateTimeEdit& DateTimeEdit::onDateTimeChanged(
+    std::function<void(const QDateTime&)> handler) {
     if (auto dateTimeEdit = qobject_cast<QDateTimeEdit*>(getWidget())) {
-        QObject::connect(dateTimeEdit, &QDateTimeEdit::dateTimeChanged, handler);
+        QObject::connect(dateTimeEdit, &QDateTimeEdit::dateTimeChanged,
+                         handler);
     }
     return *this;
 }
 
-DateTimeEdit& DateTimeEdit::onDateChanged(std::function<void(const QDate&)> handler) {
+DateTimeEdit& DateTimeEdit::onDateChanged(
+    std::function<void(const QDate&)> handler) {
     if (auto dateTimeEdit = qobject_cast<QDateTimeEdit*>(getWidget())) {
         QObject::connect(dateTimeEdit, &QDateTimeEdit::dateChanged, handler);
     }
     return *this;
 }
 
-DateTimeEdit& DateTimeEdit::onTimeChanged(std::function<void(const QTime&)> handler) {
+DateTimeEdit& DateTimeEdit::onTimeChanged(
+    std::function<void(const QTime&)> handler) {
     if (auto dateTimeEdit = qobject_cast<QDateTimeEdit*>(getWidget())) {
         QObject::connect(dateTimeEdit, &QDateTimeEdit::timeChanged, handler);
     }
@@ -109,7 +113,8 @@ DateTimeEdit& DateTimeEdit::onTimeChanged(std::function<void(const QTime&)> hand
 
 DateTimeEdit& DateTimeEdit::onEditingFinished(std::function<void()> handler) {
     if (auto dateTimeEdit = qobject_cast<QDateTimeEdit*>(getWidget())) {
-        QObject::connect(dateTimeEdit, &QDateTimeEdit::editingFinished, handler);
+        QObject::connect(dateTimeEdit, &QDateTimeEdit::editingFinished,
+                         handler);
     }
     return *this;
 }
@@ -172,14 +177,16 @@ DateTimeEdit& DateTimeEdit::setAccelerated(bool on) {
     return *this;
 }
 
-DateTimeEdit& DateTimeEdit::setButtonSymbols(QAbstractSpinBox::ButtonSymbols bs) {
+DateTimeEdit& DateTimeEdit::setButtonSymbols(
+    QAbstractSpinBox::ButtonSymbols bs) {
     if (auto dateTimeEdit = qobject_cast<QDateTimeEdit*>(getWidget())) {
         dateTimeEdit->setButtonSymbols(bs);
     }
     return *this;
 }
 
-DateTimeEdit& DateTimeEdit::setCorrectionMode(QAbstractSpinBox::CorrectionMode cm) {
+DateTimeEdit& DateTimeEdit::setCorrectionMode(
+    QAbstractSpinBox::CorrectionMode cm) {
     if (auto dateTimeEdit = qobject_cast<QDateTimeEdit*>(getWidget())) {
         dateTimeEdit->setCorrectionMode(cm);
     }

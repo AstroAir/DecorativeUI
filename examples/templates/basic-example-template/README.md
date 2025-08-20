@@ -10,10 +10,11 @@
 
 ## Concepts Demonstrated
 
-**Difficulty:** ⭐⭐⭐☆☆  
+**Difficulty:** ⭐⭐⭐☆☆
 **Category:** [Category name, e.g., "Fundamentals", "Components", etc.]
 
 This example demonstrates:
+
 - **[Concept 1]** - [Brief explanation]
 - **[Concept 2]** - [Brief explanation]
 - **[Concept 3]** - [Brief explanation]
@@ -21,6 +22,7 @@ This example demonstrates:
 ## What You'll Learn
 
 After completing this example, you'll understand:
+
 1. [Learning objective 1]
 2. [Learning objective 2]
 3. [Learning objective 3]
@@ -29,17 +31,20 @@ After completing this example, you'll understand:
 ## Running the Example
 
 ### Build and Run
+
 ```bash
 cmake --build . --target [ExampleTargetName]
 ./examples/[category]/[ExampleTargetName]
 ```
 
 ### Expected Behavior
+
 [Describe what the user should see when running the example]
 
 ## Code Walkthrough
 
 ### Key Components
+
 - **[Component/Class 1]** - [What it does]
 - **[Component/Class 2]** - [What it does]
 - **[Component/Class 3]** - [What it does]
@@ -47,40 +52,49 @@ cmake --build . --target [ExampleTargetName]
 ### Important Code Sections
 
 #### [Section 1 Name]
+
 ```cpp
 // Example code snippet
 auto widget = std::make_unique<QWidget>();
 ```
+
 [Explanation of what this code does and why it's important]
 
 #### [Section 2 Name]
+
 ```cpp
 // Another example code snippet
 connect(button, &QPushButton::clicked, []() {
     // Handler code
 });
 ```
+
 [Explanation of this code section]
 
 ## Key Concepts Explained
 
 ### [Concept 1]
+
 [Detailed explanation of the first key concept, including why it's important and how it's used in the example]
 
 ### [Concept 2]
+
 [Detailed explanation of the second key concept]
 
 ### [Concept 3]
+
 [Detailed explanation of the third key concept]
 
 ## Common Issues and Solutions
 
 ### Issue 1: [Common problem]
-**Problem:** [Description of the problem]  
+
+**Problem:** [Description of the problem]
 **Solution:** [How to solve it]
 
 ### Issue 2: [Another common problem]
-**Problem:** [Description of the problem]  
+
+**Problem:** [Description of the problem]
 **Solution:** [How to solve it]
 
 ## Exercises and Modifications
@@ -100,6 +114,7 @@ Try these modifications to deepen your understanding:
 ## Next Steps
 
 After completing this example, consider exploring:
+
 - **[Next Example/Category]** - [Why it's a logical next step]
 - **[Advanced Topic]** - [How to go deeper into this topic]
 

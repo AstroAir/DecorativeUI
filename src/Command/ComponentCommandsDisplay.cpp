@@ -1,8 +1,8 @@
-#include "ComponentCommands.hpp"
 #include <QApplication>
+#include <QCalendarWidget>
 #include <QDebug>
 #include <QLCDNumber>
-#include <QCalendarWidget>
+#include "ComponentCommands.hpp"
 
 namespace DeclarativeUI {
 namespace Command {
@@ -15,7 +15,8 @@ namespace ComponentCommands {
 LCDNumberCommand::LCDNumberCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
-CommandResult<QVariant> LCDNumberCommand::execute(const CommandContext& context) {
+CommandResult<QVariant> LCDNumberCommand::execute(
+    const CommandContext& context) {
     // Validate required parameters
     auto validationResult = validateRequiredParameters(context, {"widget"});
     if (!validationResult.isSuccess()) {
@@ -46,13 +47,15 @@ CommandResult<QVariant> LCDNumberCommand::execute(const CommandContext& context)
         return handleSetSegmentStyle(context, lcdNumber);
     }
 
-    return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
+    return CommandResult<QVariant>(
+        QString("Unknown operation: %1").arg(operation));
 }
 
 CommandResult<QVariant> LCDNumberCommand::undo(const CommandContext& context) {
     auto* lcdNumber = findLCDNumber(widget_name_);
     if (!lcdNumber) {
-        return CommandResult<QVariant>(QString("LCDNumber '%1' not found for undo").arg(widget_name_));
+        return CommandResult<QVariant>(
+            QString("LCDNumber '%1' not found for undo").arg(widget_name_));
     }
 
     lcdNumber->display(old_value_);
@@ -64,16 +67,19 @@ bool LCDNumberCommand::canUndo(const CommandContext& context) const {
 }
 
 CommandMetadata LCDNumberCommand::getMetadata() const {
-    return CommandMetadata("LCDNumberCommand", "Specialized command for LCDNumber components");
+    return CommandMetadata("LCDNumberCommand",
+                           "Specialized command for LCDNumber components");
 }
 
 QLCDNumber* LCDNumberCommand::findLCDNumber(const QString& name) {
     return findWidget<QLCDNumber>(name);
 }
 
-CommandResult<QVariant> LCDNumberCommand::handleDisplay(const CommandContext& context, QLCDNumber* widget) {
+CommandResult<QVariant> LCDNumberCommand::handleDisplay(
+    const CommandContext& context, QLCDNumber* widget) {
     if (!context.hasParameter("value")) {
-        return CommandResult<QVariant>(QString("Missing value parameter for display operation"));
+        return CommandResult<QVariant>(
+            QString("Missing value parameter for display operation"));
     }
 
     auto value = context.getParameter<double>("value");
@@ -82,9 +88,11 @@ CommandResult<QVariant> LCDNumberCommand::handleDisplay(const CommandContext& co
     return createSuccessResult("LCDNumber", "value displayed");
 }
 
-CommandResult<QVariant> LCDNumberCommand::handleSetDigitCount(const CommandContext& context, QLCDNumber* widget) {
+CommandResult<QVariant> LCDNumberCommand::handleSetDigitCount(
+    const CommandContext& context, QLCDNumber* widget) {
     if (!context.hasParameter("count")) {
-        return CommandResult<QVariant>(QString("Missing count parameter for setDigitCount operation"));
+        return CommandResult<QVariant>(
+            QString("Missing count parameter for setDigitCount operation"));
     }
 
     auto count = context.getParameter<int>("count");
@@ -92,9 +100,11 @@ CommandResult<QVariant> LCDNumberCommand::handleSetDigitCount(const CommandConte
     return createSuccessResult("LCDNumber", "digit count set");
 }
 
-CommandResult<QVariant> LCDNumberCommand::handleSetMode(const CommandContext& context, QLCDNumber* widget) {
+CommandResult<QVariant> LCDNumberCommand::handleSetMode(
+    const CommandContext& context, QLCDNumber* widget) {
     if (!context.hasParameter("mode")) {
-        return CommandResult<QVariant>(QString("Missing mode parameter for setMode operation"));
+        return CommandResult<QVariant>(
+            QString("Missing mode parameter for setMode operation"));
     }
 
     auto mode = context.getParameter<int>("mode");
@@ -102,9 +112,11 @@ CommandResult<QVariant> LCDNumberCommand::handleSetMode(const CommandContext& co
     return createSuccessResult("LCDNumber", "mode set");
 }
 
-CommandResult<QVariant> LCDNumberCommand::handleSetSegmentStyle(const CommandContext& context, QLCDNumber* widget) {
+CommandResult<QVariant> LCDNumberCommand::handleSetSegmentStyle(
+    const CommandContext& context, QLCDNumber* widget) {
     if (!context.hasParameter("style")) {
-        return CommandResult<QVariant>(QString("Missing style parameter for setSegmentStyle operation"));
+        return CommandResult<QVariant>(
+            QString("Missing style parameter for setSegmentStyle operation"));
     }
 
     auto style = context.getParameter<int>("style");
@@ -119,7 +131,8 @@ CommandResult<QVariant> LCDNumberCommand::handleSetSegmentStyle(const CommandCon
 CalendarCommand::CalendarCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
-CommandResult<QVariant> CalendarCommand::execute(const CommandContext& context) {
+CommandResult<QVariant> CalendarCommand::execute(
+    const CommandContext& context) {
     // Validate required parameters
     auto validationResult = validateRequiredParameters(context, {"widget"});
     if (!validationResult.isSuccess()) {
@@ -148,13 +161,15 @@ CommandResult<QVariant> CalendarCommand::execute(const CommandContext& context) 
         return handleSetGridVisible(context, calendar);
     }
 
-    return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
+    return CommandResult<QVariant>(
+        QString("Unknown operation: %1").arg(operation));
 }
 
 CommandResult<QVariant> CalendarCommand::undo(const CommandContext& context) {
     auto* calendar = findCalendar(widget_name_);
     if (!calendar) {
-        return CommandResult<QVariant>(QString("Calendar '%1' not found for undo").arg(widget_name_));
+        return CommandResult<QVariant>(
+            QString("Calendar '%1' not found for undo").arg(widget_name_));
     }
 
     calendar->setSelectedDate(old_date_);
@@ -166,16 +181,19 @@ bool CalendarCommand::canUndo(const CommandContext& context) const {
 }
 
 CommandMetadata CalendarCommand::getMetadata() const {
-    return CommandMetadata("CalendarCommand", "Specialized command for Calendar components");
+    return CommandMetadata("CalendarCommand",
+                           "Specialized command for Calendar components");
 }
 
 QCalendarWidget* CalendarCommand::findCalendar(const QString& name) {
     return findWidget<QCalendarWidget>(name);
 }
 
-CommandResult<QVariant> CalendarCommand::handleSetSelectedDate(const CommandContext& context, QCalendarWidget* widget) {
+CommandResult<QVariant> CalendarCommand::handleSetSelectedDate(
+    const CommandContext& context, QCalendarWidget* widget) {
     if (!context.hasParameter("date")) {
-        return CommandResult<QVariant>(QString("Missing date parameter for setSelectedDate operation"));
+        return CommandResult<QVariant>(
+            QString("Missing date parameter for setSelectedDate operation"));
     }
 
     auto date = context.getParameter<QDate>("date");
@@ -184,8 +202,10 @@ CommandResult<QVariant> CalendarCommand::handleSetSelectedDate(const CommandCont
     return createSuccessResult("Calendar", "selected date set");
 }
 
-CommandResult<QVariant> CalendarCommand::handleSetDateRange(const CommandContext& context, QCalendarWidget* widget) {
-    auto validationResult = validateRequiredParameters(context, {"minDate", "maxDate"});
+CommandResult<QVariant> CalendarCommand::handleSetDateRange(
+    const CommandContext& context, QCalendarWidget* widget) {
+    auto validationResult =
+        validateRequiredParameters(context, {"minDate", "maxDate"});
     if (!validationResult.isSuccess()) {
         return validationResult;
     }
@@ -196,9 +216,11 @@ CommandResult<QVariant> CalendarCommand::handleSetDateRange(const CommandContext
     return createSuccessResult("Calendar", "date range set");
 }
 
-CommandResult<QVariant> CalendarCommand::handleSetGridVisible(const CommandContext& context, QCalendarWidget* widget) {
+CommandResult<QVariant> CalendarCommand::handleSetGridVisible(
+    const CommandContext& context, QCalendarWidget* widget) {
     if (!context.hasParameter("visible")) {
-        return CommandResult<QVariant>(QString("Missing visible parameter for setGridVisible operation"));
+        return CommandResult<QVariant>(
+            QString("Missing visible parameter for setGridVisible operation"));
     }
 
     auto visible = context.getParameter<bool>("visible");

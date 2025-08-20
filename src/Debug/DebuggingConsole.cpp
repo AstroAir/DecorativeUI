@@ -1,17 +1,16 @@
 #include "DebuggingConsole.hpp"
+#include <QDateTime>
 #include <QDebug>
 #include <QFileDialog>
-#include <QTextStream>
 #include <QMessageBox>
-#include <QDateTime>
-#include <QStandardPaths>
-#include <QScrollBar>
 #include <QRegularExpression>
+#include <QScrollBar>
+#include <QStandardPaths>
+#include <QTextStream>
 
 namespace DeclarativeUI::Debug {
 
-DebuggingConsole::DebuggingConsole(QWidget* parent)
-    : QWidget(parent) {
+DebuggingConsole::DebuggingConsole(QWidget* parent) : QWidget(parent) {
     layout_ = new QVBoxLayout(this);
 
     export_button_ = new QPushButton("Export Log", this);
@@ -25,7 +24,8 @@ DebuggingConsole::DebuggingConsole(QWidget* parent)
     layout_->addWidget(filter_combo_);
     layout_->addWidget(log_display_);
 
-    connect(export_button_, &QPushButton::clicked, this, &DebuggingConsole::onExportLogClicked);
+    connect(export_button_, &QPushButton::clicked, this,
+            &DebuggingConsole::onExportLogClicked);
     connect(filter_combo_, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &DebuggingConsole::onFilterChanged);
 
@@ -92,26 +92,28 @@ void DebuggingConsole::setLogText(const QString& full_text) {
     onFilterChanged();
 }
 
-void DebuggingConsole::addLogMessage(const QString& level, const QString& component, const QString& message) {
+void DebuggingConsole::addLogMessage(const QString& level,
+                                     const QString& component,
+                                     const QString& message) {
     // Format the message with level and component information
-    QString formattedMessage = QString("[%1] %2: %3").arg(level, component, message);
+    QString formattedMessage =
+        QString("[%1] %2: %3").arg(level, component, message);
 
     // Use the existing appendLogLine method
     appendLogLine(formattedMessage);
 }
 
 void DebuggingConsole::onExportLogClicked() {
-    QString defaultPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    QString defaultFileName = QString("debug_log_%1.txt")
-                             .arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"));
+    QString defaultPath =
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    QString defaultFileName =
+        QString("debug_log_%1.txt")
+            .arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"));
     QString defaultFilePath = defaultPath + "/" + defaultFileName;
 
-    QString fileName = QFileDialog::getSaveFileName(
-        this,
-        "Export Debug Log",
-        defaultFilePath,
-        "Text Files (*.txt);;All Files (*)"
-    );
+    QString fileName =
+        QFileDialog::getSaveFileName(this, "Export Debug Log", defaultFilePath,
+                                     "Text Files (*.txt);;All Files (*)");
 
     if (fileName.isEmpty()) {
         return;
@@ -119,8 +121,9 @@ void DebuggingConsole::onExportLogClicked() {
 
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, "Export Failed",
-                           QString("Could not open file for writing: %1").arg(fileName));
+        QMessageBox::warning(
+            this, "Export Failed",
+            QString("Could not open file for writing: %1").arg(fileName));
         return;
     }
 
@@ -129,7 +132,8 @@ void DebuggingConsole::onExportLogClicked() {
 
     // Write header
     stream << "Debug Log Export\n";
-    stream << "Generated: " << QDateTime::currentDateTime().toString(Qt::ISODate) << "\n";
+    stream << "Generated: "
+           << QDateTime::currentDateTime().toString(Qt::ISODate) << "\n";
     stream << "Filter: " << filter_combo_->currentText() << "\n";
     stream << "Total Lines: " << all_log_lines_.size() << "\n";
     stream << QString("=").repeated(50) << "\n\n";
@@ -140,7 +144,7 @@ void DebuggingConsole::onExportLogClicked() {
     file.close();
 
     QMessageBox::information(this, "Export Successful",
-                           QString("Log exported to: %1").arg(fileName));
+                             QString("Log exported to: %1").arg(fileName));
 
     qDebug() << "Log exported to:" << fileName;
 }
@@ -165,20 +169,21 @@ void DebuggingConsole::onFilterChanged() {
     qDebug() << "Filter changed to:" << selectedFilter;
 }
 
-bool DebuggingConsole::shouldShowLogLine(const QString& line, const QString& filter) const {
+bool DebuggingConsole::shouldShowLogLine(const QString& line,
+                                         const QString& filter) const {
     if (filter == "All") {
         return true;
     }
 
     // Create case-insensitive regex patterns for each log level
     QRegularExpression errorPattern("\\b(error|err|fatal|critical)\\b",
-                                   QRegularExpression::CaseInsensitiveOption);
-    QRegularExpression warningPattern("\\b(warning|warn)\\b",
-                                     QRegularExpression::CaseInsensitiveOption);
+                                    QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression warningPattern(
+        "\\b(warning|warn)\\b", QRegularExpression::CaseInsensitiveOption);
     QRegularExpression infoPattern("\\b(info|information)\\b",
-                                  QRegularExpression::CaseInsensitiveOption);
-    QRegularExpression debugPattern("\\b(debug|dbg)\\b",
                                    QRegularExpression::CaseInsensitiveOption);
+    QRegularExpression debugPattern("\\b(debug|dbg)\\b",
+                                    QRegularExpression::CaseInsensitiveOption);
 
     if (filter == "Error") {
         return errorPattern.match(line).hasMatch();
@@ -190,7 +195,7 @@ bool DebuggingConsole::shouldShowLogLine(const QString& line, const QString& fil
         return debugPattern.match(line).hasMatch();
     }
 
-    return true; // Default to showing the line
+    return true;  // Default to showing the line
 }
 
 }  // namespace DeclarativeUI::Debug

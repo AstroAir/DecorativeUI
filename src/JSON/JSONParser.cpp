@@ -1,3 +1,26 @@
+/**
+ * @file JSONParser.cpp
+ * @brief Implementation of JSON parsing, reference resolution, and
+ * preprocessing
+ *
+ * This file provides comprehensive JSON parsing capabilities for DeclarativeUI,
+ * including support for JSON references ($ref), file includes ($include),
+ * custom type processing ($type), and comment/trailing comma preprocessing.
+ * The implementation emphasizes maintainable code with low cyclomatic
+ * complexity.
+ *
+ * Key features:
+ * - JSON reference resolution (local and external)
+ * - File inclusion with caching
+ * - Custom type processing
+ * - Comment and trailing comma support
+ * - Recursive object and array processing
+ * - Comprehensive error handling and reporting
+ *
+ * @author DeclarativeUI Team
+ * @version 1.0
+ */
+
 #include "JSONParser.hpp"
 
 #include "src/Exceptions/UIExceptions.hpp"
@@ -13,7 +36,6 @@
 #include <QNetworkRequest>
 #include <QRegularExpression>
 #include <QStandardPaths>
-
 
 namespace DeclarativeUI::JSON {
 
@@ -564,6 +586,12 @@ QJsonDocument JSONParser::parseJsonDocument(const QString& source,
     return doc;
 }
 
+/**
+ * @brief Processes a JSON object, handling special keys and references
+ * @param input The input JSON object to process
+ * @param context The parsing context for error handling and state tracking
+ * @return Processed JSON object with resolved references and includes
+ */
 QJsonObject JSONParser::processJsonObject(const QJsonObject& input,
                                           JSONParsingContext& context) {
     QJsonObject result;
@@ -572,58 +600,20 @@ QJsonObject JSONParser::processJsonObject(const QJsonObject& input,
         const QString& key = it.key();
         const QJsonValue& value = it.value();
 
-        // **Update current path**
+        // **Update current path for error reporting**
         JSONPath old_path = context.current_path;
         context.current_path.append(key);
 
         try {
-            // **Handle special keys**
-            if (key == "$ref") {
-                // **JSON Reference**
-                if (value.isString()) {
-                    QJsonValue resolved =
-                        processReference(value.toString(), context);
-                    if (!resolved.isNull()) {
-                        if (resolved.isObject()) {
-                            // **Merge referenced object**
-                            QJsonObject ref_obj = resolved.toObject();
-                            for (auto ref_it = ref_obj.begin();
-                                 ref_it != ref_obj.end(); ++ref_it) {
-                                result[ref_it.key()] = ref_it.value();
-                            }
-                        } else {
-                            result[key] = resolved;
-                        }
-                    }
-                } else {
-                    context.addError("$ref value must be a string");
-                }
-            } else if (key == "$include") {
-                // **File inclusion**
-                if (value.isString()) {
-                    QJsonValue included =
-                        processInclude(value.toString(), context);
-                    if (!included.isNull() && included.isObject()) {
-                        QJsonObject inc_obj = included.toObject();
-                        for (auto inc_it = inc_obj.begin();
-                             inc_it != inc_obj.end(); ++inc_it) {
-                            result[inc_it.key()] = inc_it.value();
-                        }
-                    }
-                } else {
-                    context.addError("$include value must be a string");
-                }
-            } else if (key == "$type") {
-                // **Custom type processing**
-                if (value.isString()) {
-                    // **Type information - store for later use**
-                    result[key] = value;
-                } else {
-                    context.addError("$type value must be a string");
-                }
-            } else {
-                // **Regular property**
-                result[key] = processJsonValue(value, context);
+            QJsonValue processed_value = processSpecialKey(key, value, context);
+
+            // **Handle the processed value based on its type**
+            if (processed_value.isObject() &&
+                (key == "$ref" || key == "$include")) {
+                // **Merge object results from references and includes**
+                mergeObjectIntoResult(processed_value.toObject(), result);
+            } else if (!processed_value.isNull()) {
+                result[key] = processed_value;
             }
 
         } catch (const std::exception& e) {
@@ -639,6 +629,92 @@ QJsonObject JSONParser::processJsonObject(const QJsonObject& input,
     }
 
     return result;
+}
+
+/**
+ * @brief Processes special JSON keys ($ref, $include, $type) and regular
+ * properties
+ * @param key The JSON key to process
+ * @param value The JSON value associated with the key
+ * @param context The parsing context for error handling
+ * @return Processed JSON value
+ */
+QJsonValue JSONParser::processSpecialKey(const QString& key,
+                                         const QJsonValue& value,
+                                         JSONParsingContext& context) {
+    if (key == "$ref") {
+        return processReferenceKey(value, context);
+    } else if (key == "$include") {
+        return processIncludeKey(value, context);
+    } else if (key == "$type") {
+        return processTypeKey(value, context);
+    } else {
+        // **Regular property - process recursively**
+        return processJsonValue(value, context);
+    }
+}
+
+/**
+ * @brief Processes JSON reference keys ($ref)
+ * @param value The reference value (should be a string)
+ * @param context The parsing context for error handling
+ * @return Resolved reference value or null if invalid
+ */
+QJsonValue JSONParser::processReferenceKey(const QJsonValue& value,
+                                           JSONParsingContext& context) {
+    if (!value.isString()) {
+        context.addError("$ref value must be a string");
+        return QJsonValue();
+    }
+
+    QJsonValue resolved = processReference(value.toString(), context);
+    return resolved.isNull() ? QJsonValue() : resolved;
+}
+
+/**
+ * @brief Processes JSON include keys ($include)
+ * @param value The include path value (should be a string)
+ * @param context The parsing context for error handling
+ * @return Included JSON object or null if invalid
+ */
+QJsonValue JSONParser::processIncludeKey(const QJsonValue& value,
+                                         JSONParsingContext& context) {
+    if (!value.isString()) {
+        context.addError("$include value must be a string");
+        return QJsonValue();
+    }
+
+    QJsonValue included = processInclude(value.toString(), context);
+    return (included.isNull() || !included.isObject()) ? QJsonValue()
+                                                       : included;
+}
+
+/**
+ * @brief Processes JSON type keys ($type)
+ * @param value The type value (should be a string)
+ * @param context The parsing context for error handling
+ * @return The type value if valid, null otherwise
+ */
+QJsonValue JSONParser::processTypeKey(const QJsonValue& value,
+                                      JSONParsingContext& context) {
+    if (!value.isString()) {
+        context.addError("$type value must be a string");
+        return QJsonValue();
+    }
+    // **Type information - store for later use**
+    return value;
+}
+
+/**
+ * @brief Merges a source JSON object into a result object
+ * @param source The source object to merge from
+ * @param result The result object to merge into
+ */
+void JSONParser::mergeObjectIntoResult(const QJsonObject& source,
+                                       QJsonObject& result) {
+    for (auto it = source.begin(); it != source.end(); ++it) {
+        result[it.key()] = it.value();
+    }
 }
 
 QJsonArray JSONParser::processJsonArray(const QJsonArray& input,

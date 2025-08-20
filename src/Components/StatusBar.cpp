@@ -42,7 +42,8 @@ StatusBar& StatusBar::insertWidget(int index, QWidget* widget, int stretch) {
     return *this;
 }
 
-StatusBar& StatusBar::insertPermanentWidget(int index, QWidget* widget, int stretch) {
+StatusBar& StatusBar::insertPermanentWidget(int index, QWidget* widget,
+                                            int stretch) {
     if (status_bar_widget_ && widget) {
         status_bar_widget_->insertPermanentWidget(index, widget, stretch);
     }
@@ -60,7 +61,8 @@ StatusBar& StatusBar::setSizeGripEnabled(bool enabled) {
     return static_cast<StatusBar&>(setProperty("sizeGripEnabled", enabled));
 }
 
-StatusBar& StatusBar::onMessageChanged(std::function<void(const QString&)> handler) {
+StatusBar& StatusBar::onMessageChanged(
+    std::function<void(const QString&)> handler) {
     message_changed_handler_ = std::move(handler);
     return *this;
 }
@@ -77,13 +79,16 @@ void StatusBar::initialize() {
         // Connect signals
         if (message_changed_handler_) {
             connect(status_bar_widget_, &QStatusBar::messageChanged, this,
-                    [this](const QString& message) { message_changed_handler_(message); });
+                    [this](const QString& message) {
+                        message_changed_handler_(message);
+                    });
         }
     }
 }
 
 QString StatusBar::currentMessage() const {
-    return status_bar_widget_ ? status_bar_widget_->currentMessage() : QString();
+    return status_bar_widget_ ? status_bar_widget_->currentMessage()
+                              : QString();
 }
 
 bool StatusBar::isSizeGripEnabled() const {

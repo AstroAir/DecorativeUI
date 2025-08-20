@@ -20,7 +20,7 @@ namespace DeclarativeUI::Debug {
         Q_OBJECT
     public:
         explicit ProfilerDashboard(QWidget* parent = nullptr);
-        
+
         // Dashboard management methods...
     };
 }
@@ -33,11 +33,13 @@ namespace DeclarativeUI::Debug {
 ```cpp
 void updatePerformanceData(const PerformanceDataPoint& data);
 ```
+
 Updates the dashboard with new performance metrics.
 
 ```cpp
 void addBottleneck(const BottleneckInfo& bottleneck);
 ```
+
 Adds a detected performance bottleneck to the dashboard.
 
 #### Configuration
@@ -45,6 +47,7 @@ Adds a detected performance bottleneck to the dashboard.
 ```cpp
 void setPerformanceThresholds(double cpu_threshold, size_t memory_threshold_mb, double frame_rate_threshold);
 ```
+
 Sets performance alert thresholds.
 
 #### Export Functionality
@@ -52,6 +55,7 @@ Sets performance alert thresholds.
 ```cpp
 void exportReport(const QString& format, const QString& filename) const;
 ```
+
 Exports performance report in specified format (JSON, text).
 
 ### Signals
@@ -79,21 +83,25 @@ Interactive debugging console for live log viewing and filtering.
 ```cpp
 void appendLogLine(const QString& text);
 ```
+
 Adds a single log line with automatic timestamp.
 
 ```cpp
 void setLogText(const QString& full_text);
 ```
+
 Sets the complete log content, replacing existing content.
 
 ```cpp
 void addLogMessage(const QString& level, const QString& component, const QString& message);
 ```
+
 Adds a structured log message with level and component information.
 
 ```cpp
 void clearLog();
 ```
+
 Clears all log content.
 
 #### Filtering
@@ -101,6 +109,7 @@ Clears all log content.
 ```cpp
 void setFilter(const QString& filter);
 ```
+
 Sets the current log level filter ("All", "Error", "Warning", "Info", "Debug").
 
 ### Signals
@@ -127,16 +136,19 @@ Interactive widget for displaying and resolving performance bottlenecks.
 ```cpp
 void addBottleneck(const QString& description, const QString& severity);
 ```
+
 Adds a bottleneck with description and severity level.
 
 ```cpp
 void clearBottlenecks();
 ```
+
 Removes all bottlenecks from the display.
 
 ```cpp
 void refreshBottlenecks();
 ```
+
 Triggers a refresh of bottleneck detection.
 
 #### Resolution
@@ -144,6 +156,7 @@ Triggers a refresh of bottleneck detection.
 ```cpp
 void resolveSelectedBottleneck();
 ```
+
 Attempts to resolve the currently selected bottleneck.
 
 ### Signals
@@ -171,16 +184,19 @@ Control panel for managing performance profiling sessions.
 ```cpp
 void startProfiling();
 ```
+
 Starts a new profiling session.
 
 ```cpp
 void stopProfiling();
 ```
+
 Stops the current profiling session.
 
 ```cpp
 void resetProfiling();
 ```
+
 Resets profiling data and state.
 
 #### Data Export
@@ -188,6 +204,7 @@ Resets profiling data and state.
 ```cpp
 void exportProfile(const QString& fileName);
 ```
+
 Exports collected profile data to JSON file.
 
 #### Status Queries
@@ -195,11 +212,13 @@ Exports collected profile data to JSON file.
 ```cpp
 bool isProfiling() const;
 ```
+
 Returns true if profiling is currently active.
 
 ```cpp
 qint64 getProfilingDuration() const;
 ```
+
 Returns the duration of the current/last profiling session in milliseconds.
 
 ### Signals
@@ -221,12 +240,12 @@ struct PerformanceDataPoint {
     size_t memory_usage_mb = 0;       // Memory usage in megabytes
     double frame_rate = 0.0;          // Frames per second
     QDateTime timestamp;              // When the measurement was taken
-    
+
     // Additional metrics
     double render_time_ms = 0.0;      // Rendering time in milliseconds
     int active_animations = 0;        // Number of active animations
     size_t widget_count = 0;          // Total widget count
-    
+
     // I/O metrics
     size_t disk_read_mb = 0;          // Disk read in MB
     size_t disk_write_mb = 0;         // Disk write in MB
@@ -245,7 +264,7 @@ struct BottleneckInfo {
     QString suggestion;               // Suggested resolution
     QDateTime detected_at;            // When it was detected
     bool resolved = false;            // Resolution status
-    
+
     // Additional context
     QString component;                // Component that caused the bottleneck
     QVariantMap metrics;              // Associated performance metrics
@@ -301,7 +320,7 @@ connect(timer, &QTimer::timeout, [dashboard]() {
     data.memory_usage_mb = getCurrentMemoryUsage();
     data.frame_rate = getCurrentFrameRate();
     data.timestamp = QDateTime::currentDateTime();
-    
+
     dashboard->updatePerformanceData(data);
 });
 
@@ -324,7 +343,7 @@ qInstallMessageHandler([](QtMsgType type, const QMessageLogContext& context, con
         case QtCriticalMsg: level = "ERROR"; break;
         case QtFatalMsg: level = "FATAL"; break;
     }
-    
+
     console->addLogMessage(level, context.category, msg);
 });
 
@@ -385,7 +404,7 @@ void trackMemoryAllocation(const QString& component, size_t size) {
     info.component = component;
     info.size_bytes = size;
     info.allocated_at = QDateTime::currentDateTime();
-    
+
     // Add to dashboard memory tracking
     dashboard->addMemoryAllocation(info);
 }
@@ -399,7 +418,7 @@ void detectMemoryLeaks() {
         bottleneck.severity = "HIGH";
         bottleneck.category = "MEMORY";
         bottleneck.suggestion = "Review component lifecycle management";
-        
+
         dashboard->addBottleneck(bottleneck);
     }
 }
@@ -427,13 +446,13 @@ connect(&AnimationEngine::instance(), &AnimationEngine::performanceAlert,
 // Log hot reload events
 connect(&HotReloadManager::instance(), &HotReloadManager::reloadCompleted,
         [console](const QString& file) {
-            console->addLogMessage("INFO", "HotReload", 
+            console->addLogMessage("INFO", "HotReload",
                                  QString("Successfully reloaded: %1").arg(file));
         });
 
 connect(&HotReloadManager::instance(), &HotReloadManager::reloadFailed,
         [console](const QString& file, const QString& error) {
-            console->addLogMessage("ERROR", "HotReload", 
+            console->addLogMessage("ERROR", "HotReload",
                                  QString("Failed to reload %1: %2").arg(file, error));
         });
 ```
@@ -444,7 +463,7 @@ connect(&HotReloadManager::instance(), &HotReloadManager::reloadFailed,
 // Monitor state changes
 connect(&StateManager::instance(), &StateManager::stateChanged,
         [console](const QString& key, const QVariant& value) {
-            console->addLogMessage("DEBUG", "StateManager", 
+            console->addLogMessage("DEBUG", "StateManager",
                                  QString("State changed: %1 = %2").arg(key, value.toString()));
         });
 ```

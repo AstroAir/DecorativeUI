@@ -8,44 +8,85 @@
 namespace DeclarativeUI::Command::UI {
 
 // **CommandEvent implementation**
-CommandEvent::CommandEvent(CommandEventType type, BaseUICommand* source) 
-    : type_(type), source_(source), timestamp_(QDateTime::currentDateTime()), id_(QUuid::createUuid()) {
+CommandEvent::CommandEvent(CommandEventType type, BaseUICommand* source)
+    : type_(type),
+      source_(source),
+      timestamp_(QDateTime::currentDateTime()),
+      id_(QUuid::createUuid()) {}
+
+/**
+ * @brief Get the string representation of the event type
+ * @return String name of the event type
+ *
+ * This function maps CommandEventType enum values to their string
+ * representations. It uses a lookup table approach to reduce cyclomatic
+ * complexity and improve performance.
+ */
+QString CommandEvent::getTypeName() const {
+    return getEventTypeNameLookup(type_);
 }
 
-QString CommandEvent::getTypeName() const {
-    switch (type_) {
-        case CommandEventType::Clicked: return "Clicked";
-        case CommandEventType::DoubleClicked: return "DoubleClicked";
-        case CommandEventType::Pressed: return "Pressed";
-        case CommandEventType::Released: return "Released";
-        case CommandEventType::Toggled: return "Toggled";
-        case CommandEventType::ValueChanged: return "ValueChanged";
-        case CommandEventType::TextChanged: return "TextChanged";
-        case CommandEventType::SelectionChanged: return "SelectionChanged";
-        case CommandEventType::StateChanged: return "StateChanged";
-        case CommandEventType::FocusIn: return "FocusIn";
-        case CommandEventType::FocusOut: return "FocusOut";
-        case CommandEventType::MouseEnter: return "MouseEnter";
-        case CommandEventType::MouseLeave: return "MouseLeave";
-        case CommandEventType::MouseMove: return "MouseMove";
-        case CommandEventType::KeyPressed: return "KeyPressed";
-        case CommandEventType::KeyReleased: return "KeyReleased";
-        case CommandEventType::ValidationFailed: return "ValidationFailed";
-        case CommandEventType::ValidationPassed: return "ValidationPassed";
-        case CommandEventType::Initialized: return "Initialized";
-        case CommandEventType::Destroyed: return "Destroyed";
-        case CommandEventType::Shown: return "Shown";
-        case CommandEventType::Hidden: return "Hidden";
-        case CommandEventType::Custom: return "Custom";
-        default: return "Unknown";
-    }
+/**
+ * @brief Static lookup function for event type names
+ * @param type The CommandEventType to convert
+ * @return String representation of the event type
+ *
+ * This helper function provides a centralized mapping between event types and
+ * their names. Using a static lookup table reduces the cyclomatic complexity of
+ * the main function.
+ */
+QString CommandEvent::getEventTypeNameLookup(CommandEventType type) {
+    // Static lookup table for better performance and reduced complexity
+    static const std::unordered_map<CommandEventType, QString> eventTypeNames =
+        {// Input events
+         {CommandEventType::Clicked, "Clicked"},
+         {CommandEventType::DoubleClicked, "DoubleClicked"},
+         {CommandEventType::Pressed, "Pressed"},
+         {CommandEventType::Released, "Released"},
+         {CommandEventType::Toggled, "Toggled"},
+
+         // Value change events
+         {CommandEventType::ValueChanged, "ValueChanged"},
+         {CommandEventType::TextChanged, "TextChanged"},
+         {CommandEventType::SelectionChanged, "SelectionChanged"},
+         {CommandEventType::StateChanged, "StateChanged"},
+
+         // Focus events
+         {CommandEventType::FocusIn, "FocusIn"},
+         {CommandEventType::FocusOut, "FocusOut"},
+
+         // Mouse events
+         {CommandEventType::MouseEnter, "MouseEnter"},
+         {CommandEventType::MouseLeave, "MouseLeave"},
+         {CommandEventType::MouseMove, "MouseMove"},
+
+         // Keyboard events
+         {CommandEventType::KeyPressed, "KeyPressed"},
+         {CommandEventType::KeyReleased, "KeyReleased"},
+
+         // Validation events
+         {CommandEventType::ValidationFailed, "ValidationFailed"},
+         {CommandEventType::ValidationPassed, "ValidationPassed"},
+
+         // Lifecycle events
+         {CommandEventType::Initialized, "Initialized"},
+         {CommandEventType::Destroyed, "Destroyed"},
+         {CommandEventType::Shown, "Shown"},
+         {CommandEventType::Hidden, "Hidden"},
+
+         // Custom events
+         {CommandEventType::Custom, "Custom"}};
+
+    auto it = eventTypeNames.find(type);
+    return (it != eventTypeNames.end()) ? it->second : "Unknown";
 }
 
 void CommandEvent::setData(const QString& key, const QVariant& value) {
     data_[key] = value;
 }
 
-QVariant CommandEvent::getData(const QString& key, const QVariant& defaultValue) const {
+QVariant CommandEvent::getData(const QString& key,
+                               const QVariant& defaultValue) const {
     auto it = data_.find(key);
     return it != data_.end() ? it->second : defaultValue;
 }
@@ -71,24 +112,25 @@ QJsonObject CommandEvent::toJson() const {
     json["accepted"] = accepted_;
     json["propagationStopped"] = propagation_stopped_;
     json["priority"] = static_cast<int>(priority_);
-    
+
     QJsonObject dataJson;
     for (const auto& [key, value] : data_) {
         dataJson[key] = QJsonValue::fromVariant(value);
     }
     json["data"] = dataJson;
-    
+
     return json;
 }
 
 void CommandEvent::fromJson(const QJsonObject& json) {
     type_ = static_cast<CommandEventType>(json["type"].toInt());
-    timestamp_ = QDateTime::fromString(json["timestamp"].toString(), Qt::ISODate);
+    timestamp_ =
+        QDateTime::fromString(json["timestamp"].toString(), Qt::ISODate);
     id_ = QUuid::fromString(json["id"].toString());
     accepted_ = json["accepted"].toBool();
     propagation_stopped_ = json["propagationStopped"].toBool();
     priority_ = static_cast<CommandEventPriority>(json["priority"].toInt());
-    
+
     QJsonObject dataJson = json["data"].toObject();
     for (auto it = dataJson.begin(); it != dataJson.end(); ++it) {
         data_[it.key()] = it.value().toVariant();
@@ -105,8 +147,8 @@ std::unique_ptr<CommandEvent> CommandEvent::clone() const {
 }
 
 // **ClickEvent implementation**
-ClickEvent::ClickEvent(BaseUICommand* source) : CommandEvent(CommandEventType::Clicked, source) {
-}
+ClickEvent::ClickEvent(BaseUICommand* source)
+    : CommandEvent(CommandEventType::Clicked, source) {}
 
 std::unique_ptr<CommandEvent> ClickEvent::clone() const {
     auto cloned = std::make_unique<ClickEvent>(source_);
@@ -118,8 +160,8 @@ std::unique_ptr<CommandEvent> ClickEvent::clone() const {
 }
 
 // **ValueChangeEvent implementation**
-ValueChangeEvent::ValueChangeEvent(BaseUICommand* source) : CommandEvent(CommandEventType::ValueChanged, source) {
-}
+ValueChangeEvent::ValueChangeEvent(BaseUICommand* source)
+    : CommandEvent(CommandEventType::ValueChanged, source) {}
 
 std::unique_ptr<CommandEvent> ValueChangeEvent::clone() const {
     auto cloned = std::make_unique<ValueChangeEvent>(source_);
@@ -131,8 +173,8 @@ std::unique_ptr<CommandEvent> ValueChangeEvent::clone() const {
 }
 
 // **TextChangeEvent implementation**
-TextChangeEvent::TextChangeEvent(BaseUICommand* source) : CommandEvent(CommandEventType::TextChanged, source) {
-}
+TextChangeEvent::TextChangeEvent(BaseUICommand* source)
+    : CommandEvent(CommandEventType::TextChanged, source) {}
 
 std::unique_ptr<CommandEvent> TextChangeEvent::clone() const {
     auto cloned = std::make_unique<TextChangeEvent>(source_);
@@ -144,8 +186,8 @@ std::unique_ptr<CommandEvent> TextChangeEvent::clone() const {
 }
 
 // **KeyEvent implementation**
-KeyEvent::KeyEvent(CommandEventType type, BaseUICommand* source) : CommandEvent(type, source) {
-}
+KeyEvent::KeyEvent(CommandEventType type, BaseUICommand* source)
+    : CommandEvent(type, source) {}
 
 std::unique_ptr<CommandEvent> KeyEvent::clone() const {
     auto cloned = std::make_unique<KeyEvent>(type_, source_);
@@ -157,8 +199,8 @@ std::unique_ptr<CommandEvent> KeyEvent::clone() const {
 }
 
 // **ValidationEvent implementation**
-ValidationEvent::ValidationEvent(CommandEventType type, BaseUICommand* source) : CommandEvent(type, source) {
-}
+ValidationEvent::ValidationEvent(CommandEventType type, BaseUICommand* source)
+    : CommandEvent(type, source) {}
 
 std::unique_ptr<CommandEvent> ValidationEvent::clone() const {
     auto cloned = std::make_unique<ValidationEvent>(type_, source_);
@@ -170,7 +212,7 @@ std::unique_ptr<CommandEvent> ValidationEvent::clone() const {
 }
 
 // **CustomEvent implementation**
-CustomEvent::CustomEvent(const QString& customType, BaseUICommand* source) 
+CustomEvent::CustomEvent(const QString& customType, BaseUICommand* source)
     : CommandEvent(CommandEventType::Custom, source) {
     setCustomType(customType);
 }
@@ -185,7 +227,8 @@ std::unique_ptr<CommandEvent> CustomEvent::clone() const {
 }
 
 // **CommandEventDispatcher implementation**
-CommandEventDispatcher::CommandEventDispatcher(QObject* parent) : QObject(parent) {
+CommandEventDispatcher::CommandEventDispatcher(QObject* parent)
+    : QObject(parent) {
     qDebug() << "⚡ CommandEventDispatcher initialized";
 }
 
@@ -194,24 +237,25 @@ CommandEventDispatcher& CommandEventDispatcher::instance() {
     return instance;
 }
 
-void CommandEventDispatcher::dispatchEvent(std::unique_ptr<CommandEvent> event) {
+void CommandEventDispatcher::dispatchEvent(
+    std::unique_ptr<CommandEvent> event) {
     if (!event) {
         qWarning() << "Cannot dispatch null event";
         return;
     }
-    
+
     if (event_queue_enabled_) {
         if (event_queue_.size() >= static_cast<size_t>(max_queue_size_)) {
             qWarning() << "Event queue is full, dropping event";
             return;
         }
-        
+
         event_queue_.push_back(std::move(event));
         QTimer::singleShot(0, this, &CommandEventDispatcher::processEventQueue);
     } else {
         processEvent(*event);
     }
-    
+
     emit eventDispatched(*event);
 }
 
@@ -220,44 +264,52 @@ void CommandEventDispatcher::dispatchEvent(const CommandEvent& event) {
     dispatchEvent(std::move(cloned));
 }
 
-QUuid CommandEventDispatcher::registerHandler(BaseUICommand* command, CommandEventType eventType, 
-                                             CommandEventHandler handler, CommandEventPriority priority) {
-    EventHandlerRegistration registration(eventType, std::move(handler), priority);
+QUuid CommandEventDispatcher::registerHandler(BaseUICommand* command,
+                                              CommandEventType eventType,
+                                              CommandEventHandler handler,
+                                              CommandEventPriority priority) {
+    EventHandlerRegistration registration(eventType, std::move(handler),
+                                          priority);
     return registerHandler(command, registration);
 }
 
-QUuid CommandEventDispatcher::registerHandler(BaseUICommand* command, const EventHandlerRegistration& registration) {
+QUuid CommandEventDispatcher::registerHandler(
+    BaseUICommand* command, const EventHandlerRegistration& registration) {
     if (!command) {
         qWarning() << "Cannot register handler for null command";
         return QUuid{};
     }
-    
+
     HandlerInfo info;
     info.command = command;
     info.registration = registration;
-    
+
     QUuid handlerId = registration.id;
     handlers_[handlerId] = info;
     command_handlers_[command].push_back(handlerId);
-    
+
     emit handlerRegistered(command, registration.event_type);
-    qDebug() << "📡 Registered event handler for" << command->getCommandType() 
+    qDebug() << "📡 Registered event handler for" << command->getCommandType()
              << "event type:" << static_cast<int>(registration.event_type);
-    
+
     return handlerId;
 }
 
-QUuid CommandEventDispatcher::registerFilteredHandler(BaseUICommand* command, CommandEventType eventType, 
-                                                     CommandEventHandler handler, CommandEventFilter filter,
-                                                     CommandEventPriority priority) {
-    EventHandlerRegistration registration(eventType, std::move(handler), priority);
+QUuid CommandEventDispatcher::registerFilteredHandler(
+    BaseUICommand* command, CommandEventType eventType,
+    CommandEventHandler handler, CommandEventFilter filter,
+    CommandEventPriority priority) {
+    EventHandlerRegistration registration(eventType, std::move(handler),
+                                          priority);
     registration.filter = std::move(filter);
     return registerHandler(command, registration);
 }
 
-QUuid CommandEventDispatcher::registerOnceHandler(BaseUICommand* command, CommandEventType eventType, 
-                                                 CommandEventHandler handler, CommandEventPriority priority) {
-    EventHandlerRegistration registration(eventType, std::move(handler), priority);
+QUuid CommandEventDispatcher::registerOnceHandler(
+    BaseUICommand* command, CommandEventType eventType,
+    CommandEventHandler handler, CommandEventPriority priority) {
+    EventHandlerRegistration registration(eventType, std::move(handler),
+                                          priority);
     registration.once = true;
     return registerHandler(command, registration);
 }
@@ -267,18 +319,20 @@ void CommandEventDispatcher::unregisterHandler(const QUuid& handlerId) {
     if (it != handlers_.end()) {
         BaseUICommand* command = it->second.command;
         CommandEventType eventType = it->second.registration.event_type;
-        
+
         // Remove from command handlers
         auto cmdIt = command_handlers_.find(command);
         if (cmdIt != command_handlers_.end()) {
             auto& handlerIds = cmdIt->second;
-            handlerIds.erase(std::remove(handlerIds.begin(), handlerIds.end(), handlerId), handlerIds.end());
-            
+            handlerIds.erase(
+                std::remove(handlerIds.begin(), handlerIds.end(), handlerId),
+                handlerIds.end());
+
             if (handlerIds.empty()) {
                 command_handlers_.erase(cmdIt);
             }
         }
-        
+
         handlers_.erase(it);
         emit handlerUnregistered(command, eventType);
         qDebug() << "🔌 Unregistered event handler:" << handlerId.toString();
@@ -291,23 +345,27 @@ void CommandEventDispatcher::unregisterAllHandlers(BaseUICommand* command) {
         for (const QUuid& handlerId : cmdIt->second) {
             auto it = handlers_.find(handlerId);
             if (it != handlers_.end()) {
-                emit handlerUnregistered(command, it->second.registration.event_type);
+                emit handlerUnregistered(command,
+                                         it->second.registration.event_type);
                 handlers_.erase(it);
             }
         }
         command_handlers_.erase(cmdIt);
-        qDebug() << "🧹 Unregistered all handlers for command:" << command->getCommandType();
+        qDebug() << "🧹 Unregistered all handlers for command:"
+                 << command->getCommandType();
     }
 }
 
-void CommandEventDispatcher::unregisterHandlersByType(BaseUICommand* command, CommandEventType eventType) {
+void CommandEventDispatcher::unregisterHandlersByType(
+    BaseUICommand* command, CommandEventType eventType) {
     auto cmdIt = command_handlers_.find(command);
     if (cmdIt != command_handlers_.end()) {
         auto& handlerIds = cmdIt->second;
-        
+
         for (auto it = handlerIds.begin(); it != handlerIds.end();) {
             auto handlerIt = handlers_.find(*it);
-            if (handlerIt != handlers_.end() && handlerIt->second.registration.event_type == eventType) {
+            if (handlerIt != handlers_.end() &&
+                handlerIt->second.registration.event_type == eventType) {
                 handlers_.erase(handlerIt);
                 it = handlerIds.erase(it);
                 emit handlerUnregistered(command, eventType);
@@ -315,22 +373,21 @@ void CommandEventDispatcher::unregisterHandlersByType(BaseUICommand* command, Co
                 ++it;
             }
         }
-        
+
         if (handlerIds.empty()) {
             command_handlers_.erase(cmdIt);
         }
     }
 }
 
-void CommandEventDispatcher::addGlobalFilter(CommandEventFilter filter, CommandEventPriority priority) {
+void CommandEventDispatcher::addGlobalFilter(CommandEventFilter filter,
+                                             CommandEventPriority priority) {
     global_filters_.emplace_back(std::move(filter), priority);
-    
+
     // Sort by priority (higher priority first)
     std::sort(global_filters_.begin(), global_filters_.end(),
-              [](const auto& a, const auto& b) {
-                  return a.second > b.second;
-              });
-    
+              [](const auto& a, const auto& b) { return a.second > b.second; });
+
     qDebug() << "🌐 Added global event filter";
 }
 
@@ -340,26 +397,32 @@ void CommandEventDispatcher::removeGlobalFilter(CommandEventFilter filter) {
     qDebug() << "🔌 Removed global event filter";
 }
 
-void CommandEventDispatcher::addEventInterceptor(CommandEventType eventType, CommandEventHandler interceptor) {
+void CommandEventDispatcher::addEventInterceptor(
+    CommandEventType eventType, CommandEventHandler interceptor) {
     interceptors_[eventType] = std::move(interceptor);
-    qDebug() << "🛡️ Added event interceptor for type:" << static_cast<int>(eventType);
+    qDebug() << "🛡️ Added event interceptor for type:"
+             << static_cast<int>(eventType);
 }
 
-void CommandEventDispatcher::removeEventInterceptor(CommandEventType eventType) {
+void CommandEventDispatcher::removeEventInterceptor(
+    CommandEventType eventType) {
     interceptors_.erase(eventType);
-    qDebug() << "🔌 Removed event interceptor for type:" << static_cast<int>(eventType);
+    qDebug() << "🔌 Removed event interceptor for type:"
+             << static_cast<int>(eventType);
 }
 
 int CommandEventDispatcher::getHandlerCount(BaseUICommand* command) const {
     auto it = command_handlers_.find(command);
-    return it != command_handlers_.end() ? static_cast<int>(it->second.size()) : 0;
+    return it != command_handlers_.end() ? static_cast<int>(it->second.size())
+                                         : 0;
 }
 
 int CommandEventDispatcher::getTotalHandlerCount() const {
     return static_cast<int>(handlers_.size());
 }
 
-QStringList CommandEventDispatcher::getRegisteredEventTypes(BaseUICommand* command) const {
+QStringList CommandEventDispatcher::getRegisteredEventTypes(
+    BaseUICommand* command) const {
     QStringList types;
     auto cmdIt = command_handlers_.find(command);
     if (cmdIt != command_handlers_.end()) {
@@ -380,7 +443,7 @@ void CommandEventDispatcher::processEvent(const CommandEvent& event) {
         if (!passesGlobalFilters(event)) {
             return;
         }
-        
+
         // Check for interceptors
         auto interceptorIt = interceptors_.find(event.getType());
         if (interceptorIt != interceptors_.end()) {
@@ -389,63 +452,67 @@ void CommandEventDispatcher::processEvent(const CommandEvent& event) {
                 return;
             }
         }
-        
+
         // Get handlers for this event
         auto handlers = getHandlersForEvent(event);
-        
+
         // Sort handlers by priority (higher priority first)
         std::sort(handlers.begin(), handlers.end(),
                   [](const HandlerInfo* a, const HandlerInfo* b) {
-                      return a->registration.priority > b->registration.priority;
+                      return a->registration.priority >
+                             b->registration.priority;
                   });
-        
+
         // Execute handlers
         for (HandlerInfo* handlerInfo : handlers) {
             if (event.isPropagationStopped()) {
                 break;
             }
-            
+
             const auto& registration = handlerInfo->registration;
-            
+
             // Apply filter if present
             if (registration.filter && !registration.filter(event)) {
                 continue;
             }
-            
+
             // Execute handler
             if (registration.handler) {
                 registration.handler(event);
             }
-            
+
             // Remove one-time handlers
             if (registration.once) {
                 unregisterHandler(registration.id);
             }
         }
-        
+
     } catch (const std::exception& e) {
-        handleError(event, QString("Event processing failed: %1").arg(e.what()));
+        handleError(event,
+                    QString("Event processing failed: %1").arg(e.what()));
     }
 }
 
-std::vector<CommandEventDispatcher::HandlerInfo*> CommandEventDispatcher::getHandlersForEvent(const CommandEvent& event) {
+std::vector<CommandEventDispatcher::HandlerInfo*>
+CommandEventDispatcher::getHandlersForEvent(const CommandEvent& event) {
     std::vector<HandlerInfo*> result;
-    
+
     BaseUICommand* source = event.getSource();
     if (!source) {
         return result;
     }
-    
+
     auto cmdIt = command_handlers_.find(source);
     if (cmdIt != command_handlers_.end()) {
         for (const QUuid& handlerId : cmdIt->second) {
             auto it = handlers_.find(handlerId);
-            if (it != handlers_.end() && it->second.registration.event_type == event.getType()) {
+            if (it != handlers_.end() &&
+                it->second.registration.event_type == event.getType()) {
                 result.push_back(&it->second);
             }
         }
     }
-    
+
     return result;
 }
 
@@ -458,7 +525,8 @@ bool CommandEventDispatcher::passesGlobalFilters(const CommandEvent& event) {
     return true;
 }
 
-void CommandEventDispatcher::handleError(const CommandEvent& event, const QString& error) {
+void CommandEventDispatcher::handleError(const CommandEvent& event,
+                                         const QString& error) {
     qWarning() << "Event handling error:" << error;
     emit eventHandlingError(event, error);
 }
@@ -467,14 +535,14 @@ void CommandEventDispatcher::processEventQueue() {
     if (event_queue_.empty()) {
         return;
     }
-    
+
     auto events = std::move(event_queue_);
     event_queue_.clear();
-    
+
     for (auto& event : events) {
         processEvent(*event);
     }
-    
+
     qDebug() << "📦 Processed" << events.size() << "queued events";
 }
 

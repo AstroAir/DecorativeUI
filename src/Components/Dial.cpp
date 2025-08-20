@@ -4,8 +4,7 @@
 namespace DeclarativeUI::Components {
 
 // **Implementation**
-Dial::Dial(QObject* parent)
-    : UIElement(parent), dial_widget_(nullptr) {}
+Dial::Dial(QObject* parent) : UIElement(parent), dial_widget_(nullptr) {}
 
 Dial& Dial::minimum(int min) {
     return static_cast<Dial&>(setProperty("minimum", min));
@@ -91,9 +90,7 @@ void Dial::initialize() {
     }
 }
 
-int Dial::getValue() const {
-    return dial_widget_ ? dial_widget_->value() : 0;
-}
+int Dial::getValue() const { return dial_widget_ ? dial_widget_->value() : 0; }
 
 void Dial::setValue(int value) {
     if (dial_widget_) {

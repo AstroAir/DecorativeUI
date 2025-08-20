@@ -14,24 +14,28 @@ This directory contains debugging and profiling tools designed for developers:
 ## Key Features
 
 ### 📊 **Performance Monitoring**
+
 - Real-time CPU, memory, and frame rate tracking
 - Performance history and trend analysis
 - Bottleneck detection with automated suggestions
 - Export capabilities for detailed analysis
 
 ### 🐛 **Interactive Debugging**
+
 - Live log viewing with filtering capabilities
 - Component inspection and state monitoring
 - Error tracking and exception handling
 - Export logs for external analysis
 
 ### 🔍 **Bottleneck Detection**
+
 - Automatic performance issue identification
 - Suggested optimizations and resolutions
 - Interactive resolution attempts
 - Performance impact measurement
 
 ### ⚡ **Profiling Tools**
+
 - Session-based performance profiling
 - Detailed metrics collection
 - JSON export for external tools
@@ -44,6 +48,7 @@ This directory contains debugging and profiling tools designed for developers:
 Comprehensive performance monitoring dashboard with multiple tabs and real-time metrics.
 
 **Key Features:**
+
 - Multi-tab interface for different monitoring aspects
 - Real-time performance data visualization
 - Memory usage tracking and leak detection
@@ -51,6 +56,7 @@ Comprehensive performance monitoring dashboard with multiple tabs and real-time 
 - Export capabilities (JSON, text reports)
 
 **Dashboard Tabs:**
+
 - **Performance**: CPU, memory, frame rate monitoring
 - **Memory**: Memory allocation tracking and leak detection
 - **Bottlenecks**: Performance issue identification
@@ -58,18 +64,19 @@ Comprehensive performance monitoring dashboard with multiple tabs and real-time 
 - **Debug**: Live debugging console
 
 **Core Methods:**
+
 ```cpp
 class ProfilerDashboard : public QMainWindow {
 public:
     explicit ProfilerDashboard(QWidget* parent = nullptr);
-    
+
     // Data updates
     void updatePerformanceData(const PerformanceDataPoint& data);
     void addBottleneck(const BottleneckInfo& bottleneck);
-    
+
     // Export functionality
     void exportReport(const QString& format, const QString& filename);
-    
+
     // Configuration
     void setPerformanceThresholds(double cpu, size_t memory, double frameRate);
 };
@@ -80,6 +87,7 @@ public:
 Interactive debugging console for live log viewing and filtering.
 
 **Key Features:**
+
 - Real-time log message display with timestamps
 - Filtering by log level (Error, Warning, Info, Debug)
 - Automatic scrolling and memory management
@@ -87,20 +95,21 @@ Interactive debugging console for live log viewing and filtering.
 - Thread-safe log message handling
 
 **Core Methods:**
+
 ```cpp
 class DebuggingConsole : public QWidget {
 public:
     explicit DebuggingConsole(QWidget* parent = nullptr);
-    
+
     // Log management
     void appendLogLine(const QString& text);
     void setLogText(const QString& full_text);
     void addLogMessage(const QString& level, const QString& component, const QString& message);
     void clearLog();
-    
+
     // Filtering
     void setFilter(const QString& filter);
-    
+
 signals:
     void exportRequested();
     void filterChanged(const QString& filter);
@@ -112,6 +121,7 @@ signals:
 Interactive widget for displaying and resolving performance bottlenecks.
 
 **Key Features:**
+
 - List of detected bottlenecks with descriptions
 - Interactive selection and detailed information
 - Automated resolution attempts
@@ -119,19 +129,20 @@ Interactive widget for displaying and resolving performance bottlenecks.
 - Visual indicators for resolved issues
 
 **Core Methods:**
+
 ```cpp
 class BottleneckDetectorWidget : public QWidget {
 public:
     explicit BottleneckDetectorWidget(QWidget* parent = nullptr);
-    
+
     // Bottleneck management
     void addBottleneck(const QString& description, const QString& severity);
     void clearBottlenecks();
     void refreshBottlenecks();
-    
+
     // Resolution
     void resolveSelectedBottleneck();
-    
+
 signals:
     void bottleneckSelected(const QString& description);
     void resolutionRequested(const QString& bottleneck);
@@ -143,6 +154,7 @@ signals:
 Control panel for managing performance profiling sessions.
 
 **Key Features:**
+
 - Start/stop profiling session controls
 - Real-time progress tracking
 - Session duration monitoring
@@ -150,23 +162,24 @@ Control panel for managing performance profiling sessions.
 - Reset and clear functionality
 
 **Core Methods:**
+
 ```cpp
 class PerformanceProfilerWidget : public QWidget {
 public:
     explicit PerformanceProfilerWidget(QWidget* parent = nullptr);
-    
+
     // Profiling control
     void startProfiling();
     void stopProfiling();
     void resetProfiling();
-    
+
     // Data export
     void exportProfile(const QString& fileName);
-    
+
     // Status
     bool isProfiling() const;
     qint64 getProfilingDuration() const;
-    
+
 signals:
     void profilingStarted();
     void profilingStopped();
@@ -210,7 +223,7 @@ connect(qApp, &QApplication::aboutToQuit, [&console]() {
 });
 
 // Add to main window or dock
-mainWindow->addDockWidget(Qt::BottomDockWidgetArea, 
+mainWindow->addDockWidget(Qt::BottomDockWidgetArea,
                          new QDockWidget("Debug Console", console.get()));
 
 // Log messages from anywhere in the application
@@ -277,38 +290,38 @@ QTimer::singleShot(30000, [&profiler]() {  // Profile for 30 seconds
 class MainWindow : public QMainWindow {
 private:
     std::unique_ptr<ProfilerDashboard> debugDashboard_;
-    
+
 public:
     MainWindow() {
         setupDebugTools();
     }
-    
+
 private:
     void setupDebugTools() {
         #ifdef QT_DEBUG
         // Only include debug tools in debug builds
         debugDashboard_ = std::make_unique<ProfilerDashboard>();
-        
+
         // Add to menu
         auto debugMenu = menuBar()->addMenu("Debug");
         auto showDashboardAction = debugMenu->addAction("Show Performance Dashboard");
         connect(showDashboardAction, &QAction::triggered,
                 [this]() { debugDashboard_->show(); });
-        
+
         // Connect to application performance monitoring
         auto timer = new QTimer(this);
         connect(timer, &QTimer::timeout, this, &MainWindow::updatePerformanceMetrics);
         timer->start(1000);  // Update every second
         #endif
     }
-    
+
     void updatePerformanceMetrics() {
         PerformanceDataPoint data;
         data.cpu_usage = getCurrentCPUUsage();
         data.memory_usage_mb = getCurrentMemoryUsage();
         data.frame_rate = getCurrentFrameRate();
         data.timestamp = QDateTime::currentDateTime();
-        
+
         debugDashboard_->updatePerformanceData(data);
     }
 };
@@ -324,7 +337,7 @@ struct PerformanceDataPoint {
     size_t memory_usage_mb = 0;       // Memory usage in MB
     double frame_rate = 0.0;          // Frames per second
     QDateTime timestamp;              // When the measurement was taken
-    
+
     // Additional metrics
     double render_time_ms = 0.0;      // Rendering time
     int active_animations = 0;        // Number of active animations
@@ -360,7 +373,7 @@ struct BottleneckInfo {
 // Connect debug console to hot reload events
 connect(&HotReloadManager::instance(), &HotReloadManager::reloadCompleted,
         [&console](const QString& file) {
-            console->addLogMessage("INFO", "HotReload", 
+            console->addLogMessage("INFO", "HotReload",
                                  QString("Reloaded: %1").arg(file));
         });
 ```

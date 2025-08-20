@@ -5,6 +5,7 @@ This comprehensive example demonstrates all features and capabilities of the Dec
 ## 🎯 Overview
 
 The DeclarativeUI Showcase is a complete application that serves as:
+
 - **Feature Demonstration**: Live examples of all 30+ components
 - **Learning Resource**: Interactive tutorials and code examples
 - **Development Tool**: Performance monitoring and debugging utilities
@@ -13,6 +14,7 @@ The DeclarativeUI Showcase is a complete application that serves as:
 ## 🚀 Features Demonstrated
 
 ### Core Framework Features
+
 - ✅ **All 30+ UI Components** - Interactive gallery with live examples
 - ✅ **State Management** - Reactive state with computed properties
 - ✅ **Animation System** - Smooth transitions and effects
@@ -23,6 +25,7 @@ The DeclarativeUI Showcase is a complete application that serves as:
 - ✅ **Performance Monitoring** - Real-time performance metrics
 
 ### Advanced Features
+
 - 🎨 **Enhanced Components** - SearchBox, DataTable, Charts, Navigation
 - 📊 **Data Visualization** - Interactive charts and graphs
 - 🔧 **Developer Tools** - Performance profiler, state inspector
@@ -73,6 +76,7 @@ example/
 ## 🛠️ Building and Running
 
 ### Prerequisites
+
 - Qt6 (6.2 or later)
 - CMake 3.20+
 - C++20 compatible compiler
@@ -102,18 +106,21 @@ cd example && mkdir -p build && cd build && cmake .. && cmake --build . && ./Dec
 ## 📚 Learning Path
 
 ### 🌱 Beginner (Start Here)
+
 1. **Component Gallery** - Explore all available components
 2. **Basic State Management** - Learn reactive state patterns
 3. **Simple Animations** - Add smooth transitions
 4. **Theme Switching** - Change application appearance
 
 ### 🏗️ Intermediate
+
 1. **Advanced State Patterns** - Computed properties and validation
 2. **Command System** - Implement undo/redo functionality
 3. **JSON UI Loading** - Create dynamic interfaces
 4. **Performance Monitoring** - Optimize application performance
 
 ### 🚀 Advanced
+
 1. **Custom Components** - Build reusable component libraries
 2. **Complex Animations** - Create sophisticated animation sequences
 3. **Hot Reload Development** - Real-time development workflow
@@ -122,14 +129,18 @@ cd example && mkdir -p build && cd build && cmake .. && cmake --build . && ./Dec
 ## 🎨 Key Demonstrations
 
 ### Component Gallery
+
 Interactive showcase of all DeclarativeUI components:
+
 - Live examples with editable properties
 - Code snippets for each component
 - Integration examples
 - Performance comparisons
 
 ### State Management Demo
+
 Comprehensive state management examples:
+
 - Global state store
 - Local component state
 - Computed properties
@@ -137,7 +148,9 @@ Comprehensive state management examples:
 - Validation patterns
 
 ### Animation Showcase
+
 Advanced animation demonstrations:
+
 - Property animations
 - Transition effects
 - Animation sequences
@@ -145,7 +158,9 @@ Advanced animation demonstrations:
 - Performance optimization
 
 ### Command System Examples
+
 Command pattern implementations:
+
 - Basic commands
 - Undo/redo functionality
 - Batch operations
@@ -155,21 +170,27 @@ Command pattern implementations:
 ## 🔧 Development Features
 
 ### Hot Reload
+
 Real-time development workflow:
+
 - Automatic UI updates on file changes
 - State preservation during reload
 - Error handling and recovery
 - Performance impact monitoring
 
 ### Performance Monitoring
+
 Built-in performance tools:
+
 - Real-time metrics display
 - Memory usage tracking
 - Animation performance analysis
 - Component creation profiling
 
 ### Developer Tools
+
 Integrated development utilities:
+
 - State inspector
 - Component hierarchy viewer
 - Performance profiler
@@ -178,18 +199,21 @@ Integrated development utilities:
 ## 🎯 Use Cases
 
 ### Learning DeclarativeUI
+
 - Complete feature overview
 - Interactive tutorials
 - Code examples
 - Best practices
 
 ### Component Development
+
 - Component testing environment
 - Performance benchmarking
 - Integration testing
 - API exploration
 
 ### Application Prototyping
+
 - Rapid UI prototyping
 - Design pattern exploration
 - Performance testing
@@ -198,6 +222,7 @@ Integrated development utilities:
 ## 📖 Documentation
 
 Each section includes:
+
 - **Overview** - Feature description and benefits
 - **Examples** - Live, interactive demonstrations
 - **Code** - Complete, runnable code snippets
@@ -207,6 +232,7 @@ Each section includes:
 ## 🤝 Contributing
 
 This example serves as a reference implementation. Contributions welcome:
+
 - New component demonstrations
 - Performance optimizations
 - Documentation improvements

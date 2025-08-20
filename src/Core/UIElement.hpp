@@ -84,69 +84,88 @@ struct AnimationConfig {
     }
 
 private:
-    // **Convert QEasingCurve::Type to Animation::EasingType**
+    /**
+     * @brief Convert QEasingCurve::Type to Animation::EasingType
+     * @param qt_easing The Qt easing curve type to convert
+     * @return Corresponding Animation::EasingType
+     *
+     * This function provides a mapping between Qt's easing curve types and the
+     * internal Animation::EasingType enum. Uses a lookup table approach to
+     * reduce cyclomatic complexity and improve performance.
+     */
     static Animation::EasingType convertEasingType(
         QEasingCurve::Type qt_easing) {
-        switch (qt_easing) {
-            case QEasingCurve::Linear:
-                return Animation::EasingType::Linear;
-            case QEasingCurve::InQuad:
-                return Animation::EasingType::QuadIn;
-            case QEasingCurve::OutQuad:
-                return Animation::EasingType::QuadOut;
-            case QEasingCurve::InOutQuad:
-                return Animation::EasingType::QuadInOut;
-            case QEasingCurve::InCubic:
-                return Animation::EasingType::CubicIn;
-            case QEasingCurve::OutCubic:
-                return Animation::EasingType::CubicOut;
-            case QEasingCurve::InOutCubic:
-                return Animation::EasingType::CubicInOut;
-            case QEasingCurve::InQuart:
-                return Animation::EasingType::QuartIn;
-            case QEasingCurve::OutQuart:
-                return Animation::EasingType::QuartOut;
-            case QEasingCurve::InOutQuart:
-                return Animation::EasingType::QuartInOut;
-            case QEasingCurve::InSine:
-                return Animation::EasingType::SineIn;
-            case QEasingCurve::OutSine:
-                return Animation::EasingType::SineOut;
-            case QEasingCurve::InOutSine:
-                return Animation::EasingType::SineInOut;
-            case QEasingCurve::InExpo:
-                return Animation::EasingType::ExpoIn;
-            case QEasingCurve::OutExpo:
-                return Animation::EasingType::ExpoOut;
-            case QEasingCurve::InOutExpo:
-                return Animation::EasingType::ExpoInOut;
-            case QEasingCurve::InCirc:
-                return Animation::EasingType::CircIn;
-            case QEasingCurve::OutCirc:
-                return Animation::EasingType::CircOut;
-            case QEasingCurve::InOutCirc:
-                return Animation::EasingType::CircInOut;
-            case QEasingCurve::InBack:
-                return Animation::EasingType::BackIn;
-            case QEasingCurve::OutBack:
-                return Animation::EasingType::BackOut;
-            case QEasingCurve::InOutBack:
-                return Animation::EasingType::BackInOut;
-            case QEasingCurve::InElastic:
-                return Animation::EasingType::ElasticIn;
-            case QEasingCurve::OutElastic:
-                return Animation::EasingType::ElasticOut;
-            case QEasingCurve::InOutElastic:
-                return Animation::EasingType::ElasticInOut;
-            case QEasingCurve::InBounce:
-                return Animation::EasingType::BounceIn;
-            case QEasingCurve::OutBounce:
-                return Animation::EasingType::BounceOut;
-            case QEasingCurve::InOutBounce:
-                return Animation::EasingType::BounceInOut;
-            default:
-                return Animation::EasingType::Linear;
-        }
+        return getEasingTypeLookup(qt_easing);
+    }
+
+    /**
+     * @brief Static lookup function for easing type conversion
+     * @param qt_easing The Qt easing curve type
+     * @return Corresponding Animation::EasingType
+     *
+     * This helper function provides a centralized mapping between Qt easing
+     * types and Animation easing types using a lookup table for better
+     * performance.
+     */
+    static Animation::EasingType getEasingTypeLookup(
+        QEasingCurve::Type qt_easing) {
+        // Static lookup table for better performance and reduced complexity
+        static const std::unordered_map<QEasingCurve::Type,
+                                        Animation::EasingType>
+            easingTypeMap = {
+                // Linear easing
+                {QEasingCurve::Linear, Animation::EasingType::Linear},
+
+                // Quadratic easing
+                {QEasingCurve::InQuad, Animation::EasingType::QuadIn},
+                {QEasingCurve::OutQuad, Animation::EasingType::QuadOut},
+                {QEasingCurve::InOutQuad, Animation::EasingType::QuadInOut},
+
+                // Cubic easing
+                {QEasingCurve::InCubic, Animation::EasingType::CubicIn},
+                {QEasingCurve::OutCubic, Animation::EasingType::CubicOut},
+                {QEasingCurve::InOutCubic, Animation::EasingType::CubicInOut},
+
+                // Quartic easing
+                {QEasingCurve::InQuart, Animation::EasingType::QuartIn},
+                {QEasingCurve::OutQuart, Animation::EasingType::QuartOut},
+                {QEasingCurve::InOutQuart, Animation::EasingType::QuartInOut},
+
+                // Sinusoidal easing
+                {QEasingCurve::InSine, Animation::EasingType::SineIn},
+                {QEasingCurve::OutSine, Animation::EasingType::SineOut},
+                {QEasingCurve::InOutSine, Animation::EasingType::SineInOut},
+
+                // Exponential easing
+                {QEasingCurve::InExpo, Animation::EasingType::ExpoIn},
+                {QEasingCurve::OutExpo, Animation::EasingType::ExpoOut},
+                {QEasingCurve::InOutExpo, Animation::EasingType::ExpoInOut},
+
+                // Circular easing
+                {QEasingCurve::InCirc, Animation::EasingType::CircIn},
+                {QEasingCurve::OutCirc, Animation::EasingType::CircOut},
+                {QEasingCurve::InOutCirc, Animation::EasingType::CircInOut},
+
+                // Back easing
+                {QEasingCurve::InBack, Animation::EasingType::BackIn},
+                {QEasingCurve::OutBack, Animation::EasingType::BackOut},
+                {QEasingCurve::InOutBack, Animation::EasingType::BackInOut},
+
+                // Elastic easing
+                {QEasingCurve::InElastic, Animation::EasingType::ElasticIn},
+                {QEasingCurve::OutElastic, Animation::EasingType::ElasticOut},
+                {QEasingCurve::InOutElastic,
+                 Animation::EasingType::ElasticInOut},
+
+                // Bounce easing
+                {QEasingCurve::InBounce, Animation::EasingType::BounceIn},
+                {QEasingCurve::OutBounce, Animation::EasingType::BounceOut},
+                {QEasingCurve::InOutBounce,
+                 Animation::EasingType::BounceInOut}};
+
+        auto it = easingTypeMap.find(qt_easing);
+        return (it != easingTypeMap.end()) ? it->second
+                                           : Animation::EasingType::Linear;
     }
 };
 
@@ -317,6 +336,14 @@ protected:
         const AnimationConfig &config);
     void setupAnimation(std::shared_ptr<Animation::Animation> animation,
                         const AnimationConfig &config);
+
+    // **Deserialization helper methods to reduce complexity**
+    bool validateDeserializationInput(const QJsonObject &json) const;
+    void deserializeProperties(const QJsonObject &json);
+    void deserializeTheme(const QJsonObject &json);
+    void deserializeConfiguration(const QJsonObject &json);
+    void applyDeserializedData();
+    PropertyValue parsePropertyValue(const QJsonValue &value) const;
 
 private slots:
     void onPropertyChanged();

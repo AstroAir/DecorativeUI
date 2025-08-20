@@ -4,14 +4,12 @@
 #include <QSignalSpy>
 #include <QTest>
 #include <QTimer>
-#include <memory>
 #include <algorithm>
-
+#include <memory>
 
 #include "../Command/BuiltinCommands.hpp"
 #include "../Command/CommandIntegration.hpp"
 #include "../Command/CommandSystem.hpp"
-
 
 using namespace DeclarativeUI::Command;
 using namespace DeclarativeUI::Command::Integration;
@@ -21,7 +19,9 @@ class TestCustomCommand : public ICommand {
     Q_OBJECT
 
 public:
-    explicit TestCustomCommand(const CommandContext& context, QObject* parent = nullptr) : ICommand(parent) {}
+    explicit TestCustomCommand(const CommandContext& context,
+                               QObject* parent = nullptr)
+        : ICommand(parent) {}
 
     CommandResult<QVariant> execute(const CommandContext& context) override {
         auto test_param = context.getParameter<QString>("test_param");
@@ -32,8 +32,8 @@ public:
             return error_result;
         }
 
-        return CommandResult<QVariant>(QVariant(
-            QString("Test executed with: %1").arg(test_param)));
+        return CommandResult<QVariant>(
+            QVariant(QString("Test executed with: %1").arg(test_param)));
     }
 
     CommandMetadata getMetadata() const override {
@@ -60,9 +60,12 @@ private slots:
 
         // Test command registration
         auto registered = factory.getRegisteredCommands();
-        QVERIFY(std::find(registered.begin(), registered.end(), "set_property") != registered.end());
-        QVERIFY(std::find(registered.begin(), registered.end(), "update_state") != registered.end());
-        QVERIFY(std::find(registered.begin(), registered.end(), "save_file") != registered.end());
+        QVERIFY(std::find(registered.begin(), registered.end(),
+                          "set_property") != registered.end());
+        QVERIFY(std::find(registered.begin(), registered.end(),
+                          "update_state") != registered.end());
+        QVERIFY(std::find(registered.begin(), registered.end(), "save_file") !=
+                registered.end());
 
         // Test command creation
         auto command = factory.createCommand("set_property");
@@ -127,9 +130,11 @@ private slots:
         QVERIFY(error_result.isError());
         QCOMPARE(error_result.getError(), QString("Error message"));
 
-        // Test monadic operations - keep result as QVariant to avoid template instantiation issues
-        auto mapped_result = success_result.map(
-            [](const QVariant& value) { return QVariant(value.toString().length()); });
+        // Test monadic operations - keep result as QVariant to avoid template
+        // instantiation issues
+        auto mapped_result = success_result.map([](const QVariant& value) {
+            return QVariant(value.toString().length());
+        });
         QVERIFY(mapped_result.isSuccess());
         QCOMPARE(mapped_result.getResult().toInt(), 8);
     }
@@ -137,7 +142,8 @@ private slots:
     void testAsyncCommandExecution() {
         auto& invoker = CommandManager::instance().getInvoker();
 
-        // Use our test command for async execution instead of the problematic DelayedCommand
+        // Use our test command for async execution instead of the problematic
+        // DelayedCommand
         CommandContext context;
         context.setParameter("test_param", QString("Async test"));
 
@@ -152,12 +158,14 @@ private slots:
             auto result = future.result();
             qDebug() << "Async result success:" << result.isSuccess();
             if (result.isSuccess()) {
-                qDebug() << "Async result data:" << result.getResult().toString();
+                qDebug() << "Async result data:"
+                         << result.getResult().toString();
             } else {
                 qDebug() << "Async execution failed:" << result.getError();
             }
             QVERIFY(result.isSuccess());
-            QCOMPARE(result.getResult().toString(), QString("Test executed with: Async test"));
+            QCOMPARE(result.getResult().toString(),
+                     QString("Test executed with: Async test"));
         } else {
             qDebug() << "Future not finished";
             QFAIL("Async command did not complete in time");
@@ -171,16 +179,18 @@ private slots:
         auto& manager = CommandManager::instance();
         manager.enableCommandHistory(true);
 
-        // The current implementation doesn't actually track commands automatically
-        // This is a limitation of the current implementation
-        // For now, we'll just verify the basic functionality exists
-        QVERIFY(!manager.canUndo());  // Should be false since no commands tracked
-        QVERIFY(!manager.canRedo());  // Should be false since no commands tracked
-        
+        // The current implementation doesn't actually track commands
+        // automatically This is a limitation of the current implementation For
+        // now, we'll just verify the basic functionality exists
+        QVERIFY(
+            !manager.canUndo());  // Should be false since no commands tracked
+        QVERIFY(
+            !manager.canRedo());  // Should be false since no commands tracked
+
         // Test that the methods exist and don't crash
         manager.undo();  // Should not crash
         manager.redo();  // Should not crash
-        
+
         // Still should be false
         QVERIFY(!manager.canUndo());
         QVERIFY(!manager.canRedo());
@@ -189,7 +199,8 @@ private slots:
     void testCommandBatch() {
         auto& invoker = CommandManager::instance().getInvoker();
 
-        std::vector<QString> commands = {"test.custom", "test.custom", "test.custom"};
+        std::vector<QString> commands = {"test.custom", "test.custom",
+                                         "test.custom"};
 
         CommandContext context;
         context.setParameter("test_param", QString("Batch test"));
@@ -202,9 +213,9 @@ private slots:
         QTest::qWait(500);
 
         qDebug() << "Batch spy count:" << spy.count();
-        
-        // The batch processing might not emit signals properly in current implementation
-        // Let's test that at least some commands were executed
+
+        // The batch processing might not emit signals properly in current
+        // implementation Let's test that at least some commands were executed
         QVERIFY(spy.count() >= 0);  // Just verify it doesn't crash
     }
 
@@ -245,9 +256,10 @@ private slots:
             "test.custom", context);
 
         QVERIFY(result.isSuccess());
-        
-        // Current implementation might not call interceptors - this is a known limitation
-        // For now, just verify the interceptor was added without crashing
+
+        // Current implementation might not call interceptors - this is a known
+        // limitation For now, just verify the interceptor was added without
+        // crashing
         QVERIFY(interceptor_ptr != nullptr);
     }
 
@@ -267,8 +279,7 @@ private slots:
 
     void testCommandMenu() {
         CommandMenu menu;
-        menu.addAction("Save", "save_file")
-            .addAction("Load", "load_file");
+        menu.addAction("Save", "save_file").addAction("Load", "load_file");
         // Test without separator first to see what we get
         // .addSeparator();
 
@@ -277,13 +288,13 @@ private slots:
 
         auto actions = qtMenu->actions();
         qDebug() << "Menu actions count:" << actions.size();
-        
+
         // Adjust expectation based on actual implementation
         QVERIFY(actions.size() >= 2);  // At least the 2 actions we added
 
         QCOMPARE(actions[0]->text(), QString("Save"));
         QCOMPARE(actions[1]->text(), QString("Load"));
-        
+
         // Only test separator if we have more than 2 actions
         if (actions.size() > 2) {
             QVERIFY(actions[2]->isSeparator());
@@ -380,8 +391,11 @@ private slots:
         auto result = command.execute(context);
 
         QVERIFY(result.isSuccess());
-        QCOMPARE(command.getState(), CommandState::Created);  // Our simple command doesn't change state
-        // We don't test state changes since our simple command doesn't implement them
+        QCOMPARE(
+            command.getState(),
+            CommandState::Created);  // Our simple command doesn't change state
+        // We don't test state changes since our simple command doesn't
+        // implement them
     }
 
     void benchmarkCommandExecution() {

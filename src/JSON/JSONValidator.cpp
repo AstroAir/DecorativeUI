@@ -1,4 +1,24 @@
-// JSON/JSONValidator.cpp
+/**
+ * @file JSONValidator.cpp
+ * @brief Implementation of the JSON validation framework for DeclarativeUI
+ *
+ * This file provides comprehensive validation capabilities for UI JSON
+ * definitions, including component structure validation, property type
+ * checking, event handler validation, and binding expression validation. The
+ * implementation focuses on maintainable code with low cyclomatic complexity
+ * through helper functions.
+ *
+ * Key features:
+ * - Component structure validation with depth limiting
+ * - Property type and compatibility validation
+ * - Event handler and binding validation
+ * - Extensible validation rule system
+ * - Detailed error reporting with path information
+ *
+ * @author DeclarativeUI Team
+ * @version 1.0
+ */
+
 #include "JSONValidator.hpp"
 #include <QDebug>
 #include <QMetaObject>
@@ -6,11 +26,18 @@
 #include <algorithm>
 #include "ComponentRegistry.hpp"
 
-
 namespace DeclarativeUI::JSON {
 
 // **ValidationResult Implementation**
 
+/**
+ * @brief Constructs a validation result with all necessary information
+ * @param valid Whether the validation passed
+ * @param sev Severity level of the validation result
+ * @param msg Human-readable validation message
+ * @param p JSON path where the validation occurred
+ * @param rule Name of the validation rule that generated this result
+ */
 ValidationResult::ValidationResult(bool valid, ValidationSeverity sev,
                                    const QString &msg, const JSONPath &p,
                                    const QString &rule)
@@ -124,6 +151,17 @@ UIJSONValidator::UIJSONValidator() {
     schema_validator_ = std::make_unique<JSONSchemaValidator>();
 }
 
+/**
+ * @brief Validates a complete UI definition JSON object
+ * @param ui_definition The root UI definition object to validate
+ * @return true if the UI definition is valid, false otherwise
+ *
+ * This is the main entry point for UI validation. It performs:
+ * - Basic structure validation (requires 'type' property)
+ * - Component structure validation
+ * - Global validator execution
+ * - Error accumulation and reporting
+ */
 bool UIJSONValidator::validate(const QJsonObject &ui_definition) {
     context_.results.clear();
     context_.root_object = ui_definition;
@@ -440,99 +478,18 @@ bool UIJSONValidator::validateAgainstSchema() const {
 
 bool UIJSONValidator::validateComponentStructure(const QJsonObject &component,
                                                  const JSONPath &path) {
-    JSONPath old_path = context_.current_path;
-    context_.current_path = path;
-
-    // **Check depth limit**
-    if (context_.current_depth >= context_.max_validation_depth) {
-        context_.addError("Maximum validation depth exceeded", "depth");
-        context_.current_path = old_path;
+    // **Setup validation context with depth checking**
+    if (!setupValidationContext(path)) {
         return false;
     }
 
+    JSONPath old_path = context_.current_path;
+    context_.current_path = path;
     context_.current_depth++;
 
     try {
-        bool valid = true;
-
-        // **Validate required 'type' property**
-        if (!component.contains("type")) {
-            context_.addError("Component must have a 'type' property",
-                              "structure");
-            valid = false;
-        } else {
-            QString component_type = component["type"].toString();
-            if (!validateComponentType(component_type, path)) {
-                valid = false;
-            }
-
-            // **Run component-specific validators**
-            runValidatorsForComponent(component_type, component, path);
-        }
-
-        // **Validate properties section**
-        if (component.contains("properties")) {
-            if (!component["properties"].isObject()) {
-                context_.addError("'properties' must be an object",
-                                  "structure");
-                valid = false;
-            } else {
-                QString widget_type = component.value("type").toString();
-                if (!validateProperties(component["properties"].toObject(),
-                                        widget_type)) {
-                    valid = false;
-                }
-            }
-        }
-
-        // **Validate events section**
-        if (component.contains("events")) {
-            if (!component["events"].isObject()) {
-                context_.addError("'events' must be an object", "structure");
-                valid = false;
-            } else {
-                if (!validateEvents(component["events"].toObject())) {
-                    valid = false;
-                }
-            }
-        }
-
-        // **Validate bindings section**
-        if (component.contains("bindings")) {
-            if (!component["bindings"].isObject()) {
-                context_.addError("'bindings' must be an object", "structure");
-                valid = false;
-            } else {
-                if (!validateBindings(component["bindings"].toObject())) {
-                    valid = false;
-                }
-            }
-        }
-
-        // **Validate layout section**
-        if (component.contains("layout")) {
-            if (!component["layout"].isObject()) {
-                context_.addError("'layout' must be an object", "structure");
-                valid = false;
-            } else {
-                if (!validateLayout(component["layout"].toObject())) {
-                    valid = false;
-                }
-            }
-        }
-
-        // **Validate children section**
-        if (component.contains("children")) {
-            if (!component["children"].isArray()) {
-                context_.addError("'children' must be an array", "structure");
-                valid = false;
-            } else {
-                if (!validateComponentChildren(component["children"].toArray(),
-                                               path)) {
-                    valid = false;
-                }
-            }
-        }
+        bool valid = validateComponentTypeAndRunValidators(component, path);
+        valid &= validateComponentSections(component);
 
         context_.current_depth--;
         context_.current_path = old_path;
@@ -546,6 +503,110 @@ bool UIJSONValidator::validateComponentStructure(const QJsonObject &component,
             "exception");
         return false;
     }
+}
+
+// **Helper methods for reducing complexity**
+
+/**
+ * @brief Sets up validation context and checks depth limits
+ * @param path The current validation path
+ * @return true if validation can proceed, false if depth limit exceeded
+ */
+bool UIJSONValidator::setupValidationContext(const JSONPath &path) {
+    if (context_.current_depth >= context_.max_validation_depth) {
+        context_.addError("Maximum validation depth exceeded", "depth");
+        return false;
+    }
+    return true;
+}
+
+/**
+ * @brief Validates component type and runs component-specific validators
+ * @param component The component object to validate
+ * @param path The current validation path
+ * @return true if validation passes, false otherwise
+ */
+bool UIJSONValidator::validateComponentTypeAndRunValidators(
+    const QJsonObject &component, const JSONPath &path) {
+    // **Validate required 'type' property**
+    if (!component.contains("type")) {
+        context_.addError("Component must have a 'type' property", "structure");
+        return false;
+    }
+
+    QString component_type = component["type"].toString();
+    if (!validateComponentType(component_type, path)) {
+        return false;
+    }
+
+    // **Run component-specific validators**
+    runValidatorsForComponent(component_type, component, path);
+    return true;
+}
+
+/**
+ * @brief Validates all component sections (properties, events, bindings,
+ * layout, children)
+ * @param component The component object to validate
+ * @return true if all sections are valid, false otherwise
+ */
+bool UIJSONValidator::validateComponentSections(const QJsonObject &component) {
+    bool valid = true;
+    QString widget_type = component.value("type").toString();
+
+    // **Validate properties section**
+    if (component.contains("properties")) {
+        if (!component["properties"].isObject()) {
+            context_.addError("'properties' must be an object", "structure");
+            valid = false;
+        } else {
+            valid &= validateProperties(component["properties"].toObject(),
+                                        widget_type);
+        }
+    }
+
+    // **Validate events section**
+    if (component.contains("events")) {
+        if (!component["events"].isObject()) {
+            context_.addError("'events' must be an object", "structure");
+            valid = false;
+        } else {
+            valid &= validateEvents(component["events"].toObject());
+        }
+    }
+
+    // **Validate bindings section**
+    if (component.contains("bindings")) {
+        if (!component["bindings"].isObject()) {
+            context_.addError("'bindings' must be an object", "structure");
+            valid = false;
+        } else {
+            valid &= validateBindings(component["bindings"].toObject());
+        }
+    }
+
+    // **Validate layout section**
+    if (component.contains("layout")) {
+        if (!component["layout"].isObject()) {
+            context_.addError("'layout' must be an object", "structure");
+            valid = false;
+        } else {
+            valid &= validateLayout(component["layout"].toObject());
+        }
+    }
+
+    // **Validate children section**
+    if (component.contains("children")) {
+        if (!component["children"].isArray()) {
+            context_.addError("'children' must be an array", "structure");
+            valid = false;
+        } else {
+            valid &= validateComponentChildren(component["children"].toArray(),
+                                               context_.current_path);
+        }
+    }
+
+    return valid;
 }
 
 bool UIJSONValidator::validateComponentType(const QString &type,
@@ -704,6 +765,28 @@ bool UIJSONValidator::validatePropertyValue(const QString &property_name,
                                             const JSONPath &path) {
     Q_UNUSED(path)
 
+    // **Validate basic property type**
+    if (!validateBasicPropertyType(property_name, value)) {
+        return false;
+    }
+
+    // **Validate widget-specific property compatibility**
+    if (!validateWidgetSpecificProperty(property_name, widget_type)) {
+        return false;
+    }
+
+    // **Validate special property formats**
+    return validateSpecialPropertyFormats(property_name, value);
+}
+
+/**
+ * @brief Validates basic property types against expected JSON value types
+ * @param property_name The name of the property to validate
+ * @param value The JSON value to validate
+ * @return true if the property type is valid, false otherwise
+ */
+bool UIJSONValidator::validateBasicPropertyType(const QString &property_name,
+                                                const QJsonValue &value) {
     // **Basic type validation for common properties**
     static const std::unordered_map<QString, QJsonValue::Type> property_types =
         {{"text", QJsonValue::String},
@@ -734,127 +817,187 @@ bool UIJSONValidator::validatePropertyValue(const QString &property_name,
     if (type_it != property_types.end()) {
         QJsonValue::Type expected_type = type_it->second;
         if (value.type() != expected_type) {
-            QString expected_type_name = [expected_type]() -> QString {
-                switch (expected_type) {
-                    case QJsonValue::String:
-                        return "string";
-                    case QJsonValue::Double:
-                        return "number";
-                    case QJsonValue::Bool:
-                        return "boolean";
-                    case QJsonValue::Array:
-                        return "array";
-                    case QJsonValue::Object:
-                        return "object";
-                    default:
-                        return "unknown";
-                }
-            }();
+            QString expected_type_name = getJsonValueTypeName(expected_type);
+            QString actual_type_name = getJsonValueTypeName(value.type());
 
             context_.addError(
                 QString("Property '%1' expects %2, got %3")
-                    .arg(property_name, expected_type_name,
-                         value.type() == QJsonValue::String   ? "string"
-                         : value.type() == QJsonValue::Double ? "number"
-                         : value.type() == QJsonValue::Bool   ? "boolean"
-                         : value.type() == QJsonValue::Array  ? "array"
-                         : value.type() == QJsonValue::Object ? "object"
-                                                              : "unknown"),
+                    .arg(property_name, expected_type_name, actual_type_name),
                 "property_type");
             return false;
         }
     }
+    return true;
+}
 
-    // **Widget-specific property validation**
-    if (!widget_type.isEmpty()) {
-        if (known_properties_.find(widget_type) != known_properties_.end()) {
-            const QStringList &valid_props = known_properties_.at(widget_type);
-            if (!valid_props.contains(property_name) &&
-                !valid_props.contains("*")) {
-                if (context_.strict_mode ||
-                    !context_.allow_additional_properties) {
-                    context_.addError(
-                        QString(
-                            "Property '%1' is not valid for widget type '%2'")
-                            .arg(property_name, widget_type),
-                        "property_compatibility");
-                    return false;
-                } else {
-                    context_.addWarning(QString("Property '%1' may not be "
-                                                "supported by widget type '%2'")
-                                            .arg(property_name, widget_type),
-                                        "property_compatibility");
-                }
+/**
+ * @brief Validates widget-specific property compatibility
+ * @param property_name The name of the property to validate
+ * @param widget_type The widget type to validate against
+ * @return true if the property is compatible with the widget type, false
+ * otherwise
+ */
+bool UIJSONValidator::validateWidgetSpecificProperty(
+    const QString &property_name, const QString &widget_type) {
+    if (widget_type.isEmpty()) {
+        return true;
+    }
+
+    if (known_properties_.find(widget_type) != known_properties_.end()) {
+        const QStringList &valid_props = known_properties_.at(widget_type);
+        if (!valid_props.contains(property_name) &&
+            !valid_props.contains("*")) {
+            if (context_.strict_mode || !context_.allow_additional_properties) {
+                context_.addError(
+                    QString("Property '%1' is not valid for widget type '%2'")
+                        .arg(property_name, widget_type),
+                    "property_compatibility");
+                return false;
+            } else {
+                context_.addWarning(QString("Property '%1' may not be "
+                                            "supported by widget type '%2'")
+                                        .arg(property_name, widget_type),
+                                    "property_compatibility");
             }
         }
     }
+    return true;
+}
 
-    // **Specific property validations**
+/**
+ * @brief Validates special property formats (size arrays, alignment,
+ * orientation)
+ * @param property_name The name of the property to validate
+ * @param value The JSON value to validate
+ * @return true if the property format is valid, false otherwise
+ */
+bool UIJSONValidator::validateSpecialPropertyFormats(
+    const QString &property_name, const QJsonValue &value) {
+    // **Size and geometry properties validation**
     if (property_name == "minimumSize" || property_name == "maximumSize" ||
         property_name == "size" || property_name == "geometry") {
-        if (!value.isArray()) {
-            context_.addError(
-                QString("Property '%1' must be an array").arg(property_name),
-                "property_format");
-            return false;
-        }
-
-        QJsonArray arr = value.toArray();
-        if (arr.size() != 2 && arr.size() != 4) {
-            context_.addError(QString("Property '%1' array must have 2 "
-                                      "elements [width, height] or "
-                                      "4 elements [x, y, width, height]")
-                                  .arg(property_name),
-                              "property_format");
-            return false;
-        }
-
-        for (int i = 0; i < arr.size(); ++i) {
-            if (!arr[i].isDouble()) {
-                context_.addError(QString("Property '%1' array element at "
-                                          "index %2 must be a number")
-                                      .arg(property_name)
-                                      .arg(i),
-                                  "property_format");
-                return false;
-            }
-            if (arr[i].toDouble() < 0) {
-                context_.addError(QString("Property '%1' array element at "
-                                          "index %2 cannot be negative")
-                                      .arg(property_name)
-                                      .arg(i),
-                                  "property_format");
-                return false;
-            }
-        }
+        return validateSizeProperty(property_name, value);
     }
 
+    // **Alignment property validation**
     if (property_name == "alignment") {
-        if (value.isDouble()) {
-            int alignment = static_cast<int>(value.toDouble());
-            // **Basic Qt::Alignment validation**
-            if (alignment < 0 || alignment > 255) {
-                context_.addWarning(
-                    QString("Alignment value %1 may be invalid").arg(alignment),
-                    "property_value");
-            }
-        }
+        return validateAlignmentProperty(value);
     }
 
+    // **Orientation property validation**
     if (property_name == "orientation") {
-        if (value.isString()) {
-            QString orientation = value.toString().toLower();
-            if (orientation != "horizontal" && orientation != "vertical") {
-                context_.addError(QString("Orientation must be 'horizontal' or "
-                                          "'vertical', got '%1'")
-                                      .arg(value.toString()),
-                                  "property_value");
-                return false;
-            }
-        }
+        return validateOrientationProperty(value);
     }
 
     return true;
+}
+
+/**
+ * @brief Validates size-related properties (arrays with 2 or 4 numeric
+ * elements)
+ * @param property_name The name of the size property
+ * @param value The JSON array value to validate
+ * @return true if the size property is valid, false otherwise
+ */
+bool UIJSONValidator::validateSizeProperty(const QString &property_name,
+                                           const QJsonValue &value) {
+    if (!value.isArray()) {
+        context_.addError(
+            QString("Property '%1' must be an array").arg(property_name),
+            "property_format");
+        return false;
+    }
+
+    QJsonArray arr = value.toArray();
+    if (arr.size() != 2 && arr.size() != 4) {
+        context_.addError(
+            QString("Property '%1' array must have 2 elements [width, height] "
+                    "or 4 elements [x, y, width, height]")
+                .arg(property_name),
+            "property_format");
+        return false;
+    }
+
+    for (int i = 0; i < arr.size(); ++i) {
+        if (!arr[i].isDouble()) {
+            context_.addError(
+                QString(
+                    "Property '%1' array element at index %2 must be a number")
+                    .arg(property_name)
+                    .arg(i),
+                "property_format");
+            return false;
+        }
+        if (arr[i].toDouble() < 0) {
+            context_.addError(QString("Property '%1' array element at index %2 "
+                                      "cannot be negative")
+                                  .arg(property_name)
+                                  .arg(i),
+                              "property_format");
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief Validates alignment property values
+ * @param value The JSON value to validate
+ * @return true if the alignment is valid, false otherwise
+ */
+bool UIJSONValidator::validateAlignmentProperty(const QJsonValue &value) {
+    if (value.isDouble()) {
+        int alignment = static_cast<int>(value.toDouble());
+        // **Basic Qt::Alignment validation**
+        if (alignment < 0 || alignment > 255) {
+            context_.addWarning(
+                QString("Alignment value %1 may be invalid").arg(alignment),
+                "property_value");
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief Validates orientation property values
+ * @param value The JSON value to validate
+ * @return true if the orientation is valid, false otherwise
+ */
+bool UIJSONValidator::validateOrientationProperty(const QJsonValue &value) {
+    if (value.isString()) {
+        QString orientation = value.toString().toLower();
+        if (orientation != "horizontal" && orientation != "vertical") {
+            context_.addError(
+                QString(
+                    "Orientation must be 'horizontal' or 'vertical', got '%1'")
+                    .arg(value.toString()),
+                "property_value");
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * @brief Gets the string representation of a JSON value type
+ * @param type The QJsonValue::Type to convert
+ * @return String representation of the type
+ */
+QString UIJSONValidator::getJsonValueTypeName(QJsonValue::Type type) const {
+    switch (type) {
+        case QJsonValue::String:
+            return "string";
+        case QJsonValue::Double:
+            return "number";
+        case QJsonValue::Bool:
+            return "boolean";
+        case QJsonValue::Array:
+            return "array";
+        case QJsonValue::Object:
+            return "object";
+        default:
+            return "unknown";
+    }
 }
 
 bool UIJSONValidator::validateEventHandler(const QString &event_name,

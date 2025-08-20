@@ -393,6 +393,23 @@ private:
                                  const QString &binding_expression,
                                  const JSONPath &path);
 
+    // **Helper methods for reducing complexity**
+    bool setupValidationContext(const JSONPath &path);
+    bool validateComponentTypeAndRunValidators(const QJsonObject &component,
+                                               const JSONPath &path);
+    bool validateComponentSections(const QJsonObject &component);
+    bool validateBasicPropertyType(const QString &property_name,
+                                   const QJsonValue &value);
+    bool validateWidgetSpecificProperty(const QString &property_name,
+                                        const QString &widget_type);
+    bool validateSpecialPropertyFormats(const QString &property_name,
+                                        const QJsonValue &value);
+    bool validateSizeProperty(const QString &property_name,
+                              const QJsonValue &value);
+    bool validateAlignmentProperty(const QJsonValue &value);
+    bool validateOrientationProperty(const QJsonValue &value);
+    QString getJsonValueTypeName(QJsonValue::Type type) const;
+
     // **Helper methods**
     void initializeKnownComponents();
     void initializeKnownProperties();

@@ -1,8 +1,8 @@
 #include "BuiltinCommands.hpp"
-#include "ComponentCommands.hpp"
 #include <QDebug>
 #include <QThread>
 #include <QtConcurrent/QtConcurrent>
+#include "ComponentCommands.hpp"
 
 namespace DeclarativeUI {
 namespace Command {
@@ -361,13 +361,15 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "checkbox",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::CheckBoxCommand>(context);
+            return std::make_unique<ComponentCommands::CheckBoxCommand>(
+                context);
         });
 
     factory.registerCommand(
         "radiobutton",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::RadioButtonCommand>(context);
+            return std::make_unique<ComponentCommands::RadioButtonCommand>(
+                context);
         });
 
     // Text components
@@ -380,13 +382,15 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "lineedit",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::LineEditCommand>(context);
+            return std::make_unique<ComponentCommands::LineEditCommand>(
+                context);
         });
 
     factory.registerCommand(
         "textedit",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::TextEditCommand>(context);
+            return std::make_unique<ComponentCommands::TextEditCommand>(
+                context);
         });
 
     // Input components
@@ -405,14 +409,16 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "combobox",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::ComboBoxCommand>(context);
+            return std::make_unique<ComponentCommands::ComboBoxCommand>(
+                context);
         });
 
     // Container components
     factory.registerCommand(
         "tabwidget",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::TabWidgetCommand>(context);
+            return std::make_unique<ComponentCommands::TabWidgetCommand>(
+                context);
         });
 
     // ========================================================================
@@ -422,25 +428,27 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "doublespinbox",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::DoubleSpinBoxCommand>(context);
+            return std::make_unique<ComponentCommands::DoubleSpinBoxCommand>(
+                context);
         });
 
     factory.registerCommand(
-        "dial",
-        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+        "dial", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
             return std::make_unique<ComponentCommands::DialCommand>(context);
         });
 
     factory.registerCommand(
         "datetimeedit",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::DateTimeEditCommand>(context);
+            return std::make_unique<ComponentCommands::DateTimeEditCommand>(
+                context);
         });
 
     factory.registerCommand(
         "progressbar",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::ProgressBarCommand>(context);
+            return std::make_unique<ComponentCommands::ProgressBarCommand>(
+                context);
         });
 
     // ========================================================================
@@ -450,13 +458,15 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "lcdnumber",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::LCDNumberCommand>(context);
+            return std::make_unique<ComponentCommands::LCDNumberCommand>(
+                context);
         });
 
     factory.registerCommand(
         "calendar",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::CalendarCommand>(context);
+            return std::make_unique<ComponentCommands::CalendarCommand>(
+                context);
         });
 
     // ========================================================================
@@ -466,19 +476,22 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "listview",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::ListViewCommand>(context);
+            return std::make_unique<ComponentCommands::ListViewCommand>(
+                context);
         });
 
     factory.registerCommand(
         "tableview",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::TableViewCommand>(context);
+            return std::make_unique<ComponentCommands::TableViewCommand>(
+                context);
         });
 
     factory.registerCommand(
         "treeview",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::TreeViewCommand>(context);
+            return std::make_unique<ComponentCommands::TreeViewCommand>(
+                context);
         });
 
     // ========================================================================
@@ -488,7 +501,8 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "groupbox",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::GroupBoxCommand>(context);
+            return std::make_unique<ComponentCommands::GroupBoxCommand>(
+                context);
         });
 
     factory.registerCommand(
@@ -500,19 +514,22 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "scrollarea",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::ScrollAreaCommand>(context);
+            return std::make_unique<ComponentCommands::ScrollAreaCommand>(
+                context);
         });
 
     factory.registerCommand(
         "splitter",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::SplitterCommand>(context);
+            return std::make_unique<ComponentCommands::SplitterCommand>(
+                context);
         });
 
     factory.registerCommand(
         "dockwidget",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::DockWidgetCommand>(context);
+            return std::make_unique<ComponentCommands::DockWidgetCommand>(
+                context);
         });
 
     // ========================================================================
@@ -528,7 +545,8 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "statusbar",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::StatusBarCommand>(context);
+            return std::make_unique<ComponentCommands::StatusBarCommand>(
+                context);
         });
 
     factory.registerCommand(
@@ -540,7 +558,8 @@ void registerBuiltinCommands() {
     factory.registerCommand(
         "toolbutton",
         [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-            return std::make_unique<ComponentCommands::ToolButtonCommand>(context);
+            return std::make_unique<ComponentCommands::ToolButtonCommand>(
+                context);
         });
 
     // Register component commands

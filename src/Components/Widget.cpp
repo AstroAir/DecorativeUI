@@ -8,12 +8,12 @@ namespace DeclarativeUI::Components {
 using namespace Core::Concepts;
 
 // **Implementation**
-Widget::Widget(QObject* parent)
-    : UIElement(parent), widget_(nullptr) {}
+Widget::Widget(QObject* parent) : UIElement(parent), widget_(nullptr) {}
 
 // Template methods are implemented in the header file
 
-Widget& Widget::sizePolicy(QSizePolicy::Policy horizontal, QSizePolicy::Policy vertical) {
+Widget& Widget::sizePolicy(QSizePolicy::Policy horizontal,
+                           QSizePolicy::Policy vertical) {
     if (widget_) {
         widget_->setSizePolicy(horizontal, vertical);
     }
@@ -44,19 +44,23 @@ Widget& Widget::windowIcon(const QIcon& icon) {
 }
 
 Widget& Widget::windowFlags(Qt::WindowFlags flags) noexcept {
-    return static_cast<Widget&>(setProperty("windowFlags", static_cast<int>(flags)));
+    return static_cast<Widget&>(
+        setProperty("windowFlags", static_cast<int>(flags)));
 }
 
 Widget& Widget::windowState(Qt::WindowStates state) noexcept {
-    return static_cast<Widget&>(setProperty("windowState", static_cast<int>(state)));
+    return static_cast<Widget&>(
+        setProperty("windowState", static_cast<int>(state)));
 }
 
 Widget& Widget::focusPolicy(Qt::FocusPolicy policy) noexcept {
-    return static_cast<Widget&>(setProperty("focusPolicy", static_cast<int>(policy)));
+    return static_cast<Widget&>(
+        setProperty("focusPolicy", static_cast<int>(policy)));
 }
 
 Widget& Widget::contextMenuPolicy(Qt::ContextMenuPolicy policy) noexcept {
-    return static_cast<Widget&>(setProperty("contextMenuPolicy", static_cast<int>(policy)));
+    return static_cast<Widget&>(
+        setProperty("contextMenuPolicy", static_cast<int>(policy)));
 }
 
 Widget& Widget::cursor(const QCursor& cursor) {

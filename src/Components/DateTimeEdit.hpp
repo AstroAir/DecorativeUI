@@ -16,7 +16,6 @@
 #include <QVBoxLayout>
 #include <functional>
 
-
 #include "../Core/UIElement.hpp"
 
 namespace DeclarativeUI::Components {
@@ -57,7 +56,8 @@ public:
     DateTimeEdit& setReadOnly(bool readOnly);
 
     // **Event Handlers**
-    DateTimeEdit& onDateTimeChanged(std::function<void(const QDateTime&)> handler);
+    DateTimeEdit& onDateTimeChanged(
+        std::function<void(const QDateTime&)> handler);
     DateTimeEdit& onDateChanged(std::function<void(const QDate&)> handler);
     DateTimeEdit& onTimeChanged(std::function<void(const QTime&)> handler);
     DateTimeEdit& onEditingFinished(std::function<void()> handler);

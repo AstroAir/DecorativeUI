@@ -9,39 +9,36 @@
  */
 
 #include <QApplication>
-#include <QWidget>
-#include <QPushButton>
+#include <QCalendarWidget>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDateTimeEdit>
+#include <QDial>
+#include <QDockWidget>
+#include <QDoubleSpinBox>
+#include <QFrame>
+#include <QGroupBox>
+#include <QLCDNumber>
 #include <QLabel>
 #include <QLineEdit>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QTextEdit>
-#include <QPlainTextEdit>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QSlider>
-#include <QProgressBar>
-#include <QComboBox>
 #include <QListView>
-#include <QTableView>
-#include <QTreeView>
-#include <QGroupBox>
-#include <QTabWidget>
-#include <QScrollArea>
-#include <QSplitter>
-#include <QDial>
-#include <QCalendarWidget>
-#include <QLCDNumber>
-#include <QFrame>
-#include <QToolButton>
-#include <QDateTimeEdit>
-#include <QProgressBar>
-#include <QListView>
-#include <QTreeView>
-#include <QDockWidget>
 #include <QMenuBar>
+#include <QPlainTextEdit>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QRadioButton>
+#include <QScrollArea>
+#include <QSlider>
+#include <QSpinBox>
+#include <QSplitter>
 #include <QStatusBar>
+#include <QTabWidget>
+#include <QTableView>
+#include <QTextEdit>
 #include <QToolBar>
+#include <QToolButton>
+#include <QTreeView>
+#include <QWidget>
 
 #include "CommandSystem.hpp"
 
@@ -64,7 +61,7 @@ using namespace DeclarativeUI::Command;
  * This template eliminates the need for separate findWidget functions
  * in each command class, reducing code duplication significantly.
  */
-template<typename T>
+template <typename T>
 T* findWidget(const QString& name) {
     for (auto* widget : QApplication::allWidgets()) {
         if (auto* typedWidget = qobject_cast<T*>(widget)) {
@@ -80,10 +77,11 @@ T* findWidget(const QString& name) {
  * @brief Validates that required parameters exist in the command context.
  * @param context The command context to validate
  * @param requiredParams List of required parameter names
- * @return CommandResult with error message if validation fails, empty result if success
+ * @return CommandResult with error message if validation fails, empty result if
+ * success
  */
-CommandResult<QVariant> validateRequiredParameters(const CommandContext& context,
-                                                   const QStringList& requiredParams);
+CommandResult<QVariant> validateRequiredParameters(
+    const CommandContext& context, const QStringList& requiredParams);
 
 /**
  * @brief Creates a standardized error result for missing widget.
@@ -101,7 +99,7 @@ CommandResult<QVariant> createWidgetNotFoundError(const QString& widgetType,
  * @return CommandResult with formatted success message
  */
 CommandResult<QVariant> createSuccessResult(const QString& widgetType,
-                                           const QString& operation);
+                                            const QString& operation);
 
 // ============================================================================
 // BUTTON COMPONENTS
@@ -253,6 +251,17 @@ public:
 
 private:
     QSpinBox* findSpinBox(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetValue(const CommandContext& context,
+                                           QSpinBox* widget);
+    CommandResult<QVariant> handleStepUp(const CommandContext& context,
+                                         QSpinBox* widget);
+    CommandResult<QVariant> handleStepDown(const CommandContext& context,
+                                           QSpinBox* widget);
+    CommandResult<QVariant> handleSetRange(const CommandContext& context,
+                                           QSpinBox* widget);
+
     QString widget_name_;
     int old_value_;
     int new_value_;
@@ -275,6 +284,13 @@ public:
 
 private:
     QSlider* findSlider(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetValue(const CommandContext& context,
+                                           QSlider* widget);
+    CommandResult<QVariant> handleSetRange(const CommandContext& context,
+                                           QSlider* widget);
+
     QString widget_name_;
     int old_value_;
     int new_value_;
@@ -283,7 +299,8 @@ private:
 
 /**
  * @class DoubleSpinBoxCommand
- * @brief Specialized command for DoubleSpinBox components with decimal value manipulation.
+ * @brief Specialized command for DoubleSpinBox components with decimal value
+ * manipulation.
  */
 class DoubleSpinBoxCommand : public DeclarativeUI::Command::ICommand {
     Q_OBJECT
@@ -299,11 +316,16 @@ private:
     QDoubleSpinBox* findDoubleSpinBox(const QString& name);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSetValue(const CommandContext& context, QDoubleSpinBox* widget);
-    CommandResult<QVariant> handleStepUp(const CommandContext& context, QDoubleSpinBox* widget);
-    CommandResult<QVariant> handleStepDown(const CommandContext& context, QDoubleSpinBox* widget);
-    CommandResult<QVariant> handleSetRange(const CommandContext& context, QDoubleSpinBox* widget);
-    CommandResult<QVariant> handleSetDecimals(const CommandContext& context, QDoubleSpinBox* widget);
+    CommandResult<QVariant> handleSetValue(const CommandContext& context,
+                                           QDoubleSpinBox* widget);
+    CommandResult<QVariant> handleStepUp(const CommandContext& context,
+                                         QDoubleSpinBox* widget);
+    CommandResult<QVariant> handleStepDown(const CommandContext& context,
+                                           QDoubleSpinBox* widget);
+    CommandResult<QVariant> handleSetRange(const CommandContext& context,
+                                           QDoubleSpinBox* widget);
+    CommandResult<QVariant> handleSetDecimals(const CommandContext& context,
+                                              QDoubleSpinBox* widget);
 
     QString widget_name_;
     double old_value_;
@@ -329,9 +351,12 @@ private:
     QDial* findDial(const QString& name);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSetValue(const CommandContext& context, QDial* widget);
-    CommandResult<QVariant> handleSetRange(const CommandContext& context, QDial* widget);
-    CommandResult<QVariant> handleSetNotchesVisible(const CommandContext& context, QDial* widget);
+    CommandResult<QVariant> handleSetValue(const CommandContext& context,
+                                           QDial* widget);
+    CommandResult<QVariant> handleSetRange(const CommandContext& context,
+                                           QDial* widget);
+    CommandResult<QVariant> handleSetNotchesVisible(
+        const CommandContext& context, QDial* widget);
 
     QString widget_name_;
     int old_value_;
@@ -357,10 +382,14 @@ private:
     QDateTimeEdit* findDateTimeEdit(const QString& name);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSetDateTime(const CommandContext& context, QDateTimeEdit* widget);
-    CommandResult<QVariant> handleSetDateRange(const CommandContext& context, QDateTimeEdit* widget);
-    CommandResult<QVariant> handleSetTimeRange(const CommandContext& context, QDateTimeEdit* widget);
-    CommandResult<QVariant> handleSetDisplayFormat(const CommandContext& context, QDateTimeEdit* widget);
+    CommandResult<QVariant> handleSetDateTime(const CommandContext& context,
+                                              QDateTimeEdit* widget);
+    CommandResult<QVariant> handleSetDateRange(const CommandContext& context,
+                                               QDateTimeEdit* widget);
+    CommandResult<QVariant> handleSetTimeRange(const CommandContext& context,
+                                               QDateTimeEdit* widget);
+    CommandResult<QVariant> handleSetDisplayFormat(
+        const CommandContext& context, QDateTimeEdit* widget);
 
     QString widget_name_;
     QDateTime old_datetime_;
@@ -386,10 +415,14 @@ private:
     QProgressBar* findProgressBar(const QString& name);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSetValue(const CommandContext& context, QProgressBar* widget);
-    CommandResult<QVariant> handleSetRange(const CommandContext& context, QProgressBar* widget);
-    CommandResult<QVariant> handleSetTextVisible(const CommandContext& context, QProgressBar* widget);
-    CommandResult<QVariant> handleReset(const CommandContext& context, QProgressBar* widget);
+    CommandResult<QVariant> handleSetValue(const CommandContext& context,
+                                           QProgressBar* widget);
+    CommandResult<QVariant> handleSetRange(const CommandContext& context,
+                                           QProgressBar* widget);
+    CommandResult<QVariant> handleSetTextVisible(const CommandContext& context,
+                                                 QProgressBar* widget);
+    CommandResult<QVariant> handleReset(const CommandContext& context,
+                                        QProgressBar* widget);
 
     QString widget_name_;
     int old_value_;
@@ -419,10 +452,14 @@ private:
     QLCDNumber* findLCDNumber(const QString& name);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleDisplay(const CommandContext& context, QLCDNumber* widget);
-    CommandResult<QVariant> handleSetDigitCount(const CommandContext& context, QLCDNumber* widget);
-    CommandResult<QVariant> handleSetMode(const CommandContext& context, QLCDNumber* widget);
-    CommandResult<QVariant> handleSetSegmentStyle(const CommandContext& context, QLCDNumber* widget);
+    CommandResult<QVariant> handleDisplay(const CommandContext& context,
+                                          QLCDNumber* widget);
+    CommandResult<QVariant> handleSetDigitCount(const CommandContext& context,
+                                                QLCDNumber* widget);
+    CommandResult<QVariant> handleSetMode(const CommandContext& context,
+                                          QLCDNumber* widget);
+    CommandResult<QVariant> handleSetSegmentStyle(const CommandContext& context,
+                                                  QLCDNumber* widget);
 
     QString widget_name_;
     double old_value_;
@@ -448,9 +485,12 @@ private:
     QCalendarWidget* findCalendar(const QString& name);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSetSelectedDate(const CommandContext& context, QCalendarWidget* widget);
-    CommandResult<QVariant> handleSetDateRange(const CommandContext& context, QCalendarWidget* widget);
-    CommandResult<QVariant> handleSetGridVisible(const CommandContext& context, QCalendarWidget* widget);
+    CommandResult<QVariant> handleSetSelectedDate(const CommandContext& context,
+                                                  QCalendarWidget* widget);
+    CommandResult<QVariant> handleSetDateRange(const CommandContext& context,
+                                               QCalendarWidget* widget);
+    CommandResult<QVariant> handleSetGridVisible(const CommandContext& context,
+                                                 QCalendarWidget* widget);
 
     QString widget_name_;
     QDate old_date_;
@@ -464,11 +504,13 @@ private:
 
 /**
  * @class ListViewCommand
- * @brief Specialized command for ListView components with model and selection operations.
+ * @brief Specialized command for ListView components with model and selection
+ * operations.
  *
  * Refactored to improve maintainability by breaking down complex execute method
  * into smaller, focused operation handlers with comprehensive documentation.
- * Provides operations for item selection, addition, removal, and model management.
+ * Provides operations for item selection, addition, removal, and model
+ * management.
  */
 class ListViewCommand : public DeclarativeUI::Command::ICommand {
     Q_OBJECT
@@ -483,15 +525,22 @@ public:
 private:
     // Widget finder and validation methods
     QListView* findListView(const QString& name);
-    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
-    CommandResult<QVariant> validateModelOperation(QAbstractItemModel* model, const QString& operation);
+    CommandResult<QVariant> validateRequiredParameter(
+        const CommandContext& context, const QString& paramName);
+    CommandResult<QVariant> validateModelOperation(QAbstractItemModel* model,
+                                                   const QString& operation);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSelectItem(const CommandContext& context, QListView* listView);
-    CommandResult<QVariant> handleAddItem(const CommandContext& context, QListView* listView);
-    CommandResult<QVariant> handleRemoveItem(const CommandContext& context, QListView* listView);
-    CommandResult<QVariant> handleClearSelection(const CommandContext& context, QListView* listView);
-    CommandResult<QVariant> handleSetModel(const CommandContext& context, QListView* listView);
+    CommandResult<QVariant> handleSelectItem(const CommandContext& context,
+                                             QListView* listView);
+    CommandResult<QVariant> handleAddItem(const CommandContext& context,
+                                          QListView* listView);
+    CommandResult<QVariant> handleRemoveItem(const CommandContext& context,
+                                             QListView* listView);
+    CommandResult<QVariant> handleClearSelection(const CommandContext& context,
+                                                 QListView* listView);
+    CommandResult<QVariant> handleSetModel(const CommandContext& context,
+                                           QListView* listView);
 
     // State management for undo functionality
     QString widget_name_;
@@ -502,11 +551,13 @@ private:
 
 /**
  * @class TableViewCommand
- * @brief Specialized command for TableView components with model and selection operations.
+ * @brief Specialized command for TableView components with model and selection
+ * operations.
  *
  * Refactored to improve maintainability by breaking down complex execute method
  * into smaller, focused operation handlers with comprehensive documentation.
- * Provides operations for cell/row/column selection, data manipulation, and model management.
+ * Provides operations for cell/row/column selection, data manipulation, and
+ * model management.
  */
 class TableViewCommand : public DeclarativeUI::Command::ICommand {
     Q_OBJECT
@@ -521,15 +572,22 @@ public:
 private:
     // Widget finder and validation methods
     QTableView* findTableView(const QString& name);
-    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
-    CommandResult<QVariant> validateModelOperation(QAbstractItemModel* model, const QString& operation);
+    CommandResult<QVariant> validateRequiredParameter(
+        const CommandContext& context, const QString& paramName);
+    CommandResult<QVariant> validateModelOperation(QAbstractItemModel* model,
+                                                   const QString& operation);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSelectCell(const CommandContext& context, QTableView* tableView);
-    CommandResult<QVariant> handleSelectRow(const CommandContext& context, QTableView* tableView);
-    CommandResult<QVariant> handleSelectColumn(const CommandContext& context, QTableView* tableView);
-    CommandResult<QVariant> handleSetItemData(const CommandContext& context, QTableView* tableView);
-    CommandResult<QVariant> handleClearSelection(const CommandContext& context, QTableView* tableView);
+    CommandResult<QVariant> handleSelectCell(const CommandContext& context,
+                                             QTableView* tableView);
+    CommandResult<QVariant> handleSelectRow(const CommandContext& context,
+                                            QTableView* tableView);
+    CommandResult<QVariant> handleSelectColumn(const CommandContext& context,
+                                               QTableView* tableView);
+    CommandResult<QVariant> handleSetItemData(const CommandContext& context,
+                                              QTableView* tableView);
+    CommandResult<QVariant> handleClearSelection(const CommandContext& context,
+                                                 QTableView* tableView);
 
     // State management for undo functionality
     QString widget_name_;
@@ -540,11 +598,13 @@ private:
 
 /**
  * @class TreeViewCommand
- * @brief Specialized command for TreeView components with model and selection operations.
+ * @brief Specialized command for TreeView components with model and selection
+ * operations.
  *
  * Refactored to improve maintainability by breaking down complex execute method
  * into smaller, focused operation handlers with comprehensive documentation.
- * Provides operations for item selection, expansion/collapse, and hierarchical model management.
+ * Provides operations for item selection, expansion/collapse, and hierarchical
+ * model management.
  */
 class TreeViewCommand : public DeclarativeUI::Command::ICommand {
     Q_OBJECT
@@ -559,16 +619,24 @@ public:
 private:
     // Widget finder and validation methods
     QTreeView* findTreeView(const QString& name);
-    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
-    CommandResult<QVariant> validateModelOperation(QAbstractItemModel* model, const QString& operation);
+    CommandResult<QVariant> validateRequiredParameter(
+        const CommandContext& context, const QString& paramName);
+    CommandResult<QVariant> validateModelOperation(QAbstractItemModel* model,
+                                                   const QString& operation);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSelectItem(const CommandContext& context, QTreeView* treeView);
-    CommandResult<QVariant> handleExpandItem(const CommandContext& context, QTreeView* treeView);
-    CommandResult<QVariant> handleCollapseItem(const CommandContext& context, QTreeView* treeView);
-    CommandResult<QVariant> handleExpandAll(const CommandContext& context, QTreeView* treeView);
-    CommandResult<QVariant> handleCollapseAll(const CommandContext& context, QTreeView* treeView);
-    CommandResult<QVariant> handleClearSelection(const CommandContext& context, QTreeView* treeView);
+    CommandResult<QVariant> handleSelectItem(const CommandContext& context,
+                                             QTreeView* treeView);
+    CommandResult<QVariant> handleExpandItem(const CommandContext& context,
+                                             QTreeView* treeView);
+    CommandResult<QVariant> handleCollapseItem(const CommandContext& context,
+                                               QTreeView* treeView);
+    CommandResult<QVariant> handleExpandAll(const CommandContext& context,
+                                            QTreeView* treeView);
+    CommandResult<QVariant> handleCollapseAll(const CommandContext& context,
+                                              QTreeView* treeView);
+    CommandResult<QVariant> handleClearSelection(const CommandContext& context,
+                                                 QTreeView* treeView);
 
     // State management for undo functionality
     QString widget_name_;
@@ -597,6 +665,13 @@ public:
 
 private:
     QTabWidget* findTabWidget(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetCurrentIndex(const CommandContext& context,
+                                                  QTabWidget* widget);
+    CommandResult<QVariant> handleSetTabText(const CommandContext& context,
+                                             QTabWidget* widget);
+
     QString widget_name_;
     int old_index_;
     int new_index_;
@@ -619,6 +694,17 @@ public:
 
 private:
     QComboBox* findComboBox(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetCurrentIndex(const CommandContext& context,
+                                                  QComboBox* widget);
+    CommandResult<QVariant> handleSetCurrentText(const CommandContext& context,
+                                                 QComboBox* widget);
+    CommandResult<QVariant> handleAddItem(const CommandContext& context,
+                                          QComboBox* widget);
+    CommandResult<QVariant> handleClear(const CommandContext& context,
+                                        QComboBox* widget);
+
     QString widget_name_;
     int old_index_;
     QString old_text_;
@@ -641,6 +727,15 @@ public:
 
 private:
     QGroupBox* findGroupBox(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetTitle(const CommandContext& context,
+                                           QGroupBox* widget);
+    CommandResult<QVariant> handleSetCheckable(const CommandContext& context,
+                                               QGroupBox* widget);
+    CommandResult<QVariant> handleSetChecked(const CommandContext& context,
+                                             QGroupBox* widget);
+
     QString widget_name_;
     QString old_title_;
     bool old_checked_;
@@ -661,6 +756,14 @@ public:
 
 private:
     QFrame* findFrame(const QString& name);
+
+    // Operation-specific handlers to reduce cyclomatic complexity
+    CommandResult<QVariant> handleSetFrameStyle(const CommandContext& context,
+                                                QFrame* widget);
+    CommandResult<QVariant> handleSetLineWidth(const CommandContext& context,
+                                               QFrame* widget);
+    CommandResult<QVariant> handleSetMidLineWidth(const CommandContext& context,
+                                                  QFrame* widget);
 };
 
 /**
@@ -697,9 +800,12 @@ private:
     QSplitter* findSplitter(const QString& name);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSetSizes(const CommandContext& context, QSplitter* widget);
-    CommandResult<QVariant> handleSetOrientation(const CommandContext& context, QSplitter* widget);
-    CommandResult<QVariant> handleSetChildrenCollapsible(const CommandContext& context, QSplitter* widget);
+    CommandResult<QVariant> handleSetSizes(const CommandContext& context,
+                                           QSplitter* widget);
+    CommandResult<QVariant> handleSetOrientation(const CommandContext& context,
+                                                 QSplitter* widget);
+    CommandResult<QVariant> handleSetChildrenCollapsible(
+        const CommandContext& context, QSplitter* widget);
 
     QString widget_name_;
     QList<int> old_sizes_;
@@ -725,9 +831,12 @@ private:
     QDockWidget* findDockWidget(const QString& name);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleSetFloating(const CommandContext& context, QDockWidget* widget);
-    CommandResult<QVariant> handleSetAllowedAreas(const CommandContext& context, QDockWidget* widget);
-    CommandResult<QVariant> handleSetFeatures(const CommandContext& context, QDockWidget* widget);
+    CommandResult<QVariant> handleSetFloating(const CommandContext& context,
+                                              QDockWidget* widget);
+    CommandResult<QVariant> handleSetAllowedAreas(const CommandContext& context,
+                                                  QDockWidget* widget);
+    CommandResult<QVariant> handleSetFeatures(const CommandContext& context,
+                                              QDockWidget* widget);
 
     QString widget_name_;
     bool old_floating_;
@@ -758,12 +867,16 @@ private:
     QMenuBar* findMenuBar(const QString& name);
 
     // Parameter validation helper
-    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
+    CommandResult<QVariant> validateRequiredParameter(
+        const CommandContext& context, const QString& paramName);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleAddMenu(const CommandContext& context, QMenuBar* menuBar);
-    CommandResult<QVariant> handleRemoveMenu(const CommandContext& context, QMenuBar* menuBar);
-    CommandResult<QVariant> handleSetNativeMenuBar(const CommandContext& context, QMenuBar* menuBar);
+    CommandResult<QVariant> handleAddMenu(const CommandContext& context,
+                                          QMenuBar* menuBar);
+    CommandResult<QVariant> handleRemoveMenu(const CommandContext& context,
+                                             QMenuBar* menuBar);
+    CommandResult<QVariant> handleSetNativeMenuBar(
+        const CommandContext& context, QMenuBar* menuBar);
 };
 
 /**
@@ -787,13 +900,18 @@ private:
     QWidget* findWidgetByName(const QString& name, QWidget* parent = nullptr);
 
     // Parameter validation helper
-    CommandResult<QVariant> validateRequiredParameter(const CommandContext& context, const QString& paramName);
+    CommandResult<QVariant> validateRequiredParameter(
+        const CommandContext& context, const QString& paramName);
 
     // Operation-specific handlers to reduce cyclomatic complexity
-    CommandResult<QVariant> handleShowMessage(const CommandContext& context, QStatusBar* statusBar);
-    CommandResult<QVariant> handleClearMessage(const CommandContext& context, QStatusBar* statusBar);
-    CommandResult<QVariant> handleAddWidget(const CommandContext& context, QStatusBar* statusBar);
-    CommandResult<QVariant> handleRemoveWidget(const CommandContext& context, QStatusBar* statusBar);
+    CommandResult<QVariant> handleShowMessage(const CommandContext& context,
+                                              QStatusBar* statusBar);
+    CommandResult<QVariant> handleClearMessage(const CommandContext& context,
+                                               QStatusBar* statusBar);
+    CommandResult<QVariant> handleAddWidget(const CommandContext& context,
+                                            QStatusBar* statusBar);
+    CommandResult<QVariant> handleRemoveWidget(const CommandContext& context,
+                                               QStatusBar* statusBar);
 };
 
 /**
@@ -812,6 +930,17 @@ public:
 
 private:
     QToolBar* findToolBar(const QString& name);
+
+    // **Operation handlers for reduced complexity**
+    CommandResult<QVariant> handleAddAction(const CommandContext& context,
+                                            QToolBar* toolBar);
+    CommandResult<QVariant> handleRemoveAction(const CommandContext& context,
+                                               QToolBar* toolBar);
+    CommandResult<QVariant> handleSetOrientation(const CommandContext& context,
+                                                 QToolBar* toolBar);
+    CommandResult<QVariant> handleSetMovable(const CommandContext& context,
+                                             QToolBar* toolBar);
+
     QString widget_name_;
     Qt::Orientation old_orientation_;
     QString operation_;

@@ -12,19 +12,22 @@ FontDialog& FontDialog::currentFont(const QFont& font) {
 }
 
 FontDialog& FontDialog::options(QFontDialog::FontDialogOptions options) {
-    return static_cast<FontDialog&>(setProperty("options", static_cast<int>(options)));
+    return static_cast<FontDialog&>(
+        setProperty("options", static_cast<int>(options)));
 }
 
 FontDialog& FontDialog::windowTitle(const QString& title) {
     return static_cast<FontDialog&>(setProperty("windowTitle", title));
 }
 
-FontDialog& FontDialog::onFontSelected(std::function<void(const QFont&)> handler) {
+FontDialog& FontDialog::onFontSelected(
+    std::function<void(const QFont&)> handler) {
     font_selected_handler_ = std::move(handler);
     return *this;
 }
 
-FontDialog& FontDialog::onCurrentFontChanged(std::function<void(const QFont&)> handler) {
+FontDialog& FontDialog::onCurrentFontChanged(
+    std::function<void(const QFont&)> handler) {
     current_font_changed_handler_ = std::move(handler);
     return *this;
 }
@@ -36,19 +39,23 @@ void FontDialog::initialize() {
 
         // Connect signals
         if (font_selected_handler_) {
-            connect(font_dialog_widget_, &QFontDialog::fontSelected, this,
-                    [this](const QFont& font) { font_selected_handler_(font); });
+            connect(
+                font_dialog_widget_, &QFontDialog::fontSelected, this,
+                [this](const QFont& font) { font_selected_handler_(font); });
         }
 
         if (current_font_changed_handler_) {
             connect(font_dialog_widget_, &QFontDialog::currentFontChanged, this,
-                    [this](const QFont& font) { current_font_changed_handler_(font); });
+                    [this](const QFont& font) {
+                        current_font_changed_handler_(font);
+                    });
         }
     }
 }
 
 int FontDialog::exec() {
-    return font_dialog_widget_ ? font_dialog_widget_->exec() : QDialog::Rejected;
+    return font_dialog_widget_ ? font_dialog_widget_->exec()
+                               : QDialog::Rejected;
 }
 
 void FontDialog::show() {
@@ -84,8 +91,9 @@ void FontDialog::setCurrentFont(const QFont& font) {
 }
 
 // **Static convenience methods**
-QFont FontDialog::getFont(bool* ok, const QFont& initial, QWidget* parent, 
-                        const QString& title, QFontDialog::FontDialogOptions options) {
+QFont FontDialog::getFont(bool* ok, const QFont& initial, QWidget* parent,
+                          const QString& title,
+                          QFontDialog::FontDialogOptions options) {
     return QFontDialog::getFont(ok, initial, parent, title, options);
 }
 

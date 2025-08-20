@@ -300,6 +300,16 @@ target_link_libraries(PerformanceComprehensiveTest
     Qt6::Concurrent
 )
 
+# **Refactored Components Tests**
+add_executable(RefactoredComponentsTest test_refactored_components.cpp)
+target_link_libraries(RefactoredComponentsTest
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+)
+
 # **Set output directory for unit tests**
 set_target_properties(
     CoreTest
@@ -330,6 +340,9 @@ set_target_properties(
     DebuggingConsoleTest
     BottleneckDetectorWidgetTest
     PerformanceProfilerWidgetTest
+    JSONExtendedTest
+    PerformanceComprehensiveTest
+    RefactoredComponentsTest
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests/unit
 )
@@ -365,6 +378,7 @@ add_dependencies(BottleneckDetectorWidgetTest CopyTestResources)
 add_dependencies(PerformanceProfilerWidgetTest CopyTestResources)
 add_dependencies(JSONExtendedTest CopyTestResources)
 add_dependencies(PerformanceComprehensiveTest CopyTestResources)
+add_dependencies(RefactoredComponentsTest CopyTestResources)
 
 # **Register tests with CTest**
 add_test(NAME CoreTest COMMAND CoreTest)
@@ -397,3 +411,4 @@ add_test(NAME BottleneckDetectorWidgetTest COMMAND BottleneckDetectorWidgetTest)
 add_test(NAME PerformanceProfilerWidgetTest COMMAND PerformanceProfilerWidgetTest)
 add_test(NAME JSONExtendedTest COMMAND JSONExtendedTest)
 add_test(NAME PerformanceComprehensiveTest COMMAND PerformanceComprehensiveTest)
+add_test(NAME RefactoredComponentsTest COMMAND RefactoredComponentsTest)

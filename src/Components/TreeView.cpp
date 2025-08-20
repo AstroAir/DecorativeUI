@@ -18,8 +18,7 @@ TreeView& TreeView::selectionBehavior(
         setProperty("selectionBehavior", static_cast<int>(behavior)));
 }
 
-TreeView& TreeView::selectionMode(
-    QAbstractItemView::SelectionMode mode) {
+TreeView& TreeView::selectionMode(QAbstractItemView::SelectionMode mode) {
     return static_cast<TreeView&>(
         setProperty("selectionMode", static_cast<int>(mode)));
 }
@@ -140,7 +139,8 @@ void TreeView::initialize() {
         }
 
         if (selection_changed_handler_) {
-            connect(tree_widget_->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+            connect(tree_widget_->selectionModel(),
+                    &QItemSelectionModel::selectionChanged, this,
                     [this]() { selection_changed_handler_(); });
         }
 
@@ -242,7 +242,7 @@ QStandardItem* TreeView::addRootItem(const QString& text) {
 }
 
 QStandardItem* TreeView::addChildItem(QStandardItem* parent,
-                                     const QString& text) {
+                                      const QString& text) {
     if (parent) {
         QStandardItem* item = new QStandardItem(text);
         parent->appendRow(item);
@@ -282,8 +282,7 @@ QStandardItem* TreeView::getRootItem(int row) const {
     return default_model_ ? default_model_->item(row) : nullptr;
 }
 
-QStandardItem* TreeView::getItemFromIndex(
-    const QModelIndex& index) const {
+QStandardItem* TreeView::getItemFromIndex(const QModelIndex& index) const {
     return default_model_ ? default_model_->itemFromIndex(index) : nullptr;
 }
 

@@ -1,7 +1,7 @@
 // Components/FontDialog.hpp
 #pragma once
-#include <QFontDialog>
 #include <QFont>
+#include <QFontDialog>
 #include <QWidget>
 
 #include "../Core/UIElement.hpp"
@@ -32,9 +32,10 @@ public:
 
     // **Static convenience methods**
     static QFont getFont(bool* ok, const QFont& initial = QFont(),
-                        QWidget* parent = nullptr,
-                        const QString& title = QString(),
-                        QFontDialog::FontDialogOptions options = QFontDialog::FontDialogOptions());
+                         QWidget* parent = nullptr,
+                         const QString& title = QString(),
+                         QFontDialog::FontDialogOptions options =
+                             QFontDialog::FontDialogOptions());
 
     static QFont getFont(bool* ok, QWidget* parent = nullptr);
 
@@ -43,7 +44,5 @@ private:
     std::function<void(const QFont&)> font_selected_handler_;
     std::function<void(const QFont&)> current_font_changed_handler_;
 };
-
-
 
 }  // namespace DeclarativeUI::Components
