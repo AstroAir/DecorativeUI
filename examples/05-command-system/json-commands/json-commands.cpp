@@ -1,16 +1,16 @@
 #include <QApplication>
 #include <QDebug>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QMainWindow>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QWidget>
-#include <QPushButton>
-#include <QLineEdit>
 #include <QLabel>
+#include <QLineEdit>
+#include <QMainWindow>
+#include <QPushButton>
 #include <QTextEdit>
-#include <QGroupBox>
+#include <QVBoxLayout>
+#include <QWidget>
 
 #ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
 #ifdef DECLARATIVE_UI_ADAPTERS_ENABLED
@@ -46,11 +46,14 @@ private:
 
             // Title
             auto* title = new QLabel("JSON Command Loading Example");
-            title->setStyleSheet("font-weight: bold; font-size: 18px; color: #2c3e50;");
+            title->setStyleSheet(
+                "font-weight: bold; font-size: 18px; color: #2c3e50;");
             layout->addWidget(title);
 
             // Description
-            auto* desc = new QLabel("This demonstrates loading UI definitions from JSON using the Command system");
+            auto* desc = new QLabel(
+                "This demonstrates loading UI definitions from JSON using the "
+                "Command system");
             desc->setStyleSheet("color: #666; margin-bottom: 20px;");
             desc->setWordWrap(true);
             layout->addWidget(desc);
@@ -61,7 +64,8 @@ private:
 
             json_display_ = new QTextEdit();
             json_display_->setMaximumHeight(200);
-            json_display_->setStyleSheet("font-family: monospace; background-color: #f8f9fa;");
+            json_display_->setStyleSheet(
+                "font-family: monospace; background-color: #f8f9fa;");
             json_layout->addWidget(json_display_);
 
             layout->addWidget(json_group);
@@ -71,18 +75,22 @@ private:
             auto* button_layout = new QHBoxLayout(button_group);
 
             auto* load_button = new QPushButton("Load JSON UI");
-            connect(load_button, &QPushButton::clicked, this, &JSONCommandExampleWindow::onLoadJSON);
+            connect(load_button, &QPushButton::clicked, this,
+                    &JSONCommandExampleWindow::onLoadJSON);
             button_layout->addWidget(load_button);
 
             auto* clear_button = new QPushButton("Clear");
-            connect(clear_button, &QPushButton::clicked, this, &JSONCommandExampleWindow::onClear);
+            connect(clear_button, &QPushButton::clicked, this,
+                    &JSONCommandExampleWindow::onClear);
             button_layout->addWidget(clear_button);
 
             layout->addWidget(button_group);
 
             // Status
             status_label_ = new QLabel("Status: Ready to load JSON");
-            status_label_->setStyleSheet("padding: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6;");
+            status_label_->setStyleSheet(
+                "padding: 10px; background-color: #f8f9fa; border: 1px solid "
+                "#dee2e6;");
             layout->addWidget(status_label_);
 
             layout->addStretch();
@@ -143,7 +151,8 @@ private slots:
 
         // In a real implementation, this would use JSONCommandLoader
         // For now, we'll simulate the loading process
-        status_label_->setText("Status: JSON UI loaded successfully! (simulated)");
+        status_label_->setText(
+            "Status: JSON UI loaded successfully! (simulated)");
     }
 
     void onClear() {
@@ -173,15 +182,17 @@ int main(int argc, char* argv[]) {
 
     return app.exec();
 #else
-    qWarning() << "❌ Adapters not enabled. Please build with BUILD_ADAPTERS=ON";
+    qWarning()
+        << "❌ Adapters not enabled. Please build with BUILD_ADAPTERS=ON";
 
     // Show a simple message for users
     QWidget window;
     window.setWindowTitle("Adapters Not Available");
     auto* layout = new QVBoxLayout(&window);
-    auto* label = new QLabel("The Command System Adapters are not enabled in this build.\n\n"
-                            "To enable them, build with:\n"
-                            "cmake -DBUILD_ADAPTERS=ON ..");
+    auto* label = new QLabel(
+        "The Command System Adapters are not enabled in this build.\n\n"
+        "To enable them, build with:\n"
+        "cmake -DBUILD_ADAPTERS=ON ..");
     label->setAlignment(Qt::AlignCenter);
     label->setStyleSheet("padding: 20px; font-size: 14px;");
     layout->addWidget(label);
@@ -198,9 +209,10 @@ int main(int argc, char* argv[]) {
     QWidget window;
     window.setWindowTitle("Command System Not Available");
     auto* layout = new QVBoxLayout(&window);
-    auto* label = new QLabel("The Command System is not enabled in this build.\n\n"
-                            "To enable it, build with:\n"
-                            "cmake -DBUILD_COMMAND_SYSTEM=ON ..");
+    auto* label = new QLabel(
+        "The Command System is not enabled in this build.\n\n"
+        "To enable it, build with:\n"
+        "cmake -DBUILD_COMMAND_SYSTEM=ON ..");
     label->setAlignment(Qt::AlignCenter);
     label->setStyleSheet("padding: 20px; font-size: 14px;");
     layout->addWidget(label);

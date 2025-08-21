@@ -124,7 +124,7 @@ body:
       render: cpp
       placeholder: |
         #include "DeclarativeUI.hpp"
-        
+
         int main() {
             // Your code here
         }

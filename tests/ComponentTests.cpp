@@ -94,7 +94,8 @@ private:
 void ComponentTests::initTestCase() {
     // Initialize test environment
     // Note: QApplication is automatically managed by Qt test framework
-    app = static_cast<QApplication*>(qApp);  // Use existing application instance
+    app =
+        static_cast<QApplication*>(qApp);  // Use existing application instance
 
     // Initialize error handling
     ErrorHandling::errorManager().addHandler(

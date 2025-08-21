@@ -42,7 +42,7 @@ private slots:
     void testAccessibilityUtilities();
 
 private:
-    QApplication* app;
+    QApplication* app = nullptr;
     std::unique_ptr<QWidget> testWidget;
 };
 

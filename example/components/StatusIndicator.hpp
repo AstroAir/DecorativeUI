@@ -5,24 +5,18 @@
 
 #pragma once
 
-#include <QWidget>
+#include <QColor>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QTimer>
-#include <QPropertyAnimation>
 #include <QPainter>
-#include <QColor>
+#include <QPropertyAnimation>
+#include <QTimer>
+#include <QWidget>
 
 /**
  * @brief Status types for the indicator
  */
-enum class StatusType {
-    Success,
-    Warning,
-    Error,
-    Info,
-    Loading
-};
+enum class StatusType { Success, Warning, Error, Info, Loading };
 
 /**
  * @brief Animated status indicator widget
@@ -32,12 +26,12 @@ class StatusIndicator : public QWidget {
 
 public:
     explicit StatusIndicator(QWidget* parent = nullptr);
-    
+
     // Status management
     void setStatus(StatusType type, const QString& message);
     void clearStatus();
     void setAutoHide(bool enabled, int timeout_ms = 3000);
-    
+
     // Appearance
     void setAnimationEnabled(bool enabled);
     void setShowIcon(bool show);
@@ -66,7 +60,7 @@ private:
     QHBoxLayout* layout_;
     QLabel* icon_label_;
     QLabel* message_label_;
-    
+
     // State
     StatusType current_status_;
     QString current_message_;
@@ -75,7 +69,7 @@ private:
     bool animation_enabled_;
     bool show_icon_;
     bool show_message_;
-    
+
     // Animation
     QTimer* auto_hide_timer_;
     QTimer* animation_timer_;

@@ -7,46 +7,48 @@
 #include <QDebug>
 
 Chart::Chart(QWidget* parent)
-    : QWidget(parent)
-    , main_layout_(nullptr)
-    , controls_layout_(nullptr)
-    , type_combo_(nullptr)
-    , export_button_(nullptr)
-    , title_label_(nullptr)
-    , chart_view_(nullptr)
-    , chart_(nullptr)
-    , current_type_(ChartType::Line)
-    , chart_title_("Sample Chart")
-    , x_axis_label_("X Axis")
-    , y_axis_label_("Y Axis")
-{
+    : QWidget(parent),
+      main_layout_(nullptr),
+      controls_layout_(nullptr),
+      type_combo_(nullptr),
+      export_button_(nullptr),
+      title_label_(nullptr),
+      chart_view_(nullptr),
+      chart_(nullptr),
+      current_type_(ChartType::Line),
+      chart_title_("Sample Chart"),
+      x_axis_label_("X Axis"),
+      y_axis_label_("Y Axis") {
     setupUI();
     createChart();
 }
 
 void Chart::setupUI() {
     main_layout_ = new QVBoxLayout(this);
-    
+
     // Create controls
     controls_layout_ = new QHBoxLayout();
-    
+
     type_combo_ = new QComboBox();
-    type_combo_->addItems({"Line Chart", "Bar Chart", "Pie Chart", "Area Chart"});
-    
+    type_combo_->addItems(
+        {"Line Chart", "Bar Chart", "Pie Chart", "Area Chart"});
+
     export_button_ = new QPushButton("Export");
     title_label_ = new QLabel(chart_title_);
-    title_label_->setStyleSheet("QLabel { font-size: 16px; font-weight: bold; }");
-    
+    title_label_->setStyleSheet(
+        "QLabel { font-size: 16px; font-weight: bold; }");
+
     controls_layout_->addWidget(new QLabel("Type:"));
     controls_layout_->addWidget(type_combo_);
     controls_layout_->addWidget(export_button_);
     controls_layout_->addStretch();
     controls_layout_->addWidget(title_label_);
-    
+
     main_layout_->addLayout(controls_layout_);
-    
+
     // Connect signals
-    connect(type_combo_, &QComboBox::currentTextChanged, this, &Chart::onChartTypeChanged);
+    connect(type_combo_, &QComboBox::currentTextChanged, this,
+            &Chart::onChartTypeChanged);
     connect(export_button_, &QPushButton::clicked, this, &Chart::onExportChart);
 }
 
@@ -54,12 +56,12 @@ void Chart::createChart() {
     chart_ = new QChart();
     chart_->setTitle(chart_title_);
     chart_->setAnimationOptions(QChart::SeriesAnimations);
-    
+
     chart_view_ = new QChartView(chart_);
     chart_view_->setRenderHint(QPainter::Antialiasing);
-    
+
     main_layout_->addWidget(chart_view_);
-    
+
     // Add sample data
     QList<QPointF> sample_data;
     for (int i = 0; i < 10; ++i) {
@@ -97,7 +99,7 @@ void Chart::setAxisLabels(const QString& x_label, const QString& y_label) {
 
 void Chart::onChartTypeChanged() {
     QString type_text = type_combo_->currentText();
-    
+
     if (type_text == "Line Chart") {
         setChartType(ChartType::Line);
     } else if (type_text == "Bar Chart") {
@@ -115,11 +117,12 @@ void Chart::onExportChart() {
 }
 
 void Chart::updateChart() {
-    if (!chart_) return;
-    
+    if (!chart_)
+        return;
+
     // Clear existing series
     chart_->removeAllSeries();
-    
+
     switch (current_type_) {
         case ChartType::Line: {
             auto series = new QLineSeries();
@@ -162,7 +165,7 @@ void Chart::updateChart() {
             break;
         }
     }
-    
+
     chart_->setTitle(chart_title_);
 }
 

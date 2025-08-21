@@ -1,7 +1,7 @@
-#include <QtTest/QtTest>
 #include <QApplication>
-#include <QWidget>
 #include <QJsonObject>
+#include <QWidget>
+#include <QtTest/QtTest>
 #include <memory>
 
 #include "../../src/Core/CacheManager.hpp"
@@ -24,17 +24,13 @@ private slots:
         }
     }
 
-    void init() {
-        cache_manager = std::make_unique<CacheManager>();
-    }
+    void init() { cache_manager = std::make_unique<CacheManager>(); }
 
-    void cleanup() {
-        cache_manager.reset();
-    }
+    void cleanup() { cache_manager.reset(); }
 
     // Test basic LRUCache functionality
     void testBasicLRUCacheOperations() {
-        LRUCache<QString, QString> cache(10, 1); // 10 items, 1MB
+        LRUCache<QString, QString> cache(10, 1);  // 10 items, 1MB
 
         // Test put and get
         QVERIFY(cache.put("key1", "value1"));
@@ -81,11 +77,13 @@ private slots:
         cache_manager->cacheStylesheet("red_style", stylesheet);
 
         // Retrieve the stylesheet
-        QString cached_stylesheet = cache_manager->getCachedStylesheet("red_style");
+        QString cached_stylesheet =
+            cache_manager->getCachedStylesheet("red_style");
         QCOMPARE(cached_stylesheet, stylesheet);
 
         // Test cache miss
-        QString missing_stylesheet = cache_manager->getCachedStylesheet("nonexistent");
+        QString missing_stylesheet =
+            cache_manager->getCachedStylesheet("nonexistent");
         QVERIFY(missing_stylesheet.isEmpty());
     }
 
@@ -97,11 +95,13 @@ private slots:
         cache_manager->cacheProperty("test_prop", property_value);
 
         // Retrieve the property
-        QVariant cached_property = cache_manager->getCachedProperty("test_prop");
+        QVariant cached_property =
+            cache_manager->getCachedProperty("test_prop");
         QCOMPARE(cached_property.toInt(), 42);
 
         // Test cache miss
-        QVariant missing_property = cache_manager->getCachedProperty("nonexistent");
+        QVariant missing_property =
+            cache_manager->getCachedProperty("nonexistent");
         QVERIFY(!missing_property.isValid());
     }
 
@@ -146,8 +146,8 @@ private slots:
     void testCacheStatistics() {
         // Add some data and access it to generate statistics
         cache_manager->cacheStylesheet("style1", "color: red;");
-        cache_manager->getCachedStylesheet("style1"); // Hit
-        cache_manager->getCachedStylesheet("nonexistent"); // Miss
+        cache_manager->getCachedStylesheet("style1");       // Hit
+        cache_manager->getCachedStylesheet("nonexistent");  // Miss
 
         // Get overall statistics
         QJsonObject stats = cache_manager->getCacheStatistics();
@@ -155,14 +155,16 @@ private slots:
         QVERIFY(stats.contains("caches"));
 
         // Get specific cache statistics
-        QJsonObject stylesheet_stats = cache_manager->getCacheStatistics("stylesheets");
+        QJsonObject stylesheet_stats =
+            cache_manager->getCacheStatistics("stylesheets");
         QVERIFY(stylesheet_stats.contains("size"));
         QVERIFY(stylesheet_stats.contains("memory_usage"));
     }
 
     // Test eviction policies
     void testEvictionPolicies() {
-        LRUCache<QString, QString> cache(2, 1); // Small cache to trigger eviction
+        LRUCache<QString, QString> cache(2,
+                                         1);  // Small cache to trigger eviction
 
         // Set LRU policy
         cache.setEvictionPolicy(EvictionPolicy::LRU);
@@ -170,9 +172,9 @@ private slots:
         // Fill cache beyond capacity
         cache.put("key1", "value1");
         cache.put("key2", "value2");
-        cache.put("key3", "value3"); // Should evict key1
+        cache.put("key3", "value3");  // Should evict key1
 
-        QVERIFY(!cache.contains("key1")); // Should be evicted
+        QVERIFY(!cache.contains("key1"));  // Should be evicted
         QVERIFY(cache.contains("key2"));
         QVERIFY(cache.contains("key3"));
     }
@@ -183,17 +185,15 @@ private slots:
 
         // Test batch put
         std::unordered_map<QString, QString> batch_data = {
-            {"key1", "value1"},
-            {"key2", "value2"},
-            {"key3", "value3"}
-        };
+            {"key1", "value1"}, {"key2", "value2"}, {"key3", "value3"}};
         cache.putBatch(batch_data);
 
         // Test batch get
         std::vector<QString> keys = {"key1", "key2", "key3", "nonexistent"};
         auto results = cache.getBatch(keys);
 
-        QCOMPARE(results.size(), size_t(3)); // Should only return existing keys
+        QCOMPARE(results.size(),
+                 size_t(3));  // Should only return existing keys
         QCOMPARE(results["key1"], QString("value1"));
         QCOMPARE(results["key2"], QString("value2"));
         QCOMPARE(results["key3"], QString("value3"));

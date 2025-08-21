@@ -17,6 +17,10 @@ option(BUILD_COMMAND_SYSTEM "Build Command-based UI system" ON)
 option(BUILD_ADAPTERS "Build integration adapters" ON)
 option(ENABLE_COMMAND_DEBUG "Enable Command system debug output" OFF)
 
+# **Enable CTest at top-level so tests in subdirectories are discoverable**
+enable_testing()
+
+
 # **Compiler-specific optimizations**
 if(MSVC)
     add_compile_options(/W4 /permissive-)
@@ -99,6 +103,7 @@ add_library(DeclarativeUI STATIC
 
 # **Add subdirectories before main library linking**
 add_subdirectory(src/Animation)
+add_subdirectory(src/Binding)
 add_subdirectory(src/Core)
 add_subdirectory(src/Components)
 
@@ -153,4 +158,3 @@ endif()
 if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
-

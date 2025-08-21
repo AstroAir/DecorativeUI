@@ -80,9 +80,9 @@ Related to #(issue number)
 
 If this is a breaking change, please describe:
 
-1. **What breaks**: 
-2. **Migration path**: 
-3. **Deprecation timeline**: 
+1. **What breaks**:
+2. **Migration path**:
+3. **Deprecation timeline**:
 
 ## Performance Impact
 

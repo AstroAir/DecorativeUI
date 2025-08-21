@@ -26,12 +26,13 @@ using namespace DeclarativeUI;
 // ============================================================================
 
 /**
- * @brief Helper function to apply common properties from JSON config to a widget.
+ * @brief Helper function to apply common properties from JSON config to a
+ * widget.
  * @tparam T The widget type
  * @param widget Pointer to the widget to configure
  * @param config JSON configuration object
  */
-template<typename T>
+template <typename T>
 void applyCommonProperties(T* widget, const QJsonObject& config) {
     if (!config.contains("properties")) {
         return;
@@ -41,7 +42,8 @@ void applyCommonProperties(T* widget, const QJsonObject& config) {
 
     // Apply text property (common to many widgets)
     if (props.contains("text")) {
-        if constexpr (std::is_same_v<T, QLabel> || std::is_same_v<T, QPushButton> ||
+        if constexpr (std::is_same_v<T, QLabel> ||
+                      std::is_same_v<T, QPushButton> ||
                       std::is_same_v<T, QCheckBox>) {
             widget->setText(props["text"].toString());
         } else if constexpr (std::is_same_v<T, QLineEdit>) {
@@ -51,13 +53,15 @@ void applyCommonProperties(T* widget, const QJsonObject& config) {
 }
 
 /**
- * @brief Template function to create a simple component registration with basic properties.
+ * @brief Template function to create a simple component registration with basic
+ * properties.
  * @tparam T The widget type to register
  * @param registry Reference to the component registry
  * @param typeName The type name for registration
  */
-template<typename T>
-void registerBasicComponent(JSON::ComponentRegistry& registry, const QString& typeName) {
+template <typename T>
+void registerBasicComponent(JSON::ComponentRegistry& registry,
+                            const QString& typeName) {
     registry.registerComponent<T>(typeName, [](const QJsonObject& config) {
         auto widget = std::make_unique<T>();
         applyCommonProperties(widget.get(), config);
@@ -69,7 +73,8 @@ void registerBasicComponent(JSON::ComponentRegistry& registry, const QString& ty
  * @brief Specialized helper for QLineEdit with its specific properties.
  */
 void applyLineEditProperties(QLineEdit* lineEdit, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("text")) {
@@ -90,7 +95,8 @@ void applyLineEditProperties(QLineEdit* lineEdit, const QJsonObject& config) {
  * @brief Specialized helper for QCheckBox with its specific properties.
  */
 void applyCheckBoxProperties(QCheckBox* checkBox, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("text")) {
@@ -108,7 +114,8 @@ void applyCheckBoxProperties(QCheckBox* checkBox, const QJsonObject& config) {
  * @brief Specialized helper for QComboBox with its specific properties.
  */
 void applyComboBoxProperties(QComboBox* comboBox, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("items")) {
@@ -129,11 +136,13 @@ void applyComboBoxProperties(QComboBox* comboBox, const QJsonObject& config) {
  * @brief Specialized helper for QSlider with its specific properties.
  */
 void applySliderProperties(QSlider* slider, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("orientation")) {
-        slider->setOrientation(static_cast<Qt::Orientation>(props["orientation"].toInt()));
+        slider->setOrientation(
+            static_cast<Qt::Orientation>(props["orientation"].toInt()));
     }
     if (props.contains("minimum")) {
         slider->setMinimum(props["minimum"].toInt());
@@ -151,7 +160,8 @@ void applySliderProperties(QSlider* slider, const QJsonObject& config) {
         slider->setPageStep(props["pageStep"].toInt());
     }
     if (props.contains("tickPosition")) {
-        slider->setTickPosition(static_cast<QSlider::TickPosition>(props["tickPosition"].toInt()));
+        slider->setTickPosition(
+            static_cast<QSlider::TickPosition>(props["tickPosition"].toInt()));
     }
     if (props.contains("tickInterval")) {
         slider->setTickInterval(props["tickInterval"].toInt());
@@ -161,8 +171,10 @@ void applySliderProperties(QSlider* slider, const QJsonObject& config) {
 /**
  * @brief Specialized helper for QProgressBar with its specific properties.
  */
-void applyProgressBarProperties(QProgressBar* progressBar, const QJsonObject& config) {
-    if (!config.contains("properties")) return;
+void applyProgressBarProperties(QProgressBar* progressBar,
+                                const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
 
     QJsonObject props = config["properties"].toObject();
     if (props.contains("minimum")) {
@@ -175,7 +187,8 @@ void applyProgressBarProperties(QProgressBar* progressBar, const QJsonObject& co
         progressBar->setValue(props["value"].toInt());
     }
     if (props.contains("orientation")) {
-        progressBar->setOrientation(static_cast<Qt::Orientation>(props["orientation"].toInt()));
+        progressBar->setOrientation(
+            static_cast<Qt::Orientation>(props["orientation"].toInt()));
     }
     if (props.contains("textVisible")) {
         progressBar->setTextVisible(props["textVisible"].toBool());
@@ -184,7 +197,8 @@ void applyProgressBarProperties(QProgressBar* progressBar, const QJsonObject& co
         progressBar->setFormat(props["format"].toString());
     }
     if (props.contains("invertedAppearance")) {
-        progressBar->setInvertedAppearance(props["invertedAppearance"].toBool());
+        progressBar->setInvertedAppearance(
+            props["invertedAppearance"].toBool());
     }
 }
 
@@ -282,40 +296,45 @@ void CounterApp::registerInputComponents() {
     auto& registry = JSON::ComponentRegistry::instance();
 
     // Register input components with specialized property handling
-    registry.registerComponent<QLineEdit>("QLineEdit", [](const QJsonObject& config) {
-        auto lineEdit = std::make_unique<QLineEdit>();
-        applyLineEditProperties(lineEdit.get(), config);
-        return lineEdit;
-    });
+    registry.registerComponent<QLineEdit>(
+        "QLineEdit", [](const QJsonObject& config) {
+            auto lineEdit = std::make_unique<QLineEdit>();
+            applyLineEditProperties(lineEdit.get(), config);
+            return lineEdit;
+        });
 
-    registry.registerComponent<QCheckBox>("QCheckBox", [](const QJsonObject& config) {
-        auto checkBox = std::make_unique<QCheckBox>();
-        applyCheckBoxProperties(checkBox.get(), config);
-        return checkBox;
-    });
+    registry.registerComponent<QCheckBox>(
+        "QCheckBox", [](const QJsonObject& config) {
+            auto checkBox = std::make_unique<QCheckBox>();
+            applyCheckBoxProperties(checkBox.get(), config);
+            return checkBox;
+        });
 
-    registry.registerComponent<QComboBox>("QComboBox", [](const QJsonObject& config) {
-        auto comboBox = std::make_unique<QComboBox>();
-        applyComboBoxProperties(comboBox.get(), config);
-        return comboBox;
-    });
+    registry.registerComponent<QComboBox>(
+        "QComboBox", [](const QJsonObject& config) {
+            auto comboBox = std::make_unique<QComboBox>();
+            applyComboBoxProperties(comboBox.get(), config);
+            return comboBox;
+        });
 }
 
 void CounterApp::registerDisplayComponents() {
     auto& registry = JSON::ComponentRegistry::instance();
 
     // Register display components with specialized property handling
-    registry.registerComponent<QSlider>("QSlider", [](const QJsonObject& config) {
-        auto slider = std::make_unique<QSlider>();
-        applySliderProperties(slider.get(), config);
-        return slider;
-    });
+    registry.registerComponent<QSlider>(
+        "QSlider", [](const QJsonObject& config) {
+            auto slider = std::make_unique<QSlider>();
+            applySliderProperties(slider.get(), config);
+            return slider;
+        });
 
-    registry.registerComponent<QProgressBar>("QProgressBar", [](const QJsonObject& config) {
-        auto progressBar = std::make_unique<QProgressBar>();
-        applyProgressBarProperties(progressBar.get(), config);
-        return progressBar;
-    });
+    registry.registerComponent<QProgressBar>(
+        "QProgressBar", [](const QJsonObject& config) {
+            auto progressBar = std::make_unique<QProgressBar>();
+            applyProgressBarProperties(progressBar.get(), config);
+            return progressBar;
+        });
 }
 std::unique_ptr<QWidget> CounterApp::createUI() {
     try {

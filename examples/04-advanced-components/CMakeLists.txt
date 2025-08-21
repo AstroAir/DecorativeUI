@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 
 # **Advanced Components Showcase**
 # Comprehensive demonstration of all advanced components
-add_executable(AdvancedComponentsShowcase 
+add_executable(AdvancedComponentsShowcase
     showcase/main.cpp
     showcase/AdvancedComponentsShowcase.cpp
     showcase/AdvancedComponentsShowcase.hpp
@@ -28,7 +28,7 @@ set_target_properties(AdvancedComponentsShowcase PROPERTIES
 
 # **SearchBox Example**
 # Demonstrates advanced search functionality
-add_executable(SearchBoxExample 
+add_executable(SearchBoxExample
     searchbox/main.cpp
     searchbox/SearchBoxExample.cpp
     searchbox/SearchBoxExample.hpp
@@ -51,7 +51,7 @@ set_target_properties(SearchBoxExample PROPERTIES
 
 # **DataTable Example**
 # Demonstrates advanced data grid functionality
-add_executable(DataTableExample 
+add_executable(DataTableExample
     datatable/main.cpp
     datatable/DataTableExample.cpp
     datatable/DataTableExample.hpp
@@ -74,7 +74,7 @@ set_target_properties(DataTableExample PROPERTIES
 
 # **PropertyEditor Example**
 # Demonstrates dynamic property editing
-add_executable(PropertyEditorExample 
+add_executable(PropertyEditorExample
     propertyeditor/main.cpp
     propertyeditor/PropertyEditorExample.cpp
     propertyeditor/PropertyEditorExample.hpp
@@ -97,7 +97,7 @@ set_target_properties(PropertyEditorExample PROPERTIES
 
 # **FormBuilder Example**
 # Demonstrates dynamic form generation
-add_executable(FormBuilderExample 
+add_executable(FormBuilderExample
     formbuilder/main.cpp
     formbuilder/FormBuilderExample.cpp
     formbuilder/FormBuilderExample.hpp
@@ -120,7 +120,7 @@ set_target_properties(FormBuilderExample PROPERTIES
 
 # **FileExplorer Example**
 # Demonstrates file system browser
-add_executable(FileExplorerExample 
+add_executable(FileExplorerExample
     fileexplorer/main.cpp
     fileexplorer/FileExplorerExample.cpp
     fileexplorer/FileExplorerExample.hpp
@@ -143,7 +143,7 @@ set_target_properties(FileExplorerExample PROPERTIES
 
 # **ChartWidget Example**
 # Demonstrates charting capabilities
-add_executable(ChartWidgetExample 
+add_executable(ChartWidgetExample
     chartwidget/main.cpp
     chartwidget/ChartWidgetExample.cpp
     chartwidget/ChartWidgetExample.hpp
@@ -166,7 +166,7 @@ set_target_properties(ChartWidgetExample PROPERTIES
 
 # **ColorPicker Example**
 # Demonstrates advanced color selection
-add_executable(ColorPickerExample 
+add_executable(ColorPickerExample
     colorpicker/main.cpp
     colorpicker/ColorPickerExample.cpp
     colorpicker/ColorPickerExample.hpp
@@ -189,7 +189,7 @@ set_target_properties(ColorPickerExample PROPERTIES
 
 # **DateTimePicker Example**
 # Demonstrates advanced date/time selection
-add_executable(DateTimePickerExample 
+add_executable(DateTimePickerExample
     datetimepicker/main.cpp
     datetimepicker/DateTimePickerExample.cpp
     datetimepicker/DateTimePickerExample.hpp

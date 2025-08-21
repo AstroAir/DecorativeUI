@@ -25,8 +25,10 @@ public:
     ScrollArea& style(const QString& stylesheet);
 
     void initialize() override;
+    // Return the QScrollArea widget managed by this component
     QWidget* getWidget() const;
-    void setWidget(QWidget* widget);
+    // Set the content widget displayed inside the QScrollArea
+    void setContentWidget(QWidget* widget);
     bool isWidgetResizable() const;
     Qt::ScrollBarPolicy getHorizontalScrollBarPolicy() const;
     Qt::ScrollBarPolicy getVerticalScrollBarPolicy() const;

@@ -19,6 +19,7 @@
  */
 
 #include "UIElement.hpp"
+#include "Lifecycle.hpp"
 
 #include <QApplication>
 #include <QJsonDocument>
@@ -44,11 +45,16 @@ UIElement::UIElement(QObject *parent) : QObject(parent) {
         connect(this, &UIElement::propertyUpdated,
                 [timer]() { timer->start(); });
 
+        // **Initialize lifecycle management**
+        lifecycle_ = std::make_unique<ComponentLifecycle>(this);
+
     } catch (const std::exception &e) {
         throw Exceptions::UIException("Failed to initialize UIElement: " +
                                       std::string(e.what()));
     }
 }
+
+UIElement::~UIElement() = default;
 
 UIElement &UIElement::bindProperty(
     const QString &property, const std::function<PropertyValue()> &binding) {
@@ -96,11 +102,30 @@ PropertyValue UIElement::getProperty(const QString &name) const {
     return it->second;
 }
 
+bool UIElement::hasProperty(const QString &name) const {
+    return properties_.find(name) != properties_.end();
+}
+
+void UIElement::initialize() {
+    // Base implementation does minimal setup; subclasses may override.
+    // This keeps UIElement non-abstract for unit tests that instantiate it.
+}
+
 void UIElement::cleanup() noexcept {
     try {
+        // Trigger unmount lifecycle event before cleanup
+        if (lifecycle_) {
+            try {
+                lifecycle_->unmount();
+            } catch (const std::exception &e) {
+                qWarning() << "Lifecycle unmount failed:" << e.what();
+            }
+        }
+
         event_handlers_.clear();
         bindings_.clear();
         properties_.clear();
+        previous_properties_.clear();
         widget_.reset();
     } catch (...) {
         // **No-throw cleanup guarantee**
@@ -158,9 +183,28 @@ void UIElement::setWidget(QWidget *widget) {
         throw Exceptions::UIException("Widget cannot be null");
     }
 
+    // Store previous properties for lifecycle update detection
+    previous_properties_.clear();
+    for (const auto &[name, value] : properties_) {
+        std::visit(
+            [&](const auto &val) {
+                previous_properties_[name] = QVariant::fromValue(val);
+            },
+            value);
+    }
+
     widget_ = std::unique_ptr<QWidget>(widget);
     applyStoredProperties();
     connectSignals();
+
+    // Trigger mount lifecycle event
+    if (lifecycle_) {
+        try {
+            lifecycle_->mount(widget);
+        } catch (const std::exception &e) {
+            qWarning() << "Lifecycle mount failed:" << e.what();
+        }
+    }
 }
 
 void UIElement::applyStoredProperties() {
@@ -897,6 +941,50 @@ PropertyValue UIElement::parsePropertyValue(const QJsonValue &value) const {
 
     // **Return default PropertyValue for unsupported types**
     return PropertyValue{QString("Unsupported type")};
+}
+
+// **Lifecycle management implementation**
+LifecycleBuilder &UIElement::lifecycle() {
+    static thread_local std::unique_ptr<LifecycleBuilder> builder;
+    builder = std::make_unique<LifecycleBuilder>(lifecycle_.get());
+    return *builder;
+}
+
+UIElement &UIElement::onMount(std::function<void()> hook) {
+    if (lifecycle_) {
+        lifecycle_->onMount([hook](const LifecycleContext &) { hook(); });
+    }
+    return *this;
+}
+
+UIElement &UIElement::onUnmount(std::function<void()> hook) {
+    if (lifecycle_) {
+        lifecycle_->onUnmount([hook](const LifecycleContext &) { hook(); });
+    }
+    return *this;
+}
+
+UIElement &UIElement::onUpdate(std::function<void()> hook) {
+    if (lifecycle_) {
+        lifecycle_->onUpdate([hook](const LifecycleContext &) { hook(); });
+    }
+    return *this;
+}
+
+UIElement &UIElement::onError(std::function<void(const QString &)> hook) {
+    if (lifecycle_) {
+        lifecycle_->onError(
+            [hook](const LifecycleContext &ctx) { hook(ctx.error_message); });
+    }
+    return *this;
+}
+
+UIElement &UIElement::useEffect(std::function<std::function<void()>()> effect,
+                                const std::vector<QVariant> &dependencies) {
+    if (lifecycle_) {
+        lifecycle_->useEffect(effect, dependencies);
+    }
+    return *this;
 }
 
 }  // namespace DeclarativeUI::Core

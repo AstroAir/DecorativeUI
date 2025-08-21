@@ -625,114 +625,152 @@ void ExpandedComponentCommandsTest::testCalendarCommand_undo() {
 }
 
 // Add placeholder implementations for remaining test methods
-void ExpandedComponentCommandsTest::testListViewCommand_selectItem() { /* Implementation
-                                                                        */
-}
-void ExpandedComponentCommandsTest::testListViewCommand_addItem() { /* Implementation
-                                                                     */
-}
-void ExpandedComponentCommandsTest::testListViewCommand_clearSelection() { /* Implementation
-                                                                            */
-}
-void ExpandedComponentCommandsTest::testListViewCommand_undo() { /* Implementation
-                                                                  */
-}
-void ExpandedComponentCommandsTest::testTableViewCommand_selectCell() { /* Implementation
-                                                                         */
-}
-void ExpandedComponentCommandsTest::testTableViewCommand_selectRow() { /* Implementation
-                                                                        */
-}
-void ExpandedComponentCommandsTest::testTableViewCommand_selectColumn() { /* Implementation
-                                                                           */
-}
-void ExpandedComponentCommandsTest::testTableViewCommand_undo() { /* Implementation
-                                                                   */
-}
-void ExpandedComponentCommandsTest::testTreeViewCommand_selectItem() { /* Implementation
-                                                                        */
-}
-void ExpandedComponentCommandsTest::testTreeViewCommand_expandItem() { /* Implementation
-                                                                        */
-}
-void ExpandedComponentCommandsTest::testTreeViewCommand_collapseItem() { /* Implementation
-                                                                          */
-}
-void ExpandedComponentCommandsTest::testTreeViewCommand_undo() { /* Implementation
-                                                                  */
-}
-void ExpandedComponentCommandsTest::testGroupBoxCommand_setTitle() { /* Implementation
-                                                                      */
-}
-void ExpandedComponentCommandsTest::testGroupBoxCommand_setCheckable() { /* Implementation
-                                                                          */
-}
-void ExpandedComponentCommandsTest::testGroupBoxCommand_setChecked() { /* Implementation
-                                                                        */
-}
-void ExpandedComponentCommandsTest::testGroupBoxCommand_undo() { /* Implementation
-                                                                  */
-}
-void ExpandedComponentCommandsTest::testFrameCommand_setFrameStyle() { /* Implementation
-                                                                        */
-}
-void ExpandedComponentCommandsTest::testFrameCommand_setLineWidth() { /* Implementation
-                                                                       */
+void ExpandedComponentCommandsTest::
+    testListViewCommand_selectItem() { /* Implementation
+                                        */
 }
 void ExpandedComponentCommandsTest::
-    testScrollAreaCommand_setWidgetResizable() { /* Implementation */ }
-void ExpandedComponentCommandsTest::
-    testScrollAreaCommand_setScrollBarPolicy() { /* Implementation */ }
-void ExpandedComponentCommandsTest::testSplitterCommand_setSizes() { /* Implementation
-                                                                      */
-}
-void ExpandedComponentCommandsTest::testSplitterCommand_setOrientation() { /* Implementation
-                                                                            */
-}
-void ExpandedComponentCommandsTest::testSplitterCommand_undo() { /* Implementation
-                                                                  */
-}
-void ExpandedComponentCommandsTest::testDockWidgetCommand_setFloating() { /* Implementation
-                                                                           */
+    testListViewCommand_addItem() { /* Implementation
+                                     */
 }
 void ExpandedComponentCommandsTest::
-    testDockWidgetCommand_setAllowedAreas() { /* Implementation */ }
-void ExpandedComponentCommandsTest::testDockWidgetCommand_undo() { /* Implementation
-                                                                    */
-}
-void ExpandedComponentCommandsTest::testMenuBarCommand_addMenu() { /* Implementation
-                                                                    */
-}
-void ExpandedComponentCommandsTest::testMenuBarCommand_removeMenu() { /* Implementation
-                                                                       */
+    testListViewCommand_clearSelection() { /* Implementation
+                                            */
 }
 void ExpandedComponentCommandsTest::
-    testMenuBarCommand_setNativeMenuBar() { /* Implementation */ }
-void ExpandedComponentCommandsTest::testStatusBarCommand_showMessage() { /* Implementation
-                                                                          */
-}
-void ExpandedComponentCommandsTest::testStatusBarCommand_clearMessage() { /* Implementation
-                                                                           */
-}
-void ExpandedComponentCommandsTest::testToolBarCommand_addAction() { /* Implementation
-                                                                      */
-}
-void ExpandedComponentCommandsTest::testToolBarCommand_removeAction() { /* Implementation
-                                                                         */
-}
-void ExpandedComponentCommandsTest::testToolBarCommand_setOrientation() { /* Implementation
-                                                                           */
-}
-void ExpandedComponentCommandsTest::testToolBarCommand_undo() { /* Implementation
-                                                                 */
-}
-void ExpandedComponentCommandsTest::testToolButtonCommand_setPopupMode() { /* Implementation
-                                                                            */
+    testListViewCommand_undo() { /* Implementation
+                                  */
 }
 void ExpandedComponentCommandsTest::
-    testToolButtonCommand_setToolButtonStyle() { /* Implementation */ }
-void ExpandedComponentCommandsTest::testToolButtonCommand_undo() { /* Implementation
-                                                                    */
+    testTableViewCommand_selectCell() { /* Implementation
+                                         */
+}
+void ExpandedComponentCommandsTest::
+    testTableViewCommand_selectRow() { /* Implementation
+                                        */
+}
+void ExpandedComponentCommandsTest::
+    testTableViewCommand_selectColumn() { /* Implementation
+                                           */
+}
+void ExpandedComponentCommandsTest::
+    testTableViewCommand_undo() { /* Implementation
+                                   */
+}
+void ExpandedComponentCommandsTest::
+    testTreeViewCommand_selectItem() { /* Implementation
+                                        */
+}
+void ExpandedComponentCommandsTest::
+    testTreeViewCommand_expandItem() { /* Implementation
+                                        */
+}
+void ExpandedComponentCommandsTest::
+    testTreeViewCommand_collapseItem() { /* Implementation
+                                          */
+}
+void ExpandedComponentCommandsTest::
+    testTreeViewCommand_undo() { /* Implementation
+                                  */
+}
+void ExpandedComponentCommandsTest::
+    testGroupBoxCommand_setTitle() { /* Implementation
+                                      */
+}
+void ExpandedComponentCommandsTest::
+    testGroupBoxCommand_setCheckable() { /* Implementation
+                                          */
+}
+void ExpandedComponentCommandsTest::
+    testGroupBoxCommand_setChecked() { /* Implementation
+                                        */
+}
+void ExpandedComponentCommandsTest::
+    testGroupBoxCommand_undo() { /* Implementation
+                                  */
+}
+void ExpandedComponentCommandsTest::
+    testFrameCommand_setFrameStyle() { /* Implementation
+                                        */
+}
+void ExpandedComponentCommandsTest::
+    testFrameCommand_setLineWidth() { /* Implementation
+                                       */
+}
+void ExpandedComponentCommandsTest::
+    testScrollAreaCommand_setWidgetResizable() { /* Implementation */
+}
+void ExpandedComponentCommandsTest::
+    testScrollAreaCommand_setScrollBarPolicy() { /* Implementation */
+}
+void ExpandedComponentCommandsTest::
+    testSplitterCommand_setSizes() { /* Implementation
+                                      */
+}
+void ExpandedComponentCommandsTest::
+    testSplitterCommand_setOrientation() { /* Implementation
+                                            */
+}
+void ExpandedComponentCommandsTest::
+    testSplitterCommand_undo() { /* Implementation
+                                  */
+}
+void ExpandedComponentCommandsTest::
+    testDockWidgetCommand_setFloating() { /* Implementation
+                                           */
+}
+void ExpandedComponentCommandsTest::
+    testDockWidgetCommand_setAllowedAreas() { /* Implementation */
+}
+void ExpandedComponentCommandsTest::
+    testDockWidgetCommand_undo() { /* Implementation
+                                    */
+}
+void ExpandedComponentCommandsTest::
+    testMenuBarCommand_addMenu() { /* Implementation
+                                    */
+}
+void ExpandedComponentCommandsTest::
+    testMenuBarCommand_removeMenu() { /* Implementation
+                                       */
+}
+void ExpandedComponentCommandsTest::
+    testMenuBarCommand_setNativeMenuBar() { /* Implementation */
+}
+void ExpandedComponentCommandsTest::
+    testStatusBarCommand_showMessage() { /* Implementation
+                                          */
+}
+void ExpandedComponentCommandsTest::
+    testStatusBarCommand_clearMessage() { /* Implementation
+                                           */
+}
+void ExpandedComponentCommandsTest::
+    testToolBarCommand_addAction() { /* Implementation
+                                      */
+}
+void ExpandedComponentCommandsTest::
+    testToolBarCommand_removeAction() { /* Implementation
+                                         */
+}
+void ExpandedComponentCommandsTest::
+    testToolBarCommand_setOrientation() { /* Implementation
+                                           */
+}
+void ExpandedComponentCommandsTest::
+    testToolBarCommand_undo() { /* Implementation
+                                 */
+}
+void ExpandedComponentCommandsTest::
+    testToolButtonCommand_setPopupMode() { /* Implementation
+                                            */
+}
+void ExpandedComponentCommandsTest::
+    testToolButtonCommand_setToolButtonStyle() { /* Implementation */
+}
+void ExpandedComponentCommandsTest::
+    testToolButtonCommand_undo() { /* Implementation
+                                    */
 }
 
 QTEST_MAIN(ExpandedComponentCommandsTest)

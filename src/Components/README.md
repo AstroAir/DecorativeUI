@@ -1,5 +1,7 @@
 # Components Module
 
+Note: See "Recent changes" at the end of this file for latest lifecycle/property application adjustments.
+
 The Components module provides a comprehensive library of 30+ UI components built on top of the DeclarativeUI Core framework. All components inherit from `UIElement` and provide fluent interfaces for easy configuration, property binding, and modern C++20 features.
 
 ## Overview
@@ -525,4 +527,11 @@ dashboard->layout<QGridLayout>()
          ->child<Components::TableView>([](auto& table) {
              table.setModel(systemDataModel);
          });
+
+## Recent changes
+
+- ScrollArea: initialize() registers QScrollArea via Core::UIElement::setWidget; getWidget() returns the QScrollArea; added setContentWidget() to avoid shadowing base setWidget.
+- Frame: frameStyle(shape, shadow) now stores frameShape/frameShadow via setProperty and applies immediately when possible.
+- Label: pixmap() also sets scaledContents=true for expected scaling behavior.
+
 ```

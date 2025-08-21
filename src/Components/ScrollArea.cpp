@@ -56,15 +56,18 @@ ScrollArea& ScrollArea::style(const QString& stylesheet) {
 void ScrollArea::initialize() {
     if (!scroll_area_widget_) {
         scroll_area_widget_ = new QScrollArea();
-        setWidget(scroll_area_widget_);
+        // Important: call the base UIElement::setWidget to register lifecycle
+        // and properties
+        Core::UIElement::setWidget(scroll_area_widget_);
     }
 }
 
 QWidget* ScrollArea::getWidget() const {
-    return scroll_area_widget_ ? scroll_area_widget_->widget() : nullptr;
+    // Return the QScrollArea itself so tests can qobject_cast to QScrollArea
+    return scroll_area_widget_;
 }
 
-void ScrollArea::setWidget(QWidget* widget) {
+void ScrollArea::setContentWidget(QWidget* widget) {
     if (scroll_area_widget_) {
         scroll_area_widget_->setWidget(widget);
     }

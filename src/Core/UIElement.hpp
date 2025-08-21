@@ -38,6 +38,8 @@ namespace DeclarativeUI::Core {
 
 // **Forward declarations**
 class UIElement;
+class ComponentLifecycle;
+class LifecycleBuilder;
 
 // **Type traits for compile-time type checking**
 template <typename T>
@@ -199,7 +201,7 @@ class UIElement : public QObject {
 
 public:
     explicit UIElement(QObject *parent = nullptr);
-    virtual ~UIElement() = default;
+    virtual ~UIElement();
 
     // **Modern C++ move semantics and RAII**
     UIElement(const UIElement &) = delete;
@@ -251,6 +253,8 @@ public:
 
     // **Exception-safe property access**
     [[nodiscard]] PropertyValue getProperty(const QString &name) const;
+    // **Property existence check for tests and introspection**
+    [[nodiscard]] bool hasProperty(const QString &name) const;
 
     // **Public getters for protected members**
     [[nodiscard]] const std::unordered_map<QString, PropertyValue> &
@@ -264,10 +268,22 @@ public:
     }
 
     // **Widget lifecycle management**
-    virtual void initialize() = 0;
+    virtual void initialize();
     virtual void cleanup() noexcept;
     virtual void refresh();
     virtual void invalidate();
+
+    // **Component lifecycle management**
+    LifecycleBuilder &lifecycle();
+    ComponentLifecycle *getLifecycle() const { return lifecycle_.get(); }
+
+    // **Lifecycle hooks (convenience methods)**
+    UIElement &onMount(std::function<void()> hook);
+    UIElement &onUnmount(std::function<void()> hook);
+    UIElement &onUpdate(std::function<void()> hook);
+    UIElement &onError(std::function<void(const QString &)> hook);
+    UIElement &useEffect(std::function<std::function<void()>()> effect,
+                         const std::vector<QVariant> &dependencies = {});
 
     // **Widget management**
     void setWidget(QWidget *widget);
@@ -320,6 +336,10 @@ protected:
     // **Responsive design**
     bool responsive_enabled_ = false;
     int current_width_ = 0;
+
+    // **Lifecycle management**
+    std::unique_ptr<ComponentLifecycle> lifecycle_;
+    std::unordered_map<QString, QVariant> previous_properties_;
 
     // **Helper methods**
     void updateBoundProperties();

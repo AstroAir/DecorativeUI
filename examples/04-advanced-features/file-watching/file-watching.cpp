@@ -180,7 +180,9 @@ private slots:
             if (filter_text == "JSON Only") {
                 filters << "*.json";
             } else if (filter_text == "UI Files") {
-                filters << "*.json" << "*.qml" << "*.ui";
+                filters << "*.json"
+                        << "*.qml"
+                        << "*.ui";
             } else if (filter_text == "All Files") {
                 filters << "*";
             }

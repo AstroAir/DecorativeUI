@@ -164,7 +164,8 @@ private slots:
         QTest::qWait(10);
 
         monitor->endOperation(operation_name);
-        // Note: endOperation doesn't return elapsed time, so we just verify it doesn't crash
+        // Note: endOperation doesn't return elapsed time, so we just verify it
+        // doesn't crash
         QVERIFY(true);
     }
 
@@ -291,7 +292,8 @@ private slots:
         auto manager = std::make_unique<HotReloadManager>();
         auto test_widget = std::make_unique<QWidget>();
 
-        QSignalSpy reload_spy(manager.get(), &HotReloadManager::reloadCompleted);
+        QSignalSpy reload_spy(manager.get(),
+                              &HotReloadManager::reloadCompleted);
 
         // Create and register UI file
         QTemporaryFile ui_file(temp_dir_->path() + "/ui_change_XXXXXX.json");
@@ -392,7 +394,7 @@ private slots:
         watcher->unwatchFile("/not/watched/file.txt");
         watcher->unwatchDirectory("/not/watched/dir/");
 
-        QVERIFY(true); // Test that operations don't crash
+        QVERIFY(true);  // Test that operations don't crash
     }
 
     void testHotReloadManagerErrorHandling() {
@@ -416,7 +418,8 @@ private slots:
         monitor->startMonitoring();
 
         // Test ending non-started operation
-        monitor->endOperation("non_existent_timer");  // Should handle gracefully
+        monitor->endOperation(
+            "non_existent_timer");  // Should handle gracefully
 
         // Test with empty operation names
         monitor->recordMemoryUsage(100);  // Should handle gracefully
@@ -431,7 +434,8 @@ private slots:
         auto manager = std::make_unique<HotReloadManager>();
         auto test_widget = std::make_unique<QWidget>();
 
-        QSignalSpy reload_spy(manager.get(), &HotReloadManager::reloadCompleted);
+        QSignalSpy reload_spy(manager.get(),
+                              &HotReloadManager::reloadCompleted);
         QSignalSpy error_spy(manager.get(), &HotReloadManager::reloadFailed);
 
         // Create UI file
@@ -517,7 +521,8 @@ private slots:
 
         // Test memory heavy files detection
         QStringList heavy_files = monitor->getMemoryHeavyFiles(50);
-        // Should be empty since we haven't associated memory with specific files
+        // Should be empty since we haven't associated memory with specific
+        // files
 
         monitor->stopMonitoring();
     }
@@ -643,7 +648,8 @@ private slots:
         main_file.write(main_content.toUtf8());
         main_file.close();
 
-        QTemporaryFile component_file(temp_dir_->path() + "/component_XXXXXX.json");
+        QTemporaryFile component_file(temp_dir_->path() +
+                                      "/component_XXXXXX.json");
         QVERIFY(component_file.open());
 
         QString component_content = R"({
@@ -660,7 +666,8 @@ private slots:
         auto component_widget = std::make_unique<QWidget>();
 
         manager->registerUIFile(main_file.fileName(), main_widget.get());
-        manager->registerUIFile(component_file.fileName(), component_widget.get());
+        manager->registerUIFile(component_file.fileName(),
+                                component_widget.get());
 
         // Test that dependency management works by triggering reloads
         // These methods are private, so we test through public interface
@@ -715,7 +722,7 @@ private slots:
         bool test_executed = false;
         auto test_function = [&test_executed]() {
             test_executed = true;
-            QTest::qWait(10); // Simulate some work
+            QTest::qWait(10);  // Simulate some work
         };
 
         // Test performance measurement through public interface
@@ -732,7 +739,8 @@ private slots:
         auto manager = std::make_unique<HotReloadManager>();
 
         // Create test file
-        QTemporaryFile test_file(temp_dir_->path() + "/rollback_test_XXXXXX.json");
+        QTemporaryFile test_file(temp_dir_->path() +
+                                 "/rollback_test_XXXXXX.json");
         QVERIFY(test_file.open());
 
         QString content = R"({

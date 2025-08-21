@@ -36,11 +36,14 @@ private:
 
             // Title
             auto* title = new QLabel("Command Builder Example");
-            title->setStyleSheet("font-weight: bold; font-size: 16px; color: #2c3e50;");
+            title->setStyleSheet(
+                "font-weight: bold; font-size: 16px; color: #2c3e50;");
             layout->addWidget(title);
 
             // Description
-            auto* desc = new QLabel("This example demonstrates the Command pattern with undo/redo functionality.");
+            auto* desc = new QLabel(
+                "This example demonstrates the Command pattern with undo/redo "
+                "functionality.");
             desc->setWordWrap(true);
             desc->setStyleSheet("color: #666; margin-bottom: 10px;");
             layout->addWidget(desc);
@@ -50,12 +53,16 @@ private:
 
             // Button that creates commands
             auto* button = new QPushButton("Execute Command");
-            connect(button, &QPushButton::clicked, this, &CommandBuilderExampleWindow::executeCommand);
+            connect(button, &QPushButton::clicked, this,
+                    &CommandBuilderExampleWindow::executeCommand);
             layout->addWidget(button);
 
             // Status label
-            status_label_ = new QLabel("Ready - Click button to execute commands");
-            status_label_->setStyleSheet("padding: 10px; background-color: #f8f9fa; border: 1px solid #dee2e6;");
+            status_label_ =
+                new QLabel("Ready - Click button to execute commands");
+            status_label_->setStyleSheet(
+                "padding: 10px; background-color: #f8f9fa; border: 1px solid "
+                "#dee2e6;");
             layout->addWidget(status_label_);
 
             // Undo/Redo buttons
@@ -63,12 +70,14 @@ private:
 
             undo_button_ = new QPushButton("Undo");
             undo_button_->setEnabled(false);
-            connect(undo_button_, &QPushButton::clicked, this, &CommandBuilderExampleWindow::undoCommand);
+            connect(undo_button_, &QPushButton::clicked, this,
+                    &CommandBuilderExampleWindow::undoCommand);
             button_layout->addWidget(undo_button_);
 
             redo_button_ = new QPushButton("Redo");
             redo_button_->setEnabled(false);
-            connect(redo_button_, &QPushButton::clicked, this, &CommandBuilderExampleWindow::redoCommand);
+            connect(redo_button_, &QPushButton::clicked, this,
+                    &CommandBuilderExampleWindow::redoCommand);
             button_layout->addWidget(redo_button_);
 
             layout->addLayout(button_layout);
@@ -77,7 +86,8 @@ private:
             qDebug() << "✅ Command Builder example UI created successfully";
 
         } catch (const std::exception& e) {
-            qWarning() << "❌ Error creating Command Builder example:" << e.what();
+            qWarning() << "❌ Error creating Command Builder example:"
+                       << e.what();
         }
     }
 
@@ -89,8 +99,8 @@ private slots:
         QString command_name = QString("Command #%1").arg(command_count);
 
         // For this example, we'll simulate command execution
-        // In a real application, commands would be registered with CommandFactory
-        // and executed through the CommandInvoker
+        // In a real application, commands would be registered with
+        // CommandFactory and executed through the CommandInvoker
 
         qDebug() << "Simulating command execution:" << command_name;
 

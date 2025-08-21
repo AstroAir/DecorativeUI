@@ -1,34 +1,33 @@
 #include <QApplication>
-#include <QWidget>
-#include <QVBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
 
 // Include DeclarativeUI headers
-#include "src/Core/DeclarativeBuilder.hpp"
 #include "src/Components/Button.hpp"
 #include "src/Components/Label.hpp"
+#include "src/Core/DeclarativeBuilder.hpp"
 
 /**
  * [Example Name] Example
- * 
+ *
  * [Brief description of what this example demonstrates]
- * 
+ *
  * Key concepts:
  * - [Concept 1]
  * - [Concept 2]
  * - [Concept 3]
  */
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     // Create main widget
     auto widget = std::make_unique<QWidget>();
     widget->setWindowTitle("[Example Name] Example");
     widget->resize(400, 300);
-    
+
     auto layout = std::make_unique<QVBoxLayout>(widget.get());
 
     // Title
@@ -38,7 +37,7 @@ int main(int argc, char *argv[])
 
     // Example content goes here
     // TODO: Add your example-specific UI components and logic
-    
+
     // Example button
     auto button = std::make_unique<QPushButton>("Click Me");
     QObject::connect(button.get(), &QPushButton::clicked, []() {
@@ -61,7 +60,7 @@ int main(int argc, char *argv[])
 
 /*
  * Template Usage Instructions:
- * 
+ *
  * 1. Copy this template to your new example directory
  * 2. Rename the file to match your example name (use kebab-case)
  * 3. Replace [Example Name] placeholders with your actual example name
@@ -72,7 +71,7 @@ int main(int argc, char *argv[])
  * 8. Create a README.md file for your example
  * 9. Test your example thoroughly
  * 10. Update the category README.md to include your example
- * 
+ *
  * Best Practices:
  * - Keep examples focused on specific concepts
  * - Use clear, descriptive variable names

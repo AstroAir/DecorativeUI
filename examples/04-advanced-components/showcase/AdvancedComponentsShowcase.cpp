@@ -1,25 +1,24 @@
 #include "AdvancedComponentsShowcase.hpp"
 
 #include <QApplication>
+#include <QClipboard>
+#include <QDebug>
 #include <QHeaderView>
+#include <QMessageBox>
 #include <QSplitter>
 #include <QTimer>
-#include <QClipboard>
-#include <QMessageBox>
-#include <QDebug>
 
 AdvancedComponentsShowcase::AdvancedComponentsShowcase(QWidget* parent)
-    : QMainWindow(parent)
-    , main_tabs_(nullptr)
-    , info_panel_(nullptr)
-    , component_tree_(nullptr)
-    , feature_list_(nullptr)
-    , status_label_(nullptr)
-    , demo_progress_(nullptr)
-    , reset_button_(nullptr)
-    , export_button_(nullptr)
-    , sample_table_model_(nullptr)
-{
+    : QMainWindow(parent),
+      main_tabs_(nullptr),
+      info_panel_(nullptr),
+      component_tree_(nullptr),
+      feature_list_(nullptr),
+      status_label_(nullptr),
+      demo_progress_(nullptr),
+      reset_button_(nullptr),
+      export_button_(nullptr),
+      sample_table_model_(nullptr) {
     setWindowTitle("DeclarativeUI - Advanced Components Showcase");
     setMinimumSize(1200, 800);
     resize(1400, 900);
@@ -52,14 +51,19 @@ void AdvancedComponentsShowcase::setupUI() {
     // Add demo tabs
     addDemoTab("🔍 SearchBox", ":/icons/search.png", createSearchBoxDemo());
     addDemoTab("📊 DataTable", ":/icons/table.png", createDataTableDemo());
-    addDemoTab("🎛️ PropertyEditor", ":/icons/properties.png", createPropertyEditorDemo());
+    addDemoTab("🎛️ PropertyEditor", ":/icons/properties.png",
+               createPropertyEditorDemo());
     addDemoTab("📋 FormBuilder", ":/icons/form.png", createFormBuilderDemo());
-    addDemoTab("🗂️ FileExplorer", ":/icons/folder.png", createFileExplorerDemo());
+    addDemoTab("🗂️ FileExplorer", ":/icons/folder.png",
+               createFileExplorerDemo());
     addDemoTab("📈 ChartWidget", ":/icons/chart.png", createChartWidgetDemo());
     addDemoTab("🎨 ColorPicker", ":/icons/color.png", createColorPickerDemo());
-    addDemoTab("📅 DateTimePicker", ":/icons/calendar.png", createDateTimePickerDemo());
-    addDemoTab("🔗 Integration", ":/icons/integration.png", createIntegrationDemo());
-    addDemoTab("⚡ Performance", ":/icons/performance.png", createPerformanceDemo());
+    addDemoTab("📅 DateTimePicker", ":/icons/calendar.png",
+               createDateTimePickerDemo());
+    addDemoTab("🔗 Integration", ":/icons/integration.png",
+               createIntegrationDemo());
+    addDemoTab("⚡ Performance", ":/icons/performance.png",
+               createPerformanceDemo());
 
     main_layout->addWidget(main_tabs_);
 
@@ -77,15 +81,13 @@ void AdvancedComponentsShowcase::setupMenuBar() {
 
     auto* new_action = file_menu->addAction("&New Demo");
     new_action->setShortcut(QKeySequence::New);
-    connect(new_action, &QAction::triggered, [this]() {
-        qDebug() << "📄 New demo requested";
-    });
+    connect(new_action, &QAction::triggered,
+            [this]() { qDebug() << "📄 New demo requested"; });
 
     auto* export_action = file_menu->addAction("&Export Demo");
     export_action->setShortcut(QKeySequence("Ctrl+E"));
-    connect(export_action, &QAction::triggered, [this]() {
-        qDebug() << "💾 Export demo requested";
-    });
+    connect(export_action, &QAction::triggered,
+            [this]() { qDebug() << "💾 Export demo requested"; });
 
     file_menu->addSeparator();
 
@@ -96,18 +98,30 @@ void AdvancedComponentsShowcase::setupMenuBar() {
     // Components menu
     auto* components_menu = menuBar()->addMenu("&Components");
 
-    components_menu->addAction("🔍 SearchBox Demo", this, &AdvancedComponentsShowcase::onSearchBoxDemo);
-    components_menu->addAction("📊 DataTable Demo", this, &AdvancedComponentsShowcase::onDataTableDemo);
-    components_menu->addAction("🎛️ PropertyEditor Demo", this, &AdvancedComponentsShowcase::onPropertyEditorDemo);
-    components_menu->addAction("📋 FormBuilder Demo", this, &AdvancedComponentsShowcase::onFormBuilderDemo);
-    components_menu->addAction("🗂️ FileExplorer Demo", this, &AdvancedComponentsShowcase::onFileExplorerDemo);
-    components_menu->addAction("📈 ChartWidget Demo", this, &AdvancedComponentsShowcase::onChartWidgetDemo);
-    components_menu->addAction("🎨 ColorPicker Demo", this, &AdvancedComponentsShowcase::onColorPickerDemo);
-    components_menu->addAction("📅 DateTimePicker Demo", this, &AdvancedComponentsShowcase::onDateTimePickerDemo);
+    components_menu->addAction("🔍 SearchBox Demo", this,
+                               &AdvancedComponentsShowcase::onSearchBoxDemo);
+    components_menu->addAction("📊 DataTable Demo", this,
+                               &AdvancedComponentsShowcase::onDataTableDemo);
+    components_menu->addAction(
+        "🎛️ PropertyEditor Demo", this,
+        &AdvancedComponentsShowcase::onPropertyEditorDemo);
+    components_menu->addAction("📋 FormBuilder Demo", this,
+                               &AdvancedComponentsShowcase::onFormBuilderDemo);
+    components_menu->addAction("🗂️ FileExplorer Demo", this,
+                               &AdvancedComponentsShowcase::onFileExplorerDemo);
+    components_menu->addAction("📈 ChartWidget Demo", this,
+                               &AdvancedComponentsShowcase::onChartWidgetDemo);
+    components_menu->addAction("🎨 ColorPicker Demo", this,
+                               &AdvancedComponentsShowcase::onColorPickerDemo);
+    components_menu->addAction(
+        "📅 DateTimePicker Demo", this,
+        &AdvancedComponentsShowcase::onDateTimePickerDemo);
 
     components_menu->addSeparator();
-    components_menu->addAction("🔗 Integration Demo", this, &AdvancedComponentsShowcase::onIntegrationDemo);
-    components_menu->addAction("⚡ Performance Demo", this, &AdvancedComponentsShowcase::onPerformanceDemo);
+    components_menu->addAction("🔗 Integration Demo", this,
+                               &AdvancedComponentsShowcase::onIntegrationDemo);
+    components_menu->addAction("⚡ Performance Demo", this,
+                               &AdvancedComponentsShowcase::onPerformanceDemo);
 
     // View menu
     auto* view_menu = menuBar()->addMenu("&View");
@@ -129,21 +143,22 @@ void AdvancedComponentsShowcase::setupMenuBar() {
     auto* about_action = help_menu->addAction("&About");
     connect(about_action, &QAction::triggered, [this]() {
         QMessageBox::about(this, "About Advanced Components Showcase",
-            "DeclarativeUI Advanced Components Showcase\n\n"
-            "This application demonstrates the sophisticated composite components "
-            "available in the DeclarativeUI framework.\n\n"
-            "Features:\n"
-            "• SearchBox with auto-completion\n"
-            "• DataTable with sorting and filtering\n"
-            "• PropertyEditor for dynamic editing\n"
-            "• FormBuilder for dynamic forms\n"
-            "• FileExplorer for file system browsing\n"
-            "• ChartWidget for data visualization\n"
-            "• ColorPicker for color selection\n"
-            "• DateTimePicker for date/time input\n"
-            "• Integration examples\n"
-            "• Performance monitoring\n\n"
-            "Built with DeclarativeUI Framework");
+                           "DeclarativeUI Advanced Components Showcase\n\n"
+                           "This application demonstrates the sophisticated "
+                           "composite components "
+                           "available in the DeclarativeUI framework.\n\n"
+                           "Features:\n"
+                           "• SearchBox with auto-completion\n"
+                           "• DataTable with sorting and filtering\n"
+                           "• PropertyEditor for dynamic editing\n"
+                           "• FormBuilder for dynamic forms\n"
+                           "• FileExplorer for file system browsing\n"
+                           "• ChartWidget for data visualization\n"
+                           "• ColorPicker for color selection\n"
+                           "• DateTimePicker for date/time input\n"
+                           "• Integration examples\n"
+                           "• Performance monitoring\n\n"
+                           "Built with DeclarativeUI Framework");
     });
 }
 
@@ -197,7 +212,8 @@ void AdvancedComponentsShowcase::setupStatusBar() {
 void AdvancedComponentsShowcase::setupDockWidgets() {
     // Component tree dock
     auto* tree_dock = new QDockWidget("Components", this);
-    tree_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    tree_dock->setAllowedAreas(Qt::LeftDockWidgetArea |
+                               Qt::RightDockWidgetArea);
 
     component_tree_ = new QTreeWidget();
     component_tree_->setHeaderLabel("Available Components");
@@ -221,7 +237,8 @@ void AdvancedComponentsShowcase::setupDockWidgets() {
 
     // Info panel dock
     auto* info_dock = new QDockWidget("Information", this);
-    info_dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+    info_dock->setAllowedAreas(Qt::LeftDockWidgetArea |
+                               Qt::RightDockWidgetArea);
 
     info_panel_ = new QTextEdit();
     info_panel_->setReadOnly(true);
@@ -252,38 +269,32 @@ void AdvancedComponentsShowcase::setupDockWidgets() {
     addDockWidget(Qt::RightDockWidgetArea, info_dock);
 
     // Connect tree selection to info updates
-    connect(component_tree_, &QTreeWidget::itemClicked, [this](QTreeWidgetItem* item) {
-        QString component_name = item->text(0);
-        showComponentInfo(component_name, "Component information", {});
-    });
+    connect(component_tree_, &QTreeWidget::itemClicked,
+            [this](QTreeWidgetItem* item) {
+                QString component_name = item->text(0);
+                showComponentInfo(component_name, "Component information", {});
+            });
 }
 
 void AdvancedComponentsShowcase::setupSampleData() {
     // Sample search data
-    sample_search_data_ = {
-        "Apple iPhone 15 Pro",
-        "Samsung Galaxy S24",
-        "Google Pixel 8",
-        "OnePlus 12",
-        "Xiaomi 14 Pro",
-        "Sony Xperia 1 V",
-        "Nothing Phone 2",
-        "Fairphone 5",
-        "MacBook Pro M3",
-        "Dell XPS 13",
-        "ThinkPad X1 Carbon",
-        "Surface Laptop 5",
-        "iPad Pro 12.9",
-        "Samsung Galaxy Tab S9",
-        "Microsoft Surface Pro 9"
-    };
+    sample_search_data_ = {"Apple iPhone 15 Pro",    "Samsung Galaxy S24",
+                           "Google Pixel 8",         "OnePlus 12",
+                           "Xiaomi 14 Pro",          "Sony Xperia 1 V",
+                           "Nothing Phone 2",        "Fairphone 5",
+                           "MacBook Pro M3",         "Dell XPS 13",
+                           "ThinkPad X1 Carbon",     "Surface Laptop 5",
+                           "iPad Pro 12.9",          "Samsung Galaxy Tab S9",
+                           "Microsoft Surface Pro 9"};
 
     // Sample table model
     sample_table_model_ = new SampleDataModel(this);
     qobject_cast<SampleDataModel*>(sample_table_model_)->addSampleData();
 }
 
-void AdvancedComponentsShowcase::addDemoTab(const QString& title, const QString& icon_path, QWidget* content) {
+void AdvancedComponentsShowcase::addDemoTab(const QString& title,
+                                            const QString& icon_path,
+                                            QWidget* content) {
     QIcon icon(icon_path);
     if (icon.isNull()) {
         // Fallback to text-based icon
@@ -293,7 +304,8 @@ void AdvancedComponentsShowcase::addDemoTab(const QString& title, const QString&
     }
 }
 
-QWidget* AdvancedComponentsShowcase::createDemoSection(const QString& title, const QString& description, QWidget* demo_widget) {
+QWidget* AdvancedComponentsShowcase::createDemoSection(
+    const QString& title, const QString& description, QWidget* demo_widget) {
     auto* section = new QWidget();
     auto* layout = new QVBoxLayout(section);
     layout->setContentsMargins(20, 20, 20, 20);
@@ -301,7 +313,9 @@ QWidget* AdvancedComponentsShowcase::createDemoSection(const QString& title, con
 
     // Title
     auto* title_label = new QLabel(title);
-    title_label->setStyleSheet("font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 10px;");
+    title_label->setStyleSheet(
+        "font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: "
+        "10px;");
     layout->addWidget(title_label);
 
     // Description
@@ -319,15 +333,19 @@ QWidget* AdvancedComponentsShowcase::createDemoSection(const QString& title, con
     return section;
 }
 
-void AdvancedComponentsShowcase::showComponentInfo(const QString& component_name, const QString& description, const QStringList& features) {
-    if (!info_panel_) return;
+void AdvancedComponentsShowcase::showComponentInfo(
+    const QString& component_name, const QString& description,
+    const QStringList& features) {
+    if (!info_panel_)
+        return;
 
     QString html = QString(R"(
         <h3>%1</h3>
         <p>%2</p>
         <h4>Features:</h4>
         <ul>
-    )").arg(component_name, description);
+    )")
+                       .arg(component_name, description);
 
     for (const QString& feature : features) {
         html += QString("<li>%1</li>").arg(feature);
@@ -401,9 +419,10 @@ QWidget* AdvancedComponentsShowcase::createSearchBoxDemo() {
     layout->addWidget(title);
 
     auto* description = new QLabel(
-        "The SearchBox component provides advanced search functionality with auto-completion, "
-        "search history, fuzzy matching, and customizable suggestion templates."
-    );
+        "The SearchBox component provides advanced search functionality with "
+        "auto-completion, "
+        "search history, fuzzy matching, and customizable suggestion "
+        "templates.");
     description->setWordWrap(true);
     description->setStyleSheet("color: #666; margin-bottom: 20px;");
     layout->addWidget(description);
@@ -412,7 +431,8 @@ QWidget* AdvancedComponentsShowcase::createSearchBoxDemo() {
     try {
         demo_search_box_ = std::make_unique<SearchBox>();
         demo_search_box_->initialize();
-        demo_search_box_->placeholder("Search for products, people, or documents...");
+        demo_search_box_->placeholder(
+            "Search for products, people, or documents...");
         demo_search_box_->suggestions(sample_search_data_);
         demo_search_box_->autoComplete(true);
         demo_search_box_->showHistory(true);
@@ -422,16 +442,19 @@ QWidget* AdvancedComponentsShowcase::createSearchBoxDemo() {
             qDebug() << "🔍 Search query changed:" << query;
             status_label_->setText(QString("Searching for: %1").arg(query));
         });
-        demo_search_box_->onSuggestionSelected([this](const SearchSuggestion& suggestion) {
-            qDebug() << "✅ Selected suggestion:" << suggestion.text;
-            status_label_->setText(QString("Selected: %1").arg(suggestion.text));
-        });
+        demo_search_box_->onSuggestionSelected(
+            [this](const SearchSuggestion& suggestion) {
+                qDebug() << "✅ Selected suggestion:" << suggestion.text;
+                status_label_->setText(
+                    QString("Selected: %1").arg(suggestion.text));
+            });
 
         layout->addWidget(demo_search_box_->getWidget());
 
     } catch (const std::exception& e) {
         qWarning() << "❌ Failed to create SearchBox demo:" << e.what();
-        auto* error_label = new QLabel("Failed to create SearchBox demo. Check console for details.");
+        auto* error_label = new QLabel(
+            "Failed to create SearchBox demo. Check console for details.");
         error_label->setStyleSheet("color: red; font-weight: bold;");
         layout->addWidget(error_label);
     }
@@ -468,9 +491,10 @@ QWidget* AdvancedComponentsShowcase::createDataTableDemo() {
     layout->addWidget(title);
 
     auto* description = new QLabel(
-        "The DataTable component provides a powerful data grid with sorting, filtering, "
-        "in-line editing, row selection, pagination, and export functionality."
-    );
+        "The DataTable component provides a powerful data grid with sorting, "
+        "filtering, "
+        "in-line editing, row selection, pagination, and export "
+        "functionality.");
     description->setWordWrap(true);
     description->setStyleSheet("color: #666; margin-bottom: 20px;");
     layout->addWidget(description);
@@ -491,10 +515,14 @@ QWidget* AdvancedComponentsShowcase::createDataTableDemo() {
             qDebug() << "📋 Row selected:" << row;
             status_label_->setText(QString("Selected row: %1").arg(row));
         });
-        demo_data_table_->onCellEdited([this](int row, int column, const QVariant& value) {
-            qDebug() << "✏️ Cell edited:" << row << column << value;
-            status_label_->setText(QString("Edited cell [%1,%2]: %3").arg(row).arg(column).arg(value.toString()));
-        });
+        demo_data_table_->onCellEdited(
+            [this](int row, int column, const QVariant& value) {
+                qDebug() << "✏️ Cell edited:" << row << column << value;
+                status_label_->setText(QString("Edited cell [%1,%2]: %3")
+                                           .arg(row)
+                                           .arg(column)
+                                           .arg(value.toString()));
+            });
         demo_data_table_->onFilterChanged([this](const QString& filter) {
             qDebug() << "🔍 Filter changed:" << filter;
             status_label_->setText(QString("Filter applied: %1").arg(filter));
@@ -504,7 +532,8 @@ QWidget* AdvancedComponentsShowcase::createDataTableDemo() {
 
     } catch (const std::exception& e) {
         qWarning() << "❌ Failed to create DataTable demo:" << e.what();
-        auto* error_label = new QLabel("Failed to create DataTable demo. Check console for details.");
+        auto* error_label = new QLabel(
+            "Failed to create DataTable demo. Check console for details.");
         error_label->setStyleSheet("color: red; font-weight: bold;");
         layout->addWidget(error_label);
     }
@@ -513,57 +542,57 @@ QWidget* AdvancedComponentsShowcase::createDataTableDemo() {
 }
 
 QWidget* AdvancedComponentsShowcase::createPropertyEditorDemo() {
-    return createDemoSection(
-        "🎛️ PropertyEditor Component Demo",
-        "The PropertyEditor component provides dynamic property editing with automatic "
-        "editor generation based on data types, validation, and real-time updates.",
-        new QLabel("PropertyEditor demo - Coming soon!")
-    );
+    return createDemoSection("🎛️ PropertyEditor Component Demo",
+                             "The PropertyEditor component provides dynamic "
+                             "property editing with automatic "
+                             "editor generation based on data types, "
+                             "validation, and real-time updates.",
+                             new QLabel("PropertyEditor demo - Coming soon!"));
 }
 
 QWidget* AdvancedComponentsShowcase::createFormBuilderDemo() {
     return createDemoSection(
         "📋 FormBuilder Component Demo",
-        "The FormBuilder component enables dynamic form generation from JSON schemas "
+        "The FormBuilder component enables dynamic form generation from JSON "
+        "schemas "
         "with validation, conditional fields, and multi-step support.",
-        new QLabel("FormBuilder demo - Coming soon!")
-    );
+        new QLabel("FormBuilder demo - Coming soon!"));
 }
 
 QWidget* AdvancedComponentsShowcase::createFileExplorerDemo() {
     return createDemoSection(
         "🗂️ FileExplorer Component Demo",
-        "The FileExplorer component provides a complete file system browser with "
+        "The FileExplorer component provides a complete file system browser "
+        "with "
         "multiple view modes, file operations, and drag-and-drop support.",
-        new QLabel("FileExplorer demo - Coming soon!")
-    );
+        new QLabel("FileExplorer demo - Coming soon!"));
 }
 
 QWidget* AdvancedComponentsShowcase::createChartWidgetDemo() {
-    return createDemoSection(
-        "📈 ChartWidget Component Demo",
-        "The ChartWidget component offers comprehensive charting capabilities with "
-        "multiple chart types, interactive features, and real-time data updates.",
-        new QLabel("ChartWidget demo - Coming soon!")
-    );
+    return createDemoSection("📈 ChartWidget Component Demo",
+                             "The ChartWidget component offers comprehensive "
+                             "charting capabilities with "
+                             "multiple chart types, interactive features, and "
+                             "real-time data updates.",
+                             new QLabel("ChartWidget demo - Coming soon!"));
 }
 
 QWidget* AdvancedComponentsShowcase::createColorPickerDemo() {
     return createDemoSection(
         "🎨 ColorPicker Component Demo",
-        "The ColorPicker component provides advanced color selection with multiple "
+        "The ColorPicker component provides advanced color selection with "
+        "multiple "
         "color models, palette management, and accessibility features.",
-        new QLabel("ColorPicker demo - Coming soon!")
-    );
+        new QLabel("ColorPicker demo - Coming soon!"));
 }
 
 QWidget* AdvancedComponentsShowcase::createDateTimePickerDemo() {
     return createDemoSection(
         "📅 DateTimePicker Component Demo",
-        "The DateTimePicker component offers sophisticated date and time selection "
+        "The DateTimePicker component offers sophisticated date and time "
+        "selection "
         "with calendar views, time zones, and localization support.",
-        new QLabel("DateTimePicker demo - Coming soon!")
-    );
+        new QLabel("DateTimePicker demo - Coming soon!"));
 }
 
 QWidget* AdvancedComponentsShowcase::createIntegrationDemo() {
@@ -571,8 +600,7 @@ QWidget* AdvancedComponentsShowcase::createIntegrationDemo() {
         "🔗 Integration Demo",
         "This demo shows how advanced components work together to create "
         "sophisticated user interfaces with seamless data flow.",
-        new QLabel("Integration demo - Coming soon!")
-    );
+        new QLabel("Integration demo - Coming soon!"));
 }
 
 QWidget* AdvancedComponentsShowcase::createPerformanceDemo() {
@@ -580,15 +608,14 @@ QWidget* AdvancedComponentsShowcase::createPerformanceDemo() {
         "⚡ Performance Demo",
         "This demo monitors the performance of advanced components and shows "
         "optimization techniques for large datasets and complex UIs.",
-        new QLabel("Performance demo - Coming soon!")
-    );
+        new QLabel("Performance demo - Coming soon!"));
 }
 
 // **SampleDataModel Implementation**
 SampleDataModel::SampleDataModel(QObject* parent)
-    : QAbstractTableModel(parent)
-{
-    headers_ = {"Name", "Email", "Age", "Department", "Hire Date", "Active", "Salary"};
+    : QAbstractTableModel(parent) {
+    headers_ = {"Name",      "Email",  "Age",   "Department",
+                "Hire Date", "Active", "Salary"};
 }
 
 int SampleDataModel::rowCount(const QModelIndex& parent) const {
@@ -610,20 +637,28 @@ QVariant SampleDataModel::data(const QModelIndex& index, int role) const {
 
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         switch (index.column()) {
-            case 0: return row.name;
-            case 1: return row.email;
-            case 2: return row.age;
-            case 3: return row.department;
-            case 4: return row.hire_date;
-            case 5: return row.active ? "Yes" : "No";
-            case 6: return QString("$%1").arg(row.salary, 0, 'f', 0);
+            case 0:
+                return row.name;
+            case 1:
+                return row.email;
+            case 2:
+                return row.age;
+            case 3:
+                return row.department;
+            case 4:
+                return row.hire_date;
+            case 5:
+                return row.active ? "Yes" : "No";
+            case 6:
+                return QString("$%1").arg(row.salary, 0, 'f', 0);
         }
     }
 
     return QVariant();
 }
 
-QVariant SampleDataModel::headerData(int section, Qt::Orientation orientation, int role) const {
+QVariant SampleDataModel::headerData(int section, Qt::Orientation orientation,
+                                     int role) const {
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         if (section >= 0 && section < headers_.size()) {
             return headers_[section];
@@ -632,22 +667,39 @@ QVariant SampleDataModel::headerData(int section, Qt::Orientation orientation, i
     return QVariant();
 }
 
-bool SampleDataModel::setData(const QModelIndex& index, const QVariant& value, int role) {
-    if (!index.isValid() || index.row() >= sample_data_.size() || role != Qt::EditRole) {
+bool SampleDataModel::setData(const QModelIndex& index, const QVariant& value,
+                              int role) {
+    if (!index.isValid() || index.row() >= sample_data_.size() ||
+        role != Qt::EditRole) {
         return false;
     }
 
     SampleRow& row = sample_data_[index.row()];
 
     switch (index.column()) {
-        case 0: row.name = value.toString(); break;
-        case 1: row.email = value.toString(); break;
-        case 2: row.age = value.toInt(); break;
-        case 3: row.department = value.toString(); break;
-        case 4: row.hire_date = value.toDate(); break;
-        case 5: row.active = value.toBool(); break;
-        case 6: row.salary = value.toDouble(); break;
-        default: return false;
+        case 0:
+            row.name = value.toString();
+            break;
+        case 1:
+            row.email = value.toString();
+            break;
+        case 2:
+            row.age = value.toInt();
+            break;
+        case 3:
+            row.department = value.toString();
+            break;
+        case 4:
+            row.hire_date = value.toDate();
+            break;
+        case 5:
+            row.active = value.toBool();
+            break;
+        case 6:
+            row.salary = value.toDouble();
+            break;
+        default:
+            return false;
     }
 
     emit dataChanged(index, index);
@@ -664,18 +716,26 @@ Qt::ItemFlags SampleDataModel::flags(const QModelIndex& index) const {
 void SampleDataModel::addSampleData() {
     beginResetModel();
 
-    sample_data_ = {
-        {"John Doe", "john.doe@company.com", 32, "Engineering", QDate(2020, 3, 15), true, 85000},
-        {"Jane Smith", "jane.smith@company.com", 28, "Design", QDate(2021, 7, 22), true, 75000},
-        {"Bob Johnson", "bob.johnson@company.com", 45, "Management", QDate(2018, 1, 10), true, 120000},
-        {"Alice Brown", "alice.brown@company.com", 35, "Marketing", QDate(2019, 11, 5), false, 68000},
-        {"Charlie Wilson", "charlie.wilson@company.com", 29, "Engineering", QDate(2022, 2, 14), true, 78000},
-        {"Diana Davis", "diana.davis@company.com", 41, "Sales", QDate(2017, 9, 30), true, 92000},
-        {"Eve Miller", "eve.miller@company.com", 26, "Design", QDate(2023, 1, 8), true, 72000},
-        {"Frank Garcia", "frank.garcia@company.com", 38, "Engineering", QDate(2019, 6, 12), true, 88000},
-        {"Grace Lee", "grace.lee@company.com", 33, "Marketing", QDate(2020, 10, 25), true, 71000},
-        {"Henry Taylor", "henry.taylor@company.com", 42, "Management", QDate(2016, 4, 18), true, 115000}
-    };
+    sample_data_ = {{"John Doe", "john.doe@company.com", 32, "Engineering",
+                     QDate(2020, 3, 15), true, 85000},
+                    {"Jane Smith", "jane.smith@company.com", 28, "Design",
+                     QDate(2021, 7, 22), true, 75000},
+                    {"Bob Johnson", "bob.johnson@company.com", 45, "Management",
+                     QDate(2018, 1, 10), true, 120000},
+                    {"Alice Brown", "alice.brown@company.com", 35, "Marketing",
+                     QDate(2019, 11, 5), false, 68000},
+                    {"Charlie Wilson", "charlie.wilson@company.com", 29,
+                     "Engineering", QDate(2022, 2, 14), true, 78000},
+                    {"Diana Davis", "diana.davis@company.com", 41, "Sales",
+                     QDate(2017, 9, 30), true, 92000},
+                    {"Eve Miller", "eve.miller@company.com", 26, "Design",
+                     QDate(2023, 1, 8), true, 72000},
+                    {"Frank Garcia", "frank.garcia@company.com", 38,
+                     "Engineering", QDate(2019, 6, 12), true, 88000},
+                    {"Grace Lee", "grace.lee@company.com", 33, "Marketing",
+                     QDate(2020, 10, 25), true, 71000},
+                    {"Henry Taylor", "henry.taylor@company.com", 42,
+                     "Management", QDate(2016, 4, 18), true, 115000}};
 
     endResetModel();
 }

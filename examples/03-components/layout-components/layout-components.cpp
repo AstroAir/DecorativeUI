@@ -1,35 +1,34 @@
 #include <QApplication>
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGridLayout>
 #include <QFormLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QLineEdit>
+#include <QGridLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
 
 // Include DeclarativeUI headers
-#include "src/Core/DeclarativeBuilder.hpp"
 #include "src/Components/Button.hpp"
 #include "src/Components/Label.hpp"
+#include "src/Core/DeclarativeBuilder.hpp"
 
 /**
  * Layout Components Example
- * 
+ *
  * Demonstrates different layout managers and container components.
  * Shows how to organize UI elements using various layout strategies.
  */
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
 
     // Create main widget
     auto widget = std::make_unique<QWidget>();
     widget->setWindowTitle("Layout Components Example");
     widget->resize(600, 500);
-    
+
     auto mainLayout = std::make_unique<QVBoxLayout>(widget.get());
 
     // Title
@@ -38,7 +37,8 @@ int main(int argc, char *argv[])
     mainLayout->addWidget(title.release());
 
     // Horizontal Layout Example
-    auto hboxGroup = std::make_unique<QGroupBox>("Horizontal Layout (QHBoxLayout)");
+    auto hboxGroup =
+        std::make_unique<QGroupBox>("Horizontal Layout (QHBoxLayout)");
     auto hboxLayout = std::make_unique<QHBoxLayout>(hboxGroup.get());
     hboxLayout->addWidget(new QPushButton("Button 1"));
     hboxLayout->addWidget(new QPushButton("Button 2"));
@@ -65,14 +65,14 @@ int main(int argc, char *argv[])
     // Nested Layout Example
     auto nestedGroup = std::make_unique<QGroupBox>("Nested Layouts");
     auto nestedMainLayout = std::make_unique<QVBoxLayout>(nestedGroup.get());
-    
+
     auto nestedHLayout = std::make_unique<QHBoxLayout>();
     nestedHLayout->addWidget(new QLabel("Left"));
     nestedHLayout->addWidget(new QLabel("Right"));
-    
+
     nestedMainLayout->addLayout(nestedHLayout.release());
     nestedMainLayout->addWidget(new QPushButton("Bottom Button"));
-    
+
     mainLayout->addWidget(nestedGroup.release());
 
     widget->show();

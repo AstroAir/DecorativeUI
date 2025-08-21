@@ -373,6 +373,10 @@ ctest -R Binding
 
 ## Future Enhancements
 
+## Recent stability changes
+
+- PropertyBindingTemplate: target widget pointer is now stored as QPointer to QWidget so it automatically becomes null when the widget is destroyed. This prevents use-after-free crashes during batch operations and teardown.
+
 - **Reactive Collections**: Observable arrays and maps
 - **Async State**: Support for asynchronous state updates
 - **State Middleware**: Plugin system for state transformations

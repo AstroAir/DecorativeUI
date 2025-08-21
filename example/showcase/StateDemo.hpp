@@ -5,15 +5,15 @@
 
 #pragma once
 
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
-#include <QPushButton>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QSpinBox>
 #include <QTextEdit>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <memory>
 
 #include "Binding/StateManager.hpp"
@@ -38,6 +38,6 @@ private:
     QVBoxLayout* main_layout_;
     QGroupBox* demo_group_;
     QTextEdit* state_display_;
-    
+
     std::shared_ptr<Binding::StateManager> state_manager_;
 };

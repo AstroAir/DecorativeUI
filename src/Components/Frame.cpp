@@ -10,6 +10,11 @@ namespace DeclarativeUI::Components {
 Frame::Frame(QObject* parent) : UIElement(parent), frame_widget_(nullptr) {}
 
 Frame& Frame::frameStyle(QFrame::Shape shape, QFrame::Shadow shadow) {
+    // Store as properties so they apply pre- and post-initialize
+    static_cast<Frame&>(setProperty("frameShape", static_cast<int>(shape)));
+    static_cast<Frame&>(setProperty("frameShadow", static_cast<int>(shadow)));
+
+    // If widget already exists, also set directly for immediate effect
     if (frame_widget_) {
         frame_widget_->setFrameStyle(static_cast<int>(shape) |
                                      static_cast<int>(shadow));

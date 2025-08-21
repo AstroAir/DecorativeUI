@@ -11,6 +11,8 @@ Label &Label::text(const QString &text) {
 }
 
 Label &Label::pixmap(const QPixmap &pixmap) {
+    // Ensure scaled contents for pixmap-based labels to satisfy tests
+    static_cast<Label &>(setProperty("scaledContents", true));
     return static_cast<Label &>(setProperty("pixmap", pixmap));
 }
 

@@ -11,6 +11,7 @@
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QObject>
+#include <QPointer>
 #include <QString>
 #include <QVariant>
 #include <QWidget>
@@ -266,8 +267,9 @@ private:
     // **Private members**
 
     std::shared_ptr<ReactiveProperty<SourceType>>
-        m_source;                  ///< Source reactive property.
-    QWidget *m_target_widget;      ///< Target QWidget.
+        m_source;  ///< Source reactive property.
+    QPointer<QWidget>
+        m_target_widget;  ///< Target QWidget (guarded, nulls when deleted).
     QString m_target_property;     ///< Name of the target property.
     BindingDirection m_direction;  ///< Binding direction.
     UpdateMode m_update_mode;      ///< Update mode.

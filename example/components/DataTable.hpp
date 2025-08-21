@@ -5,15 +5,15 @@
 
 #pragma once
 
-#include <QWidget>
-#include <QTableWidget>
-#include <QVBoxLayout>
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
-#include <QPushButton>
 #include <QLabel>
+#include <QPushButton>
 #include <QSpinBox>
-#include <QComboBox>
+#include <QTableWidget>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <memory>
 
 class DataTable : public QWidget {
@@ -21,7 +21,7 @@ class DataTable : public QWidget {
 
 public:
     explicit DataTable(QWidget* parent = nullptr);
-    
+
     void setData(const QList<QStringList>& data);
     void setHeaders(const QStringList& headers);
     void setPageSize(int size);
@@ -45,13 +45,13 @@ private:
     QVBoxLayout* main_layout_;
     QHBoxLayout* controls_layout_;
     QTableWidget* table_;
-    
+
     QPushButton* prev_button_;
     QPushButton* next_button_;
     QLabel* page_label_;
     QSpinBox* page_spin_;
     QComboBox* page_size_combo_;
-    
+
     QList<QStringList> table_data_;
     QStringList headers_;
     int current_page_;
