@@ -1,18 +1,21 @@
 #include "PerformanceProfilerWidget.hpp"
-#include <QDebug>
-#include <QTimer>
 #include <QDateTime>
+#include <QDebug>
+#include <QElapsedTimer>
 #include <QFileDialog>
-#include <QMessageBox>
-#include <QStandardPaths>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QElapsedTimer>
+#include <QMessageBox>
+#include <QStandardPaths>
+#include <QTimer>
 
 namespace DeclarativeUI::Debug {
 
 PerformanceProfilerWidget::PerformanceProfilerWidget(QWidget* parent)
-    : QWidget(parent), is_profiling_(false), profiling_timer_(nullptr), profiling_start_time_(0) {
+    : QWidget(parent),
+      is_profiling_(false),
+      profiling_timer_(nullptr),
+      profiling_start_time_(0) {
     layout_ = new QVBoxLayout(this);
 
     start_button_ = new QPushButton("Start Profiling", this);
@@ -36,14 +39,19 @@ PerformanceProfilerWidget::PerformanceProfilerWidget(QWidget* parent)
     layout_->addWidget(progress_bar_);
     layout_->addWidget(status_label_);
 
-    connect(start_button_, &QPushButton::clicked, this, &PerformanceProfilerWidget::onStartProfilingClicked);
-    connect(stop_button_, &QPushButton::clicked, this, &PerformanceProfilerWidget::onStopProfilingClicked);
-    connect(reset_button_, &QPushButton::clicked, this, &PerformanceProfilerWidget::onResetProfilingClicked);
-    connect(export_button_, &QPushButton::clicked, this, &PerformanceProfilerWidget::onExportProfileClicked);
+    connect(start_button_, &QPushButton::clicked, this,
+            &PerformanceProfilerWidget::onStartProfilingClicked);
+    connect(stop_button_, &QPushButton::clicked, this,
+            &PerformanceProfilerWidget::onStopProfilingClicked);
+    connect(reset_button_, &QPushButton::clicked, this,
+            &PerformanceProfilerWidget::onResetProfilingClicked);
+    connect(export_button_, &QPushButton::clicked, this,
+            &PerformanceProfilerWidget::onExportProfileClicked);
 
     // Set up profiling timer for progress updates
     profiling_timer_ = new QTimer(this);
-    connect(profiling_timer_, &QTimer::timeout, this, &PerformanceProfilerWidget::updateProfilingProgress);
+    connect(profiling_timer_, &QTimer::timeout, this,
+            &PerformanceProfilerWidget::updateProfilingProgress);
 
     qDebug() << "PerformanceProfilerWidget created";
 }
@@ -65,7 +73,8 @@ void PerformanceProfilerWidget::onStartProfilingClicked() {
     // Start the progress timer (update every 100ms)
     profiling_timer_->start(100);
 
-    qDebug() << "Profiling started at" << QDateTime::currentDateTime().toString();
+    qDebug() << "Profiling started at"
+             << QDateTime::currentDateTime().toString();
 }
 
 void PerformanceProfilerWidget::onStopProfilingClicked() {
@@ -76,12 +85,14 @@ void PerformanceProfilerWidget::onStopProfilingClicked() {
     is_profiling_ = false;
     profiling_timer_->stop();
 
-    qint64 duration = QDateTime::currentMSecsSinceEpoch() - profiling_start_time_;
+    qint64 duration =
+        QDateTime::currentMSecsSinceEpoch() - profiling_start_time_;
 
     // Update UI state
     start_button_->setEnabled(true);
     stop_button_->setEnabled(false);
-    status_label_->setText(QString("Stopped - Duration: %1s").arg(duration / 1000.0, 0, 'f', 1));
+    status_label_->setText(
+        QString("Stopped - Duration: %1s").arg(duration / 1000.0, 0, 'f', 1));
     progress_bar_->setValue(100);
 
     qDebug() << "Profiling stopped. Duration:" << duration << "ms";
@@ -102,17 +113,16 @@ void PerformanceProfilerWidget::onResetProfilingClicked() {
 }
 
 void PerformanceProfilerWidget::onExportProfileClicked() {
-    QString defaultPath = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    QString defaultFileName = QString("performance_profile_%1.json")
-                             .arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"));
+    QString defaultPath =
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    QString defaultFileName =
+        QString("performance_profile_%1.json")
+            .arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss"));
     QString defaultFilePath = defaultPath + "/" + defaultFileName;
 
     QString fileName = QFileDialog::getSaveFileName(
-        this,
-        "Export Performance Profile",
-        defaultFilePath,
-        "JSON Files (*.json);;All Files (*)"
-    );
+        this, "Export Performance Profile", defaultFilePath,
+        "JSON Files (*.json);;All Files (*)");
 
     if (fileName.isEmpty()) {
         return;
@@ -120,9 +130,12 @@ void PerformanceProfilerWidget::onExportProfileClicked() {
 
     // Create sample profile data
     QJsonObject profileData;
-    profileData["timestamp"] = QDateTime::currentDateTime().toString(Qt::ISODate);
-    profileData["duration_ms"] = is_profiling_ ?
-        (QDateTime::currentMSecsSinceEpoch() - profiling_start_time_) : 0;
+    profileData["timestamp"] =
+        QDateTime::currentDateTime().toString(Qt::ISODate);
+    profileData["duration_ms"] =
+        is_profiling_
+            ? (QDateTime::currentMSecsSinceEpoch() - profiling_start_time_)
+            : 0;
     profileData["status"] = is_profiling_ ? "active" : "stopped";
 
     // Add sample performance metrics
@@ -140,12 +153,14 @@ void PerformanceProfilerWidget::onExportProfileClicked() {
         file.write(doc.toJson());
         file.close();
 
-        QMessageBox::information(this, "Export Successful",
-                               QString("Profile exported to: %1").arg(fileName));
+        QMessageBox::information(
+            this, "Export Successful",
+            QString("Profile exported to: %1").arg(fileName));
         qDebug() << "Profile exported to:" << fileName;
     } else {
-        QMessageBox::warning(this, "Export Failed",
-                           QString("Could not open file for writing: %1").arg(fileName));
+        QMessageBox::warning(
+            this, "Export Failed",
+            QString("Could not open file for writing: %1").arg(fileName));
     }
 }
 
@@ -154,7 +169,8 @@ void PerformanceProfilerWidget::updateProfilingProgress() {
         return;
     }
 
-    qint64 elapsed = QDateTime::currentMSecsSinceEpoch() - profiling_start_time_;
+    qint64 elapsed =
+        QDateTime::currentMSecsSinceEpoch() - profiling_start_time_;
     double seconds = elapsed / 1000.0;
 
     // Update status with elapsed time

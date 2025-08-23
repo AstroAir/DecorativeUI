@@ -2,6 +2,9 @@
 # This file contains all test applications
 # Tests are built conditionally based on BUILD_TESTS option
 
+# **Enable CTest integration early so add_test() works in subdirs**
+enable_testing()
+
 # **Enable Qt MOC processing for all tests**
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

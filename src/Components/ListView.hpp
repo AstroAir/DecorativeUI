@@ -1,10 +1,10 @@
 // Components/ListView.hpp
 #pragma once
-#include <QListView>
 #include <QAbstractItemModel>
-#include <QStringListModel>
-#include <QStandardItemModel>
+#include <QListView>
 #include <QModelIndex>
+#include <QStandardItemModel>
+#include <QStringListModel>
 
 #include "../Core/UIElement.hpp"
 
@@ -53,7 +53,9 @@ public:
     void setCurrentIndex(const QModelIndex& index);
     void clearSelection();
     void selectAll();
-    void scrollTo(const QModelIndex& index, QAbstractItemView::ScrollHint hint = QAbstractItemView::EnsureVisible);
+    void scrollTo(
+        const QModelIndex& index,
+        QAbstractItemView::ScrollHint hint = QAbstractItemView::EnsureVisible);
     void addItem(const QString& text);
     void addItems(const QStringList& texts);
     void removeItem(int row);
@@ -73,9 +75,5 @@ private:
     std::function<void()> viewport_entered_handler_;
     std::function<void(const QSize&)> icon_size_changed_handler_;
 };
-
-
-
-
 
 }  // namespace DeclarativeUI::Components

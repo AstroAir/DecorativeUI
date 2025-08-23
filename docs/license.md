@@ -57,13 +57,13 @@ DeclarativeUI depends on the following third-party libraries:
 ### Qt6
 
 - **License**: LGPL v3 / GPL v3 / Commercial
-- **Website**: https://www.qt.io/licensing/
+- **Website**: <https://www.qt.io/licensing/>
 - **Usage**: Core framework dependency
 
 ### CMake
 
 - **License**: BSD 3-Clause
-- **Website**: https://cmake.org/licensing/
+- **Website**: <https://cmake.org/licensing/>
 - **Usage**: Build system
 
 ## Contributing

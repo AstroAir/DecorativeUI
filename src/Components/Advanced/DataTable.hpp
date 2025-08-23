@@ -2,7 +2,8 @@
 
 /**
  * @file DataTable.hpp
- * @brief Advanced data table component with sorting, filtering, pagination, and editing
+ * @brief Advanced data table component with sorting, filtering, pagination, and
+ * editing
  *
  * The DataTable component provides a comprehensive data grid interface with:
  * - Virtual scrolling for large datasets
@@ -15,25 +16,25 @@
  * - Custom cell renderers
  */
 
-#include <QTableView>
-#include <QHeaderView>
 #include <QAbstractItemModel>
-#include <QSortFilterProxyModel>
-#include <QStyledItemDelegate>
-#include <QLineEdit>
-#include <QComboBox>
+#include <QAction>
 #include <QCheckBox>
-#include <QSpinBox>
+#include <QComboBox>
 #include <QDateEdit>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMenu>
 #include <QProgressBar>
+#include <QPushButton>
+#include <QSortFilterProxyModel>
+#include <QSpinBox>
+#include <QStyledItemDelegate>
+#include <QTableView>
+#include <QTimer>
 #include <QToolBar>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPushButton>
-#include <QMenu>
-#include <QAction>
-#include <QTimer>
 #include <functional>
 #include <memory>
 
@@ -49,7 +50,7 @@ struct DataTableColumn {
     QString key;
     QString title;
     QString data_type = "string";  // string, number, date, boolean, custom
-    int width = -1;  // -1 for auto-size
+    int width = -1;                // -1 for auto-size
     bool sortable = true;
     bool filterable = true;
     bool editable = false;
@@ -96,16 +97,19 @@ struct DataTableSelection {
     QList<QPair<int, int>> selected_cells;
 
     bool isEmpty() const {
-        return selected_rows.isEmpty() && selected_columns.isEmpty() && selected_cells.isEmpty();
+        return selected_rows.isEmpty() && selected_columns.isEmpty() &&
+               selected_cells.isEmpty();
     }
 
     int count() const {
-        return selected_rows.size() + selected_columns.size() + selected_cells.size();
+        return selected_rows.size() + selected_columns.size() +
+               selected_cells.size();
     }
 };
 
 /**
- * @brief Advanced DataTable component with comprehensive data grid functionality
+ * @brief Advanced DataTable component with comprehensive data grid
+ * functionality
  */
 class DataTable : public Core::UIElement {
     Q_OBJECT
@@ -134,16 +138,23 @@ public:
     DataTable& onRowsSelected(std::function<void(const QList<int>&)> handler);
     DataTable& onCellClicked(std::function<void(int, int)> handler);
     DataTable& onCellDoubleClicked(std::function<void(int, int)> handler);
-    DataTable& onCellEdited(std::function<void(int, int, const QVariant&)> handler);
+    DataTable& onCellEdited(
+        std::function<void(int, int, const QVariant&)> handler);
     DataTable& onSortChanged(std::function<void(int, Qt::SortOrder)> handler);
     DataTable& onFilterChanged(std::function<void(const QString&)> handler);
-    DataTable& onSelectionChanged(std::function<void(const DataTableSelection&)> handler);
-    DataTable& onBulkOperation(std::function<void(const QString&, const QList<int>&)> handler);
+    DataTable& onSelectionChanged(
+        std::function<void(const DataTableSelection&)> handler);
+    DataTable& onBulkOperation(
+        std::function<void(const QString&, const QList<int>&)> handler);
 
     // **Cell renderers and editors**
-    DataTable& cellRenderer(const QString& column, std::function<QWidget*(const QVariant&, QWidget*)> renderer);
-    DataTable& editorFactory(const QString& column, std::function<QWidget*(QWidget*)> factory);
-    DataTable& columnValidator(const QString& column, std::function<bool(const QVariant&)> validator);
+    DataTable& cellRenderer(
+        const QString& column,
+        std::function<QWidget*(const QVariant&, QWidget*)> renderer);
+    DataTable& editorFactory(const QString& column,
+                             std::function<QWidget*(QWidget*)> factory);
+    DataTable& columnValidator(const QString& column,
+                               std::function<bool(const QVariant&)> validator);
 
     // **Public methods**
     QAbstractItemModel* getModel() const;
@@ -215,10 +226,12 @@ private:
     std::function<void(int, Qt::SortOrder)> sort_changed_handler_;
     std::function<void(const QString&)> filter_changed_handler_;
     std::function<void(const DataTableSelection&)> selection_changed_handler_;
-    std::function<void(const QString&, const QList<int>&)> bulk_operation_handler_;
+    std::function<void(const QString&, const QList<int>&)>
+        bulk_operation_handler_;
 
     // **Custom renderers and editors**
-    QMap<QString, std::function<QWidget*(const QVariant&, QWidget*)>> cell_renderers_;
+    QMap<QString, std::function<QWidget*(const QVariant&, QWidget*)>>
+        cell_renderers_;
     QMap<QString, std::function<QWidget*(QWidget*)>> editor_factories_;
     QMap<QString, std::function<bool(const QVariant&)>> column_validators_;
 
@@ -258,11 +271,16 @@ public:
     explicit DataTableItemDelegate(DataTable* parent);
 
     // **QStyledItemDelegate interface**
-    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-    void setEditorData(QWidget* editor, const QModelIndex& index) const override;
-    void setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const override;
-    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
+                          const QModelIndex& index) const override;
+    void setEditorData(QWidget* editor,
+                       const QModelIndex& index) const override;
+    void setModelData(QWidget* editor, QAbstractItemModel* model,
+                      const QModelIndex& index) const override;
+    void paint(QPainter* painter, const QStyleOptionViewItem& option,
+               const QModelIndex& index) const override;
+    QSize sizeHint(const QStyleOptionViewItem& option,
+                   const QModelIndex& index) const override;
 
 signals:
     void cellEdited(int row, int column, const QVariant& value);
@@ -270,8 +288,10 @@ signals:
 private:
     DataTable* data_table_;
 
-    QWidget* createDefaultEditor(const QString& data_type, QWidget* parent) const;
-    void paintCell(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    QWidget* createDefaultEditor(const QString& data_type,
+                                 QWidget* parent) const;
+    void paintCell(QPainter* painter, const QStyleOptionViewItem& option,
+                   const QModelIndex& index) const;
 };
 
-} // namespace DeclarativeUI::Components::Advanced
+}  // namespace DeclarativeUI::Components::Advanced

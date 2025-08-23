@@ -25,6 +25,7 @@ High-level JSON parsing and preprocessing utility with advanced features:
 - Comprehensive error reporting with path information
 
 **Key Features:**
+
 - **Reference Resolution**: Support for JSON references (`$ref`) and includes
 - **Custom Parsers**: Extensible type-specific parsing
 - **Preprocessing**: Comment removal and trailing comma handling
@@ -33,6 +34,7 @@ High-level JSON parsing and preprocessing utility with advanced features:
 - **Utility Functions**: Path navigation, value manipulation, pretty printing
 
 **Core Classes:**
+
 - `JSONPath`: Path navigation and manipulation
 - `JSONReferenceResolver`: Reference and include resolution
 - `JSONParser`: Main parsing interface
@@ -50,6 +52,7 @@ Flexible validation framework for DeclarativeUI JSON documents:
 - Integrate lightweight JSON Schema-like validation
 
 **Key Features:**
+
 - **Rule-Based Validation**: Flexible validation rule system
 - **Component Validation**: UI component-specific validation
 - **Property Validation**: Widget property compatibility checking
@@ -58,6 +61,7 @@ Flexible validation framework for DeclarativeUI JSON documents:
 - **Custom Validators**: Extensible validation framework
 
 **Built-in Validators:**
+
 - `RequiredPropertyValidator`: Ensures required properties are present
 - `PropertyTypeValidator`: Validates property value types
 - `PropertyCompatibilityValidator`: Ensures properties are compatible with widget types
@@ -75,6 +79,7 @@ Load and instantiate QWidget-based UI components from JSON definitions:
 - Support for custom component types
 
 **Key Features:**
+
 - **Widget Creation**: Instantiate Qt widgets from JSON
 - **Property Application**: Set widget properties from JSON
 - **Layout Management**: Create and configure layouts
@@ -93,6 +98,7 @@ Global registry mapping textual type names to component factories:
 - Extensible factory system for custom components
 
 **Key Features:**
+
 - **Type Safety**: Template-based factory registration
 - **Factory Pattern**: Flexible component creation
 - **Built-in Components**: Standard Qt widget support
@@ -100,6 +106,7 @@ Global registry mapping textual type names to component factories:
 - **Thread Safety**: Safe for concurrent access
 
 **Built-in Components:**
+
 - QWidget, QLabel, QPushButton
 - QLineEdit, QTextEdit, QCheckBox
 - QRadioButton, QComboBox, QSpinBox
@@ -182,7 +189,7 @@ ComponentRegistry::instance().registerComponent<MyCustomWidget>(
 
 // Create component instance
 auto widget = ComponentRegistry::instance().createComponent(
-    "MyCustomWidget", 
+    "MyCustomWidget",
     config_json
 );
 ```
@@ -214,23 +221,23 @@ The module supports a subset of JSON Schema for validation:
 
 ```json
 {
-    "type": "object",
-    "required": ["type"],
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["QWidget", "QLabel", "QPushButton"]
+    },
     "properties": {
-        "type": {
-            "type": "string",
-            "enum": ["QWidget", "QLabel", "QPushButton"]
-        },
-        "properties": {
-            "type": "object"
-        },
-        "children": {
-            "type": "array",
-            "items": {
-                "$ref": "#"
-            }
-        }
+      "type": "object"
+    },
+    "children": {
+      "type": "array",
+      "items": {
+        "$ref": "#"
+      }
     }
+  }
 }
 ```
 
@@ -271,31 +278,31 @@ Example JSON UI definition:
 
 ```json
 {
-    "type": "QWidget",
-    "properties": {
-        "windowTitle": "Example Application",
-        "geometry": [100, 100, 800, 600]
-    },
-    "layout": {
-        "type": "QVBoxLayout",
-        "children": [
-            {
-                "type": "QLabel",
-                "properties": {
-                    "text": "Welcome to DeclarativeUI",
-                    "alignment": "AlignCenter"
-                }
-            },
-            {
-                "type": "QPushButton",
-                "properties": {
-                    "text": "Click Me"
-                },
-                "events": {
-                    "clicked": "handleButtonClick"
-                }
-            }
-        ]
-    }
+  "type": "QWidget",
+  "properties": {
+    "windowTitle": "Example Application",
+    "geometry": [100, 100, 800, 600]
+  },
+  "layout": {
+    "type": "QVBoxLayout",
+    "children": [
+      {
+        "type": "QLabel",
+        "properties": {
+          "text": "Welcome to DeclarativeUI",
+          "alignment": "AlignCenter"
+        }
+      },
+      {
+        "type": "QPushButton",
+        "properties": {
+          "text": "Click Me"
+        },
+        "events": {
+          "clicked": "handleButtonClick"
+        }
+      }
+    ]
+  }
 }
 ```

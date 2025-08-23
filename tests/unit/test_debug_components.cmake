@@ -12,10 +12,10 @@ set(DEBUG_TEST_SOURCES
 foreach(TEST_SOURCE ${DEBUG_TEST_SOURCES})
     # Extract test name from filename
     get_filename_component(TEST_NAME ${TEST_SOURCE} NAME_WE)
-    
+
     # Create executable
     add_executable(${TEST_NAME} ${TEST_SOURCE})
-    
+
     # Link required libraries
     target_link_libraries(${TEST_NAME}
         Qt6::Core
@@ -23,17 +23,17 @@ foreach(TEST_SOURCE ${DEBUG_TEST_SOURCES})
         Qt6::Test
         DeclarativeUI_Debug  # Assuming this is the Debug library target
     )
-    
+
     # Set include directories
     target_include_directories(${TEST_NAME} PRIVATE
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_SOURCE_DIR}/src/Debug
         ${CMAKE_CURRENT_SOURCE_DIR}
     )
-    
+
     # Add to test suite
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
-    
+
     # Set test properties
     set_tests_properties(${TEST_NAME} PROPERTIES
         TIMEOUT 30
@@ -49,7 +49,7 @@ set_property(TEST test_performance_profiler_widget PROPERTY LABELS "unit;debug;p
 # Add custom target to run all debug tests
 add_custom_target(test_debug_components
     COMMAND ${CMAKE_CTEST_COMMAND} -L "debug" --output-on-failure
-    DEPENDS 
+    DEPENDS
         test_debugging_console
         test_bottleneck_detector_widget
         test_performance_profiler_widget

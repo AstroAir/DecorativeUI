@@ -5,16 +5,25 @@ namespace DeclarativeUI::Components {
 
 // **Constructors**
 GroupBox::GroupBox(QObject* parent)
-    : UIElement(parent), current_layout_(nullptr), is_collapsible_(false),
-      is_animated_(false), animation_duration_(300), min_content_height_(0),
+    : UIElement(parent),
+      current_layout_(nullptr),
+      is_collapsible_(false),
+      is_animated_(false),
+      animation_duration_(300),
+      min_content_height_(0),
       max_content_height_(16777215) {
     // Widget creation is deferred to initialize() method
 }
 
 GroupBox::GroupBox(const QString& title, QObject* parent)
-    : UIElement(parent), current_layout_(nullptr), is_collapsible_(false),
-      is_animated_(false), animation_duration_(300), min_content_height_(0),
-      max_content_height_(16777215), title_(title) {
+    : UIElement(parent),
+      current_layout_(nullptr),
+      is_collapsible_(false),
+      is_animated_(false),
+      animation_duration_(300),
+      min_content_height_(0),
+      max_content_height_(16777215),
+      title_(title) {
     // Widget creation is deferred to initialize() method
 }
 
@@ -106,7 +115,8 @@ GroupBox& GroupBox::addWidget(QWidget* widget, int row, int col) {
     return *this;
 }
 
-GroupBox& GroupBox::addWidget(QWidget* widget, int row, int col, int rowSpan, int colSpan) {
+GroupBox& GroupBox::addWidget(QWidget* widget, int row, int col, int rowSpan,
+                              int colSpan) {
     if (auto gridLayout = qobject_cast<QGridLayout*>(current_layout_)) {
         gridLayout->addWidget(widget, row, col, rowSpan, colSpan);
     }
@@ -179,8 +189,7 @@ GroupBox& GroupBox::setTitleColor(const QColor& color) {
 GroupBox& GroupBox::setBackgroundColor(const QColor& color) {
     if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setStyleSheet(
-            QString("QGroupBox { background-color: %1; }")
-                .arg(color.name()));
+            QString("QGroupBox { background-color: %1; }").arg(color.name()));
     }
     return *this;
 }
@@ -188,8 +197,7 @@ GroupBox& GroupBox::setBackgroundColor(const QColor& color) {
 GroupBox& GroupBox::setBorderColor(const QColor& color) {
     if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
         groupBox->setStyleSheet(
-            QString("QGroupBox { border: 1px solid %1; }")
-                .arg(color.name()));
+            QString("QGroupBox { border: 1px solid %1; }").arg(color.name()));
     }
     return *this;
 }
@@ -260,9 +268,7 @@ bool GroupBox::isFlat() const {
     return false;
 }
 
-QLayout* GroupBox::getLayout() const {
-    return current_layout_;
-}
+QLayout* GroupBox::getLayout() const { return current_layout_; }
 
 // **Advanced Features**
 GroupBox& GroupBox::setCollapsible(bool collapsible) {
@@ -270,7 +276,8 @@ GroupBox& GroupBox::setCollapsible(bool collapsible) {
     if (collapsible) {
         setCheckable(true);
         onToggled([this](bool checked) {
-            if (auto groupBox = qobject_cast<QGroupBox*>(UIElement::getWidget())) {
+            if (auto groupBox =
+                    qobject_cast<QGroupBox*>(UIElement::getWidget())) {
                 for (int i = 0; i < groupBox->children().size(); ++i) {
                     if (auto child = qobject_cast<QWidget*>(
                             groupBox->children().at(i))) {
@@ -290,9 +297,7 @@ GroupBox& GroupBox::setCollapsed(bool collapsed) {
     return *this;
 }
 
-bool GroupBox::isCollapsed() const {
-    return is_collapsible_ && !isChecked();
-}
+bool GroupBox::isCollapsed() const { return is_collapsible_ && !isChecked(); }
 
 GroupBox& GroupBox::setMinimumContentHeight(int height) {
     min_content_height_ = height;

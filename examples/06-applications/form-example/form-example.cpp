@@ -1,4 +1,23 @@
-// Examples/form_example.cpp
+/**
+ * @file form-example.cpp
+ * @brief Comprehensive form application demonstrating DeclarativeUI
+ * capabilities
+ *
+ * This example showcases a complete form application with:
+ * - Component registration with property configuration
+ * - State management and data binding
+ * - Event handling and form validation
+ * - Hot reload functionality for development
+ * - Fallback UI creation for error handling
+ *
+ * The implementation emphasizes maintainable code with low cyclomatic
+ * complexity by breaking down the large registerComponents function into
+ * focused helper functions.
+ *
+ * @author DeclarativeUI Team
+ * @version 1.0
+ */
+
 #include <QApplication>
 #include <QCheckBox>
 #include <QComboBox>
@@ -203,125 +222,226 @@ private:
                                          [this]() { onResetForm(); });
     }
 
+    /**
+     * @brief Registers all UI components with the component registry
+     *
+     * This function organizes component registration into logical groups
+     * to improve maintainability and reduce complexity.
+     */
     void registerComponents() {
+        registerBasicComponents();
+        registerInputComponents();
+        registerDisplayComponents();
+    }
+
+private:
+    /**
+     * @brief Registers basic UI components (QWidget, QLabel, QPushButton)
+     */
+    void registerBasicComponents() {
         auto& registry = JSON::ComponentRegistry::instance();
 
-        // **Register standard Qt widgets**
+        // **Register QWidget - base component**
         registry.registerComponent<QWidget>("QWidget", [](const QJsonObject&) {
             return std::make_unique<QWidget>();
         });
 
+        // **Register QLabel with text property support**
         registry.registerComponent<QLabel>(
             "QLabel", [](const QJsonObject& config) {
                 auto label = std::make_unique<QLabel>();
-                if (config.contains("properties")) {
-                    QJsonObject props = config["properties"].toObject();
-                    if (props.contains("text")) {
-                        label->setText(props["text"].toString());
-                    }
-                }
+                applyTextProperty(label.get(), config);
                 return label;
             });
 
+        // **Register QPushButton with text property support**
         registry.registerComponent<QPushButton>(
             "QPushButton", [](const QJsonObject& config) {
                 auto button = std::make_unique<QPushButton>();
-                if (config.contains("properties")) {
-                    QJsonObject props = config["properties"].toObject();
-                    if (props.contains("text")) {
-                        button->setText(props["text"].toString());
-                    }
-                }
+                applyTextProperty(button.get(), config);
                 return button;
             });
+    }
 
+    /**
+     * @brief Registers input components (QLineEdit, QComboBox, QCheckBox)
+     */
+    void registerInputComponents() {
+        auto& registry = JSON::ComponentRegistry::instance();
+
+        // **Register QLineEdit with text and placeholder support**
         registry.registerComponent<QLineEdit>(
             "QLineEdit", [](const QJsonObject& config) {
                 auto lineEdit = std::make_unique<QLineEdit>();
-                if (config.contains("properties")) {
-                    QJsonObject props = config["properties"].toObject();
-                    if (props.contains("placeholderText")) {
-                        lineEdit->setPlaceholderText(
-                            props["placeholderText"].toString());
-                    }
-                    if (props.contains("text")) {
-                        lineEdit->setText(props["text"].toString());
-                    }
-                }
+                applyLineEditProperties(lineEdit.get(), config);
                 return lineEdit;
             });
 
+        // **Register QComboBox with items support**
         registry.registerComponent<QComboBox>(
             "QComboBox", [](const QJsonObject& config) {
                 auto comboBox = std::make_unique<QComboBox>();
-                if (config.contains("properties")) {
-                    QJsonObject props = config["properties"].toObject();
-                    if (props.contains("items")) {
-                        QJsonArray items = props["items"].toArray();
-                        for (const auto& item : items) {
-                            comboBox->addItem(item.toString());
-                        }
-                    }
-                }
+                applyComboBoxProperties(comboBox.get(), config);
                 return comboBox;
             });
 
+        // **Register QCheckBox with text and checked state support**
         registry.registerComponent<QCheckBox>(
             "QCheckBox", [](const QJsonObject& config) {
                 auto checkBox = std::make_unique<QCheckBox>();
-                if (config.contains("properties")) {
-                    QJsonObject props = config["properties"].toObject();
-                    if (props.contains("text")) {
-                        checkBox->setText(props["text"].toString());
-                    }
-                    if (props.contains("checked")) {
-                        checkBox->setChecked(props["checked"].toBool());
-                    }
-                }
+                applyCheckBoxProperties(checkBox.get(), config);
                 return checkBox;
             });
+    }
 
+    /**
+     * @brief Registers display components (QSlider, QProgressBar)
+     */
+    void registerDisplayComponents() {
+        auto& registry = JSON::ComponentRegistry::instance();
+
+        // **Register QSlider with range and orientation support**
         registry.registerComponent<QSlider>(
             "QSlider", [](const QJsonObject& config) {
                 auto slider = std::make_unique<QSlider>();
-                if (config.contains("properties")) {
-                    QJsonObject props = config["properties"].toObject();
-                    if (props.contains("orientation")) {
-                        slider->setOrientation(static_cast<Qt::Orientation>(
-                            props["orientation"].toInt()));
-                    }
-                    if (props.contains("minimum")) {
-                        slider->setMinimum(props["minimum"].toInt());
-                    }
-                    if (props.contains("maximum")) {
-                        slider->setMaximum(props["maximum"].toInt());
-                    }
-                    if (props.contains("value")) {
-                        slider->setValue(props["value"].toInt());
-                    }
-                }
+                applySliderProperties(slider.get(), config);
                 return slider;
             });
 
+        // **Register QProgressBar with range and value support**
         registry.registerComponent<QProgressBar>(
             "QProgressBar", [](const QJsonObject& config) {
                 auto progressBar = std::make_unique<QProgressBar>();
-                if (config.contains("properties")) {
-                    QJsonObject props = config["properties"].toObject();
-                    if (props.contains("minimum")) {
-                        progressBar->setMinimum(props["minimum"].toInt());
-                    }
-                    if (props.contains("maximum")) {
-                        progressBar->setMaximum(props["maximum"].toInt());
-                    }
-                    if (props.contains("value")) {
-                        progressBar->setValue(props["value"].toInt());
-                    }
-                }
+                applyProgressBarProperties(progressBar.get(), config);
                 return progressBar;
             });
     }
 
+    /**
+     * @brief Helper functions for applying component properties
+     */
+
+    /**
+     * @brief Applies text property to widgets that support setText()
+     * @param widget The widget to apply properties to
+     * @param config The JSON configuration object
+     */
+    template <typename T>
+    static void applyTextProperty(T* widget, const QJsonObject& config) {
+        if (config.contains("properties")) {
+            QJsonObject props = config["properties"].toObject();
+            if (props.contains("text")) {
+                widget->setText(props["text"].toString());
+            }
+        }
+    }
+
+    /**
+     * @brief Applies QLineEdit-specific properties
+     * @param lineEdit The QLineEdit widget to configure
+     * @param config The JSON configuration object
+     */
+    static void applyLineEditProperties(QLineEdit* lineEdit,
+                                        const QJsonObject& config) {
+        if (!config.contains("properties"))
+            return;
+
+        QJsonObject props = config["properties"].toObject();
+        if (props.contains("placeholderText")) {
+            lineEdit->setPlaceholderText(props["placeholderText"].toString());
+        }
+        if (props.contains("text")) {
+            lineEdit->setText(props["text"].toString());
+        }
+    }
+
+    /**
+     * @brief Applies QComboBox-specific properties
+     * @param comboBox The QComboBox widget to configure
+     * @param config The JSON configuration object
+     */
+    static void applyComboBoxProperties(QComboBox* comboBox,
+                                        const QJsonObject& config) {
+        if (!config.contains("properties"))
+            return;
+
+        QJsonObject props = config["properties"].toObject();
+        if (props.contains("items")) {
+            QJsonArray items = props["items"].toArray();
+            for (const auto& item : items) {
+                comboBox->addItem(item.toString());
+            }
+        }
+    }
+
+    /**
+     * @brief Applies QCheckBox-specific properties
+     * @param checkBox The QCheckBox widget to configure
+     * @param config The JSON configuration object
+     */
+    static void applyCheckBoxProperties(QCheckBox* checkBox,
+                                        const QJsonObject& config) {
+        if (!config.contains("properties"))
+            return;
+
+        QJsonObject props = config["properties"].toObject();
+        if (props.contains("text")) {
+            checkBox->setText(props["text"].toString());
+        }
+        if (props.contains("checked")) {
+            checkBox->setChecked(props["checked"].toBool());
+        }
+    }
+
+    /**
+     * @brief Applies QSlider-specific properties
+     * @param slider The QSlider widget to configure
+     * @param config The JSON configuration object
+     */
+    static void applySliderProperties(QSlider* slider,
+                                      const QJsonObject& config) {
+        if (!config.contains("properties"))
+            return;
+
+        QJsonObject props = config["properties"].toObject();
+        if (props.contains("orientation")) {
+            slider->setOrientation(
+                static_cast<Qt::Orientation>(props["orientation"].toInt()));
+        }
+        if (props.contains("minimum")) {
+            slider->setMinimum(props["minimum"].toInt());
+        }
+        if (props.contains("maximum")) {
+            slider->setMaximum(props["maximum"].toInt());
+        }
+        if (props.contains("value")) {
+            slider->setValue(props["value"].toInt());
+        }
+    }
+
+    /**
+     * @brief Applies QProgressBar-specific properties
+     * @param progressBar The QProgressBar widget to configure
+     * @param config The JSON configuration object
+     */
+    static void applyProgressBarProperties(QProgressBar* progressBar,
+                                           const QJsonObject& config) {
+        if (!config.contains("properties"))
+            return;
+
+        QJsonObject props = config["properties"].toObject();
+        if (props.contains("minimum")) {
+            progressBar->setMinimum(props["minimum"].toInt());
+        }
+        if (props.contains("maximum")) {
+            progressBar->setMaximum(props["maximum"].toInt());
+        }
+        if (props.contains("value")) {
+            progressBar->setValue(props["value"].toInt());
+        }
+    }
+
+public:
     void createUI() {
         try {
             QString ui_file_path = "Resources/ui_definitions/form_demo.json";

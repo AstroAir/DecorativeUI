@@ -23,7 +23,7 @@ using namespace DeclarativeUI::Exceptions;
 
 /**
  * @brief Comprehensive tests for JSON module functionality
- * 
+ *
  * This test suite focuses on testing all the JSON parsing, validation,
  * and UI loading functionality to ensure complete implementation.
  */
@@ -46,14 +46,12 @@ private slots:
         QVERIFY(temp_dir_->isValid());
     }
 
-    void cleanup() {
-        temp_dir_.reset();
-    }
+    void cleanup() { temp_dir_.reset(); }
 
     // **Test JSONParser Advanced Features**
     void testJSONParserAdvancedFeatures() {
         JSONParser parser;
-        
+
         // Test parsing with comments (if supported)
         QString json_with_comments = R"({
             // This is a comment
@@ -62,7 +60,7 @@ private slots:
             /* Multi-line comment */
             "enabled": true
         })";
-        
+
         try {
             auto result = parser.parseString(json_with_comments);
             // If comments are supported, this should work
@@ -71,14 +69,14 @@ private slots:
             // If comments are not supported, that's also valid
             qDebug() << "Comments not supported (expected):" << e.what();
         }
-        
+
         // Test parsing with trailing commas (if supported)
         QString json_with_trailing_commas = R"({
             "name": "test",
             "value": 42,
             "enabled": true,
         })";
-        
+
         try {
             auto result = parser.parseString(json_with_trailing_commas);
             // If trailing commas are supported, this should work
@@ -92,7 +90,7 @@ private slots:
     // **Test JSONParser Error Handling**
     void testJSONParserErrorHandling() {
         JSONParser parser;
-        
+
         // Test invalid JSON
         QString invalid_json = R"({
             "name": "test",
@@ -100,7 +98,7 @@ private slots:
             "enabled": true
             // Missing closing brace
         )";
-        
+
         try {
             auto result = parser.parseString(invalid_json);
             QFAIL("Should have thrown an exception for invalid JSON");
@@ -108,7 +106,7 @@ private slots:
             // Expected to fail
             qDebug() << "Invalid JSON correctly rejected:" << e.what();
         }
-        
+
         // Test parsing non-existent file
         try {
             auto result = parser.parseFile("non_existent_file.json");
@@ -122,11 +120,11 @@ private slots:
     // **Test JSONParser Reference Resolution**
     void testJSONParserReferenceResolution() {
         JSONParser parser;
-        
+
         // Create a referenced file
         QTemporaryFile ref_file(temp_dir_->path() + "/reference_XXXXXX.json");
         QVERIFY(ref_file.open());
-        
+
         QString ref_content = R"({
             "type": "QLabel",
             "properties": {
@@ -135,11 +133,11 @@ private slots:
         })";
         ref_file.write(ref_content.toUtf8());
         ref_file.close();
-        
+
         // Create main file with reference
         QTemporaryFile main_file(temp_dir_->path() + "/main_XXXXXX.json");
         QVERIFY(main_file.open());
-        
+
         QString main_content = QString(R"({
             "type": "QWidget",
             "children": [
@@ -147,10 +145,11 @@ private slots:
                     "$ref": "%1"
                 }
             ]
-        })").arg(ref_file.fileName());
+        })")
+                                   .arg(ref_file.fileName());
         main_file.write(main_content.toUtf8());
         main_file.close();
-        
+
         try {
             auto result = parser.parseFile(main_file.fileName());
             // If references are supported, this should work
@@ -166,16 +165,16 @@ private slots:
         // Test singleton access
         ComponentRegistry& registry1 = ComponentRegistry::instance();
         ComponentRegistry& registry2 = ComponentRegistry::instance();
-        QVERIFY(&registry1 == &registry2); // Should be the same instance
-        
+        QVERIFY(&registry1 == &registry2);  // Should be the same instance
+
         // Test built-in component creation
         QJsonObject config;
         config["text"] = "Test Label";
-        
+
         try {
             auto widget = registry1.createComponent("QLabel", config);
             QVERIFY(widget != nullptr);
-            
+
             QLabel* label = qobject_cast<QLabel*>(widget.get());
             if (label) {
                 QCOMPARE(label->text(), QString("Test Label"));
@@ -183,28 +182,25 @@ private slots:
         } catch (const std::exception& e) {
             qDebug() << "Component creation failed:" << e.what();
         }
-        
+
         // Test querying registered types
         QStringList types = registry1.getRegisteredTypes();
-        QVERIFY(types.size() > 0); // Should have some built-in types
+        QVERIFY(types.size() > 0);  // Should have some built-in types
         QVERIFY(types.contains("QWidget") || types.contains("QLabel"));
     }
 
     // **Test JSONValidator Functionality**
     void testJSONValidatorFunctionality() {
         UIJSONValidator validator;
-        
+
         // Register built-in validators
         validator.registerBuiltinValidators();
-        
+
         // Test valid UI definition
         QJsonObject valid_ui = QJsonObject{
             {"type", "QWidget"},
-            {"properties", QJsonObject{
-                {"windowTitle", "Test Window"}
-            }}
-        };
-        
+            {"properties", QJsonObject{{"windowTitle", "Test Window"}}}};
+
         bool is_valid = validator.validate(valid_ui);
         if (!is_valid) {
             QStringList errors = validator.getErrorMessages();
@@ -212,24 +208,23 @@ private slots:
                 qDebug() << "Validation error:" << error;
             }
         }
-        // Note: We don't assert true here because validation rules may be strict
-        
+        // Note: We don't assert true here because validation rules may be
+        // strict
+
         // Test invalid UI definition (missing required type)
         QJsonObject invalid_ui = QJsonObject{
-            {"properties", QJsonObject{
-                {"windowTitle", "Test Window"}
-            }}
-        };
-        
+            {"properties", QJsonObject{{"windowTitle", "Test Window"}}}};
+
         bool is_invalid = validator.validate(invalid_ui);
-        // This should ideally be false, but depends on validation implementation
+        // This should ideally be false, but depends on validation
+        // implementation
         Q_UNUSED(is_invalid);
     }
 
     // **Test JSONUILoader Basic Functionality**
     void testJSONUILoaderBasicFunctionality() {
         auto loader = std::make_unique<JSONUILoader>();
-        
+
         // Test loading simple widget from JSON string
         QString simple_json = R"({
             "type": "QWidget",
@@ -238,7 +233,7 @@ private slots:
                 "geometry": [100, 100, 400, 300]
             }
         })";
-        
+
         try {
             auto widget = loader->loadFromString(simple_json);
             QVERIFY(widget != nullptr);
@@ -246,7 +241,7 @@ private slots:
         } catch (const std::exception& e) {
             qDebug() << "Widget loading failed:" << e.what();
         }
-        
+
         // Test loading widget with children
         QString complex_json = R"({
             "type": "QWidget",
@@ -262,12 +257,12 @@ private slots:
                 }
             ]
         })";
-        
+
         try {
             auto widget = loader->loadFromString(complex_json);
             QVERIFY(widget != nullptr);
             QCOMPARE(widget->windowTitle(), QString("Parent Widget"));
-            
+
             // Check if child was created
             auto children = widget->findChildren<QLabel*>();
             if (!children.isEmpty()) {
@@ -281,11 +276,11 @@ private slots:
     // **Test JSONUILoader File Loading**
     void testJSONUILoaderFileLoading() {
         auto loader = std::make_unique<JSONUILoader>();
-        
+
         // Create temporary JSON file
         QTemporaryFile json_file(temp_dir_->path() + "/ui_XXXXXX.json");
         QVERIFY(json_file.open());
-        
+
         QString json_content = R"({
             "type": "QWidget",
             "properties": {
@@ -303,12 +298,12 @@ private slots:
         })";
         json_file.write(json_content.toUtf8());
         json_file.close();
-        
+
         try {
             auto widget = loader->loadFromFile(json_file.fileName());
             QVERIFY(widget != nullptr);
             QCOMPARE(widget->windowTitle(), QString("File Loaded Widget"));
-            
+
             // Check if button was created
             auto buttons = widget->findChildren<QPushButton*>();
             if (!buttons.isEmpty()) {
@@ -322,7 +317,7 @@ private slots:
     // **Test Error Handling in JSONUILoader**
     void testJSONUILoaderErrorHandling() {
         auto loader = std::make_unique<JSONUILoader>();
-        
+
         // Test loading invalid JSON
         QString invalid_json = R"({
             "type": "NonExistentWidget",
@@ -330,7 +325,7 @@ private slots:
                 "invalidProperty": "value"
             }
         })";
-        
+
         try {
             auto widget = loader->loadFromString(invalid_json);
             // May succeed with fallback behavior or fail
@@ -338,7 +333,7 @@ private slots:
         } catch (const std::exception& e) {
             qDebug() << "Invalid widget type correctly rejected:" << e.what();
         }
-        
+
         // Test loading from non-existent file
         try {
             auto widget = loader->loadFromFile("non_existent_ui.json");

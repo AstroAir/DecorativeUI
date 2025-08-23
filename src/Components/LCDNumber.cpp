@@ -24,7 +24,8 @@ LCDNumber& LCDNumber::mode(QLCDNumber::Mode mode) {
 }
 
 LCDNumber& LCDNumber::segmentStyle(QLCDNumber::SegmentStyle style) {
-    return static_cast<LCDNumber&>(setProperty("segmentStyle", static_cast<int>(style)));
+    return static_cast<LCDNumber&>(
+        setProperty("segmentStyle", static_cast<int>(style)));
 }
 
 LCDNumber& LCDNumber::smallDecimalPoint(bool small) {

@@ -20,12 +20,15 @@ public:
     ScrollArea& verticalScrollBarPolicy(Qt::ScrollBarPolicy policy);
     ScrollArea& alignment(Qt::Alignment alignment);
     ScrollArea& ensureVisible(int x, int y, int xmargin = 50, int ymargin = 50);
-    ScrollArea& ensureWidgetVisible(QWidget* childWidget, int xmargin = 50, int ymargin = 50);
+    ScrollArea& ensureWidgetVisible(QWidget* childWidget, int xmargin = 50,
+                                    int ymargin = 50);
     ScrollArea& style(const QString& stylesheet);
 
     void initialize() override;
+    // Return the QScrollArea widget managed by this component
     QWidget* getWidget() const;
-    void setWidget(QWidget* widget);
+    // Set the content widget displayed inside the QScrollArea
+    void setContentWidget(QWidget* widget);
     bool isWidgetResizable() const;
     Qt::ScrollBarPolicy getHorizontalScrollBarPolicy() const;
     Qt::ScrollBarPolicy getVerticalScrollBarPolicy() const;
@@ -35,7 +38,5 @@ public:
 private:
     QScrollArea* scroll_area_widget_;
 };
-
-
 
 }  // namespace DeclarativeUI::Components

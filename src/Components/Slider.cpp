@@ -4,8 +4,7 @@
 namespace DeclarativeUI::Components {
 
 // **Implementation**
-Slider::Slider(QObject* parent)
-    : UIElement(parent), slider_widget_(nullptr) {}
+Slider::Slider(QObject* parent) : UIElement(parent), slider_widget_(nullptr) {}
 
 Slider& Slider::orientation(Qt::Orientation orientation) {
     return static_cast<Slider&>(

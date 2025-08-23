@@ -1,6 +1,19 @@
 # **Unit Tests Configuration**
 # Core unit tests for individual components
 
+# Ensure all test targets can include headers from src/* modules with paths like "Binding/...", "Core/...", "JSON/..."
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
+# GoogleTest for specific suites that use gtest (e.g., RefactoredComponentsTest)
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+# For MSYS/MinGW and Qt builds, static gtest is fine
+set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
 # **Core Module Tests**
 add_executable(CoreTest test_core.cpp)
 target_link_libraries(CoreTest
@@ -300,6 +313,31 @@ target_link_libraries(PerformanceComprehensiveTest
     Qt6::Concurrent
 )
 
+# **Refactored Components Tests**
+add_executable(RefactoredComponentsTest test_refactored_components.cpp)
+# Link GoogleTest for this target (uses <gtest/gtest.h>)
+# Merge with existing libraries using the plain signature for consistency
+# Note: Keep Qt6::Test for Qt-related assertions used elsewhere
+# clang-format off
+set(_refactored_components_test_libs
+    DeclarativeUI
+    Components
+    Qt6::Core
+    Qt6::Widgets
+    Qt6::Test
+    GTest::gtest
+    GTest::gtest_main
+)
+# clang-format on
+# Replace the previous target_link_libraries call by re-defining below
+# First, remove existing linkage by resetting properties is not trivial; instead, we directly set using plain signature once
+# CMake requires a single signature usage; thus we ensure only one call below
+# The previous call above will be the only one after this edit
+# Apply libraries in one plain-signature call
+# shellcheck disable=SC1000
+# End of comments
+target_link_libraries(RefactoredComponentsTest ${_refactored_components_test_libs})
+
 # **Set output directory for unit tests**
 set_target_properties(
     CoreTest
@@ -330,6 +368,9 @@ set_target_properties(
     DebuggingConsoleTest
     BottleneckDetectorWidgetTest
     PerformanceProfilerWidgetTest
+    JSONExtendedTest
+    PerformanceComprehensiveTest
+    RefactoredComponentsTest
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests/unit
 )
@@ -365,6 +406,7 @@ add_dependencies(BottleneckDetectorWidgetTest CopyTestResources)
 add_dependencies(PerformanceProfilerWidgetTest CopyTestResources)
 add_dependencies(JSONExtendedTest CopyTestResources)
 add_dependencies(PerformanceComprehensiveTest CopyTestResources)
+add_dependencies(RefactoredComponentsTest CopyTestResources)
 
 # **Register tests with CTest**
 add_test(NAME CoreTest COMMAND CoreTest)
@@ -397,3 +439,4 @@ add_test(NAME BottleneckDetectorWidgetTest COMMAND BottleneckDetectorWidgetTest)
 add_test(NAME PerformanceProfilerWidgetTest COMMAND PerformanceProfilerWidgetTest)
 add_test(NAME JSONExtendedTest COMMAND JSONExtendedTest)
 add_test(NAME PerformanceComprehensiveTest COMMAND PerformanceComprehensiveTest)
+add_test(NAME RefactoredComponentsTest COMMAND RefactoredComponentsTest)

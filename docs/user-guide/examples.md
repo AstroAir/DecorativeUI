@@ -1530,6 +1530,7 @@ private:
    ```
 
 3. **Use Fluent API**: Chain method calls for readability
+
    ```cpp
    button->text("Save")
          .enabled(true)

@@ -1,0 +1,119 @@
+---
+# DeclarativeUI .clang-tidy configuration
+# Static analysis configuration for C++ code quality
+
+# Inherit from parent directories
+InheritParentConfig: false
+
+# Checks to enable/disable
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-exception-escape,
+  cert-*,
+  -cert-dcl21-cpp,
+  -cert-dcl58-cpp,
+  -cert-err58-cpp,
+  clang-analyzer-*,
+  concurrency-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-owning-memory,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-vararg,
+  -cppcoreguidelines-special-member-functions,
+  google-*,
+  -google-readability-todo,
+  -google-runtime-references,
+  hicpp-*,
+  -hicpp-avoid-goto,
+  -hicpp-braces-around-statements,
+  -hicpp-named-parameter,
+  -hicpp-no-array-decay,
+  -hicpp-special-member-functions,
+  -hicpp-uppercase-literal-suffix,
+  -hicpp-use-auto,
+  -hicpp-vararg,
+  misc-*,
+  -misc-non-private-member-variables-in-classes,
+  -misc-unused-parameters,
+  modernize-*,
+  -modernize-avoid-c-arrays,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  portability-*,
+  readability-*,
+  -readability-avoid-const-params-in-decls,
+  -readability-braces-around-statements,
+  -readability-function-cognitive-complexity,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -readability-named-parameter,
+  -readability-uppercase-literal-suffix
+
+# Warning as errors
+WarningsAsErrors: ''
+
+# Header filter (analyze headers in project)
+HeaderFilterRegex: '^.*/(src|tests|examples)/.*\.(h|hpp)$'
+
+# Analysis timeout
+AnalyzeTemporaryDtors: false
+
+# Format style (should match .clang-format)
+FormatStyle: file
+
+# Check options
+CheckOptions:
+  # Naming conventions
+  readability-identifier-naming.NamespaceCase: lower_case
+  readability-identifier-naming.ClassCase: CamelCase
+  readability-identifier-naming.StructCase: CamelCase
+  readability-identifier-naming.TemplateParameterCase: CamelCase
+  readability-identifier-naming.FunctionCase: camelBack
+  readability-identifier-naming.VariableCase: camelBack
+  readability-identifier-naming.PrivateMemberCase: camelBack
+  readability-identifier-naming.PrivateMemberSuffix: _
+  readability-identifier-naming.ProtectedMemberCase: camelBack
+  readability-identifier-naming.ProtectedMemberSuffix: _
+  readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+  readability-identifier-naming.EnumConstantCase: UPPER_CASE
+  readability-identifier-naming.ConstexprVariableCase: UPPER_CASE
+  readability-identifier-naming.GlobalConstantCase: UPPER_CASE
+  readability-identifier-naming.MemberConstantCase: UPPER_CASE
+  readability-identifier-naming.StaticConstantCase: UPPER_CASE
+
+  # Function length
+  readability-function-size.LineThreshold: 100
+  readability-function-size.StatementThreshold: 50
+  readability-function-size.BranchThreshold: 10
+  readability-function-size.ParameterThreshold: 8
+  readability-function-size.NestingThreshold: 4
+
+  # Performance
+  performance-unnecessary-value-param.AllowedTypes: 'QColor;QPoint;QSize;QRect;QString'
+
+  # Modernize
+  modernize-loop-convert.MaxCopySize: 16
+  modernize-loop-convert.MinConfidence: reasonable
+  modernize-use-nullptr.NullMacros: 'NULL'
+
+  # Misc
+  misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: true
+  misc-throw-by-value-catch-by-reference.CheckThrowTemporaries: true
+
+  # Bugprone
+  bugprone-argument-comment.StrictMode: false
+  bugprone-suspicious-string-compare.WarnOnImplicitComparison: true
+  bugprone-suspicious-string-compare.WarnOnLogicalNotComparison: true
+
+  # Core Guidelines
+  cppcoreguidelines-avoid-goto.IgnoreMacros: true
+  cppcoreguidelines-init-variables.MathHeader: '<cmath>'
+  cppcoreguidelines-narrowing-conversions.WarnOnFloatingPointNarrowingConversion: false

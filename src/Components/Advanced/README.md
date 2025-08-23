@@ -16,9 +16,11 @@ Advanced components are built using composition patterns, combining multiple bas
 ## Available Components
 
 ### 🔍 SearchBox
+
 A comprehensive search input component with auto-completion, filtering, and advanced search features.
 
 **Features:**
+
 - Auto-completion with customizable data sources
 - Real-time search suggestions
 - Search history management
@@ -27,9 +29,11 @@ A comprehensive search input component with auto-completion, filtering, and adva
 - Customizable result templates
 
 ### 📊 DataTable
+
 A powerful data grid component with sorting, filtering, pagination, and editing capabilities.
 
 **Features:**
+
 - Virtual scrolling for large datasets
 - Column sorting and filtering
 - In-line editing with validation
@@ -40,9 +44,11 @@ A powerful data grid component with sorting, filtering, pagination, and editing 
 - Custom cell renderers
 
 ### 🎛️ PropertyEditor
+
 A dynamic property editing component that automatically generates appropriate editors for different data types.
 
 **Features:**
+
 - Automatic editor generation based on data types
 - Support for nested objects and arrays
 - Custom editor registration
@@ -51,9 +57,11 @@ A dynamic property editing component that automatically generates appropriate ed
 - Real-time property binding
 
 ### 📋 FormBuilder
+
 A dynamic form generation component that creates forms from JSON schemas or data models.
 
 **Features:**
+
 - JSON Schema-based form generation
 - Dynamic field addition/removal
 - Complex validation rules
@@ -62,9 +70,11 @@ A dynamic form generation component that creates forms from JSON schemas or data
 - Form state management
 
 ### 🗂️ FileExplorer
+
 A complete file system browser component with tree view, details view, and file operations.
 
 **Features:**
+
 - Multiple view modes (tree, list, grid, details)
 - File operations (copy, move, delete, rename)
 - File type filtering and search
@@ -73,9 +83,11 @@ A complete file system browser component with tree view, details view, and file 
 - Drag and drop support
 
 ### 📈 ChartWidget
+
 A comprehensive charting component supporting multiple chart types with interactive features.
 
 **Features:**
+
 - Multiple chart types (line, bar, pie, scatter, area)
 - Interactive zoom and pan
 - Real-time data updates
@@ -84,9 +96,11 @@ A comprehensive charting component supporting multiple chart types with interact
 - Responsive design
 
 ### 🎨 ColorPicker
+
 An advanced color selection component with multiple color models and palette management.
 
 **Features:**
+
 - Multiple color models (RGB, HSV, HSL, CMYK)
 - Color palette management
 - Eyedropper tool
@@ -95,9 +109,11 @@ An advanced color selection component with multiple color models and palette man
 - Custom color spaces
 
 ### 📅 DateTimePicker
+
 A sophisticated date and time selection component with calendar views and time zones.
 
 **Features:**
+
 - Multiple calendar views (month, year, decade)
 - Time zone support
 - Date range selection
@@ -237,7 +253,7 @@ dataTable->onBulkOperation([](const QString& operation, const QList<int>& rows) 
         .parameter("operation", operation)
         .parameter("rows", QVariant::fromValue(rows))
         .build();
-    
+
     CommandInvoker::instance().execute(command);
 });
 ```
@@ -305,12 +321,12 @@ searchBox->style(R"(
         border: 1px solid #cccccc;
         border-radius: 4px;
     }
-    
+
     SearchBox::suggestions {
         background-color: #f9f9f9;
         border: 1px solid #dddddd;
     }
-    
+
     SearchBox::suggestion:hover {
         background-color: #e6f3ff;
     }
@@ -325,13 +341,13 @@ Components support custom templates for rendering:
 dataTable->cellTemplate("status", [](const QVariant& value) -> QWidget* {
     auto status = value.toString();
     auto label = new QLabel(status);
-    
+
     if (status == "Active") {
         label->setStyleSheet("color: green; font-weight: bold;");
     } else if (status == "Inactive") {
         label->setStyleSheet("color: red;");
     }
-    
+
     return label;
 });
 ```

@@ -7,10 +7,10 @@ add_executable(EventHandlingExample event-handling/event-handling.cpp)
 target_include_directories(EventHandlingExample PRIVATE
     ${CMAKE_SOURCE_DIR}/src
 )
-target_link_libraries(EventHandlingExample 
-    DeclarativeUI 
-    Components 
-    Qt6::Core 
+target_link_libraries(EventHandlingExample
+    DeclarativeUI
+    Components
+    Qt6::Core
     Qt6::Widgets
 )
 set_target_properties(EventHandlingExample PROPERTIES
@@ -23,10 +23,10 @@ add_executable(JSONUILoadingExample json-ui-loading/json-ui-loading.cpp)
 target_include_directories(JSONUILoadingExample PRIVATE
     ${CMAKE_SOURCE_DIR}/src
 )
-target_link_libraries(JSONUILoadingExample 
-    DeclarativeUI 
-    Components 
-    Qt6::Core 
+target_link_libraries(JSONUILoadingExample
+    DeclarativeUI
+    Components
+    Qt6::Core
     Qt6::Widgets
 )
 set_target_properties(JSONUILoadingExample PROPERTIES
@@ -39,10 +39,10 @@ add_executable(PropertyBindingExample property-binding/property-binding.cpp)
 target_include_directories(PropertyBindingExample PRIVATE
     ${CMAKE_SOURCE_DIR}/src
 )
-target_link_libraries(PropertyBindingExample 
-    DeclarativeUI 
-    Components 
-    Qt6::Core 
+target_link_libraries(PropertyBindingExample
+    DeclarativeUI
+    Components
+    Qt6::Core
     Qt6::Widgets
 )
 set_target_properties(PropertyBindingExample PROPERTIES
@@ -55,10 +55,10 @@ add_executable(StateManagementExample state-management/state-management.cpp)
 target_include_directories(StateManagementExample PRIVATE
     ${CMAKE_SOURCE_DIR}/src
 )
-target_link_libraries(StateManagementExample 
-    DeclarativeUI 
-    Components 
-    Qt6::Core 
+target_link_libraries(StateManagementExample
+    DeclarativeUI
+    Components
+    Qt6::Core
     Qt6::Widgets
 )
 set_target_properties(StateManagementExample PROPERTIES

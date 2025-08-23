@@ -20,15 +20,18 @@ ScrollArea& ScrollArea::widgetResizable(bool resizable) {
 }
 
 ScrollArea& ScrollArea::horizontalScrollBarPolicy(Qt::ScrollBarPolicy policy) {
-    return static_cast<ScrollArea&>(setProperty("horizontalScrollBarPolicy", static_cast<int>(policy)));
+    return static_cast<ScrollArea&>(
+        setProperty("horizontalScrollBarPolicy", static_cast<int>(policy)));
 }
 
 ScrollArea& ScrollArea::verticalScrollBarPolicy(Qt::ScrollBarPolicy policy) {
-    return static_cast<ScrollArea&>(setProperty("verticalScrollBarPolicy", static_cast<int>(policy)));
+    return static_cast<ScrollArea&>(
+        setProperty("verticalScrollBarPolicy", static_cast<int>(policy)));
 }
 
 ScrollArea& ScrollArea::alignment(Qt::Alignment alignment) {
-    return static_cast<ScrollArea&>(setProperty("alignment", static_cast<int>(alignment)));
+    return static_cast<ScrollArea&>(
+        setProperty("alignment", static_cast<int>(alignment)));
 }
 
 ScrollArea& ScrollArea::ensureVisible(int x, int y, int xmargin, int ymargin) {
@@ -38,7 +41,8 @@ ScrollArea& ScrollArea::ensureVisible(int x, int y, int xmargin, int ymargin) {
     return *this;
 }
 
-ScrollArea& ScrollArea::ensureWidgetVisible(QWidget* childWidget, int xmargin, int ymargin) {
+ScrollArea& ScrollArea::ensureWidgetVisible(QWidget* childWidget, int xmargin,
+                                            int ymargin) {
     if (scroll_area_widget_ && childWidget) {
         scroll_area_widget_->ensureWidgetVisible(childWidget, xmargin, ymargin);
     }
@@ -52,15 +56,18 @@ ScrollArea& ScrollArea::style(const QString& stylesheet) {
 void ScrollArea::initialize() {
     if (!scroll_area_widget_) {
         scroll_area_widget_ = new QScrollArea();
-        setWidget(scroll_area_widget_);
+        // Important: call the base UIElement::setWidget to register lifecycle
+        // and properties
+        Core::UIElement::setWidget(scroll_area_widget_);
     }
 }
 
 QWidget* ScrollArea::getWidget() const {
-    return scroll_area_widget_ ? scroll_area_widget_->widget() : nullptr;
+    // Return the QScrollArea itself so tests can qobject_cast to QScrollArea
+    return scroll_area_widget_;
 }
 
-void ScrollArea::setWidget(QWidget* widget) {
+void ScrollArea::setContentWidget(QWidget* widget) {
     if (scroll_area_widget_) {
         scroll_area_widget_->setWidget(widget);
     }
@@ -71,19 +78,24 @@ bool ScrollArea::isWidgetResizable() const {
 }
 
 Qt::ScrollBarPolicy ScrollArea::getHorizontalScrollBarPolicy() const {
-    return scroll_area_widget_ ? scroll_area_widget_->horizontalScrollBarPolicy() : Qt::ScrollBarAsNeeded;
+    return scroll_area_widget_
+               ? scroll_area_widget_->horizontalScrollBarPolicy()
+               : Qt::ScrollBarAsNeeded;
 }
 
 Qt::ScrollBarPolicy ScrollArea::getVerticalScrollBarPolicy() const {
-    return scroll_area_widget_ ? scroll_area_widget_->verticalScrollBarPolicy() : Qt::ScrollBarAsNeeded;
+    return scroll_area_widget_ ? scroll_area_widget_->verticalScrollBarPolicy()
+                               : Qt::ScrollBarAsNeeded;
 }
 
 QScrollBar* ScrollArea::horizontalScrollBar() const {
-    return scroll_area_widget_ ? scroll_area_widget_->horizontalScrollBar() : nullptr;
+    return scroll_area_widget_ ? scroll_area_widget_->horizontalScrollBar()
+                               : nullptr;
 }
 
 QScrollBar* ScrollArea::verticalScrollBar() const {
-    return scroll_area_widget_ ? scroll_area_widget_->verticalScrollBar() : nullptr;
+    return scroll_area_widget_ ? scroll_area_widget_->verticalScrollBar()
+                               : nullptr;
 }
 
 }  // namespace DeclarativeUI::Components

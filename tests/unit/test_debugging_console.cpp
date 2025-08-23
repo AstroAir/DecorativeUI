@@ -1,10 +1,10 @@
 #include <QApplication>
-#include <QSignalSpy>
-#include <QTest>
-#include <QTimer>
-#include <QTemporaryFile>
-#include <QTextStream>
 #include <QScrollBar>
+#include <QSignalSpy>
+#include <QTemporaryFile>
+#include <QTest>
+#include <QTextStream>
+#include <QTimer>
 #include <memory>
 
 #include "../../src/Debug/DebuggingConsole.hpp"
@@ -124,7 +124,8 @@ private slots:
         QVERIFY(filterCombo != nullptr);
 
         // Check that all expected filter options are present
-        QStringList expectedItems = {"All", "Error", "Warning", "Info", "Debug"};
+        QStringList expectedItems = {"All", "Error", "Warning", "Info",
+                                     "Debug"};
         for (const QString& item : expectedItems) {
             QVERIFY(filterCombo->findText(item) != -1);
         }
@@ -163,7 +164,8 @@ private slots:
         QString displayText = logDisplay->toPlainText();
         // Should not contain the earliest lines due to limit
         QVERIFY(!displayText.contains("Line 0"));
-        QVERIFY(displayText.contains(QString("Line %1").arg(excessiveLines - 1)));
+        QVERIFY(
+            displayText.contains(QString("Line %1").arg(excessiveLines - 1)));
     }
 
     void testFilteringEdgeCases() {
@@ -215,7 +217,8 @@ private slots:
 
         QString displayText = logDisplay->toPlainText();
         QVERIFY(displayText.contains("Rapid log 0"));
-        QVERIFY(displayText.contains(QString("Rapid log %1").arg(rapidLogs - 1)));
+        QVERIFY(
+            displayText.contains(QString("Rapid log %1").arg(rapidLogs - 1)));
     }
 
     void testSpecialCharactersInLogs() {
@@ -248,17 +251,19 @@ private slots:
         // Check that scroll bar is at maximum (bottom)
         QScrollBar* scrollBar = logDisplay->verticalScrollBar();
         QVERIFY(scrollBar != nullptr);
-        // Note: In headless testing, scroll position might not behave exactly as in GUI
-        // but we can verify the scrollbar exists and the method doesn't crash
+        // Note: In headless testing, scroll position might not behave exactly
+        // as in GUI but we can verify the scrollbar exists and the method
+        // doesn't crash
         QVERIFY(scrollBar->maximum() >= 0);
     }
 
     void testEmptyAndWhitespaceHandling() {
         // Test various empty and whitespace scenarios
-        console_->appendLogLine("");  // Empty string
-        console_->appendLogLine("   ");  // Only spaces
+        console_->appendLogLine("");      // Empty string
+        console_->appendLogLine("   ");   // Only spaces
         console_->appendLogLine("\t\n");  // Only whitespace chars
-        console_->appendLogLine("  Valid message  ");  // Message with surrounding spaces
+        console_->appendLogLine(
+            "  Valid message  ");  // Message with surrounding spaces
 
         QTextEdit* logDisplay = console_->findChild<QTextEdit*>();
         QVERIFY(logDisplay != nullptr);

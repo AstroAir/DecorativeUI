@@ -112,7 +112,8 @@ public slots:
      *
      * This method formats the message and calls appendLogLine internally.
      */
-    void addLogMessage(const QString& level, const QString& component, const QString& message);
+    void addLogMessage(const QString& level, const QString& component,
+                       const QString& message);
 
 private slots:
     /**
@@ -169,7 +170,8 @@ private:
     QStringList all_log_lines_;
 
     /**
-     * @brief Helper method to determine if a log line should be shown based on the current filter.
+     * @brief Helper method to determine if a log line should be shown based on
+     * the current filter.
      * @param line The log line to check.
      * @param filter The current filter setting.
      * @return True if the line should be shown, false otherwise.

@@ -8,7 +8,8 @@ MessageBox::MessageBox(QObject* parent)
     : UIElement(parent), message_box_widget_(nullptr) {}
 
 MessageBox& MessageBox::icon(QMessageBox::Icon icon) {
-    return static_cast<MessageBox&>(setProperty("icon", static_cast<int>(icon)));
+    return static_cast<MessageBox&>(
+        setProperty("icon", static_cast<int>(icon)));
 }
 
 MessageBox& MessageBox::text(const QString& text) {
@@ -28,7 +29,8 @@ MessageBox& MessageBox::windowTitle(const QString& title) {
 }
 
 MessageBox& MessageBox::standardButtons(QMessageBox::StandardButtons buttons) {
-    return static_cast<MessageBox&>(setProperty("standardButtons", static_cast<int>(buttons)));
+    return static_cast<MessageBox&>(
+        setProperty("standardButtons", static_cast<int>(buttons)));
 }
 
 MessageBox& MessageBox::defaultButton(QMessageBox::StandardButton button) {
@@ -46,10 +48,12 @@ MessageBox& MessageBox::escapeButton(QMessageBox::StandardButton button) {
 }
 
 MessageBox& MessageBox::textFormat(Qt::TextFormat format) {
-    return static_cast<MessageBox&>(setProperty("textFormat", static_cast<int>(format)));
+    return static_cast<MessageBox&>(
+        setProperty("textFormat", static_cast<int>(format)));
 }
 
-MessageBox& MessageBox::onButtonClicked(std::function<void(QAbstractButton*)> handler) {
+MessageBox& MessageBox::onButtonClicked(
+    std::function<void(QAbstractButton*)> handler) {
     button_clicked_handler_ = std::move(handler);
     return *this;
 }
@@ -67,18 +71,22 @@ void MessageBox::initialize() {
         // Connect signals
         if (button_clicked_handler_) {
             connect(message_box_widget_, &QMessageBox::buttonClicked, this,
-                    [this](QAbstractButton* button) { button_clicked_handler_(button); });
+                    [this](QAbstractButton* button) {
+                        button_clicked_handler_(button);
+                    });
         }
 
         if (finished_handler_) {
-            connect(message_box_widget_, QOverload<int>::of(&QMessageBox::finished), this,
+            connect(message_box_widget_,
+                    QOverload<int>::of(&QMessageBox::finished), this,
                     [this](int result) { finished_handler_(result); });
         }
     }
 }
 
 int MessageBox::exec() {
-    return message_box_widget_ ? message_box_widget_->exec() : QMessageBox::Cancel;
+    return message_box_widget_ ? message_box_widget_->exec()
+                               : QMessageBox::Cancel;
 }
 
 void MessageBox::show() {
@@ -99,40 +107,44 @@ void MessageBox::reject() {
     }
 }
 
-QMessageBox::StandardButton MessageBox::getStandardButton(QAbstractButton* button) const {
-    return message_box_widget_ ? message_box_widget_->standardButton(button) : QMessageBox::NoButton;
+QMessageBox::StandardButton MessageBox::getStandardButton(
+    QAbstractButton* button) const {
+    return message_box_widget_ ? message_box_widget_->standardButton(button)
+                               : QMessageBox::NoButton;
 }
 
-QAbstractButton* MessageBox::getButton(QMessageBox::StandardButton which) const {
+QAbstractButton* MessageBox::getButton(
+    QMessageBox::StandardButton which) const {
     return message_box_widget_ ? message_box_widget_->button(which) : nullptr;
 }
 
 // **Static convenience methods**
-QMessageBox::StandardButton MessageBox::information(QWidget* parent, const QString& title, 
-                                                   const QString& text, 
-                                                   QMessageBox::StandardButtons buttons,
-                                                   QMessageBox::StandardButton defaultButton) {
-    return QMessageBox::information(parent, title, text, buttons, defaultButton);
+QMessageBox::StandardButton MessageBox::information(
+    QWidget* parent, const QString& title, const QString& text,
+    QMessageBox::StandardButtons buttons,
+    QMessageBox::StandardButton defaultButton) {
+    return QMessageBox::information(parent, title, text, buttons,
+                                    defaultButton);
 }
 
-QMessageBox::StandardButton MessageBox::question(QWidget* parent, const QString& title, 
-                                               const QString& text, 
-                                               QMessageBox::StandardButtons buttons,
-                                               QMessageBox::StandardButton defaultButton) {
+QMessageBox::StandardButton MessageBox::question(
+    QWidget* parent, const QString& title, const QString& text,
+    QMessageBox::StandardButtons buttons,
+    QMessageBox::StandardButton defaultButton) {
     return QMessageBox::question(parent, title, text, buttons, defaultButton);
 }
 
-QMessageBox::StandardButton MessageBox::warning(QWidget* parent, const QString& title, 
-                                              const QString& text, 
-                                              QMessageBox::StandardButtons buttons,
-                                              QMessageBox::StandardButton defaultButton) {
+QMessageBox::StandardButton MessageBox::warning(
+    QWidget* parent, const QString& title, const QString& text,
+    QMessageBox::StandardButtons buttons,
+    QMessageBox::StandardButton defaultButton) {
     return QMessageBox::warning(parent, title, text, buttons, defaultButton);
 }
 
-QMessageBox::StandardButton MessageBox::critical(QWidget* parent, const QString& title, 
-                                               const QString& text, 
-                                               QMessageBox::StandardButtons buttons,
-                                               QMessageBox::StandardButton defaultButton) {
+QMessageBox::StandardButton MessageBox::critical(
+    QWidget* parent, const QString& title, const QString& text,
+    QMessageBox::StandardButtons buttons,
+    QMessageBox::StandardButton defaultButton) {
     return QMessageBox::critical(parent, title, text, buttons, defaultButton);
 }
 

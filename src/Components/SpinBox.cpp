@@ -52,8 +52,7 @@ SpinBox& SpinBox::onValueChanged(std::function<void(int)> handler) {
     return *this;
 }
 
-SpinBox& SpinBox::onTextChanged(
-    std::function<void(const QString&)> handler) {
+SpinBox& SpinBox::onTextChanged(std::function<void(const QString&)> handler) {
     text_changed_handler_ = std::move(handler);
     return *this;
 }
@@ -167,7 +166,5 @@ void SpinBox::clear() {
         spinbox_widget_->clear();
     }
 }
-
-
 
 }  // namespace DeclarativeUI::Components

@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <QWidget>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QLabel>
 #include <QButtonGroup>
-#include <QPropertyAnimation>
 #include <QGraphicsDropShadowEffect>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPropertyAnimation>
+#include <QPushButton>
+#include <QWidget>
 #include <memory>
 
 /**
@@ -22,8 +22,9 @@ struct NavigationItem {
     QString icon;
     QString tooltip;
     bool enabled;
-    
-    NavigationItem(const QString& n, const QString& i, const QString& t, bool e = true)
+
+    NavigationItem(const QString& n, const QString& i, const QString& t,
+                   bool e = true)
         : name(n), icon(i), tooltip(t), enabled(e) {}
 };
 
@@ -35,13 +36,14 @@ class NavigationBar : public QWidget {
 
 public:
     explicit NavigationBar(QWidget* parent = nullptr);
-    
+
     // Navigation management
-    void addItem(const QString& name, const QString& icon, const QString& tooltip);
+    void addItem(const QString& name, const QString& icon,
+                 const QString& tooltip);
     void removeItem(int index);
     void setCurrentIndex(int index);
     int currentIndex() const;
-    
+
     // Styling
     void setAnimationEnabled(bool enabled);
     void setHighlightColor(const QColor& color);
@@ -65,17 +67,17 @@ private:
     QHBoxLayout* layout_;
     QButtonGroup* button_group_;
     QWidget* highlight_indicator_;
-    
+
     // Navigation items
     std::vector<NavigationItem> items_;
     std::vector<QPushButton*> buttons_;
-    
+
     // State
     int current_index_;
     bool animation_enabled_;
     QColor highlight_color_;
     QColor background_color_;
-    
+
     // Animation
     std::unique_ptr<QPropertyAnimation> highlight_animation_;
 };

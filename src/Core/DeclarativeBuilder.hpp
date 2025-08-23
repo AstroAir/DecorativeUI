@@ -148,6 +148,38 @@ public:
                              std::function<PropertyValue()> binding);
 
     /**
+     * @brief Register lifecycle hooks for component management.
+     *
+     * These methods provide a fluent interface for registering lifecycle hooks
+     * that will be called at appropriate times during the component's lifetime.
+     *
+     * @param hook Function to call during the lifecycle event.
+     * @return reference to *this for fluent chaining.
+     */
+    DeclarativeBuilder &onMount(std::function<void()> hook);
+    DeclarativeBuilder &onUnmount(std::function<void()> hook);
+    DeclarativeBuilder &onUpdate(std::function<void()> hook);
+    DeclarativeBuilder &onError(std::function<void(const QString &)> hook);
+    DeclarativeBuilder &useEffect(
+        std::function<std::function<void()>()> effect,
+        const std::vector<QVariant> &dependencies = {});
+
+    /**
+     * @brief Add conditional rendering support.
+     *
+     * Provides conditional rendering functionality that shows/hides child
+     * widgets based on conditions, similar to React's conditional rendering.
+     *
+     * @param condition Function that returns true/false for rendering decision.
+     * @param config Configuration function for the child widget.
+     * @return reference to *this for fluent chaining.
+     */
+    template <typename ChildType>
+    DeclarativeBuilder &conditionalChild(
+        std::function<bool()> condition,
+        std::function<void(DeclarativeBuilder<ChildType> &)> config);
+
+    /**
      * @brief Add a child widget using a nested builder configuration.
      *
      * The provided config function receives a builder for the ChildType which
@@ -611,6 +643,108 @@ DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::property(
             "Property setting failed for " + name.toStdString() + ": " +
             e.what());
     }
+}
+
+/**
+ * @brief Lifecycle method implementations for DeclarativeBuilder
+ */
+template <typename WidgetType>
+DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::onMount(
+    std::function<void()> hook) {
+    if (!element_) {
+        throw DeclarativeUI::Exceptions::ComponentCreationException(
+            "UIElement is null");
+    }
+
+    element_->onMount(std::move(hook));
+    return *this;
+}
+
+template <typename WidgetType>
+DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::onUnmount(
+    std::function<void()> hook) {
+    if (!element_) {
+        throw DeclarativeUI::Exceptions::ComponentCreationException(
+            "UIElement is null");
+    }
+
+    element_->onUnmount(std::move(hook));
+    return *this;
+}
+
+template <typename WidgetType>
+DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::onUpdate(
+    std::function<void()> hook) {
+    if (!element_) {
+        throw DeclarativeUI::Exceptions::ComponentCreationException(
+            "UIElement is null");
+    }
+
+    element_->onUpdate(std::move(hook));
+    return *this;
+}
+
+template <typename WidgetType>
+DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::onError(
+    std::function<void(const QString &)> hook) {
+    if (!element_) {
+        throw DeclarativeUI::Exceptions::ComponentCreationException(
+            "UIElement is null");
+    }
+
+    element_->onError(std::move(hook));
+    return *this;
+}
+
+template <typename WidgetType>
+DeclarativeBuilder<WidgetType> &DeclarativeBuilder<WidgetType>::useEffect(
+    std::function<std::function<void()>()> effect,
+    const std::vector<QVariant> &dependencies) {
+    if (!element_) {
+        throw DeclarativeUI::Exceptions::ComponentCreationException(
+            "UIElement is null");
+    }
+
+    element_->useEffect(std::move(effect), dependencies);
+    return *this;
+}
+
+template <typename WidgetType>
+template <typename ChildType>
+DeclarativeBuilder<WidgetType> &
+DeclarativeBuilder<WidgetType>::conditionalChild(
+    std::function<bool()> condition,
+    std::function<void(DeclarativeBuilder<ChildType> &)> config) {
+    if (!condition || !config) {
+        throw std::invalid_argument(
+            "Condition and config functions cannot be null");
+    }
+
+    // Create a configurator that adds conditional rendering
+    configurators_.emplace_back([condition, config](WidgetType *widget) {
+        try {
+            // Create the conditional child widget
+            DeclarativeBuilder<ChildType> child_builder;
+            config(child_builder);
+
+            // Only build and add if condition is true
+            if (condition()) {
+                auto child_widget = child_builder.build();
+                if (child_widget) {
+                    child_widget->setParent(widget);
+
+                    // Add to layout if widget has one
+                    if (auto layout = widget->layout()) {
+                        layout->addWidget(child_widget.release());
+                    }
+                }
+            }
+        } catch (const std::exception &e) {
+            qWarning() << "Conditional child creation failed:" << e.what();
+        }
+    });
+
+    return *this;
 }
 
 }  // namespace DeclarativeUI::Core

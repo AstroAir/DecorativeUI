@@ -5,39 +5,39 @@
  * @brief Comprehensive showcase of all advanced DeclarativeUI components
  */
 
-#include <QMainWindow>
-#include <QTabWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QWidget>
-#include <QLabel>
-#include <QPushButton>
-#include <QLineEdit>
-#include <QTextEdit>
-#include <QSpinBox>
 #include <QCheckBox>
-#include <QComboBox>
-#include <QGroupBox>
-#include <QSplitter>
-#include <QTreeWidget>
-#include <QListWidget>
-#include <QTableWidget>
-#include <QProgressBar>
-#include <QSlider>
-#include <QDateEdit>
-#include <QTimeEdit>
 #include <QColorDialog>
-#include <QFileDialog>
-#include <QMenuBar>
-#include <QStatusBar>
-#include <QToolBar>
+#include <QComboBox>
+#include <QDateEdit>
 #include <QDockWidget>
+#include <QFileDialog>
+#include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QMainWindow>
+#include <QMenuBar>
+#include <QProgressBar>
+#include <QPushButton>
 #include <QScrollArea>
+#include <QSlider>
+#include <QSpinBox>
+#include <QSplitter>
+#include <QStatusBar>
+#include <QTabWidget>
+#include <QTableWidget>
+#include <QTextEdit>
+#include <QTimeEdit>
+#include <QToolBar>
+#include <QTreeWidget>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <memory>
 
 // Include advanced components
-#include "../../../src/Components/Advanced/SearchBox.hpp"
 #include "../../../src/Components/Advanced/DataTable.hpp"
+#include "../../../src/Components/Advanced/SearchBox.hpp"
 
 using namespace DeclarativeUI::Components::Advanced;
 
@@ -70,7 +70,7 @@ private:
     void setupToolBar();
     void setupStatusBar();
     void setupDockWidgets();
-    
+
     // **Component Demos**
     QWidget* createSearchBoxDemo();
     QWidget* createDataTableDemo();
@@ -82,28 +82,32 @@ private:
     QWidget* createDateTimePickerDemo();
     QWidget* createIntegrationDemo();
     QWidget* createPerformanceDemo();
-    
+
     // **Helper Methods**
-    QWidget* createDemoSection(const QString& title, const QString& description, QWidget* demo_widget);
-    void addDemoTab(const QString& title, const QString& icon_path, QWidget* content);
-    void showComponentInfo(const QString& component_name, const QString& description, const QStringList& features);
-    
+    QWidget* createDemoSection(const QString& title, const QString& description,
+                               QWidget* demo_widget);
+    void addDemoTab(const QString& title, const QString& icon_path,
+                    QWidget* content);
+    void showComponentInfo(const QString& component_name,
+                           const QString& description,
+                           const QStringList& features);
+
     // **Main Components**
     QTabWidget* main_tabs_;
     QTextEdit* info_panel_;
     QTreeWidget* component_tree_;
     QListWidget* feature_list_;
-    
+
     // **Demo Components**
     std::unique_ptr<SearchBox> demo_search_box_;
     std::unique_ptr<DataTable> demo_data_table_;
-    
+
     // **Status and Info**
     QLabel* status_label_;
     QProgressBar* demo_progress_;
     QPushButton* reset_button_;
     QPushButton* export_button_;
-    
+
     // **Sample Data**
     void setupSampleData();
     QStringList sample_search_data_;
@@ -118,14 +122,15 @@ class ComponentInfoWidget : public QWidget {
 
 public:
     explicit ComponentInfoWidget(QWidget* parent = nullptr);
-    
-    void setComponentInfo(const QString& name, const QString& description, 
-                         const QStringList& features, const QString& usage_example);
+
+    void setComponentInfo(const QString& name, const QString& description,
+                          const QStringList& features,
+                          const QString& usage_example);
     void clearInfo();
 
 private:
     void setupUI();
-    
+
     QLabel* name_label_;
     QTextEdit* description_text_;
     QListWidget* features_list_;
@@ -140,10 +145,11 @@ class PerformanceMonitor : public QWidget {
 
 public:
     explicit PerformanceMonitor(QWidget* parent = nullptr);
-    
+
     void startMonitoring();
     void stopMonitoring();
-    void recordMetric(const QString& component, const QString& operation, qint64 duration_ms);
+    void recordMetric(const QString& component, const QString& operation,
+                      qint64 duration_ms);
 
 signals:
     void performanceAlert(const QString& message);
@@ -153,12 +159,12 @@ private slots:
 
 private:
     void setupUI();
-    
+
     QTableWidget* metrics_table_;
     QLabel* memory_usage_;
     QLabel* cpu_usage_;
     QProgressBar* performance_bar_;
-    
+
     QTimer* update_timer_;
     QMap<QString, QList<qint64>> performance_data_;
 };
@@ -180,7 +186,7 @@ private slots:
 private:
     void setupUI();
     void connectComponents();
-    
+
     std::unique_ptr<SearchBox> search_component_;
     std::unique_ptr<DataTable> table_component_;
     QTextEdit* details_panel_;
@@ -195,15 +201,18 @@ class SampleDataModel : public QAbstractTableModel {
 
 public:
     explicit SampleDataModel(QObject* parent = nullptr);
-    
+
     // QAbstractTableModel interface
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+    QVariant data(const QModelIndex& index,
+                  int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation,
+                        int role = Qt::DisplayRole) const override;
+    bool setData(const QModelIndex& index, const QVariant& value,
+                 int role = Qt::EditRole) override;
     Qt::ItemFlags flags(const QModelIndex& index) const override;
-    
+
     // Custom methods
     void addSampleData();
     void clearData();
@@ -220,7 +229,7 @@ private:
         bool active;
         double salary;
     };
-    
+
     QList<SampleRow> sample_data_;
     QStringList headers_;
 };
@@ -243,11 +252,11 @@ private slots:
 private:
     void setupUI();
     void applyTheme(const QString& theme_name);
-    
+
     QComboBox* theme_combo_;
     QLabel* preview_label_;
     QPushButton* apply_button_;
-    
+
     QMap<QString, QString> available_themes_;
 };
 
@@ -259,9 +268,11 @@ class CodeExampleViewer : public QWidget {
 
 public:
     explicit CodeExampleViewer(QWidget* parent = nullptr);
-    
-    void setExample(const QString& title, const QString& code, const QString& description);
-    void addExample(const QString& title, const QString& code, const QString& description);
+
+    void setExample(const QString& title, const QString& code,
+                    const QString& description);
+    void addExample(const QString& title, const QString& code,
+                    const QString& description);
     void clearExamples();
 
 private slots:
@@ -271,18 +282,18 @@ private slots:
 private:
     void setupUI();
     void highlightCode();
-    
+
     QComboBox* example_selector_;
     QTextEdit* code_display_;
     QTextEdit* description_display_;
     QPushButton* copy_button_;
     QPushButton* run_button_;
-    
+
     struct CodeExample {
         QString title;
         QString code;
         QString description;
     };
-    
+
     QList<CodeExample> examples_;
 };

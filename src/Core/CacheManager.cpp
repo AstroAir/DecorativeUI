@@ -1,3 +1,25 @@
+/**
+ * @file CacheManager.cpp
+ * @brief Implementation of thread-safe LRU cache system for DeclarativeUI
+ *
+ * This file provides the implementation of a comprehensive caching system
+ * with LRU eviction, memory management, expiration handling, and thread safety.
+ * The cache supports multiple data types and provides statistics for
+ * monitoring.
+ *
+ * Key features:
+ * - Thread-safe operations with shared/exclusive locking
+ * - Memory-aware caching with configurable limits
+ * - Automatic expiration and cleanup
+ * - LRU eviction policy
+ * - Comprehensive statistics collection
+ * - Batch operations for performance
+ *
+ * @author DeclarativeUI Team
+ * @version 1.0
+ * @date 2024
+ */
+
 #include "CacheManager.hpp"
 
 #include <QDebug>
@@ -7,7 +29,24 @@
 
 namespace DeclarativeUI::Core {
 
-// **LRUCache template implementation**
+/**
+ * @brief LRU Cache template implementation with memory management
+ *
+ * This section contains the template implementations for the LRUCache class,
+ * providing thread-safe caching operations with automatic memory management
+ * and eviction policies.
+ */
+
+/**
+ * @brief Construct a new LRUCache with size and memory limits
+ * @tparam Key Cache key type
+ * @tparam Value Cache value type
+ * @param max_size Maximum number of entries in the cache
+ * @param max_memory_mb Maximum memory usage in megabytes
+ *
+ * Initializes the cache with the specified limits. The cache will automatically
+ * evict entries when these limits are exceeded.
+ */
 template <typename Key, typename Value>
 LRUCache<Key, Value>::LRUCache(size_t max_size, size_t max_memory_mb)
     : max_size_(max_size), max_memory_bytes_(max_memory_mb * 1024 * 1024) {}
@@ -56,12 +95,21 @@ bool LRUCache<Key, Value>::put(const Key& key, const Value& value,
     return true;
 }
 
+/**
+ * @brief Retrieve a value from the cache with thread-safe access
+ * @param key The cache key to look up
+ * @return Optional value if found and not expired, nullopt otherwise
+ *
+ * This function implements thread-safe cache retrieval with proper lock
+ * management and expiration handling. The logic is broken down into
+ * smaller helper functions for better maintainability.
+ */
 template <typename Key, typename Value>
 std::optional<Value> LRUCache<Key, Value>::get(const Key& key) {
     std::shared_lock<std::shared_mutex> lock(mutex_);
-
     statistics_.total_requests.fetch_add(1);
 
+    // Check if key exists in cache
     auto it = cache_.find(key);
     if (it == cache_.end()) {
         statistics_.cache_misses.fetch_add(1);
@@ -70,27 +118,47 @@ std::optional<Value> LRUCache<Key, Value>::get(const Key& key) {
 
     auto& entry = it->second;
 
-    // Check if expired
+    // Handle expired entries
     if (entry->isExpired()) {
-        lock.unlock();
-        std::unique_lock<std::shared_mutex> write_lock(mutex_);
-        auto it_recheck = cache_.find(key);  // Re-find after lock upgrade
-        if (it_recheck != cache_.end()) {
-            statistics_.total_memory_usage.fetch_sub(
-                it_recheck->second->memory_size.load());
-            cache_.erase(it_recheck);
-            // Remove from access order
-            auto access_it = access_iterators_.find(key);
-            if (access_it != access_iterators_.end()) {
-                access_order_.erase(access_it->second);
-                access_iterators_.erase(access_it);
-            }
-        }
-        statistics_.cache_misses.fetch_add(1);
-        return std::nullopt;
+        return handleExpiredEntry(key, lock);
     }
 
-    // Need to upgrade to exclusive lock for updating access order
+    // Update access information and return value
+    return updateAccessAndReturn(key, lock);
+}
+
+/**
+ * @brief Handle expired cache entries with proper cleanup
+ * @param key The cache key for the expired entry
+ * @param lock The current shared lock (will be upgraded to exclusive)
+ * @return nullopt as the entry is expired
+ */
+template <typename Key, typename Value>
+std::optional<Value> LRUCache<Key, Value>::handleExpiredEntry(
+    const Key& key, std::shared_lock<std::shared_mutex>& lock) {
+    lock.unlock();
+    std::unique_lock<std::shared_mutex> write_lock(mutex_);
+
+    // Re-find after lock upgrade to ensure consistency
+    auto it_recheck = cache_.find(key);
+    if (it_recheck != cache_.end()) {
+        removeExpiredEntry(key, it_recheck);
+    }
+
+    statistics_.cache_misses.fetch_add(1);
+    return std::nullopt;
+}
+
+/**
+ * @brief Update access information and return cached value
+ * @param key The cache key
+ * @param lock The current shared lock (will be upgraded to exclusive)
+ * @return The cached value if still valid
+ */
+template <typename Key, typename Value>
+std::optional<Value> LRUCache<Key, Value>::updateAccessAndReturn(
+    const Key& key, std::shared_lock<std::shared_mutex>& lock) {
+    // Upgrade to exclusive lock for updating access order
     lock.unlock();
     std::unique_lock<std::shared_mutex> write_lock(mutex_);
 
@@ -107,6 +175,27 @@ std::optional<Value> LRUCache<Key, Value>::get(const Key& key) {
 
     statistics_.cache_hits.fetch_add(1);
     return it_recheck->second->data;
+}
+
+/**
+ * @brief Remove an expired entry from cache and access tracking
+ * @param key The cache key to remove
+ * @param it Iterator pointing to the cache entry
+ */
+template <typename Key, typename Value>
+void LRUCache<Key, Value>::removeExpiredEntry(
+    const Key& key,
+    typename std::unordered_map<Key, std::shared_ptr<CacheEntryType>>::iterator
+        it) {
+    statistics_.total_memory_usage.fetch_sub(it->second->memory_size.load());
+    cache_.erase(it);
+
+    // Remove from access order tracking
+    auto access_it = access_iterators_.find(key);
+    if (access_it != access_iterators_.end()) {
+        access_order_.erase(access_it->second);
+        access_iterators_.erase(access_it);
+    }
 }
 
 template <typename Key, typename Value>

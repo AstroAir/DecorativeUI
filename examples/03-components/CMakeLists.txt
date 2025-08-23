@@ -82,4 +82,3 @@ set_target_properties(NewComponentsExample PROPERTIES
 )
 
 message(STATUS "Component examples configured")
-

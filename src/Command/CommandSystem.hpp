@@ -364,7 +364,7 @@ public:
         const CommandContext& context) = 0;
 
     CommandResult<QVariant> execute(
-        const CommandContext& context) override final ;
+        const CommandContext& context) override final;
 };
 
 // **Command with transactional support**
@@ -398,23 +398,23 @@ public:
 
     CommandResult<QVariant> execute(const CommandContext& context) override;
 
-    CommandResult<QVariant> undo(const CommandContext& context) override ;
+    CommandResult<QVariant> undo(const CommandContext& context) override;
 
-    CommandMetadata getMetadata() const override ;
+    CommandMetadata getMetadata() const override;
 
 protected:
     std::vector<std::unique_ptr<ICommand>> commands_;
 
-    CommandResult<QVariant> rollbackCommands(const CommandContext& context) ;
+    CommandResult<QVariant> rollbackCommands(const CommandContext& context);
 };
 
 // **Command factory with modern registration system**
 class CommandFactory {
 public:
-    static CommandFactory& instance() ;
+    static CommandFactory& instance();
 
-    std::unique_ptr<ICommand> createCommand(
-        const QString& command_name, const CommandContext& context = {}) ;
+    std::unique_ptr<ICommand> createCommand(const QString& command_name,
+                                            const CommandContext& context = {});
 
     void registerCommand(
         const QString& command_name,
@@ -577,22 +577,22 @@ private:
 
 // **Forward declarations for UI Command system**
 namespace DeclarativeUI::Command::UI {
-    class BaseUICommand;
-    class UICommandMetadata;
-    class UICommandState;
-    class WidgetMapper;
-    class UICommandFactory;
-}
+class BaseUICommand;
+class UICommandMetadata;
+class UICommandState;
+class WidgetMapper;
+class UICommandFactory;
+}  // namespace DeclarativeUI::Command::UI
 
+#include "CommandBinding.hpp"
+#include "CommandBuilder.hpp"
+#include "CommandEvents.hpp"
+#include "CoreCommands.hpp"
+#include "MVCIntegration.hpp"
+#include "SpecializedCommands.hpp"
 #include "UICommand.hpp"
 #include "UICommandFactory.hpp"
 #include "WidgetMapper.hpp"
-#include "CoreCommands.hpp"
-#include "SpecializedCommands.hpp"
-#include "CommandBuilder.hpp"
-#include "CommandBinding.hpp"
-#include "MVCIntegration.hpp"
-#include "CommandEvents.hpp"
 
 Q_DECLARE_METATYPE(DeclarativeUI::Command::CommandState)
 Q_DECLARE_METATYPE(DeclarativeUI::Command::CommandPriority)

@@ -1,27 +1,23 @@
 #include "DataTable.hpp"
 
 #include <QApplication>
+#include <QDebug>
+#include <QFileDialog>
 #include <QHeaderView>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QMessageBox>
 #include <QScrollBar>
 #include <QSplitter>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
 #include <QTextStream>
-#include <QDebug>
 
 #include "../../Exceptions/UIExceptions.hpp"
 
 namespace DeclarativeUI::Components::Advanced {
 
 DataTable::DataTable(QObject* parent)
-    : Core::UIElement(parent)
-    , config_()
-    , source_model_(nullptr)
-{
-}
+    : Core::UIElement(parent), config_(), source_model_(nullptr) {}
 
 DataTable& DataTable::model(QAbstractItemModel* model) {
     source_model_ = model;
@@ -61,9 +57,10 @@ DataTable& DataTable::filterable(bool enabled) {
 DataTable& DataTable::editable(bool enabled) {
     config_.editable = enabled;
     if (table_view_) {
-        table_view_->setEditTriggers(enabled ?
-            QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed :
-            QAbstractItemView::NoEditTriggers);
+        table_view_->setEditTriggers(enabled
+                                         ? QAbstractItemView::DoubleClicked |
+                                               QAbstractItemView::EditKeyPressed
+                                         : QAbstractItemView::NoEditTriggers);
     }
     return *this;
 }
@@ -71,9 +68,9 @@ DataTable& DataTable::editable(bool enabled) {
 DataTable& DataTable::selectable(bool enabled) {
     config_.selectable = enabled;
     if (table_view_) {
-        table_view_->setSelectionMode(enabled ?
-            QAbstractItemView::ExtendedSelection :
-            QAbstractItemView::NoSelection);
+        table_view_->setSelectionMode(enabled
+                                          ? QAbstractItemView::ExtendedSelection
+                                          : QAbstractItemView::NoSelection);
     }
     return *this;
 }
@@ -81,9 +78,9 @@ DataTable& DataTable::selectable(bool enabled) {
 DataTable& DataTable::multiSelect(bool enabled) {
     config_.multi_select = enabled;
     if (table_view_) {
-        table_view_->setSelectionMode(enabled ?
-            QAbstractItemView::ExtendedSelection :
-            QAbstractItemView::SingleSelection);
+        table_view_->setSelectionMode(enabled
+                                          ? QAbstractItemView::ExtendedSelection
+                                          : QAbstractItemView::SingleSelection);
     }
     return *this;
 }
@@ -128,7 +125,8 @@ DataTable& DataTable::onRowSelected(std::function<void(int)> handler) {
     return *this;
 }
 
-DataTable& DataTable::onRowsSelected(std::function<void(const QList<int>&)> handler) {
+DataTable& DataTable::onRowsSelected(
+    std::function<void(const QList<int>&)> handler) {
     rows_selected_handler_ = std::move(handler);
     return *this;
 }
@@ -138,54 +136,62 @@ DataTable& DataTable::onCellClicked(std::function<void(int, int)> handler) {
     return *this;
 }
 
-DataTable& DataTable::onCellDoubleClicked(std::function<void(int, int)> handler) {
+DataTable& DataTable::onCellDoubleClicked(
+    std::function<void(int, int)> handler) {
     cell_double_clicked_handler_ = std::move(handler);
     return *this;
 }
 
-DataTable& DataTable::onCellEdited(std::function<void(int, int, const QVariant&)> handler) {
+DataTable& DataTable::onCellEdited(
+    std::function<void(int, int, const QVariant&)> handler) {
     cell_edited_handler_ = std::move(handler);
     return *this;
 }
 
-DataTable& DataTable::onSortChanged(std::function<void(int, Qt::SortOrder)> handler) {
+DataTable& DataTable::onSortChanged(
+    std::function<void(int, Qt::SortOrder)> handler) {
     sort_changed_handler_ = std::move(handler);
     return *this;
 }
 
-DataTable& DataTable::onFilterChanged(std::function<void(const QString&)> handler) {
+DataTable& DataTable::onFilterChanged(
+    std::function<void(const QString&)> handler) {
     filter_changed_handler_ = std::move(handler);
     return *this;
 }
 
-DataTable& DataTable::onSelectionChanged(std::function<void(const DataTableSelection&)> handler) {
+DataTable& DataTable::onSelectionChanged(
+    std::function<void(const DataTableSelection&)> handler) {
     selection_changed_handler_ = std::move(handler);
     return *this;
 }
 
-DataTable& DataTable::onBulkOperation(std::function<void(const QString&, const QList<int>&)> handler) {
+DataTable& DataTable::onBulkOperation(
+    std::function<void(const QString&, const QList<int>&)> handler) {
     bulk_operation_handler_ = std::move(handler);
     return *this;
 }
 
-DataTable& DataTable::cellRenderer(const QString& column, std::function<QWidget*(const QVariant&, QWidget*)> renderer) {
+DataTable& DataTable::cellRenderer(
+    const QString& column,
+    std::function<QWidget*(const QVariant&, QWidget*)> renderer) {
     cell_renderers_[column] = std::move(renderer);
     return *this;
 }
 
-DataTable& DataTable::editorFactory(const QString& column, std::function<QWidget*(QWidget*)> factory) {
+DataTable& DataTable::editorFactory(const QString& column,
+                                    std::function<QWidget*(QWidget*)> factory) {
     editor_factories_[column] = std::move(factory);
     return *this;
 }
 
-DataTable& DataTable::columnValidator(const QString& column, std::function<bool(const QVariant&)> validator) {
+DataTable& DataTable::columnValidator(
+    const QString& column, std::function<bool(const QVariant&)> validator) {
     column_validators_[column] = std::move(validator);
     return *this;
 }
 
-QAbstractItemModel* DataTable::getModel() const {
-    return source_model_;
-}
+QAbstractItemModel* DataTable::getModel() const { return source_model_; }
 
 void DataTable::setModel(QAbstractItemModel* model) {
     source_model_ = model;
@@ -201,9 +207,8 @@ void DataTable::addColumn(const DataTableColumn& column) {
 }
 
 void DataTable::removeColumn(const QString& key) {
-    columns_.removeIf([&key](const DataTableColumn& col) {
-        return col.key == key;
-    });
+    columns_.removeIf(
+        [&key](const DataTableColumn& col) { return col.key == key; });
     updateColumns();
 }
 
@@ -245,9 +250,7 @@ void DataTable::setFilter(const QString& filter) {
     updateStatusBar();
 }
 
-void DataTable::clearFilter() {
-    setFilter("");
-}
+void DataTable::clearFilter() { setFilter(""); }
 
 DataTableSelection DataTable::getSelection() const {
     return current_selection_;
@@ -275,7 +278,8 @@ void DataTable::clearSelection() {
 }
 
 void DataTable::exportData(const QString& format, const QString& filename) {
-    if (!source_model_) return;
+    if (!source_model_)
+        return;
 
     if (format.toLower() == "csv") {
         exportToCSV(filename);
@@ -303,7 +307,8 @@ void DataTable::initialize() {
 
         qDebug() << "✅ DataTable initialized successfully";
     } catch (const std::exception& e) {
-        throw Exceptions::UIException("Failed to initialize DataTable: " + std::string(e.what()));
+        throw Exceptions::UIException("Failed to initialize DataTable: " +
+                                      std::string(e.what()));
     }
 }
 
@@ -345,25 +350,28 @@ void DataTable::setupUI() {
 }
 
 void DataTable::setupTableView() {
-    if (!table_view_) return;
+    if (!table_view_)
+        return;
 
     // Configure table view
     table_view_->setSortingEnabled(config_.sortable);
     table_view_->setAlternatingRowColors(config_.alternating_rows);
     table_view_->setShowGrid(config_.show_grid);
     table_view_->setSelectionBehavior(QAbstractItemView::SelectRows);
-    table_view_->setSelectionMode(config_.multi_select ?
-        QAbstractItemView::ExtendedSelection :
-        QAbstractItemView::SingleSelection);
-    table_view_->setEditTriggers(config_.editable ?
-        QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed :
-        QAbstractItemView::NoEditTriggers);
+    table_view_->setSelectionMode(config_.multi_select
+                                      ? QAbstractItemView::ExtendedSelection
+                                      : QAbstractItemView::SingleSelection);
+    table_view_->setEditTriggers(config_.editable
+                                     ? QAbstractItemView::DoubleClicked |
+                                           QAbstractItemView::EditKeyPressed
+                                     : QAbstractItemView::NoEditTriggers);
 
     // Configure headers
     QHeaderView* horizontal_header = table_view_->horizontalHeader();
     horizontal_header->setStretchLastSection(true);
-    horizontal_header->setSectionResizeMode(config_.resizable_columns ?
-        QHeaderView::Interactive : QHeaderView::Fixed);
+    horizontal_header->setSectionResizeMode(config_.resizable_columns
+                                                ? QHeaderView::Interactive
+                                                : QHeaderView::Fixed);
     horizontal_header->setSectionsMovable(config_.reorderable_columns);
 
     QHeaderView* vertical_header = table_view_->verticalHeader();
@@ -373,12 +381,13 @@ void DataTable::setupTableView() {
     // Set custom delegate
     auto* delegate = new DataTableItemDelegate(this);
     table_view_->setItemDelegate(delegate);
-    connect(delegate, &DataTableItemDelegate::cellEdited,
-            this, &DataTable::cellEdited);
+    connect(delegate, &DataTableItemDelegate::cellEdited, this,
+            &DataTable::cellEdited);
 }
 
 void DataTable::setupToolbar() {
-    if (!toolbar_) return;
+    if (!toolbar_)
+        return;
 
     // Filter input
     if (config_.filterable) {
@@ -405,21 +414,25 @@ void DataTable::setupToolbar() {
         toolbar_->addSeparator();
         auto* bulk_actions_button = new QPushButton("Actions");
         bulk_actions_menu_ = new QMenu();
-        bulk_actions_menu_->addAction("Delete Selected", this, &DataTable::onBulkActionTriggered);
-        bulk_actions_menu_->addAction("Export Selected", this, &DataTable::onBulkActionTriggered);
+        bulk_actions_menu_->addAction("Delete Selected", this,
+                                      &DataTable::onBulkActionTriggered);
+        bulk_actions_menu_->addAction("Export Selected", this,
+                                      &DataTable::onBulkActionTriggered);
         bulk_actions_button->setMenu(bulk_actions_menu_);
         toolbar_->addWidget(bulk_actions_button);
     }
 }
 
 void DataTable::setupStatusBar() {
-    if (!status_container_ || !status_label_) return;
+    if (!status_container_ || !status_label_)
+        return;
 
     updateStatusBar();
 }
 
 void DataTable::setupPagination() {
-    if (!pagination_container_) return;
+    if (!pagination_container_)
+        return;
 
     // TODO: Implement pagination controls
     updatePagination();
@@ -428,14 +441,15 @@ void DataTable::setupPagination() {
 void DataTable::setupEventHandlers() {
     if (table_view_) {
         // Selection changes
-        connect(table_view_->selectionModel(), &QItemSelectionModel::selectionChanged,
-                this, &DataTable::onTableSelectionChanged);
+        connect(table_view_->selectionModel(),
+                &QItemSelectionModel::selectionChanged, this,
+                &DataTable::onTableSelectionChanged);
 
         // Cell clicks
-        connect(table_view_.get(), &QTableView::clicked,
-                this, &DataTable::onTableCellClicked);
-        connect(table_view_.get(), &QTableView::doubleClicked,
-                this, &DataTable::onTableCellDoubleClicked);
+        connect(table_view_.get(), &QTableView::clicked, this,
+                &DataTable::onTableCellClicked);
+        connect(table_view_.get(), &QTableView::doubleClicked, this,
+                &DataTable::onTableCellDoubleClicked);
 
         // Header clicks for sorting
         connect(table_view_->horizontalHeader(), &QHeaderView::sectionClicked,
@@ -443,13 +457,15 @@ void DataTable::setupEventHandlers() {
     }
 
     if (filter_input_) {
-        connect(filter_input_, &QLineEdit::textChanged,
-                this, &DataTable::onFilterTextChanged);
+        connect(filter_input_, &QLineEdit::textChanged, this,
+                &DataTable::onFilterTextChanged);
     }
 
     if (export_button_) {
         connect(export_button_, &QPushButton::clicked, [this]() {
-            QString filename = QFileDialog::getSaveFileName(nullptr, "Export Data", "", "CSV Files (*.csv);;JSON Files (*.json)");
+            QString filename = QFileDialog::getSaveFileName(
+                nullptr, "Export Data", "",
+                "CSV Files (*.csv);;JSON Files (*.json)");
             if (!filename.isEmpty()) {
                 QString format = filename.endsWith(".json") ? "json" : "csv";
                 exportData(format, filename);
@@ -458,7 +474,8 @@ void DataTable::setupEventHandlers() {
     }
 
     if (refresh_button_) {
-        connect(refresh_button_, &QPushButton::clicked, this, &DataTable::refresh);
+        connect(refresh_button_, &QPushButton::clicked, this,
+                &DataTable::refresh);
     }
 }
 
@@ -521,7 +538,8 @@ void DataTable::onTableSelectionChanged() {
 }
 
 void DataTable::onTableCellClicked(const QModelIndex& index) {
-    if (!index.isValid()) return;
+    if (!index.isValid())
+        return;
 
     int row = index.row();
     int column = index.column();
@@ -533,7 +551,8 @@ void DataTable::onTableCellClicked(const QModelIndex& index) {
 }
 
 void DataTable::onTableCellDoubleClicked(const QModelIndex& index) {
-    if (!index.isValid()) return;
+    if (!index.isValid())
+        return;
 
     int row = index.row();
     int column = index.column();
@@ -545,11 +564,13 @@ void DataTable::onTableCellDoubleClicked(const QModelIndex& index) {
 }
 
 void DataTable::onHeaderSectionClicked(int logical_index) {
-    if (!proxy_model_) return;
+    if (!proxy_model_)
+        return;
 
     Qt::SortOrder order = proxy_model_->sortOrder();
     if (proxy_model_->sortColumn() == logical_index) {
-        order = (order == Qt::AscendingOrder) ? Qt::DescendingOrder : Qt::AscendingOrder;
+        order = (order == Qt::AscendingOrder) ? Qt::DescendingOrder
+                                              : Qt::AscendingOrder;
     } else {
         order = Qt::AscendingOrder;
     }
@@ -571,7 +592,8 @@ void DataTable::onFilterTextChanged(const QString& text) {
 
 void DataTable::onBulkActionTriggered() {
     auto* action = qobject_cast<QAction*>(sender());
-    if (!action) return;
+    if (!action)
+        return;
 
     QString operation = action->text();
     QList<int> selected_rows = getSelectedRows();
@@ -594,7 +616,8 @@ void DataTable::updateSelection() {
 }
 
 void DataTable::updateStatusBar() {
-    if (!status_label_) return;
+    if (!status_label_)
+        return;
 
     int total_rows = proxy_model_ ? proxy_model_->rowCount() : 0;
     int selected_count = current_selection_.selected_rows.size();
@@ -632,7 +655,8 @@ DataTableColumn* DataTable::getColumn(const QString& key) {
 QList<int> DataTable::getSelectedRows() const {
     QList<int> rows;
     if (table_view_) {
-        QModelIndexList selected = table_view_->selectionModel()->selectedRows();
+        QModelIndexList selected =
+            table_view_->selectionModel()->selectedRows();
         for (const QModelIndex& index : selected) {
             rows.append(index.row());
         }
@@ -659,10 +683,11 @@ void DataTable::exportToJSON(const QString& filename) {
 
 // DataTableItemDelegate implementation
 DataTableItemDelegate::DataTableItemDelegate(DataTable* parent)
-    : QStyledItemDelegate(parent), data_table_(parent) {
-}
+    : QStyledItemDelegate(parent), data_table_(parent) {}
 
-QWidget* DataTableItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const {
+QWidget* DataTableItemDelegate::createEditor(QWidget* parent,
+                                             const QStyleOptionViewItem& option,
+                                             const QModelIndex& index) const {
     Q_UNUSED(option)
 
     // Check for custom editor factory
@@ -673,25 +698,31 @@ QWidget* DataTableItemDelegate::createEditor(QWidget* parent, const QStyleOption
         }
 
         // Use default editor based on data type
-        const QString& data_type = data_table_->columns_[index.column()].data_type;
+        const QString& data_type =
+            data_table_->columns_[index.column()].data_type;
         return createDefaultEditor(data_type, parent);
     }
 
     return QStyledItemDelegate::createEditor(parent, option, index);
 }
 
-void DataTableItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const {
+void DataTableItemDelegate::setEditorData(QWidget* editor,
+                                          const QModelIndex& index) const {
     QStyledItemDelegate::setEditorData(editor, index);
 }
 
-void DataTableItemDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const {
+void DataTableItemDelegate::setModelData(QWidget* editor,
+                                         QAbstractItemModel* model,
+                                         const QModelIndex& index) const {
     QStyledItemDelegate::setModelData(editor, model, index);
 
     // Emit cell edited signal
     emit cellEdited(index.row(), index.column(), index.data());
 }
 
-void DataTableItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const {
+void DataTableItemDelegate::paint(QPainter* painter,
+                                  const QStyleOptionViewItem& option,
+                                  const QModelIndex& index) const {
     // Check for custom cell renderer
     if (data_table_ && index.column() < data_table_->columns_.size()) {
         const QString& column_key = data_table_->columns_[index.column()].key;
@@ -704,11 +735,13 @@ void DataTableItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem&
     QStyledItemDelegate::paint(painter, option, index);
 }
 
-QSize DataTableItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const {
+QSize DataTableItemDelegate::sizeHint(const QStyleOptionViewItem& option,
+                                      const QModelIndex& index) const {
     return QStyledItemDelegate::sizeHint(option, index);
 }
 
-QWidget* DataTableItemDelegate::createDefaultEditor(const QString& data_type, QWidget* parent) const {
+QWidget* DataTableItemDelegate::createDefaultEditor(const QString& data_type,
+                                                    QWidget* parent) const {
     if (data_type == "number") {
         return new QSpinBox(parent);
     } else if (data_type == "date") {
@@ -720,4 +753,4 @@ QWidget* DataTableItemDelegate::createDefaultEditor(const QString& data_type, QW
     }
 }
 
-} // namespace DeclarativeUI::Components::Advanced
+}  // namespace DeclarativeUI::Components::Advanced

@@ -1,8 +1,8 @@
 // Components/FileDialog.hpp
 #pragma once
 #include <QFileDialog>
-#include <QWidget>
 #include <QUrl>
+#include <QWidget>
 
 #include "../Core/UIElement.hpp"
 
@@ -26,7 +26,8 @@ public:
     FileDialog& options(QFileDialog::Options options);
     FileDialog& windowTitle(const QString& title);
     FileDialog& onFileSelected(std::function<void(const QString&)> handler);
-    FileDialog& onFilesSelected(std::function<void(const QStringList&)> handler);
+    FileDialog& onFilesSelected(
+        std::function<void(const QStringList&)> handler);
     FileDialog& onCurrentChanged(std::function<void(const QString&)> handler);
     FileDialog& onDirectoryEntered(std::function<void(const QString&)> handler);
     FileDialog& onFilterSelected(std::function<void(const QString&)> handler);
@@ -42,31 +43,28 @@ public:
     QStringList getNameFilters() const;
 
     // **Static convenience methods**
-    static QString getOpenFileName(QWidget* parent = nullptr,
-                                  const QString& caption = QString(),
-                                  const QString& dir = QString(),
-                                  const QString& filter = QString(),
-                                  QString* selectedFilter = nullptr,
-                                  QFileDialog::Options options = QFileDialog::Options());
+    static QString getOpenFileName(
+        QWidget* parent = nullptr, const QString& caption = QString(),
+        const QString& dir = QString(), const QString& filter = QString(),
+        QString* selectedFilter = nullptr,
+        QFileDialog::Options options = QFileDialog::Options());
 
-    static QStringList getOpenFileNames(QWidget* parent = nullptr,
-                                       const QString& caption = QString(),
-                                       const QString& dir = QString(),
-                                       const QString& filter = QString(),
-                                       QString* selectedFilter = nullptr,
-                                       QFileDialog::Options options = QFileDialog::Options());
+    static QStringList getOpenFileNames(
+        QWidget* parent = nullptr, const QString& caption = QString(),
+        const QString& dir = QString(), const QString& filter = QString(),
+        QString* selectedFilter = nullptr,
+        QFileDialog::Options options = QFileDialog::Options());
 
-    static QString getSaveFileName(QWidget* parent = nullptr,
-                                  const QString& caption = QString(),
-                                  const QString& dir = QString(),
-                                  const QString& filter = QString(),
-                                  QString* selectedFilter = nullptr,
-                                  QFileDialog::Options options = QFileDialog::Options());
+    static QString getSaveFileName(
+        QWidget* parent = nullptr, const QString& caption = QString(),
+        const QString& dir = QString(), const QString& filter = QString(),
+        QString* selectedFilter = nullptr,
+        QFileDialog::Options options = QFileDialog::Options());
 
-    static QString getExistingDirectory(QWidget* parent = nullptr,
-                                       const QString& caption = QString(),
-                                       const QString& dir = QString(),
-                                       QFileDialog::Options options = QFileDialog::ShowDirsOnly);
+    static QString getExistingDirectory(
+        QWidget* parent = nullptr, const QString& caption = QString(),
+        const QString& dir = QString(),
+        QFileDialog::Options options = QFileDialog::ShowDirsOnly);
 
 private:
     QFileDialog* file_dialog_widget_;
@@ -76,7 +74,5 @@ private:
     std::function<void(const QString&)> directory_entered_handler_;
     std::function<void(const QString&)> filter_selected_handler_;
 };
-
-
 
 }  // namespace DeclarativeUI::Components

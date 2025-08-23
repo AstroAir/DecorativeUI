@@ -6,8 +6,8 @@
 #include "ComponentGallery.hpp"
 #include <QApplication>
 #include <QClipboard>
-#include <QMessageBox>
 #include <QDebug>
+#include <QMessageBox>
 
 // Include enhanced components
 #include "../../src/Components/Enhanced/ComponentEnhancer.hpp"
@@ -16,19 +16,18 @@
 using namespace DeclarativeUI::Components;
 
 ComponentGallery::ComponentGallery(QWidget* parent)
-    : QWidget(parent)
-    , main_layout_(nullptr)
-    , splitter_(nullptr)
-    , component_list_(nullptr)
-    , demo_widget_(nullptr)
-    , demo_layout_(nullptr)
-    , demo_group_(nullptr)
-    , current_demo_(nullptr)
-    , code_group_(nullptr)
-    , code_viewer_(nullptr)
-    , copy_button_(nullptr)
-    , current_component_("")
-{
+    : QWidget(parent),
+      main_layout_(nullptr),
+      splitter_(nullptr),
+      component_list_(nullptr),
+      demo_widget_(nullptr),
+      demo_layout_(nullptr),
+      demo_group_(nullptr),
+      current_demo_(nullptr),
+      code_group_(nullptr),
+      code_viewer_(nullptr),
+      copy_button_(nullptr),
+      current_component_("") {
     setupUI();
     createComponentList();
     createComponentDemo();
@@ -57,11 +56,10 @@ void ComponentGallery::createComponentList() {
 
     // Add all available components
     QStringList components = {
-        "Button", "LineEdit", "CheckBox", "ComboBox", "Label",
-        "ProgressBar", "Slider", "SpinBox", "TextEdit", "RadioButton",
-        "GroupBox", "TabWidget", "ScrollArea", "Splitter", "Calendar",
-        "DateTimeEdit", "Dial", "LCDNumber", "TableView", "ListView"
-    };
+        "Button",       "LineEdit",  "CheckBox",   "ComboBox",  "Label",
+        "ProgressBar",  "Slider",    "SpinBox",    "TextEdit",  "RadioButton",
+        "GroupBox",     "TabWidget", "ScrollArea", "Splitter",  "Calendar",
+        "DateTimeEdit", "Dial",      "LCDNumber",  "TableView", "ListView"};
 
     for (const QString& component : components) {
         component_list_->addItem(component);
@@ -69,7 +67,8 @@ void ComponentGallery::createComponentList() {
 
     connect(component_list_, &QListWidget::itemClicked,
             [this](QListWidgetItem* item) {
-                if (item) onComponentSelected(item->text());
+                if (item)
+                    onComponentSelected(item->text());
             });
 
     splitter_->addWidget(component_list_);
@@ -95,7 +94,8 @@ void ComponentGallery::createCodeViewer() {
     code_viewer_->setMaximumHeight(200);
 
     copy_button_ = new QPushButton("Copy Code");
-    connect(copy_button_, &QPushButton::clicked, this, &ComponentGallery::onCodeCopyRequested);
+    connect(copy_button_, &QPushButton::clicked, this,
+            &ComponentGallery::onCodeCopyRequested);
 
     code_layout->addWidget(code_viewer_);
     code_layout->addWidget(copy_button_);
@@ -125,14 +125,17 @@ void ComponentGallery::showComponent(const QString& name) {
         // Basic button with enhancements
         auto button = new QPushButton("Enhanced Button");
         connect(button, &QPushButton::clicked, []() {
-            QMessageBox::information(nullptr, "Button", "Enhanced button clicked!");
+            QMessageBox::information(nullptr, "Button",
+                                     "Enhanced button clicked!");
         });
 
         // Apply enhancements using the ComponentEnhancer
-        Enhanced::ComponentEnhancer::enhance(button,
+        Enhanced::ComponentEnhancer::enhance(
+            button,
             Enhanced::enhance()
                 .accessibleName("Sample Button")
-                .accessibleDescription("A button that demonstrates enhanced features")
+                .accessibleDescription(
+                    "A button that demonstrates enhanced features")
                 .tooltip("Click me to see enhanced button functionality")
                 .dropShadow(true)
                 .hoverEffect(true)
@@ -140,14 +143,14 @@ void ComponentGallery::showComponent(const QString& name) {
                 .borderRadius(8)
                 .focusColor(QColor("#3498db"))
                 .shortcut(QKeySequence("Ctrl+B"))
-                .build()
-        );
+                .build());
 
         layout->addWidget(button);
 
         // Validation button example
         auto validation_button = new QPushButton("Validation Button");
-        Enhanced::ComponentEnhancer::enhance(validation_button,
+        Enhanced::ComponentEnhancer::enhance(
+            validation_button,
             Enhanced::enhance()
                 .accessibleName("Validation Button")
                 .tooltip("This button demonstrates validation features")
@@ -159,8 +162,7 @@ void ComponentGallery::showComponent(const QString& name) {
                 .validationError("Button must be enabled to be valid")
                 .dropShadow(true)
                 .borderRadius(4)
-                .build()
-        );
+                .build());
 
         layout->addWidget(validation_button);
 
@@ -169,7 +171,8 @@ void ComponentGallery::showComponent(const QString& name) {
         auto line_edit = new QLineEdit();
         line_edit->setPlaceholderText("Enter your email...");
 
-        Enhanced::ComponentEnhancer::enhance(line_edit,
+        Enhanced::ComponentEnhancer::enhance(
+            line_edit,
             Enhanced::enhance()
                 .accessibleName("Email Input")
                 .accessibleDescription("Enter your email address")
@@ -177,7 +180,8 @@ void ComponentGallery::showComponent(const QString& name) {
                 .required(true)
                 .validator([](QWidget* widget) -> bool {
                     auto* edit = qobject_cast<QLineEdit*>(widget);
-                    if (!edit) return false;
+                    if (!edit)
+                        return false;
                     QString text = edit->text();
                     return text.contains("@") && text.contains(".");
                 })
@@ -187,8 +191,7 @@ void ComponentGallery::showComponent(const QString& name) {
                 .focusColor(QColor("#3498db"))
                 .borderRadius(4)
                 .selectAllOnFocus(true)
-                .build()
-        );
+                .build());
 
         layout->addWidget(line_edit);
 
@@ -196,60 +199,63 @@ void ComponentGallery::showComponent(const QString& name) {
         auto autocomplete_edit = new QLineEdit();
         autocomplete_edit->setPlaceholderText("Type a country name...");
 
-        QStringList countries = {"United States", "United Kingdom", "Canada", "Australia",
-                               "Germany", "France", "Japan", "China", "Brazil", "India"};
+        QStringList countries = {
+            "United States", "United Kingdom", "Canada", "Australia", "Germany",
+            "France",        "Japan",          "China",  "Brazil",    "India"};
 
-        Enhanced::ComponentEnhancer::enhance(autocomplete_edit,
+        Enhanced::ComponentEnhancer::enhance(
+            autocomplete_edit,
             Enhanced::enhance()
                 .accessibleName("Country Input")
                 .tooltip("Start typing to see country suggestions")
                 .autoComplete(countries)
                 .focusEffect(true)
                 .borderRadius(4)
-                .build()
-        );
+                .build());
 
         layout->addWidget(autocomplete_edit);
 
     } else if (name == "CheckBox") {
         // Enhanced checkboxes
         auto checkbox1 = new QCheckBox("Enhanced Option 1");
-        Enhanced::ComponentEnhancer::enhance(checkbox1,
+        Enhanced::ComponentEnhancer::enhance(
+            checkbox1,
             Enhanced::enhance()
                 .accessibleName("Option 1")
-                .accessibleDescription("First checkbox option with enhancements")
-                .tooltip("This is an enhanced checkbox with accessibility features")
+                .accessibleDescription(
+                    "First checkbox option with enhancements")
+                .tooltip(
+                    "This is an enhanced checkbox with accessibility features")
                 .hoverEffect(true)
                 .focusEffect(true)
                 .shortcut(QKeySequence("Ctrl+1"))
-                .build()
-        );
+                .build());
 
         auto checkbox2 = new QCheckBox("Required Option");
         checkbox2->setChecked(true);
-        Enhanced::ComponentEnhancer::enhance(checkbox2,
-            Enhanced::enhance()
-                .accessibleName("Required Option")
-                .tooltip("This option is required")
-                .required(true)
-                .validator([](QWidget* widget) -> bool {
-                    auto* checkbox = qobject_cast<QCheckBox*>(widget);
-                    return checkbox && checkbox->isChecked();
-                })
-                .validationError("This option must be checked")
-                .focusEffect(true)
-                .build()
-        );
+        Enhanced::ComponentEnhancer::enhance(
+            checkbox2, Enhanced::enhance()
+                           .accessibleName("Required Option")
+                           .tooltip("This option is required")
+                           .required(true)
+                           .validator([](QWidget* widget) -> bool {
+                               auto* checkbox =
+                                   qobject_cast<QCheckBox*>(widget);
+                               return checkbox && checkbox->isChecked();
+                           })
+                           .validationError("This option must be checked")
+                           .focusEffect(true)
+                           .build());
 
         auto checkbox3 = new QCheckBox("Disabled Option");
         checkbox3->setEnabled(false);
-        Enhanced::ComponentEnhancer::enhance(checkbox3,
+        Enhanced::ComponentEnhancer::enhance(
+            checkbox3,
             Enhanced::enhance()
                 .accessibleName("Disabled Option")
                 .accessibleDescription("This option is currently disabled")
                 .tooltip("This option is disabled for demonstration")
-                .build()
-        );
+                .build());
 
         layout->addWidget(checkbox1);
         layout->addWidget(checkbox2);
@@ -258,43 +264,48 @@ void ComponentGallery::showComponent(const QString& name) {
     } else if (name == "ProgressBar") {
         auto progress = new QProgressBar();
         progress->setValue(65);
-        Enhanced::ComponentEnhancer::enhance(progress,
+        Enhanced::ComponentEnhancer::enhance(
+            progress,
             Enhanced::enhance()
                 .accessibleName("Progress Indicator")
                 .accessibleDescription("Shows current progress at 65%")
                 .tooltip("Current progress: 65%")
                 .borderRadius(8)
-                .build()
-        );
+                .build());
         layout->addWidget(progress);
 
         auto animated_progress = new QProgressBar();
-        animated_progress->setRange(0, 0); // Indeterminate
-        Enhanced::ComponentEnhancer::enhance(animated_progress,
+        animated_progress->setRange(0, 0);  // Indeterminate
+        Enhanced::ComponentEnhancer::enhance(
+            animated_progress,
             Enhanced::enhance()
                 .accessibleName("Loading Indicator")
                 .accessibleDescription("Indeterminate progress indicator")
                 .tooltip("Loading in progress...")
                 .borderRadius(8)
-                .build()
-        );
+                .build());
         layout->addWidget(animated_progress);
 
     } else {
         // Generic demo for other components with basic enhancements
-        auto label = new QLabel(QString("Enhanced Demo for %1 component").arg(name));
+        auto label =
+            new QLabel(QString("Enhanced Demo for %1 component").arg(name));
         label->setAlignment(Qt::AlignCenter);
-        label->setStyleSheet("QLabel { padding: 20px; background-color: #f0f0f0; border: 1px solid #ccc; }");
+        label->setStyleSheet(
+            "QLabel { padding: 20px; background-color: #f0f0f0; border: 1px "
+            "solid #ccc; }");
 
-        Enhanced::ComponentEnhancer::enhance(label,
+        Enhanced::ComponentEnhancer::enhance(
+            label,
             Enhanced::enhance()
                 .accessibleName(QString("%1 Demo").arg(name))
-                .accessibleDescription(QString("Demonstration of enhanced %1 component").arg(name))
-                .tooltip(QString("This shows an enhanced %1 component").arg(name))
+                .accessibleDescription(
+                    QString("Demonstration of enhanced %1 component").arg(name))
+                .tooltip(
+                    QString("This shows an enhanced %1 component").arg(name))
                 .borderRadius(8)
                 .dropShadow(true)
-                .build()
-        );
+                .build());
 
         layout->addWidget(label);
     }
@@ -355,7 +366,8 @@ using namespace DeclarativeUI::Components;
 
 auto component = std::make_unique<%1>();
 // Configure component properties here
-component->initialize();)").arg(component_name);
+component->initialize();)")
+                           .arg(component_name);
     }
 
     code_viewer_->setPlainText(code_example);
@@ -368,7 +380,8 @@ void ComponentGallery::onPropertyChanged() {
 
 void ComponentGallery::onCodeCopyRequested() {
     QApplication::clipboard()->setText(code_viewer_->toPlainText());
-    QMessageBox::information(this, "Code Copied", "Code example copied to clipboard!");
+    QMessageBox::information(this, "Code Copied",
+                             "Code example copied to clipboard!");
 }
 
 #include "ComponentGallery.moc"

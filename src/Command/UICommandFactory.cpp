@@ -1,10 +1,10 @@
 #include "UICommandFactory.hpp"
-#include "CoreCommands.hpp"
-#include "SpecializedCommands.hpp"
 #include <QDebug>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <algorithm>
+#include "CoreCommands.hpp"
+#include "SpecializedCommands.hpp"
 
 namespace DeclarativeUI::Command::UI {
 
@@ -18,15 +18,17 @@ UICommandFactory& UICommandFactory::instance() {
     return instance;
 }
 
-void UICommandFactory::registerCommand(const QString& command_type, const CommandRegistrationInfo& info) {
+void UICommandFactory::registerCommand(const QString& command_type,
+                                       const CommandRegistrationInfo& info) {
     validateRegistration(command_type, info);
     registrations_[command_type] = info;
     emit commandRegistered(command_type);
     qDebug() << "📝 Registered command type:" << command_type;
 }
 
-void UICommandFactory::registerCommand(const QString& command_type, CommandFactory factory,
-                                      const UICommandMetadata& metadata) {
+void UICommandFactory::registerCommand(const QString& command_type,
+                                       CommandFactory factory,
+                                       const UICommandMetadata& metadata) {
     CommandRegistrationInfo info;
     info.command_type = command_type;
     info.factory = std::move(factory);
@@ -36,11 +38,13 @@ void UICommandFactory::registerCommand(const QString& command_type, CommandFacto
     registerCommand(command_type, info);
 }
 
-std::shared_ptr<BaseUICommand> UICommandFactory::createCommand(const QString& command_type) {
+std::shared_ptr<BaseUICommand> UICommandFactory::createCommand(
+    const QString& command_type) {
     return createCommandInternal(command_type);
 }
 
-std::shared_ptr<BaseUICommand> UICommandFactory::createCommand(const QString& command_type, const QJsonObject& config) {
+std::shared_ptr<BaseUICommand> UICommandFactory::createCommand(
+    const QString& command_type, const QJsonObject& config) {
     return createCommandInternal(command_type, config);
 }
 
@@ -50,7 +54,8 @@ UICommandFactory::createCommandWithWidget(const QString& command_type) {
 }
 
 std::pair<std::shared_ptr<BaseUICommand>, std::unique_ptr<QWidget>>
-UICommandFactory::createCommandWithWidget(const QString& command_type, const QJsonObject& config) {
+UICommandFactory::createCommandWithWidget(const QString& command_type,
+                                          const QJsonObject& config) {
     auto command = createCommandInternal(command_type, config);
     if (!command) {
         return {nullptr, nullptr};
@@ -65,7 +70,8 @@ UICommandFactory::createCommandWithWidget(const QString& command_type, const QJs
     return {command, std::move(widget)};
 }
 
-std::vector<std::shared_ptr<BaseUICommand>> UICommandFactory::createCommands(const QStringList& command_types) {
+std::vector<std::shared_ptr<BaseUICommand>> UICommandFactory::createCommands(
+    const QStringList& command_types) {
     std::vector<std::shared_ptr<BaseUICommand>> commands;
     commands.reserve(command_types.size());
 
@@ -81,7 +87,8 @@ std::vector<std::shared_ptr<BaseUICommand>> UICommandFactory::createCommands(con
     return commands;
 }
 
-std::vector<std::shared_ptr<BaseUICommand>> UICommandFactory::createCommandsFromJson(const QJsonArray& commands) {
+std::vector<std::shared_ptr<BaseUICommand>>
+UICommandFactory::createCommandsFromJson(const QJsonArray& commands) {
     std::vector<std::shared_ptr<BaseUICommand>> result;
     result.reserve(commands.size());
 
@@ -107,7 +114,8 @@ std::vector<std::shared_ptr<BaseUICommand>> UICommandFactory::createCommandsFrom
     return result;
 }
 
-std::shared_ptr<BaseUICommand> UICommandFactory::createCommandHierarchy(const QJsonObject& hierarchy) {
+std::shared_ptr<BaseUICommand> UICommandFactory::createCommandHierarchy(
+    const QJsonObject& hierarchy) {
     if (!hierarchy.contains("type")) {
         qWarning() << "Hierarchy root missing 'type' field";
         return nullptr;
@@ -124,7 +132,8 @@ std::shared_ptr<BaseUICommand> UICommandFactory::createCommandHierarchy(const QJ
         QJsonArray children = hierarchy["children"].toArray();
         for (const auto& child_value : children) {
             if (child_value.isObject()) {
-                auto child_command = createCommandHierarchy(child_value.toObject());
+                auto child_command =
+                    createCommandHierarchy(child_value.toObject());
                 if (child_command) {
                     root_command->addChild(child_command);
                 }
@@ -147,9 +156,11 @@ QStringList UICommandFactory::getRegisteredTypes() const {
     return types;
 }
 
-UICommandMetadata UICommandFactory::getMetadata(const QString& command_type) const {
+UICommandMetadata UICommandFactory::getMetadata(
+    const QString& command_type) const {
     auto it = registrations_.find(command_type);
-    return it != registrations_.end() ? it->second.metadata : UICommandMetadata{};
+    return it != registrations_.end() ? it->second.metadata
+                                      : UICommandMetadata{};
 }
 
 QString UICommandFactory::getWidgetType(const QString& command_type) const {
@@ -157,11 +168,13 @@ QString UICommandFactory::getWidgetType(const QString& command_type) const {
     return it != registrations_.end() ? it->second.widget_type : QString{};
 }
 
-void UICommandFactory::setDefaultProperties(const QString& command_type, const QJsonObject& properties) {
+void UICommandFactory::setDefaultProperties(const QString& command_type,
+                                            const QJsonObject& properties) {
     default_properties_[command_type] = properties;
 }
 
-QJsonObject UICommandFactory::getDefaultProperties(const QString& command_type) const {
+QJsonObject UICommandFactory::getDefaultProperties(
+    const QString& command_type) const {
     auto it = default_properties_.find(command_type);
     return it != default_properties_.end() ? it->second : QJsonObject{};
 }
@@ -170,11 +183,13 @@ bool UICommandFactory::validateCommandType(const QString& command_type) const {
     return isRegistered(command_type);
 }
 
-QStringList UICommandFactory::validateCommandConfig(const QString& command_type, const QJsonObject& config) const {
+QStringList UICommandFactory::validateCommandConfig(
+    const QString& command_type, const QJsonObject& config) const {
     QStringList errors;
 
     if (!isRegistered(command_type)) {
-        errors.append(QString("Command type '%1' is not registered").arg(command_type));
+        errors.append(
+            QString("Command type '%1' is not registered").arg(command_type));
         return errors;
     }
 
@@ -183,7 +198,8 @@ QStringList UICommandFactory::validateCommandConfig(const QString& command_type,
     // Check required properties
     for (const QString& required_prop : metadata.required_properties) {
         if (!config.contains(required_prop)) {
-            errors.append(QString("Required property '%1' is missing").arg(required_prop));
+            errors.append(QString("Required property '%1' is missing")
+                              .arg(required_prop));
         }
     }
 
@@ -229,7 +245,8 @@ void UICommandFactory::setupBuiltinCommands() {
     qDebug() << "✅ Built-in UI commands setup complete";
 }
 
-void UICommandFactory::applyConfiguration(BaseUICommand* command, const QJsonObject& config) {
+void UICommandFactory::applyConfiguration(BaseUICommand* command,
+                                          const QJsonObject& config) {
     if (!command) {
         return;
     }
@@ -252,7 +269,8 @@ void UICommandFactory::applyConfiguration(BaseUICommand* command, const QJsonObj
     }
 }
 
-void UICommandFactory::validateRegistration(const QString& command_type, const CommandRegistrationInfo& info) {
+void UICommandFactory::validateRegistration(
+    const QString& command_type, const CommandRegistrationInfo& info) {
     if (command_type.isEmpty()) {
         throw std::invalid_argument("Command type cannot be empty");
     }
@@ -264,11 +282,12 @@ void UICommandFactory::validateRegistration(const QString& command_type, const C
     // Additional validation could be added here
 }
 
-std::shared_ptr<BaseUICommand> UICommandFactory::createCommandInternal(const QString& command_type,
-                                                                       const QJsonObject& config) {
+std::shared_ptr<BaseUICommand> UICommandFactory::createCommandInternal(
+    const QString& command_type, const QJsonObject& config) {
     auto it = registrations_.find(command_type);
     if (it == registrations_.end()) {
-        QString error = QString("Command type '%1' is not registered").arg(command_type);
+        QString error =
+            QString("Command type '%1' is not registered").arg(command_type);
         emit commandCreationFailed(command_type, error);
         qWarning() << error;
         return nullptr;
@@ -277,7 +296,9 @@ std::shared_ptr<BaseUICommand> UICommandFactory::createCommandInternal(const QSt
     try {
         auto command = it->second.factory();
         if (!command) {
-            QString error = QString("Factory returned null for command type '%1'").arg(command_type);
+            QString error =
+                QString("Factory returned null for command type '%1'")
+                    .arg(command_type);
             emit commandCreationFailed(command_type, error);
             qWarning() << error;
             return nullptr;
@@ -292,7 +313,8 @@ std::shared_ptr<BaseUICommand> UICommandFactory::createCommandInternal(const QSt
         return command;
 
     } catch (const std::exception& e) {
-        QString error = QString("Failed to create command '%1': %2").arg(command_type, e.what());
+        QString error = QString("Failed to create command '%1': %2")
+                            .arg(command_type, e.what());
         emit commandCreationFailed(command_type, error);
         qWarning() << error;
         return nullptr;

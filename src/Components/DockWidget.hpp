@@ -20,11 +20,14 @@ public:
     DockWidget& allowedAreas(Qt::DockWidgetAreas areas);
     DockWidget& floating(bool floating);
     DockWidget& titleBarWidget(QWidget* widget);
-    DockWidget& onFeaturesChanged(std::function<void(QDockWidget::DockWidgetFeatures)> handler);
+    DockWidget& onFeaturesChanged(
+        std::function<void(QDockWidget::DockWidgetFeatures)> handler);
     DockWidget& onTopLevelChanged(std::function<void(bool)> handler);
-    DockWidget& onAllowedAreasChanged(std::function<void(Qt::DockWidgetAreas)> handler);
+    DockWidget& onAllowedAreasChanged(
+        std::function<void(Qt::DockWidgetAreas)> handler);
     DockWidget& onVisibilityChanged(std::function<void(bool)> handler);
-    DockWidget& onDockLocationChanged(std::function<void(Qt::DockWidgetArea)> handler);
+    DockWidget& onDockLocationChanged(
+        std::function<void(Qt::DockWidgetArea)> handler);
     DockWidget& style(const QString& stylesheet);
 
     void initialize() override;
@@ -37,15 +40,12 @@ public:
 
 private:
     QDockWidget* dock_widget_;
-    std::function<void(QDockWidget::DockWidgetFeatures)> features_changed_handler_;
+    std::function<void(QDockWidget::DockWidgetFeatures)>
+        features_changed_handler_;
     std::function<void(bool)> top_level_changed_handler_;
     std::function<void(Qt::DockWidgetAreas)> allowed_areas_changed_handler_;
     std::function<void(bool)> visibility_changed_handler_;
     std::function<void(Qt::DockWidgetArea)> dock_location_changed_handler_;
 };
-
-
-
-
 
 }  // namespace DeclarativeUI::Components

@@ -8,11 +8,13 @@ Splitter::Splitter(QObject* parent)
     : UIElement(parent), splitter_widget_(nullptr) {}
 
 Splitter& Splitter::orientation(Qt::Orientation orientation) {
-    return static_cast<Splitter&>(setProperty("orientation", static_cast<int>(orientation)));
+    return static_cast<Splitter&>(
+        setProperty("orientation", static_cast<int>(orientation)));
 }
 
 Splitter& Splitter::childrenCollapsible(bool collapsible) {
-    return static_cast<Splitter&>(setProperty("childrenCollapsible", collapsible));
+    return static_cast<Splitter&>(
+        setProperty("childrenCollapsible", collapsible));
 }
 
 Splitter& Splitter::handleWidth(int width) {
@@ -68,14 +70,14 @@ void Splitter::initialize() {
         // Connect signals
         if (splitter_moved_handler_) {
             connect(splitter_widget_, &QSplitter::splitterMoved, this,
-                    [this](int pos, int index) { splitter_moved_handler_(pos, index); });
+                    [this](int pos, int index) {
+                        splitter_moved_handler_(pos, index);
+                    });
         }
     }
 }
 
-QWidget* Splitter::getWidget() const {
-    return splitter_widget_;
-}
+QWidget* Splitter::getWidget() const { return splitter_widget_; }
 
 Qt::Orientation Splitter::getOrientation() const {
     return splitter_widget_ ? splitter_widget_->orientation() : Qt::Horizontal;

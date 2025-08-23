@@ -27,16 +27,19 @@ The Command System consists of several key components:
 The system now includes specialized commands for all UI components:
 
 #### Button Components
+
 - `ButtonCommand` - Handle button clicks, text changes, enable/disable
 - `CheckBoxCommand` - Toggle states, check/uncheck with undo support
 - `RadioButtonCommand` - Selection with undo support
 
 #### Text Components
+
 - `LabelCommand` - Text setting and clearing with undo
 - `LineEditCommand` - Text editing, clearing, selection with undo
 - `TextEditCommand` - Rich text editing, appending, clearing with undo
 
 #### Input Components
+
 - `SpinBoxCommand` - Value setting, stepping, range configuration with undo
 - `DoubleSpinBoxCommand` - Decimal value setting, stepping, decimals configuration with undo
 - `SliderCommand` - Value setting, range configuration with undo
@@ -46,15 +49,18 @@ The system now includes specialized commands for all UI components:
 - `ProgressBarCommand` - Value setting, range configuration, text visibility, reset
 
 #### Display Components
+
 - `LCDNumberCommand` - Value display, digit count, mode, segment style
 - `CalendarCommand` - Date selection, date ranges, grid visibility with undo
 
 #### View Components
+
 - `ListViewCommand` - Model operations, item selection, item management with undo
 - `TableViewCommand` - Model operations, cell/row/column selection, data setting with undo
 - `TreeViewCommand` - Model operations, item selection, expand/collapse, data setting with undo
 
 #### Container Components
+
 - `TabWidgetCommand` - Tab switching, text setting with undo
 - `GroupBoxCommand` - Title setting, checkable state, checked state with undo
 - `FrameCommand` - Frame style, line width, mid line width
@@ -63,6 +69,7 @@ The system now includes specialized commands for all UI components:
 - `DockWidgetCommand` - Floating state, allowed areas, features with undo
 
 #### Menu/Toolbar Components
+
 - `MenuBarCommand` - Menu management, native menu bar setting
 - `StatusBarCommand` - Message display, widget management
 - `ToolBarCommand` - Action management, orientation, movable state with undo
@@ -139,25 +146,30 @@ mapper.establishBinding(myCommand, widget.get());
 ## Command Operations
 
 ### Button Commands
+
 - `click` - Trigger button click
 - `setText` - Set button text
 - `setEnabled` - Enable/disable button
 
 ### CheckBox Commands
+
 - `toggle` - Toggle checked state
 - `setChecked` - Set specific checked state
 
 ### RadioButton Commands
+
 - `select` - Select radio button
 - `setChecked` - Set specific checked state
 
 ### Text Commands
+
 - `setText` - Set text content
 - `append` - Append text (TextEdit only)
 - `clear` - Clear all text
 - `selectAll` - Select all text (LineEdit only)
 
 ### Input Commands
+
 - `setValue` - Set numeric value
 - `stepUp`/`stepDown` - Step values (SpinBox, DoubleSpinBox)
 - `setRange` - Set min/max range
@@ -167,18 +179,21 @@ mapper.establishBinding(myCommand, widget.get());
 - `addItem` - Add new item (ComboBox)
 
 ### DateTime Commands
+
 - `setDateTime` - Set date and time
 - `setDateRange` - Set minimum and maximum dates
 - `setTimeRange` - Set minimum and maximum times
 - `setDisplayFormat` - Set display format string
 
 ### Progress Commands
+
 - `setValue` - Set progress value
 - `setRange` - Set progress range
 - `setTextVisible` - Set text visibility
 - `reset` - Reset to minimum value
 
 ### Display Commands
+
 - `display` - Display value (LCDNumber)
 - `setDigitCount` - Set number of digits (LCDNumber)
 - `setMode` - Set display mode (LCDNumber)
@@ -187,6 +202,7 @@ mapper.establishBinding(myCommand, widget.get());
 - `setGridVisible` - Set grid visibility (Calendar)
 
 ### View Commands
+
 - `selectItem` - Select item by index
 - `selectCell` - Select table cell (TableView)
 - `selectRow` - Select table row (TableView)
@@ -199,6 +215,7 @@ mapper.establishBinding(myCommand, widget.get());
 - `setItemData` - Set item data (TableView, TreeView)
 
 ### Container Commands
+
 - `setCurrentIndex` - Switch tabs (TabWidget)
 - `setTabText` - Set tab text (TabWidget)
 - `setTitle` - Set title (GroupBox)
@@ -217,6 +234,7 @@ mapper.establishBinding(myCommand, widget.get());
 - `setFeatures` - Set dock widget features (DockWidget)
 
 ### Menu/Toolbar Commands
+
 - `addMenu` - Add menu (MenuBar)
 - `removeMenu` - Remove menu (MenuBar)
 - `setNativeMenuBar` - Set native menu bar (MenuBar)
@@ -250,17 +268,21 @@ if (command.canUndo(context)) {
 ## Integration
 
 ### State Management
+
 Commands integrate with the DeclarativeUI state management system through adapters.
 
 ### Event System
+
 Commands can emit and handle events through the CommandEvents system.
 
 ### JSON Configuration
+
 Commands can be configured and loaded from JSON through the JSONCommandLoader adapter.
 
 ## Examples
 
 Examples demonstrating command usage can be found in:
+
 - `examples/05-command-system/command-basics/`
 - `examples/05-command-system/command-builder/`
 - `examples/05-command-system/component-commands/`
@@ -268,6 +290,7 @@ Examples demonstrating command usage can be found in:
 ## Testing
 
 Comprehensive tests are available in:
+
 - `tests/command/test_component_commands.cpp`
 - `tests/command/test_command_*.cpp`
 

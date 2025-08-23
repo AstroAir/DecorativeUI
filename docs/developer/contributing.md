@@ -29,6 +29,7 @@ We welcome contributions to DeclarativeUI! This guide will help you get started 
    ```
 
 4. **Run tests to verify setup:**
+
    ```bash
    ctest --output-on-failure
    ```
@@ -432,6 +433,7 @@ void TestPerformance::testLargeUICreation() {
    ```
 
 6. **Add documentation:**
+
    ```cpp
    /**
     * @brief Brief description of MyNewComponent

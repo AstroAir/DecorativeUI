@@ -432,8 +432,21 @@ void Button::updateButtonState() {
     // Update multi-state
     updateMultiState();
 
-    // Update disabled state
-    button->setEnabled(!disabled_state_ && !loading_state_);
+    // Check if enabled property was set through the property system
+    bool property_enabled = true;
+    if (hasProperty("enabled")) {
+        try {
+            auto enabled_prop = getProperty("enabled");
+            if (std::holds_alternative<bool>(enabled_prop)) {
+                property_enabled = std::get<bool>(enabled_prop);
+            }
+        } catch (const std::exception& e) {
+            qWarning() << "Failed to get enabled property:" << e.what();
+        }
+    }
+
+    // Update disabled state - consider both internal state and property
+    button->setEnabled(property_enabled && !disabled_state_ && !loading_state_);
 
     if (disabled_state_ && !disabled_reason_.isEmpty()) {
         button->setToolTip(disabled_reason_);

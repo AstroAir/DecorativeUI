@@ -34,6 +34,4 @@ private:
     std::function<void()> overflow_handler_;
 };
 
-
-
 }  // namespace DeclarativeUI::Components

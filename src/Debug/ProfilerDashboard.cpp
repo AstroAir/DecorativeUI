@@ -1,20 +1,20 @@
 #include "ProfilerDashboard.hpp"
 
-#include <QDebug>
-#include <QJsonDocument>
-#include <QFileDialog>
-#include <QMessageBox>
 #include <QApplication>
-#include <QHeaderView>
-#include <QSplitter>
-#include <QGroupBox>
-#include <QGridLayout>
-#include <QDateTime>
-#include <QMenuBar>
-#include <QStatusBar>
-#include <QListWidget>
 #include <QComboBox>
+#include <QDateTime>
+#include <QDebug>
+#include <QFileDialog>
+#include <QGridLayout>
+#include <QGroupBox>
+#include <QHeaderView>
+#include <QJsonDocument>
+#include <QListWidget>
+#include <QMenuBar>
+#include <QMessageBox>
 #include <QProgressBar>
+#include <QSplitter>
+#include <QStatusBar>
 #include <mutex>
 #include <shared_mutex>
 
@@ -39,8 +39,9 @@ PerformanceChart::PerformanceChart(const QString& title, QWidget* parent)
 
     // Setup update timer
     update_timer_ = std::make_unique<QTimer>(this);
-    connect(update_timer_.get(), &QTimer::timeout, this, &PerformanceChart::updateChart);
-    update_timer_->start(1000);  // Update every second
+    connect(update_timer_.get(), &QTimer::timeout, this,
+&PerformanceChart::updateChart); update_timer_->start(1000);  // Update every
+second
 }
 
 void PerformanceChart::addDataPoint(double value) {
@@ -125,27 +126,37 @@ void MemoryVisualizationWidget::setupUI() {
     // Allocation table
     allocation_table_ = new QTableWidget(this);
     allocation_table_->setColumnCount(5);
-    allocation_table_->setHorizontalHeaderLabels({"Address", "Size", "File", "Line", "Timestamp"});
+    allocation_table_->setHorizontalHeaderLabels(
+        {"Address", "Size", "File", "Line", "Timestamp"});
     allocation_table_->horizontalHeader()->setStretchLastSection(true);
 
     layout_->addWidget(allocation_table_);
 
     // Connect signals
-    connect(refresh_button_, &QPushButton::clicked, this, &MemoryVisualizationWidget::onRefreshClicked);
-    connect(gc_button_, &QPushButton::clicked, this, &MemoryVisualizationWidget::onGCClicked);
-    connect(leak_scan_button_, &QPushButton::clicked, this, &MemoryVisualizationWidget::onMemoryLeakScanClicked);
+    connect(refresh_button_, &QPushButton::clicked, this,
+            &MemoryVisualizationWidget::onRefreshClicked);
+    connect(gc_button_, &QPushButton::clicked, this,
+            &MemoryVisualizationWidget::onGCClicked);
+    connect(leak_scan_button_, &QPushButton::clicked, this,
+            &MemoryVisualizationWidget::onMemoryLeakScanClicked);
 }
 
-void MemoryVisualizationWidget::updateMemoryData(const QJsonObject& memory_data) {
+void MemoryVisualizationWidget::updateMemoryData(
+    const QJsonObject& memory_data) {
     qint64 total_memory = memory_data["total_allocated_bytes"].toInt();
     qint64 used_memory = memory_data["current_allocated_bytes"].toInt();
     qint64 available_memory = memory_limit_mb_ * 1024 * 1024 - used_memory;
 
-    total_memory_label_->setText(QString("Total: %1 MB").arg(total_memory / (1024 * 1024)));
-    used_memory_label_->setText(QString("Used: %1 MB").arg(used_memory / (1024 * 1024)));
-    available_memory_label_->setText(QString("Available: %1 MB").arg(available_memory / (1024 * 1024)));
+    total_memory_label_->setText(
+        QString("Total: %1 MB").arg(total_memory / (1024 * 1024)));
+    used_memory_label_->setText(
+        QString("Used: %1 MB").arg(used_memory / (1024 * 1024)));
+    available_memory_label_->setText(
+        QString("Available: %1 MB").arg(available_memory / (1024 * 1024)));
 
-    int usage_percentage = static_cast<int>((static_cast<double>(used_memory) / (memory_limit_mb_ * 1024 * 1024)) * 100);
+    int usage_percentage = static_cast<int>(
+        (static_cast<double>(used_memory) / (memory_limit_mb_ * 1024 * 1024)) *
+        100);
     memory_usage_bar_->setValue(usage_percentage);
 
     // Update allocation table if data is available
@@ -173,17 +184,25 @@ void MemoryVisualizationWidget::onMemoryLeakScanClicked() {
     qDebug() << "🔥 Memory leak scan requested";
 }
 
-void MemoryVisualizationWidget::updateAllocationTable(const QJsonArray& allocations) {
+void MemoryVisualizationWidget::updateAllocationTable(
+    const QJsonArray& allocations) {
     allocation_table_->setRowCount(allocations.size());
 
     for (int i = 0; i < allocations.size(); ++i) {
         QJsonObject allocation = allocations[i].toObject();
 
-        allocation_table_->setItem(i, 0, new QTableWidgetItem(allocation["address"].toString()));
-        allocation_table_->setItem(i, 1, new QTableWidgetItem(QString::number(allocation["size"].toInt())));
-        allocation_table_->setItem(i, 2, new QTableWidgetItem(allocation["file"].toString()));
-        allocation_table_->setItem(i, 3, new QTableWidgetItem(QString::number(allocation["line"].toInt())));
-        allocation_table_->setItem(i, 4, new QTableWidgetItem(allocation["timestamp"].toString()));
+        allocation_table_->setItem(
+            i, 0, new QTableWidgetItem(allocation["address"].toString()));
+        allocation_table_->setItem(
+            i, 1,
+            new QTableWidgetItem(QString::number(allocation["size"].toInt())));
+        allocation_table_->setItem(
+            i, 2, new QTableWidgetItem(allocation["file"].toString()));
+        allocation_table_->setItem(
+            i, 3,
+            new QTableWidgetItem(QString::number(allocation["line"].toInt())));
+        allocation_table_->setItem(
+            i, 4, new QTableWidgetItem(allocation["timestamp"].toString()));
     }
 }
 
@@ -196,7 +215,8 @@ ProfilerDashboard::ProfilerDashboard(QWidget* parent) : QMainWindow(parent) {
 
     // Setup update timer
     update_timer_ = std::make_unique<QTimer>(this);
-    connect(update_timer_.get(), &QTimer::timeout, this, &ProfilerDashboard::onRealTimeUpdate);
+    connect(update_timer_.get(), &QTimer::timeout, this,
+            &ProfilerDashboard::onRealTimeUpdate);
 
     if (real_time_updates_enabled_) {
         update_timer_->start(update_interval_ms_);
@@ -245,7 +265,8 @@ void ProfilerDashboard::setupPerformanceTab() {
     performance_tab_ = new QWidget();
     [[maybe_unused]] auto layout = new QGridLayout(performance_tab_);
 
-    // Create performance charts - commented out due to missing Qt Charts dependency
+    // Create performance charts - commented out due to missing Qt Charts
+    // dependency
     /*
     cpu_chart_ = new PerformanceChart("CPU Usage (%)", this);
     memory_chart_ = new PerformanceChart("Memory Usage (MB)", this);
@@ -308,7 +329,8 @@ void ProfilerDashboard::setupMenuBar() {
     auto file_menu = menuBar()->addMenu("&File");
 
     auto export_action = file_menu->addAction("&Export Report...");
-    connect(export_action, &QAction::triggered, this, &ProfilerDashboard::onExportReportClicked);
+    connect(export_action, &QAction::triggered, this,
+            &ProfilerDashboard::onExportReportClicked);
 
     file_menu->addSeparator();
 
@@ -318,29 +340,36 @@ void ProfilerDashboard::setupMenuBar() {
     auto view_menu = menuBar()->addMenu("&View");
 
     auto refresh_action = view_menu->addAction("&Refresh");
-    connect(refresh_action, &QAction::triggered, this, &ProfilerDashboard::updateDashboard);
+    connect(refresh_action, &QAction::triggered, this,
+            &ProfilerDashboard::updateDashboard);
 
     auto settings_menu = menuBar()->addMenu("&Settings");
 
     auto preferences_action = settings_menu->addAction("&Preferences...");
-    connect(preferences_action, &QAction::triggered, this, &ProfilerDashboard::onSettingsClicked);
+    connect(preferences_action, &QAction::triggered, this,
+            &ProfilerDashboard::onSettingsClicked);
 }
 
 void ProfilerDashboard::setupStatusBar() {
     status_label_ = new QLabel("Ready", this);
     statusBar()->addWidget(status_label_);
 
-    auto update_label = new QLabel(QString("Update Interval: %1ms").arg(update_interval_ms_), this);
+    auto update_label = new QLabel(
+        QString("Update Interval: %1ms").arg(update_interval_ms_), this);
     statusBar()->addPermanentWidget(update_label);
 }
 
 void ProfilerDashboard::connectSignals() {
-    connect(real_time_checkbox_, &QCheckBox::toggled, this, &ProfilerDashboard::enableRealTimeUpdates);
-    connect(export_button_, &QPushButton::clicked, this, &ProfilerDashboard::onExportReportClicked);
-    connect(settings_button_, &QPushButton::clicked, this, &ProfilerDashboard::onSettingsClicked);
+    connect(real_time_checkbox_, &QCheckBox::toggled, this,
+            &ProfilerDashboard::enableRealTimeUpdates);
+    connect(export_button_, &QPushButton::clicked, this,
+            &ProfilerDashboard::onExportReportClicked);
+    connect(settings_button_, &QPushButton::clicked, this,
+            &ProfilerDashboard::onSettingsClicked);
 }
 
-void ProfilerDashboard::updatePerformanceData(const PerformanceDataPoint& data_point) {
+void ProfilerDashboard::updatePerformanceData(
+    const PerformanceDataPoint& data_point) {
     std::unique_lock<std::shared_mutex> lock(data_mutex_);
 
     performance_history_.push_back(data_point);
@@ -368,7 +397,8 @@ void ProfilerDashboard::updateMemoryData(const QJsonObject& memory_data) {
     }
 }
 
-void ProfilerDashboard::updateBottlenecks(const std::vector<BottleneckInfo>& bottlenecks) {
+void ProfilerDashboard::updateBottlenecks(
+    const std::vector<BottleneckInfo>& bottlenecks) {
     std::unique_lock<std::shared_mutex> lock(data_mutex_);
     current_bottlenecks_ = bottlenecks;
 
@@ -380,7 +410,9 @@ void ProfilerDashboard::updateBottlenecks(const std::vector<BottleneckInfo>& bot
     */
 }
 
-void ProfilerDashboard::addLogMessage(const QString& level, const QString& component, const QString& message) {
+void ProfilerDashboard::addLogMessage(const QString& level,
+                                      const QString& component,
+                                      const QString& message) {
     if (debug_console_) {
         debug_console_->addLogMessage(level, component, message);
     }
@@ -418,10 +450,11 @@ void ProfilerDashboard::onRealTimeUpdate() {
 }
 
 void ProfilerDashboard::onExportReportClicked() {
-    QString filename = QFileDialog::getSaveFileName(this, "Export Performance Report",
-                                                   QString("performance_report_%1.json")
-                                                   .arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")),
-                                                   "JSON Files (*.json)");
+    QString filename = QFileDialog::getSaveFileName(
+        this, "Export Performance Report",
+        QString("performance_report_%1.json")
+            .arg(QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss")),
+        "JSON Files (*.json)");
 
     if (!filename.isEmpty()) {
         exportReport("json", filename);
@@ -434,21 +467,26 @@ void ProfilerDashboard::onSettingsClicked() {
 }
 
 void ProfilerDashboard::updateStatusBar() {
-    QString status = real_time_updates_enabled_ ? "Real-time monitoring active" : "Manual mode";
+    QString status = real_time_updates_enabled_ ? "Real-time monitoring active"
+                                                : "Manual mode";
     status_label_->setText(status);
 }
 
-void ProfilerDashboard::checkPerformanceThresholds(const PerformanceDataPoint& data_point) {
+void ProfilerDashboard::checkPerformanceThresholds(
+    const PerformanceDataPoint& data_point) {
     if (data_point.cpu_usage > cpu_threshold_) {
-        qWarning() << "🔥 CPU usage threshold exceeded:" << data_point.cpu_usage << "%";
+        qWarning() << "🔥 CPU usage threshold exceeded:" << data_point.cpu_usage
+                   << "%";
     }
 
     if (data_point.memory_usage_mb > memory_threshold_mb_) {
-        qWarning() << "🔥 Memory usage threshold exceeded:" << data_point.memory_usage_mb << "MB";
+        qWarning() << "🔥 Memory usage threshold exceeded:"
+                   << data_point.memory_usage_mb << "MB";
     }
 
     if (data_point.frame_rate < frame_rate_threshold_) {
-        qWarning() << "🔥 Frame rate below threshold:" << data_point.frame_rate << "FPS";
+        qWarning() << "🔥 Frame rate below threshold:" << data_point.frame_rate
+                   << "FPS";
     }
 }
 
@@ -464,7 +502,8 @@ QJsonObject ProfilerDashboard::generateReport() const {
     if (!performance_history_.empty()) {
         const auto& latest = performance_history_.back();
         performance_summary["cpu_usage"] = latest.cpu_usage;
-        performance_summary["memory_usage_mb"] = static_cast<qint64>(latest.memory_usage_mb);
+        performance_summary["memory_usage_mb"] =
+            static_cast<qint64>(latest.memory_usage_mb);
         performance_summary["frame_rate"] = latest.frame_rate;
         performance_summary["response_time_ms"] = latest.response_time_ms;
     }
@@ -485,7 +524,8 @@ QJsonObject ProfilerDashboard::generateReport() const {
     return report;
 }
 
-void ProfilerDashboard::exportReport(const QString& format, const QString& filename) const {
+void ProfilerDashboard::exportReport(const QString& format,
+                                     const QString& filename) const {
     QJsonObject report = generateReport();
 
     if (format.toLower() == "json") {
@@ -496,13 +536,13 @@ void ProfilerDashboard::exportReport(const QString& format, const QString& filen
             file.write(doc.toJson());
             file.close();
 
-            QMessageBox::information(const_cast<ProfilerDashboard*>(this),
-                                   "Export Successful",
-                                   QString("Report exported to: %1").arg(filename));
+            QMessageBox::information(
+                const_cast<ProfilerDashboard*>(this), "Export Successful",
+                QString("Report exported to: %1").arg(filename));
         } else {
             QMessageBox::warning(const_cast<ProfilerDashboard*>(this),
-                                "Export Failed",
-                                "Failed to write report file.");
+                                 "Export Failed",
+                                 "Failed to write report file.");
         }
     }
 }
@@ -522,10 +562,11 @@ ProfilerIntegration::ProfilerIntegration(QObject* parent) : QObject(parent) {
     dashboard_ = std::make_unique<ProfilerDashboard>();
 
     collection_timer_ = std::make_unique<QTimer>(this);
-    connect(collection_timer_.get(), &QTimer::timeout, this, &ProfilerIntegration::onCollectionTimer);
+    connect(collection_timer_.get(), &QTimer::timeout, this,
+            &ProfilerIntegration::onCollectionTimer);
 
-    connect(dashboard_.get(), &ProfilerDashboard::dashboardClosed,
-            this, &ProfilerIntegration::onDashboardClosed);
+    connect(dashboard_.get(), &ProfilerDashboard::dashboardClosed, this,
+            &ProfilerIntegration::onDashboardClosed);
 
     if (auto_collection_enabled_) {
         collection_timer_->start(collection_interval_ms_);
@@ -576,17 +617,18 @@ void ProfilerIntegration::onDashboardClosed() {
     qDebug() << "🔥 Dashboard closed";
 }
 
-PerformanceDataPoint ProfilerIntegration::collectCurrentPerformanceData() const {
+PerformanceDataPoint ProfilerIntegration::collectCurrentPerformanceData()
+    const {
     PerformanceDataPoint data_point;
     data_point.timestamp = QDateTime::currentDateTime();
 
     // In a real implementation, these would collect actual system metrics
-    data_point.cpu_usage = 45.0;  // Placeholder
-    data_point.memory_usage_mb = 256;  // Placeholder
-    data_point.frame_rate = 60.0;  // Placeholder
-    data_point.active_animations = 5;  // Placeholder
-    data_point.cache_hit_ratio = 85.0;  // Placeholder
-    data_point.active_threads = 8;  // Placeholder
+    data_point.cpu_usage = 45.0;         // Placeholder
+    data_point.memory_usage_mb = 256;    // Placeholder
+    data_point.frame_rate = 60.0;        // Placeholder
+    data_point.active_animations = 5;    // Placeholder
+    data_point.cache_hit_ratio = 85.0;   // Placeholder
+    data_point.active_threads = 8;       // Placeholder
     data_point.response_time_ms = 12.5;  // Placeholder
 
     return data_point;
@@ -630,17 +672,19 @@ void ProfilerIntegration::collectBottleneckData() {
 QJsonObject ProfilerIntegration::collectCurrentMemoryData() const {
     QJsonObject memory_data;
 
-    // Placeholder data - in real implementation, this would collect from MemoryManager
-    memory_data["total_allocated_bytes"] = 268435456;  // 256MB
+    // Placeholder data - in real implementation, this would collect from
+    // MemoryManager
+    memory_data["total_allocated_bytes"] = 268435456;    // 256MB
     memory_data["current_allocated_bytes"] = 134217728;  // 128MB
-    memory_data["peak_allocated_bytes"] = 201326592;  // 192MB
+    memory_data["peak_allocated_bytes"] = 201326592;     // 192MB
     memory_data["allocation_count"] = 1024;
     memory_data["gc_count"] = 5;
 
     return memory_data;
 }
 
-std::vector<BottleneckInfo> ProfilerIntegration::collectCurrentBottlenecks() const {
+std::vector<BottleneckInfo> ProfilerIntegration::collectCurrentBottlenecks()
+    const {
     std::vector<BottleneckInfo> bottlenecks;
 
     // Placeholder bottleneck detection
@@ -648,8 +692,10 @@ std::vector<BottleneckInfo> ProfilerIntegration::collectCurrentBottlenecks() con
     cpu_bottleneck.component = "Animation Engine";
     cpu_bottleneck.type = "CPU";
     cpu_bottleneck.severity = 65.0;
-    cpu_bottleneck.description = "High CPU usage detected in animation processing";
-    cpu_bottleneck.recommendations = {"Reduce animation complexity", "Enable GPU acceleration"};
+    cpu_bottleneck.description =
+        "High CPU usage detected in animation processing";
+    cpu_bottleneck.recommendations = {"Reduce animation complexity",
+                                      "Enable GPU acceleration"};
     cpu_bottleneck.detected_at = QDateTime::currentDateTime();
 
     bottlenecks.push_back(cpu_bottleneck);

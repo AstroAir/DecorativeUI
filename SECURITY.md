@@ -21,4 +21,3 @@ No dedicated security contact key at this time.
 ## Scope
 
 This policy covers vulnerabilities in the source code, build scripts, and documentation tooling. It does not cover vulnerabilities in dependencies; please report those upstream to the respective projects.
-

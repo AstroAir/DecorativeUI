@@ -30,11 +30,13 @@ QStringList UICommandState::getPropertyNames() const {
     return names;
 }
 
-void UICommandState::setValidator(const QString& property, std::function<bool(const QVariant&)> validator) {
+void UICommandState::setValidator(
+    const QString& property, std::function<bool(const QVariant&)> validator) {
     validators_[property] = validator;
 }
 
-bool UICommandState::validateProperty(const QString& property, const QVariant& value) const {
+bool UICommandState::validateProperty(const QString& property,
+                                      const QVariant& value) const {
     auto it = validators_.find(property);
     if (it != validators_.end()) {
         return it->second(value);
@@ -74,7 +76,7 @@ void UICommandState::fromJson(const QJsonObject& json) {
     for (auto it = json.begin(); it != json.end(); ++it) {
         const QString& key = it.key();
         const QJsonValue& value = it.value();
-        
+
         QVariant variant;
         if (value.isString()) {
             variant = value.toString();
@@ -85,7 +87,7 @@ void UICommandState::fromJson(const QJsonObject& json) {
         } else {
             variant = value.toVariant();
         }
-        
+
         properties_[key] = variant;
     }
     emit stateChanged();
@@ -95,7 +97,7 @@ bool UICommandState::equals(const UICommandState& other) const {
     if (properties_.size() != other.properties_.size()) {
         return false;
     }
-    
+
     for (const auto& [name, value] : properties_) {
         auto it = other.properties_.find(name);
         if (it == other.properties_.end() || it->second != value) {
@@ -107,25 +109,28 @@ bool UICommandState::equals(const UICommandState& other) const {
 
 QStringList UICommandState::getDifferences(const UICommandState& other) const {
     QStringList differences;
-    
+
     // Check for properties that differ or are missing in other
     for (const auto& [name, value] : properties_) {
         auto it = other.properties_.find(name);
         if (it == other.properties_.end()) {
-            differences.append(QString("Property '%1' missing in other").arg(name));
+            differences.append(
+                QString("Property '%1' missing in other").arg(name));
         } else if (it->second != value) {
-            differences.append(QString("Property '%1' differs: %2 vs %3")
-                             .arg(name, value.toString(), it->second.toString()));
+            differences.append(
+                QString("Property '%1' differs: %2 vs %3")
+                    .arg(name, value.toString(), it->second.toString()));
         }
     }
-    
+
     // Check for properties that exist in other but not in this
     for (const auto& [name, value] : other.properties_) {
         if (properties_.find(name) == properties_.end()) {
-            differences.append(QString("Property '%1' missing in this").arg(name));
+            differences.append(
+                QString("Property '%1' missing in this").arg(name));
         }
     }
-    
+
     return differences;
 }
 
@@ -144,15 +149,16 @@ void UICommandState::clearProperties() {
 }
 
 // **BaseUICommand implementation**
-BaseUICommand::BaseUICommand(QObject* parent) 
-    : QObject(parent), state_(std::make_unique<UICommandState>(this)), id_(QUuid::createUuid()) {
-    
+BaseUICommand::BaseUICommand(QObject* parent)
+    : QObject(parent),
+      state_(std::make_unique<UICommandState>(this)),
+      id_(QUuid::createUuid()) {
     // Connect state changes to our signals
-    connect(state_.get(), &UICommandState::propertyChanged, 
-            this, &BaseUICommand::propertyChanged);
-    connect(state_.get(), &UICommandState::stateChanged, 
-            this, &BaseUICommand::stateChanged);
-    
+    connect(state_.get(), &UICommandState::propertyChanged, this,
+            &BaseUICommand::propertyChanged);
+    connect(state_.get(), &UICommandState::stateChanged, this,
+            &BaseUICommand::stateChanged);
+
     qDebug() << "🎯 BaseUICommand created with ID:" << id_.toString();
 }
 
@@ -161,9 +167,9 @@ void BaseUICommand::onWidgetCreated(QWidget* widget) {
         qWarning() << "Widget is null in onWidgetCreated";
         return;
     }
-    
+
     qDebug() << "🔗 Widget created for command:" << getCommandType();
-    
+
     // Sync current state to the new widget
     syncToWidget();
 }
@@ -177,14 +183,14 @@ void BaseUICommand::syncToWidget() {
     if (!widget_) {
         return;
     }
-    
+
     // Sync all properties from command state to widget
     const auto propertyNames = state_->getPropertyNames();
     for (const QString& propertyName : propertyNames) {
         QVariant value = state_->getProperty<QVariant>(propertyName);
         widget_->setProperty(propertyName.toUtf8().constData(), value);
     }
-    
+
     qDebug() << "📤 Synced" << propertyNames.size() << "properties to widget";
 }
 
@@ -192,23 +198,25 @@ void BaseUICommand::syncFromWidget() {
     if (!widget_) {
         return;
     }
-    
+
     // This would typically sync specific properties back from widget
     // Implementation depends on specific widget types and their properties
     qDebug() << "📥 Synced properties from widget";
 }
 
-void BaseUICommand::handleEvent(const QString& eventType, const QVariant& eventData) {
+void BaseUICommand::handleEvent(const QString& eventType,
+                                const QVariant& eventData) {
     auto it = event_handlers_.find(eventType);
     if (it != event_handlers_.end()) {
         it->second(eventData);
     }
-    
+
     emit eventTriggered(eventType, eventData);
     qDebug() << "⚡ Event handled:" << eventType;
 }
 
-void BaseUICommand::bindToState(const QString& stateKey, const QString& property) {
+void BaseUICommand::bindToState(const QString& stateKey,
+                                const QString& property) {
     QString prop = property.isEmpty() ? "value" : property;
     state_bindings_[prop] = stateKey;
     connectToStateManager();
@@ -219,7 +227,8 @@ void BaseUICommand::unbindFromState(const QString& property) {
         // Unbind all state bindings
         state_bindings_.clear();
         disconnectFromStateManager();
-        qDebug() << "🔌 Unbound all state bindings for command:" << getCommandType();
+        qDebug() << "🔌 Unbound all state bindings for command:"
+                 << getCommandType();
     } else {
         // Unbind specific property
         auto it = state_bindings_.find(property);
@@ -234,16 +243,16 @@ void BaseUICommand::addChild(std::shared_ptr<BaseUICommand> child) {
     if (!child || child.get() == this) {
         return;
     }
-    
+
     // Remove from previous parent if any
     if (child->parent_) {
         child->parent_->removeChild(child);
     }
-    
+
     children_.push_back(child);
     child->setParent(this);
     emit childAdded(child);
-    
+
     qDebug() << "👶 Child added to command:" << getCommandType();
 }
 
@@ -253,7 +262,7 @@ void BaseUICommand::removeChild(std::shared_ptr<BaseUICommand> child) {
         (*it)->setParent(nullptr);
         children_.erase(it);
         emit childRemoved(child);
-        
+
         qDebug() << "👋 Child removed from command:" << getCommandType();
     }
 }
@@ -262,9 +271,7 @@ std::vector<std::shared_ptr<BaseUICommand>> BaseUICommand::getChildren() const {
     return children_;
 }
 
-BaseUICommand* BaseUICommand::getParent() const {
-    return parent_;
-}
+BaseUICommand* BaseUICommand::getParent() const { return parent_; }
 
 void BaseUICommand::updateBoundProperties() {
     for (const auto& [property, binding] : property_bindings_) {
@@ -272,19 +279,22 @@ void BaseUICommand::updateBoundProperties() {
             QVariant value = binding();
             state_->setProperty(property, value);
         } catch (const std::exception& e) {
-            qWarning() << "Property binding failed for" << property << ":" << e.what();
+            qWarning() << "Property binding failed for" << property << ":"
+                       << e.what();
         }
     }
 }
 
 void BaseUICommand::connectToStateManager() {
     // Get state manager instance for future use
-    [[maybe_unused]] auto& stateManager = DeclarativeUI::Binding::StateManager::instance();
+    [[maybe_unused]] auto& stateManager =
+        DeclarativeUI::Binding::StateManager::instance();
 
     for (const auto& [property, stateKey] : state_bindings_) {
         // This would connect to state manager changes
         // Implementation depends on StateManager interface
-        qDebug() << "🔗 Connected property" << property << "to state" << stateKey;
+        qDebug() << "🔗 Connected property" << property << "to state"
+                 << stateKey;
     }
 }
 
@@ -298,17 +308,15 @@ void BaseUICommand::setWidget(QWidget* widget) {
         if (widget_) {
             onWidgetDestroyed();
         }
-        
+
         widget_ = widget;
-        
+
         if (widget_) {
             onWidgetCreated(widget_);
         }
     }
 }
 
-void BaseUICommand::setParent(BaseUICommand* parent) {
-    parent_ = parent;
-}
+void BaseUICommand::setParent(BaseUICommand* parent) { parent_ = parent; }
 
 }  // namespace DeclarativeUI::Command::UI

@@ -31,36 +31,36 @@ public:
     void show();
     void accept();
     void reject();
-    QMessageBox::StandardButton getStandardButton(QAbstractButton* button) const;
+    QMessageBox::StandardButton getStandardButton(
+        QAbstractButton* button) const;
     QAbstractButton* getButton(QMessageBox::StandardButton which) const;
 
     // **Static convenience methods**
-    static QMessageBox::StandardButton information(QWidget* parent, const QString& title, 
-                                                   const QString& text, 
-                                                   QMessageBox::StandardButtons buttons = QMessageBox::Ok,
-                                                   QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
-    
-    static QMessageBox::StandardButton question(QWidget* parent, const QString& title, 
-                                               const QString& text, 
-                                               QMessageBox::StandardButtons buttons = QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No),
-                                               QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
-    
-    static QMessageBox::StandardButton warning(QWidget* parent, const QString& title, 
-                                              const QString& text, 
-                                              QMessageBox::StandardButtons buttons = QMessageBox::Ok,
-                                              QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
-    
-    static QMessageBox::StandardButton critical(QWidget* parent, const QString& title, 
-                                               const QString& text, 
-                                               QMessageBox::StandardButtons buttons = QMessageBox::Ok,
-                                               QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
+    static QMessageBox::StandardButton information(
+        QWidget* parent, const QString& title, const QString& text,
+        QMessageBox::StandardButtons buttons = QMessageBox::Ok,
+        QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
+
+    static QMessageBox::StandardButton question(
+        QWidget* parent, const QString& title, const QString& text,
+        QMessageBox::StandardButtons buttons =
+            QMessageBox::StandardButtons(QMessageBox::Yes | QMessageBox::No),
+        QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
+
+    static QMessageBox::StandardButton warning(
+        QWidget* parent, const QString& title, const QString& text,
+        QMessageBox::StandardButtons buttons = QMessageBox::Ok,
+        QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
+
+    static QMessageBox::StandardButton critical(
+        QWidget* parent, const QString& title, const QString& text,
+        QMessageBox::StandardButtons buttons = QMessageBox::Ok,
+        QMessageBox::StandardButton defaultButton = QMessageBox::NoButton);
 
 private:
     QMessageBox* message_box_widget_;
     std::function<void(QAbstractButton*)> button_clicked_handler_;
     std::function<void(int)> finished_handler_;
 };
-
-
 
 }  // namespace DeclarativeUI::Components

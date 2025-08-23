@@ -49,7 +49,8 @@ void IntegrationManager::shutdown() {
     qDebug() << "🔌 IntegrationManager shutdown";
 }
 
-std::shared_ptr<UI::BaseUICommand> IntegrationManager::convertToCommand(QObject* source) {
+std::shared_ptr<UI::BaseUICommand> IntegrationManager::convertToCommand(
+    QObject* source) {
     if (!source) {
         return nullptr;
     }
@@ -68,7 +69,8 @@ std::shared_ptr<UI::BaseUICommand> IntegrationManager::convertToCommand(QObject*
     return nullptr;
 }
 
-std::unique_ptr<QObject> IntegrationManager::convertFromCommand(std::shared_ptr<UI::BaseUICommand> command, const QString& targetType) {
+std::unique_ptr<QObject> IntegrationManager::convertFromCommand(
+    std::shared_ptr<UI::BaseUICommand> command, const QString& targetType) {
     if (!command) {
         return nullptr;
     }
@@ -82,7 +84,8 @@ std::unique_ptr<QObject> IntegrationManager::convertFromCommand(std::shared_ptr<
     return nullptr;
 }
 
-std::shared_ptr<UI::BaseUICommand> IntegrationManager::loadFromFile(const QString& filePath) {
+std::shared_ptr<UI::BaseUICommand> IntegrationManager::loadFromFile(
+    const QString& filePath) {
     if (!json_loader_) {
         return nullptr;
     }
@@ -97,7 +100,8 @@ std::shared_ptr<UI::BaseUICommand> IntegrationManager::loadFromFile(const QStrin
     return nullptr;
 }
 
-std::shared_ptr<UI::BaseUICommand> IntegrationManager::loadFromJSON(const QJsonObject& json) {
+std::shared_ptr<UI::BaseUICommand> IntegrationManager::loadFromJSON(
+    const QJsonObject& json) {
     if (!json_loader_) {
         return nullptr;
     }
@@ -106,7 +110,8 @@ std::shared_ptr<UI::BaseUICommand> IntegrationManager::loadFromJSON(const QJsonO
     return json_loader_->loadCommandFromObject(json);
 }
 
-std::shared_ptr<UI::BaseUICommand> IntegrationManager::loadFromString(const QString& content) {
+std::shared_ptr<UI::BaseUICommand> IntegrationManager::loadFromString(
+    const QString& content) {
     if (!json_loader_) {
         return nullptr;
     }
@@ -124,7 +129,8 @@ void IntegrationManager::migrateProject(const QString& projectPath) {
     emit migrationCompleted(projectPath);
 }
 
-void IntegrationManager::migrateFile(const QString& filePath, const QString& outputPath) {
+void IntegrationManager::migrateFile(const QString& filePath,
+                                     const QString& outputPath) {
     QString output = outputPath.isEmpty() ? filePath : outputPath;
 
     // Simple file migration logic
@@ -142,12 +148,15 @@ void IntegrationManager::migrateFile(const QString& filePath, const QString& out
     updateStatistics("migration");
 }
 
-QString IntegrationManager::generateMigrationReport(const QString& projectPath) {
+QString IntegrationManager::generateMigrationReport(
+    const QString& projectPath) {
     QString report = QString("Migration Report for: %1\n").arg(projectPath);
-    report += QString("Compatibility Mode: %1\n").arg(static_cast<int>(compatibility_mode_));
+    report += QString("Compatibility Mode: %1\n")
+                  .arg(static_cast<int>(compatibility_mode_));
     report += QString("Statistics:\n");
     report += QString("  Commands Created: %1\n").arg(stats_.commands_created);
-    report += QString("  Components Converted: %1\n").arg(stats_.components_converted);
+    report += QString("  Components Converted: %1\n")
+                  .arg(stats_.components_converted);
     report += QString("  Widgets Mapped: %1\n").arg(stats_.widgets_mapped);
     report += QString("  State Bindings: %1\n").arg(stats_.state_bindings);
     report += QString("  Event Handlers: %1\n").arg(stats_.event_handlers);
@@ -159,7 +168,8 @@ void IntegrationManager::setCompatibilityMode(CompatibilityMode mode) {
     if (compatibility_mode_ != mode) {
         compatibility_mode_ = mode;
         emit compatibilityModeChanged(mode);
-        qDebug() << "🔄 Compatibility mode changed to:" << static_cast<int>(mode);
+        qDebug() << "🔄 Compatibility mode changed to:"
+                 << static_cast<int>(mode);
     }
 }
 
@@ -294,13 +304,12 @@ void IntegrationManager::setBatchUpdates(bool enabled) {
     }
 }
 
-void IntegrationManager::resetStatistics() {
-    stats_ = IntegrationStats{};
-}
+void IntegrationManager::resetStatistics() { stats_ = IntegrationStats{}; }
 
 void IntegrationManager::initializeAdapters() {
-    // Create adapter instances - UIElementCommandAdapter will be created when needed
-    // ui_element_adapter_ = std::make_unique<UIElementCommandAdapter>(...);
+    // Create adapter instances - UIElementCommandAdapter will be created when
+    // needed ui_element_adapter_ =
+    // std::make_unique<UIElementCommandAdapter>(...);
 
     json_loader_ = std::make_unique<JSONCommandLoader>();
     state_adapter_ = std::make_unique<CommandStateManagerAdapter>();
@@ -311,14 +320,16 @@ void IntegrationManager::initializeAdapters() {
 
 void IntegrationManager::setupTypeConverters() {
     // Set up type converters for automatic conversion
-    type_converters_["Components::Button"] = [this](QObject* obj) -> std::shared_ptr<UI::BaseUICommand> {
+    type_converters_["Components::Button"] =
+        [this](QObject* obj) -> std::shared_ptr<UI::BaseUICommand> {
         if (auto* button = qobject_cast<Components::Button*>(obj)) {
             return component_adapter_->convertToCommand(button);
         }
         return nullptr;
     };
 
-    type_converters_["Components::Widget"] = [this](QObject* obj) -> std::shared_ptr<UI::BaseUICommand> {
+    type_converters_["Components::Widget"] =
+        [this](QObject* obj) -> std::shared_ptr<UI::BaseUICommand> {
         if (auto* widget = qobject_cast<Components::Widget*>(obj)) {
             return component_adapter_->convertToCommand(widget);
         }
@@ -340,8 +351,10 @@ void IntegrationManager::setupDefaultMappings() {
 void IntegrationManager::registerBuiltinConverters() {
     if (component_adapter_) {
         // TODO: Fix these converters when UI commands are properly defined
-        // component_adapter_->registerConverter<Components::Button, UI::ButtonCommand>();
-        // component_adapter_->registerConverter<Components::Widget, UI::ContainerCommand>();
+        // component_adapter_->registerConverter<Components::Button,
+        // UI::ButtonCommand>();
+        // component_adapter_->registerConverter<Components::Widget,
+        // UI::ContainerCommand>();
     }
 
     qDebug() << "📋 Built-in converters registered";
@@ -360,16 +373,18 @@ void IntegrationManager::connectAdapterSignals() {
 
     if (state_adapter_) {
         connect(state_adapter_.get(), &CommandStateManagerAdapter::syncError,
-                this, [this](std::shared_ptr<UI::BaseUICommand>, const QString& error) {
-                    onAdapterError(error);
-                });
+                this,
+                [this](std::shared_ptr<UI::BaseUICommand>,
+                       const QString& error) { onAdapterError(error); });
     }
 
     if (component_adapter_) {
-        connect(component_adapter_.get(), &ComponentSystemAdapter::conversionError,
-                this, &IntegrationManager::onAdapterError);
-        connect(component_adapter_.get(), &ComponentSystemAdapter::componentConverted,
-                this, &IntegrationManager::onConversionCompleted);
+        connect(component_adapter_.get(),
+                &ComponentSystemAdapter::conversionError, this,
+                &IntegrationManager::onAdapterError);
+        connect(component_adapter_.get(),
+                &ComponentSystemAdapter::componentConverted, this,
+                &IntegrationManager::onConversionCompleted);
     }
 
     qDebug() << "🔗 Adapter signals connected";
@@ -395,7 +410,9 @@ void IntegrationManager::handleMigrationRequest(const QString& path) {
     if (dir.exists()) {
         // Process directory
         QStringList filters;
-        filters << "*.json" << "*.ui" << "*.qml";
+        filters << "*.json"
+                << "*.ui"
+                << "*.qml";
 
         QFileInfoList files = dir.entryInfoList(filters, QDir::Files);
         for (const QFileInfo& fileInfo : files) {
@@ -443,7 +460,8 @@ void IntegrationManager::onAdapterError(const QString& error) {
     emit integrationError(error);
 }
 
-void IntegrationManager::onConversionCompleted(QObject* source, std::shared_ptr<UI::BaseUICommand> result) {
+void IntegrationManager::onConversionCompleted(
+    QObject* source, std::shared_ptr<UI::BaseUICommand> result) {
     updateStatistics("conversion");
     emit conversionPerformed(source, result);
 }
@@ -451,7 +469,8 @@ void IntegrationManager::onConversionCompleted(QObject* source, std::shared_ptr<
 // **CompatibilityLayer implementation**
 // Template implementation is in the header file
 
-void CompatibilityLayer::setProperty(QObject* object, const QString& property, const QVariant& value) {
+void CompatibilityLayer::setProperty(QObject* object, const QString& property,
+                                     const QVariant& value) {
     if (isCommand(object)) {
         auto command = asCommand(object);
         if (command) {
@@ -462,7 +481,8 @@ void CompatibilityLayer::setProperty(QObject* object, const QString& property, c
     }
 }
 
-QVariant CompatibilityLayer::getProperty(QObject* object, const QString& property) {
+QVariant CompatibilityLayer::getProperty(QObject* object,
+                                         const QString& property) {
     if (isCommand(object)) {
         auto command = asCommand(object);
         if (command) {
@@ -473,7 +493,8 @@ QVariant CompatibilityLayer::getProperty(QObject* object, const QString& propert
     return object->property(property.toUtf8().constData());
 }
 
-void CompatibilityLayer::connectEvent(QObject* source, const QString& event, std::function<void()> handler) {
+void CompatibilityLayer::connectEvent(QObject* source, const QString& event,
+                                      std::function<void()> handler) {
     if (isCommand(source)) {
         auto command = asCommand(source);
         if (command) {
@@ -485,7 +506,8 @@ void CompatibilityLayer::connectEvent(QObject* source, const QString& event, std
     }
 }
 
-void CompatibilityLayer::bindToState(QObject* object, const QString& stateKey, const QString& property) {
+void CompatibilityLayer::bindToState(QObject* object, const QString& stateKey,
+                                     const QString& property) {
     if (isCommand(object)) {
         auto command = asCommand(object);
         if (command) {
@@ -511,13 +533,19 @@ bool CompatibilityLayer::isUIElement(QObject* object) {
     return qobject_cast<Core::UIElement*>(object) != nullptr;
 }
 
-std::shared_ptr<UI::BaseUICommand> CompatibilityLayer::asCommand(QObject* object) {
+std::shared_ptr<UI::BaseUICommand> CompatibilityLayer::asCommand(
+    QObject* object) {
     auto* command = qobject_cast<UI::BaseUICommand*>(object);
     if (command) {
-        // This is a simplified approach - in practice, you'd need proper shared_ptr management
-        return std::shared_ptr<UI::BaseUICommand>(command, [](UI::BaseUICommand*) {
-            // Custom deleter that doesn't actually delete (object is managed elsewhere)
-        });
+        // This is a simplified approach - in practice, you'd need proper
+        // shared_ptr management
+        return std::shared_ptr<UI::BaseUICommand>(command,
+                                                  [](UI::BaseUICommand*) {
+                                                      // Custom deleter that
+                                                      // doesn't actually delete
+                                                      // (object is managed
+                                                      // elsewhere)
+                                                  });
     }
     return nullptr;
 }
@@ -531,7 +559,8 @@ QWidget* CompatibilityLayer::asWidget(QObject* object) {
 }
 
 // **MigrationAssistant implementation**
-MigrationAssistant::ProjectAnalysis MigrationAssistant::analyzeProject(const QString& projectPath) {
+MigrationAssistant::ProjectAnalysis MigrationAssistant::analyzeProject(
+    const QString& projectPath) {
     ProjectAnalysis analysis;
     analysis.project_path = projectPath;
 
@@ -542,9 +571,15 @@ MigrationAssistant::ProjectAnalysis MigrationAssistant::analyzeProject(const QSt
 
     // Analyze files in project
     QStringList filters;
-    filters << "*.cpp" << "*.h" << "*.hpp" << "*.json" << "*.ui" << "*.qml";
+    filters << "*.cpp"
+            << "*.h"
+            << "*.hpp"
+            << "*.json"
+            << "*.ui"
+            << "*.qml";
 
-    QFileInfoList files = dir.entryInfoList(filters, QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
+    QFileInfoList files = dir.entryInfoList(
+        filters, QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
     analysis.total_files = files.size();
 
     for (const QFileInfo& fileInfo : files) {
@@ -557,7 +592,8 @@ MigrationAssistant::ProjectAnalysis MigrationAssistant::analyzeProject(const QSt
     return analysis;
 }
 
-MigrationAssistant::MigrationPlan MigrationAssistant::createMigrationPlan(const ProjectAnalysis& analysis) {
+MigrationAssistant::MigrationPlan MigrationAssistant::createMigrationPlan(
+    const ProjectAnalysis& analysis) {
     MigrationPlan plan;
     plan.analysis = analysis;
 
@@ -581,12 +617,15 @@ MigrationAssistant::MigrationPlan MigrationAssistant::createMigrationPlan(const 
     plan.testing_recommendations.append("Test each component after conversion");
     plan.testing_recommendations.append("Run integration tests");
 
-    plan.estimated_timeline = QString("%1 days").arg((analysis.estimated_effort_hours + 7) / 8);
+    plan.estimated_timeline =
+        QString("%1 days").arg((analysis.estimated_effort_hours + 7) / 8);
 
     return plan;
 }
 
-bool MigrationAssistant::executeMigrationPlan(const MigrationPlan& plan, std::function<void(const QString&)> progressCallback) {
+bool MigrationAssistant::executeMigrationPlan(
+    const MigrationPlan& plan,
+    std::function<void(const QString&)> progressCallback) {
     if (progressCallback) {
         progressCallback("Starting migration...");
     }
@@ -608,7 +647,8 @@ bool MigrationAssistant::executeMigrationPlan(const MigrationPlan& plan, std::fu
     return true;
 }
 
-bool MigrationAssistant::createBackup(const QString& projectPath, const QString& backupPath) {
+bool MigrationAssistant::createBackup(const QString& projectPath,
+                                      const QString& backupPath) {
     QDir sourceDir(projectPath);
     QDir targetDir(backupPath);
 
@@ -626,9 +666,11 @@ bool MigrationAssistant::createBackup(const QString& projectPath, const QString&
     return true;
 }
 
-bool MigrationAssistant::rollbackMigration(const QString& projectPath, const QString& backupPath) {
+bool MigrationAssistant::rollbackMigration(const QString& projectPath,
+                                           const QString& backupPath) {
     // Restore from backup (simplified implementation)
-    qDebug() << "Rolling back migration from" << backupPath << "to" << projectPath;
+    qDebug() << "Rolling back migration from" << backupPath << "to"
+             << projectPath;
     return true;
 }
 
@@ -645,7 +687,8 @@ QStringList MigrationAssistant::getMigrationIssues(const QString& projectPath) {
     return manager.getIntegrationIssues();
 }
 
-void MigrationAssistant::analyzeFile(const QString& filePath, ProjectAnalysis& analysis) {
+void MigrationAssistant::analyzeFile(const QString& filePath,
+                                     ProjectAnalysis& analysis) {
     QFileInfo fileInfo(filePath);
     QString suffix = fileInfo.suffix().toLower();
 
@@ -659,7 +702,8 @@ void MigrationAssistant::analyzeFile(const QString& filePath, ProjectAnalysis& a
 }
 
 QString MigrationAssistant::assessComplexity(const ProjectAnalysis& analysis) {
-    int totalFiles = analysis.ui_files + analysis.component_files + analysis.json_files;
+    int totalFiles =
+        analysis.ui_files + analysis.component_files + analysis.json_files;
 
     if (totalFiles < 10) {
         return "Simple";
@@ -673,11 +717,11 @@ QString MigrationAssistant::assessComplexity(const ProjectAnalysis& analysis) {
 int MigrationAssistant::estimateEffort(const ProjectAnalysis& analysis) {
     // Estimate effort in hours based on file counts
     int effort = 0;
-    effort += analysis.ui_files * 2;        // 2 hours per UI file
-    effort += analysis.component_files * 1; // 1 hour per component file
-    effort += analysis.json_files * 1;      // 1 hour per JSON file
+    effort += analysis.ui_files * 2;         // 2 hours per UI file
+    effort += analysis.component_files * 1;  // 1 hour per component file
+    effort += analysis.json_files * 1;       // 1 hour per JSON file
 
-    return std::max(effort, 4); // Minimum 4 hours
+    return std::max(effort, 4);  // Minimum 4 hours
 }
 
 }  // namespace DeclarativeUI::Command::Adapters

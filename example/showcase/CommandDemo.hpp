@@ -5,13 +5,13 @@
 
 #pragma once
 
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QGroupBox>
-#include <QPushButton>
+#include <QHBoxLayout>
 #include <QListWidget>
+#include <QPushButton>
 #include <QTextEdit>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <memory>
 
 #include "Command/CommandSystem.hpp"
@@ -39,14 +39,14 @@ private:
     QVBoxLayout* main_layout_;
     QGroupBox* controls_group_;
     QGroupBox* history_group_;
-    
+
     QPushButton* execute_button_;
     QPushButton* undo_button_;
     QPushButton* redo_button_;
     QPushButton* clear_button_;
-    
+
     QListWidget* history_list_;
     QTextEdit* result_display_;
-    
+
     std::unique_ptr<Command::CommandInvoker> command_invoker_;
 };

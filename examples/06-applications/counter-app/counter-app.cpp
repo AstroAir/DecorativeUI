@@ -11,6 +11,7 @@
 #include <QSlider>
 #include <QVBoxLayout>
 #include <memory>
+#include <type_traits>
 
 #include "Binding/StateManager.hpp"
 #include "Core/DeclarativeBuilder.hpp"
@@ -19,6 +20,187 @@
 #include "JSON/JSONUILoader.hpp"
 
 using namespace DeclarativeUI;
+
+// ============================================================================
+// COMPONENT REGISTRATION HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * @brief Helper function to apply common properties from JSON config to a
+ * widget.
+ * @tparam T The widget type
+ * @param widget Pointer to the widget to configure
+ * @param config JSON configuration object
+ */
+template <typename T>
+void applyCommonProperties(T* widget, const QJsonObject& config) {
+    if (!config.contains("properties")) {
+        return;
+    }
+
+    QJsonObject props = config["properties"].toObject();
+
+    // Apply text property (common to many widgets)
+    if (props.contains("text")) {
+        if constexpr (std::is_same_v<T, QLabel> ||
+                      std::is_same_v<T, QPushButton> ||
+                      std::is_same_v<T, QCheckBox>) {
+            widget->setText(props["text"].toString());
+        } else if constexpr (std::is_same_v<T, QLineEdit>) {
+            widget->setText(props["text"].toString());
+        }
+    }
+}
+
+/**
+ * @brief Template function to create a simple component registration with basic
+ * properties.
+ * @tparam T The widget type to register
+ * @param registry Reference to the component registry
+ * @param typeName The type name for registration
+ */
+template <typename T>
+void registerBasicComponent(JSON::ComponentRegistry& registry,
+                            const QString& typeName) {
+    registry.registerComponent<T>(typeName, [](const QJsonObject& config) {
+        auto widget = std::make_unique<T>();
+        applyCommonProperties(widget.get(), config);
+        return widget;
+    });
+}
+
+/**
+ * @brief Specialized helper for QLineEdit with its specific properties.
+ */
+void applyLineEditProperties(QLineEdit* lineEdit, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
+
+    QJsonObject props = config["properties"].toObject();
+    if (props.contains("text")) {
+        lineEdit->setText(props["text"].toString());
+    }
+    if (props.contains("placeholderText")) {
+        lineEdit->setPlaceholderText(props["placeholderText"].toString());
+    }
+    if (props.contains("readOnly")) {
+        lineEdit->setReadOnly(props["readOnly"].toBool());
+    }
+    if (props.contains("maxLength")) {
+        lineEdit->setMaxLength(props["maxLength"].toInt());
+    }
+}
+
+/**
+ * @brief Specialized helper for QCheckBox with its specific properties.
+ */
+void applyCheckBoxProperties(QCheckBox* checkBox, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
+
+    QJsonObject props = config["properties"].toObject();
+    if (props.contains("text")) {
+        checkBox->setText(props["text"].toString());
+    }
+    if (props.contains("checked")) {
+        checkBox->setChecked(props["checked"].toBool());
+    }
+    if (props.contains("tristate")) {
+        checkBox->setTristate(props["tristate"].toBool());
+    }
+}
+
+/**
+ * @brief Specialized helper for QComboBox with its specific properties.
+ */
+void applyComboBoxProperties(QComboBox* comboBox, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
+
+    QJsonObject props = config["properties"].toObject();
+    if (props.contains("items")) {
+        QJsonArray items = props["items"].toArray();
+        for (const auto& item : items) {
+            comboBox->addItem(item.toString());
+        }
+    }
+    if (props.contains("currentIndex")) {
+        comboBox->setCurrentIndex(props["currentIndex"].toInt());
+    }
+    if (props.contains("editable")) {
+        comboBox->setEditable(props["editable"].toBool());
+    }
+}
+
+/**
+ * @brief Specialized helper for QSlider with its specific properties.
+ */
+void applySliderProperties(QSlider* slider, const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
+
+    QJsonObject props = config["properties"].toObject();
+    if (props.contains("orientation")) {
+        slider->setOrientation(
+            static_cast<Qt::Orientation>(props["orientation"].toInt()));
+    }
+    if (props.contains("minimum")) {
+        slider->setMinimum(props["minimum"].toInt());
+    }
+    if (props.contains("maximum")) {
+        slider->setMaximum(props["maximum"].toInt());
+    }
+    if (props.contains("value")) {
+        slider->setValue(props["value"].toInt());
+    }
+    if (props.contains("singleStep")) {
+        slider->setSingleStep(props["singleStep"].toInt());
+    }
+    if (props.contains("pageStep")) {
+        slider->setPageStep(props["pageStep"].toInt());
+    }
+    if (props.contains("tickPosition")) {
+        slider->setTickPosition(
+            static_cast<QSlider::TickPosition>(props["tickPosition"].toInt()));
+    }
+    if (props.contains("tickInterval")) {
+        slider->setTickInterval(props["tickInterval"].toInt());
+    }
+}
+
+/**
+ * @brief Specialized helper for QProgressBar with its specific properties.
+ */
+void applyProgressBarProperties(QProgressBar* progressBar,
+                                const QJsonObject& config) {
+    if (!config.contains("properties"))
+        return;
+
+    QJsonObject props = config["properties"].toObject();
+    if (props.contains("minimum")) {
+        progressBar->setMinimum(props["minimum"].toInt());
+    }
+    if (props.contains("maximum")) {
+        progressBar->setMaximum(props["maximum"].toInt());
+    }
+    if (props.contains("value")) {
+        progressBar->setValue(props["value"].toInt());
+    }
+    if (props.contains("orientation")) {
+        progressBar->setOrientation(
+            static_cast<Qt::Orientation>(props["orientation"].toInt()));
+    }
+    if (props.contains("textVisible")) {
+        progressBar->setTextVisible(props["textVisible"].toBool());
+    }
+    if (props.contains("format")) {
+        progressBar->setFormat(props["format"].toString());
+    }
+    if (props.contains("invertedAppearance")) {
+        progressBar->setInvertedAppearance(
+            props["invertedAppearance"].toBool());
+    }
+}
 
 class CounterApp : public QObject {
     Q_OBJECT
@@ -83,180 +265,74 @@ private:
     std::shared_ptr<Binding::ReactiveProperty<QString>> counter_text_;
 
     void registerComponents();
+
+    // Helper methods to break down component registration
+    void registerBasicComponents();
+    void registerInputComponents();
+    void registerDisplayComponents();
 };
 
 void CounterApp::registerComponents() {
+    // Register components in organized groups
+    registerBasicComponents();
+    registerInputComponents();
+    registerDisplayComponents();
+}
+
+void CounterApp::registerBasicComponents() {
     auto& registry = JSON::ComponentRegistry::instance();
 
-    // **Register standard Qt widgets**
+    // Register basic Qt widgets with minimal configuration
     registry.registerComponent<QWidget>("QWidget", [](const QJsonObject&) {
         return std::make_unique<QWidget>();
     });
 
-    registry.registerComponent<QLabel>("QLabel", [](const QJsonObject& config) {
-        auto label = std::make_unique<QLabel>();
+    // Register components that only need basic text property handling
+    registerBasicComponent<QLabel>(registry, "QLabel");
+    registerBasicComponent<QPushButton>(registry, "QPushButton");
+}
 
-        // **Apply initial properties from config**
-        if (config.contains("properties")) {
-            QJsonObject props = config["properties"].toObject();
-            if (props.contains("text")) {
-                label->setText(props["text"].toString());
-            }
-        }
+void CounterApp::registerInputComponents() {
+    auto& registry = JSON::ComponentRegistry::instance();
 
-        return label;
-    });
-
-    registry.registerComponent<QPushButton>(
-        "QPushButton", [](const QJsonObject& config) {
-            auto button = std::make_unique<QPushButton>();
-
-            if (config.contains("properties")) {
-                QJsonObject props = config["properties"].toObject();
-                if (props.contains("text")) {
-                    button->setText(props["text"].toString());
-                }
-            }
-
-            return button;
-        });
-
-    // **Register new component types**
+    // Register input components with specialized property handling
     registry.registerComponent<QLineEdit>(
         "QLineEdit", [](const QJsonObject& config) {
             auto lineEdit = std::make_unique<QLineEdit>();
-
-            if (config.contains("properties")) {
-                QJsonObject props = config["properties"].toObject();
-                if (props.contains("text")) {
-                    lineEdit->setText(props["text"].toString());
-                }
-                if (props.contains("placeholderText")) {
-                    lineEdit->setPlaceholderText(
-                        props["placeholderText"].toString());
-                }
-                if (props.contains("readOnly")) {
-                    lineEdit->setReadOnly(props["readOnly"].toBool());
-                }
-                if (props.contains("maxLength")) {
-                    lineEdit->setMaxLength(props["maxLength"].toInt());
-                }
-            }
-
+            applyLineEditProperties(lineEdit.get(), config);
             return lineEdit;
         });
 
     registry.registerComponent<QCheckBox>(
         "QCheckBox", [](const QJsonObject& config) {
             auto checkBox = std::make_unique<QCheckBox>();
-
-            if (config.contains("properties")) {
-                QJsonObject props = config["properties"].toObject();
-                if (props.contains("text")) {
-                    checkBox->setText(props["text"].toString());
-                }
-                if (props.contains("checked")) {
-                    checkBox->setChecked(props["checked"].toBool());
-                }
-                if (props.contains("tristate")) {
-                    checkBox->setTristate(props["tristate"].toBool());
-                }
-            }
-
+            applyCheckBoxProperties(checkBox.get(), config);
             return checkBox;
         });
 
     registry.registerComponent<QComboBox>(
         "QComboBox", [](const QJsonObject& config) {
             auto comboBox = std::make_unique<QComboBox>();
-
-            if (config.contains("properties")) {
-                QJsonObject props = config["properties"].toObject();
-                if (props.contains("items")) {
-                    QJsonArray items = props["items"].toArray();
-                    for (const auto& item : items) {
-                        comboBox->addItem(item.toString());
-                    }
-                }
-                if (props.contains("currentIndex")) {
-                    comboBox->setCurrentIndex(props["currentIndex"].toInt());
-                }
-                if (props.contains("editable")) {
-                    comboBox->setEditable(props["editable"].toBool());
-                }
-            }
-
+            applyComboBoxProperties(comboBox.get(), config);
             return comboBox;
         });
+}
 
+void CounterApp::registerDisplayComponents() {
+    auto& registry = JSON::ComponentRegistry::instance();
+
+    // Register display components with specialized property handling
     registry.registerComponent<QSlider>(
         "QSlider", [](const QJsonObject& config) {
             auto slider = std::make_unique<QSlider>();
-
-            if (config.contains("properties")) {
-                QJsonObject props = config["properties"].toObject();
-                if (props.contains("orientation")) {
-                    slider->setOrientation(static_cast<Qt::Orientation>(
-                        props["orientation"].toInt()));
-                }
-                if (props.contains("minimum")) {
-                    slider->setMinimum(props["minimum"].toInt());
-                }
-                if (props.contains("maximum")) {
-                    slider->setMaximum(props["maximum"].toInt());
-                }
-                if (props.contains("value")) {
-                    slider->setValue(props["value"].toInt());
-                }
-                if (props.contains("singleStep")) {
-                    slider->setSingleStep(props["singleStep"].toInt());
-                }
-                if (props.contains("pageStep")) {
-                    slider->setPageStep(props["pageStep"].toInt());
-                }
-                if (props.contains("tickPosition")) {
-                    slider->setTickPosition(static_cast<QSlider::TickPosition>(
-                        props["tickPosition"].toInt()));
-                }
-                if (props.contains("tickInterval")) {
-                    slider->setTickInterval(props["tickInterval"].toInt());
-                }
-            }
-
+            applySliderProperties(slider.get(), config);
             return slider;
         });
 
     registry.registerComponent<QProgressBar>(
         "QProgressBar", [](const QJsonObject& config) {
             auto progressBar = std::make_unique<QProgressBar>();
-
-            if (config.contains("properties")) {
-                QJsonObject props = config["properties"].toObject();
-                if (props.contains("minimum")) {
-                    progressBar->setMinimum(props["minimum"].toInt());
-                }
-                if (props.contains("maximum")) {
-                    progressBar->setMaximum(props["maximum"].toInt());
-                }
-                if (props.contains("value")) {
-                    progressBar->setValue(props["value"].toInt());
-                }
-                if (props.contains("orientation")) {
-                    progressBar->setOrientation(static_cast<Qt::Orientation>(
-                        props["orientation"].toInt()));
-                }
-                if (props.contains("textVisible")) {
-                    progressBar->setTextVisible(props["textVisible"].toBool());
-                }
-                if (props.contains("format")) {
-                    progressBar->setFormat(props["format"].toString());
-                }
-                if (props.contains("invertedAppearance")) {
-                    progressBar->setInvertedAppearance(
-                        props["invertedAppearance"].toBool());
-                }
-            }
-
+            applyProgressBarProperties(progressBar.get(), config);
             return progressBar;
         });
 }

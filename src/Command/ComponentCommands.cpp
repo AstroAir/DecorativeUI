@@ -18,12 +18,14 @@ CommandResult<QVariant> ButtonCommand::execute(const CommandContext& context) {
     auto operation = context.getParameter<QString>("operation");
 
     if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
+        return CommandResult<QVariant>(
+            QString("Missing required parameter: widget"));
     }
 
     auto* button = findButton(widget_name);
     if (!button) {
-        return CommandResult<QVariant>(QString("Button '%1' not found").arg(widget_name));
+        return CommandResult<QVariant>(
+            QString("Button '%1' not found").arg(widget_name));
     }
 
     if (operation == "click" || operation.isEmpty()) {
@@ -33,23 +35,29 @@ CommandResult<QVariant> ButtonCommand::execute(const CommandContext& context) {
         auto text = context.getParameter<QString>("text");
         if (context.hasParameter("text")) {
             button->setText(text);
-            return CommandResult<QVariant>(QString("Button text set successfully"));
+            return CommandResult<QVariant>(
+                QString("Button text set successfully"));
         }
-        return CommandResult<QVariant>(QString("Missing text parameter for setText operation"));
+        return CommandResult<QVariant>(
+            QString("Missing text parameter for setText operation"));
     } else if (operation == "setEnabled") {
         auto enabled = context.getParameter<bool>("enabled");
         if (context.hasParameter("enabled")) {
             button->setEnabled(enabled);
-            return CommandResult<QVariant>(QString("Button enabled state set successfully"));
+            return CommandResult<QVariant>(
+                QString("Button enabled state set successfully"));
         }
-        return CommandResult<QVariant>(QString("Missing enabled parameter for setEnabled operation"));
+        return CommandResult<QVariant>(
+            QString("Missing enabled parameter for setEnabled operation"));
     }
 
-    return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
+    return CommandResult<QVariant>(
+        QString("Unknown operation: %1").arg(operation));
 }
 
 CommandMetadata ButtonCommand::getMetadata() const {
-    return CommandMetadata("ButtonCommand", "Specialized command for Button components");
+    return CommandMetadata("ButtonCommand",
+                           "Specialized command for Button components");
 }
 
 QPushButton* ButtonCommand::findButton(const QString& name) {
@@ -89,17 +97,20 @@ QPushButton* ButtonCommand::findButton(const QString& name) {
 CheckBoxCommand::CheckBoxCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
-CommandResult<QVariant> CheckBoxCommand::execute(const CommandContext& context) {
+CommandResult<QVariant> CheckBoxCommand::execute(
+    const CommandContext& context) {
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
     if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
+        return CommandResult<QVariant>(
+            QString("Missing required parameter: widget"));
     }
 
     auto* checkbox = findCheckBox(widget_name);
     if (!checkbox) {
-        return CommandResult<QVariant>(QString("CheckBox '%1' not found").arg(widget_name));
+        return CommandResult<QVariant>(
+            QString("CheckBox '%1' not found").arg(widget_name));
     }
 
     widget_name_ = widget_name;
@@ -108,24 +119,29 @@ CommandResult<QVariant> CheckBoxCommand::execute(const CommandContext& context) 
     if (operation == "toggle" || operation.isEmpty()) {
         new_state_ = !old_state_;
         checkbox->setChecked(new_state_);
-        return CommandResult<QVariant>(QString("CheckBox toggled successfully"));
+        return CommandResult<QVariant>(
+            QString("CheckBox toggled successfully"));
     } else if (operation == "setChecked") {
         auto checked = context.getParameter<bool>("checked");
         if (context.hasParameter("checked")) {
             new_state_ = checked;
             checkbox->setChecked(new_state_);
-            return CommandResult<QVariant>(QString("CheckBox state set successfully"));
+            return CommandResult<QVariant>(
+                QString("CheckBox state set successfully"));
         }
-        return CommandResult<QVariant>(QString("Missing checked parameter for setChecked operation"));
+        return CommandResult<QVariant>(
+            QString("Missing checked parameter for setChecked operation"));
     }
 
-    return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
+    return CommandResult<QVariant>(
+        QString("Unknown operation: %1").arg(operation));
 }
 
 CommandResult<QVariant> CheckBoxCommand::undo(const CommandContext& context) {
     auto* checkbox = findCheckBox(widget_name_);
     if (!checkbox) {
-        return CommandResult<QVariant>(QString("CheckBox '%1' not found for undo").arg(widget_name_));
+        return CommandResult<QVariant>(
+            QString("CheckBox '%1' not found for undo").arg(widget_name_));
     }
 
     checkbox->setChecked(old_state_);
@@ -137,7 +153,8 @@ bool CheckBoxCommand::canUndo(const CommandContext& context) const {
 }
 
 CommandMetadata CheckBoxCommand::getMetadata() const {
-    return CommandMetadata("CheckBoxCommand", "Specialized command for CheckBox components");
+    return CommandMetadata("CheckBoxCommand",
+                           "Specialized command for CheckBox components");
 }
 
 QCheckBox* CheckBoxCommand::findCheckBox(const QString& name) {
@@ -158,17 +175,20 @@ QCheckBox* CheckBoxCommand::findCheckBox(const QString& name) {
 RadioButtonCommand::RadioButtonCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
-CommandResult<QVariant> RadioButtonCommand::execute(const CommandContext& context) {
+CommandResult<QVariant> RadioButtonCommand::execute(
+    const CommandContext& context) {
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
     if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
+        return CommandResult<QVariant>(
+            QString("Missing required parameter: widget"));
     }
 
     auto* radioButton = findRadioButton(widget_name);
     if (!radioButton) {
-        return CommandResult<QVariant>(QString("RadioButton '%1' not found").arg(widget_name));
+        return CommandResult<QVariant>(
+            QString("RadioButton '%1' not found").arg(widget_name));
     }
 
     widget_name_ = widget_name;
@@ -176,23 +196,29 @@ CommandResult<QVariant> RadioButtonCommand::execute(const CommandContext& contex
 
     if (operation == "select" || operation.isEmpty()) {
         radioButton->setChecked(true);
-        return CommandResult<QVariant>(QString("RadioButton selected successfully"));
+        return CommandResult<QVariant>(
+            QString("RadioButton selected successfully"));
     } else if (operation == "setChecked") {
         auto checked = context.getParameter<bool>("checked");
         if (context.hasParameter("checked")) {
             radioButton->setChecked(checked);
-            return CommandResult<QVariant>(QString("RadioButton state set successfully"));
+            return CommandResult<QVariant>(
+                QString("RadioButton state set successfully"));
         }
-        return CommandResult<QVariant>(QString("Missing checked parameter for setChecked operation"));
+        return CommandResult<QVariant>(
+            QString("Missing checked parameter for setChecked operation"));
     }
 
-    return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
+    return CommandResult<QVariant>(
+        QString("Unknown operation: %1").arg(operation));
 }
 
-CommandResult<QVariant> RadioButtonCommand::undo(const CommandContext& context) {
+CommandResult<QVariant> RadioButtonCommand::undo(
+    const CommandContext& context) {
     auto* radioButton = findRadioButton(widget_name_);
     if (!radioButton) {
-        return CommandResult<QVariant>(QString("RadioButton '%1' not found for undo").arg(widget_name_));
+        return CommandResult<QVariant>(
+            QString("RadioButton '%1' not found for undo").arg(widget_name_));
     }
 
     radioButton->setChecked(old_state_);
@@ -204,7 +230,8 @@ bool RadioButtonCommand::canUndo(const CommandContext& context) const {
 }
 
 CommandMetadata RadioButtonCommand::getMetadata() const {
-    return CommandMetadata("RadioButtonCommand", "Specialized command for RadioButton components");
+    return CommandMetadata("RadioButtonCommand",
+                           "Specialized command for RadioButton components");
 }
 
 QRadioButton* RadioButtonCommand::findRadioButton(const QString& name) {
@@ -225,17 +252,20 @@ QRadioButton* RadioButtonCommand::findRadioButton(const QString& name) {
 TextEditCommand::TextEditCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
-CommandResult<QVariant> TextEditCommand::execute(const CommandContext& context) {
+CommandResult<QVariant> TextEditCommand::execute(
+    const CommandContext& context) {
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
     if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
+        return CommandResult<QVariant>(
+            QString("Missing required parameter: widget"));
     }
 
     auto* textEdit = findTextEdit(widget_name);
     if (!textEdit) {
-        return CommandResult<QVariant>(QString("TextEdit '%1' not found").arg(widget_name));
+        return CommandResult<QVariant>(
+            QString("TextEdit '%1' not found").arg(widget_name));
     }
 
     widget_name_ = widget_name;
@@ -247,30 +277,37 @@ CommandResult<QVariant> TextEditCommand::execute(const CommandContext& context) 
         if (context.hasParameter("text")) {
             new_text_ = text;
             textEdit->setPlainText(text);
-            return CommandResult<QVariant>(QString("TextEdit text set successfully"));
+            return CommandResult<QVariant>(
+                QString("TextEdit text set successfully"));
         }
-        return CommandResult<QVariant>(QString("Missing text parameter for setText operation"));
+        return CommandResult<QVariant>(
+            QString("Missing text parameter for setText operation"));
     } else if (operation == "append") {
         auto text = context.getParameter<QString>("text");
         if (context.hasParameter("text")) {
             textEdit->append(text);
             new_text_ = textEdit->toPlainText();
-            return CommandResult<QVariant>(QString("Text appended successfully"));
+            return CommandResult<QVariant>(
+                QString("Text appended successfully"));
         }
-        return CommandResult<QVariant>(QString("Missing text parameter for append operation"));
+        return CommandResult<QVariant>(
+            QString("Missing text parameter for append operation"));
     } else if (operation == "clear") {
         textEdit->clear();
         new_text_ = "";
-        return CommandResult<QVariant>(QString("TextEdit cleared successfully"));
+        return CommandResult<QVariant>(
+            QString("TextEdit cleared successfully"));
     }
 
-    return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
+    return CommandResult<QVariant>(
+        QString("Unknown operation: %1").arg(operation));
 }
 
 CommandResult<QVariant> TextEditCommand::undo(const CommandContext& context) {
     auto* textEdit = findTextEdit(widget_name_);
     if (!textEdit) {
-        return CommandResult<QVariant>(QString("TextEdit '%1' not found for undo").arg(widget_name_));
+        return CommandResult<QVariant>(
+            QString("TextEdit '%1' not found for undo").arg(widget_name_));
     }
 
     textEdit->setPlainText(old_text_);
@@ -282,7 +319,8 @@ bool TextEditCommand::canUndo(const CommandContext& context) const {
 }
 
 CommandMetadata TextEditCommand::getMetadata() const {
-    return CommandMetadata("TextEditCommand", "Specialized command for TextEdit components");
+    return CommandMetadata("TextEditCommand",
+                           "Specialized command for TextEdit components");
 }
 
 QTextEdit* TextEditCommand::findTextEdit(const QString& name) {
@@ -303,17 +341,20 @@ QTextEdit* TextEditCommand::findTextEdit(const QString& name) {
 LineEditCommand::LineEditCommand(const CommandContext& context)
     : ICommand(nullptr) {}
 
-CommandResult<QVariant> LineEditCommand::execute(const CommandContext& context) {
+CommandResult<QVariant> LineEditCommand::execute(
+    const CommandContext& context) {
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
     if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
+        return CommandResult<QVariant>(
+            QString("Missing required parameter: widget"));
     }
 
     auto* lineEdit = findLineEdit(widget_name);
     if (!lineEdit) {
-        return CommandResult<QVariant>(QString("LineEdit '%1' not found").arg(widget_name));
+        return CommandResult<QVariant>(
+            QString("LineEdit '%1' not found").arg(widget_name));
     }
 
     widget_name_ = widget_name;
@@ -325,25 +366,31 @@ CommandResult<QVariant> LineEditCommand::execute(const CommandContext& context) 
         if (context.hasParameter("text")) {
             new_text_ = text;
             lineEdit->setText(text);
-            return CommandResult<QVariant>(QString("LineEdit text set successfully"));
+            return CommandResult<QVariant>(
+                QString("LineEdit text set successfully"));
         }
-        return CommandResult<QVariant>(QString("Missing text parameter for setText operation"));
+        return CommandResult<QVariant>(
+            QString("Missing text parameter for setText operation"));
     } else if (operation == "clear") {
         lineEdit->clear();
         new_text_ = "";
-        return CommandResult<QVariant>(QString("LineEdit cleared successfully"));
+        return CommandResult<QVariant>(
+            QString("LineEdit cleared successfully"));
     } else if (operation == "selectAll") {
         lineEdit->selectAll();
-        return CommandResult<QVariant>(QString("LineEdit text selected successfully"));
+        return CommandResult<QVariant>(
+            QString("LineEdit text selected successfully"));
     }
 
-    return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
+    return CommandResult<QVariant>(
+        QString("Unknown operation: %1").arg(operation));
 }
 
 CommandResult<QVariant> LineEditCommand::undo(const CommandContext& context) {
     auto* lineEdit = findLineEdit(widget_name_);
     if (!lineEdit) {
-        return CommandResult<QVariant>(QString("LineEdit '%1' not found for undo").arg(widget_name_));
+        return CommandResult<QVariant>(
+            QString("LineEdit '%1' not found for undo").arg(widget_name_));
     }
 
     lineEdit->setText(old_text_);
@@ -355,7 +402,8 @@ bool LineEditCommand::canUndo(const CommandContext& context) const {
 }
 
 CommandMetadata LineEditCommand::getMetadata() const {
-    return CommandMetadata("LineEditCommand", "Specialized command for LineEdit components");
+    return CommandMetadata("LineEditCommand",
+                           "Specialized command for LineEdit components");
 }
 
 QLineEdit* LineEditCommand::findLineEdit(const QString& name) {
@@ -373,20 +421,21 @@ QLineEdit* LineEditCommand::findLineEdit(const QString& name) {
 // LABEL COMPONENTS
 // ============================================================================
 
-LabelCommand::LabelCommand(const CommandContext& context)
-    : ICommand(nullptr) {}
+LabelCommand::LabelCommand(const CommandContext& context) : ICommand(nullptr) {}
 
 CommandResult<QVariant> LabelCommand::execute(const CommandContext& context) {
     auto widget_name = context.getParameter<QString>("widget");
     auto operation = context.getParameter<QString>("operation");
 
     if (!context.hasParameter("widget")) {
-        return CommandResult<QVariant>(QString("Missing required parameter: widget"));
+        return CommandResult<QVariant>(
+            QString("Missing required parameter: widget"));
     }
 
     auto* label = findLabel(widget_name);
     if (!label) {
-        return CommandResult<QVariant>(QString("Label '%1' not found").arg(widget_name));
+        return CommandResult<QVariant>(
+            QString("Label '%1' not found").arg(widget_name));
     }
 
     widget_name_ = widget_name;
@@ -397,22 +446,26 @@ CommandResult<QVariant> LabelCommand::execute(const CommandContext& context) {
         if (context.hasParameter("text")) {
             new_text_ = text;
             label->setText(text);
-            return CommandResult<QVariant>(QString("Label text set successfully"));
+            return CommandResult<QVariant>(
+                QString("Label text set successfully"));
         }
-        return CommandResult<QVariant>(QString("Missing text parameter for setText operation"));
+        return CommandResult<QVariant>(
+            QString("Missing text parameter for setText operation"));
     } else if (operation == "clear") {
         label->clear();
         new_text_ = "";
         return CommandResult<QVariant>(QString("Label cleared successfully"));
     }
 
-    return CommandResult<QVariant>(QString("Unknown operation: %1").arg(operation));
+    return CommandResult<QVariant>(
+        QString("Unknown operation: %1").arg(operation));
 }
 
 CommandResult<QVariant> LabelCommand::undo(const CommandContext& context) {
     auto* label = findLabel(widget_name_);
     if (!label) {
-        return CommandResult<QVariant>(QString("Label '%1' not found for undo").arg(widget_name_));
+        return CommandResult<QVariant>(
+            QString("Label '%1' not found for undo").arg(widget_name_));
     }
 
     label->setText(old_text_);
@@ -424,7 +477,8 @@ bool LabelCommand::canUndo(const CommandContext& context) const {
 }
 
 CommandMetadata LabelCommand::getMetadata() const {
-    return CommandMetadata("LabelCommand", "Specialized command for Label components");
+    return CommandMetadata("LabelCommand",
+                           "Specialized command for Label components");
 }
 
 QLabel* LabelCommand::findLabel(const QString& name) {
@@ -452,53 +506,71 @@ void registerComponentCommands() {
     // ========================================================================
 
     // Register ButtonCommand with CommandFactory
-    factory.registerCommand("button", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-        return std::make_unique<ButtonCommand>(context);
-    });
+    factory.registerCommand(
+        "button",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ButtonCommand>(context);
+        });
 
     // Register CheckBoxCommand
-    factory.registerCommand("checkbox", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-        return std::make_unique<CheckBoxCommand>(context);
-    });
+    factory.registerCommand(
+        "checkbox",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<CheckBoxCommand>(context);
+        });
 
     // Register RadioButtonCommand
-    factory.registerCommand("radiobutton", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-        return std::make_unique<RadioButtonCommand>(context);
-    });
+    factory.registerCommand(
+        "radiobutton",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<RadioButtonCommand>(context);
+        });
 
     // ========================================================================
     // INPUT COMPONENTS
     // ========================================================================
 
     // Register SpinBoxCommand
-    factory.registerCommand("spinbox", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-        return std::make_unique<SpinBoxCommand>(context);
-    });
+    factory.registerCommand(
+        "spinbox",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<SpinBoxCommand>(context);
+        });
 
     // Register SliderCommand
-    factory.registerCommand("slider", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-        return std::make_unique<SliderCommand>(context);
-    });
+    factory.registerCommand(
+        "slider",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<SliderCommand>(context);
+        });
 
     // Register ComboBoxCommand
-    factory.registerCommand("combobox", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-        return std::make_unique<ComboBoxCommand>(context);
-    });
+    factory.registerCommand(
+        "combobox",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<ComboBoxCommand>(context);
+        });
 
     // Register LineEditCommand
-    factory.registerCommand("lineedit", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-        return std::make_unique<LineEditCommand>(context);
-    });
+    factory.registerCommand(
+        "lineedit",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<LineEditCommand>(context);
+        });
 
     // Register TextEditCommand
-    factory.registerCommand("textedit", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-        return std::make_unique<TextEditCommand>(context);
-    });
+    factory.registerCommand(
+        "textedit",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<TextEditCommand>(context);
+        });
 
     // Register LabelCommand
-    factory.registerCommand("label", [](const CommandContext& context) -> std::unique_ptr<ICommand> {
-        return std::make_unique<LabelCommand>(context);
-    });
+    factory.registerCommand(
+        "label",
+        [](const CommandContext& context) -> std::unique_ptr<ICommand> {
+            return std::make_unique<LabelCommand>(context);
+        });
 
     qDebug() << "✅ Component commands registered successfully";
 }

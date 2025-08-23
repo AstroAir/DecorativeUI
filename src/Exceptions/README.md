@@ -14,24 +14,28 @@ This directory contains the complete exception hierarchy and utilities:
 ## Key Features
 
 ### 🛡️ **Comprehensive Exception Hierarchy**
+
 - Base `UIException` class with rich context information
 - Specialized exceptions for different framework subsystems
 - Exception chaining and aggregation support
 - Detailed error messages with suggestions
 
 ### 📝 **Rich Error Context**
+
 - Contextual information for better debugging
 - Suggested solutions for common problems
 - Formatted error messages with hierarchy
 - Integration with Qt logging system
 
 ### 🔧 **Error Recovery Utilities**
+
 - Safe execution patterns with fallback handling
 - Exception validation and categorization
 - Automatic error reporting and logging
 - Recovery strategies for different error types
 
 ### 🎯 **Framework Integration**
+
 - Seamless integration with all DeclarativeUI modules
 - Qt-specific error handling patterns
 - Thread-safe exception handling
@@ -44,6 +48,7 @@ This directory contains the complete exception hierarchy and utilities:
 The foundation class for all DeclarativeUI exceptions.
 
 **Key Features:**
+
 - Rich error messages with context and suggestions
 - Fluent interface for adding context information
 - Cached formatted messages for performance
@@ -55,11 +60,11 @@ public:
     explicit UIException(std::string message);
     UIException(std::string message, std::string context);
     UIException(std::string message, std::string context, std::string suggestion);
-    
+
     // Fluent interface
     UIException& withContext(const std::string& context);
     UIException& withSuggestion(const std::string& suggestion);
-    
+
     // Access methods
     const std::string& getMessage() const noexcept;
     const std::string& getContext() const noexcept;
@@ -70,16 +75,19 @@ public:
 ### Component and Lifecycle Exceptions
 
 **ComponentCreationException**: Component instantiation failures
+
 ```cpp
 throw ComponentCreationException("Button", "Failed to create QPushButton widget");
 ```
 
 **ComponentRegistrationException**: Component registry issues
+
 ```cpp
 throw ComponentRegistrationException("CustomWidget", "Component already registered");
 ```
 
 **InitializationException**: Component initialization failures
+
 ```cpp
 throw InitializationException("AnimationEngine", "OpenGL context not available");
 ```
@@ -87,11 +95,13 @@ throw InitializationException("AnimationEngine", "OpenGL context not available")
 ### Property and State Management Exceptions
 
 **PropertyBindingException**: Property binding failures
+
 ```cpp
 throw PropertyBindingException("text", "Source property does not exist");
 ```
 
 **StateManagementException**: State system errors
+
 ```cpp
 throw StateManagementException("user.profile", "State key not found");
 ```
@@ -99,11 +109,13 @@ throw StateManagementException("user.profile", "State key not found");
 ### Layout and UI Exceptions
 
 **LayoutException**: Layout management errors
+
 ```cpp
 throw LayoutException("QVBoxLayout", "Cannot add widget to finalized layout");
 ```
 
 **StyleException**: Styling and theming errors
+
 ```cpp
 throw StyleException("QPushButton", "Invalid CSS selector syntax");
 ```
@@ -111,16 +123,19 @@ throw StyleException("QPushButton", "Invalid CSS selector syntax");
 ### JSON and Configuration Exceptions
 
 **JSONParsingException**: JSON parsing errors with line/column information
+
 ```cpp
 throw JSONParsingException("config.json", "Unexpected token", 15, 23);
 ```
 
 **JSONValidationException**: Schema validation failures
+
 ```cpp
 throw JSONValidationException("Invalid component type", "$.components[0].type");
 ```
 
 **ConfigurationException**: Configuration errors
+
 ```cpp
 throw ConfigurationException("theme.primary_color", "Invalid color format");
 ```
@@ -128,11 +143,13 @@ throw ConfigurationException("theme.primary_color", "Invalid color format");
 ### Hot Reload and File System Exceptions
 
 **HotReloadException**: Hot reload system errors
+
 ```cpp
 throw HotReloadException("ui/main.json", "Circular dependency detected");
 ```
 
 **FileWatchException**: File monitoring failures
+
 ```cpp
 throw FileWatchException("/path/to/file.json", "Permission denied");
 ```
@@ -140,11 +157,13 @@ throw FileWatchException("/path/to/file.json", "Permission denied");
 ### Resource and Network Exceptions
 
 **ResourceLoadException**: Asset loading failures
+
 ```cpp
 throw ResourceLoadException("icons/save.png", "File not found");
 ```
 
 **NetworkException**: Network operation errors
+
 ```cpp
 throw NetworkException("https://api.example.com", 404, "Resource not found");
 ```
@@ -152,11 +171,13 @@ throw NetworkException("https://api.example.com", 404, "Resource not found");
 ### Runtime and Threading Exceptions
 
 **RuntimeException**: General runtime errors
+
 ```cpp
 throw RuntimeException("widget_update", "Widget destroyed during update");
 ```
 
 **ConcurrencyException**: Threading and synchronization errors
+
 ```cpp
 throw ConcurrencyException("UI_THREAD", "Cannot access UI from background thread");
 ```
@@ -211,7 +232,7 @@ try {
         // Critical error - shut down gracefully
         initiateGracefulShutdown();
     }
-    
+
     QString category = getExceptionCategory(e);
     logException(e, category);
 }
@@ -246,7 +267,7 @@ void validateConfiguration(const QJsonObject& config) {
             .withContext("Configuration file validation")
             .withSuggestion("Add 'version' field to configuration file");
     }
-    
+
     if (config["version"].toString().isEmpty()) {
         throw ConfigurationException("version", "Version field is empty")
             .withSuggestion("Set version to a valid semantic version (e.g., '1.0.0')");
@@ -262,10 +283,10 @@ QJsonObject parseUIDefinition(const QString& filePath) {
     if (!file.open(QIODevice::ReadOnly)) {
         throw ResourceLoadException(filePath.toStdString(), "Cannot open file for reading");
     }
-    
+
     QJsonParseError parseError;
     QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), &parseError);
-    
+
     if (parseError.error != QJsonParseError::NoError) {
         throw JSONParsingException(
             filePath.toStdString(),
@@ -273,7 +294,7 @@ QJsonObject parseUIDefinition(const QString& filePath) {
             parseError.offset  // Convert offset to line/column if needed
         );
     }
-    
+
     return doc.object();
 }
 ```
@@ -283,7 +304,7 @@ QJsonObject parseUIDefinition(const QString& filePath) {
 ```cpp
 void loadAndApplyTheme(const QString& themePath) {
     ExceptionChain errors("Theme loading failed");
-    
+
     try {
         auto themeData = parseUIDefinition(themePath);
         validateThemeData(themeData);
@@ -295,7 +316,7 @@ void loadAndApplyTheme(const QString& themePath) {
     } catch (const StyleException& e) {
         errors.addException(std::make_unique<StyleException>(e));
     }
-    
+
     if (errors.getExceptionCount() > 0) {
         throw errors;
     }

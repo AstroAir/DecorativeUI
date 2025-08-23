@@ -3,12 +3,13 @@
 #include <QMetaObject>
 #include <QMetaProperty>
 #include <QThread>
-#include "../WidgetMapper.hpp"
 #include "../ComponentCommands.hpp"
+#include "../WidgetMapper.hpp"
 
 namespace DeclarativeUI::Command::Adapters {
 
-ComponentSystemAdapter::ComponentSystemAdapter(QObject* parent) : QObject(parent) {
+ComponentSystemAdapter::ComponentSystemAdapter(QObject* parent)
+    : QObject(parent) {
     setupBuiltinConverters();
     qDebug() << "🔄 ComponentSystemAdapter initialized";
 }
@@ -18,35 +19,43 @@ ComponentSystemAdapter& ComponentSystemAdapter::instance() {
     return instance;
 }
 
-std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::convertToCommand(Components::Button* button) {
+std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::convertToCommand(
+    Components::Button* button) {
     return ButtonAdapter::toCommand(button);
 }
 
-std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::convertToCommand(Components::Widget* widget) {
+std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::convertToCommand(
+    Components::Widget* widget) {
     return WidgetAdapter::toCommand(widget);
 }
 
-std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::convertToCommand(Components::Layout* layout) {
+std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::convertToCommand(
+    Components::Layout* layout) {
     return LayoutAdapter::toCommand(layout);
 }
 
-std::unique_ptr<Components::Button> ComponentSystemAdapter::convertToButton(std::shared_ptr<UI::BaseUICommand> command) {
+std::unique_ptr<Components::Button> ComponentSystemAdapter::convertToButton(
+    std::shared_ptr<UI::BaseUICommand> command) {
     return ButtonAdapter::toComponent(command);
 }
 
-std::unique_ptr<Components::Widget> ComponentSystemAdapter::convertToWidget(std::shared_ptr<UI::BaseUICommand> command) {
+std::unique_ptr<Components::Widget> ComponentSystemAdapter::convertToWidget(
+    std::shared_ptr<UI::BaseUICommand> command) {
     return WidgetAdapter::toComponent(command);
 }
 
-std::unique_ptr<Components::Layout> ComponentSystemAdapter::convertToLayout(std::shared_ptr<UI::BaseUICommand> command) {
+std::unique_ptr<Components::Layout> ComponentSystemAdapter::convertToLayout(
+    std::shared_ptr<UI::BaseUICommand> command) {
     return LayoutAdapter::toComponent(command);
 }
 
-std::unique_ptr<ComponentSystemAdapter::HybridContainer> ComponentSystemAdapter::createHybridContainer() {
+std::unique_ptr<ComponentSystemAdapter::HybridContainer>
+ComponentSystemAdapter::createHybridContainer() {
     return std::make_unique<HybridContainer>();
 }
 
-void ComponentSystemAdapter::establishSync(Components::Button* button, std::shared_ptr<UI::BaseUICommand> command) {
+void ComponentSystemAdapter::establishSync(
+    Components::Button* button, std::shared_ptr<UI::BaseUICommand> command) {
     ButtonAdapter::establishSync(button, command);
 
     SyncInfo syncInfo;
@@ -59,7 +68,8 @@ void ComponentSystemAdapter::establishSync(Components::Button* button, std::shar
     emit syncEstablished(button, command);
 }
 
-void ComponentSystemAdapter::establishSync(Components::Widget* widget, std::shared_ptr<UI::BaseUICommand> command) {
+void ComponentSystemAdapter::establishSync(
+    Components::Widget* widget, std::shared_ptr<UI::BaseUICommand> command) {
     WidgetAdapter::establishSync(widget, command);
 
     SyncInfo syncInfo;
@@ -90,7 +100,8 @@ void ComponentSystemAdapter::removeSync(Components::Widget* widget) {
     }
 }
 
-std::vector<std::shared_ptr<UI::BaseUICommand>> ComponentSystemAdapter::convertComponentHierarchy(QWidget* rootWidget) {
+std::vector<std::shared_ptr<UI::BaseUICommand>>
+ComponentSystemAdapter::convertComponentHierarchy(QWidget* rootWidget) {
     std::vector<std::shared_ptr<UI::BaseUICommand>> commands;
 
     if (!rootWidget) {
@@ -117,13 +128,16 @@ std::vector<std::shared_ptr<UI::BaseUICommand>> ComponentSystemAdapter::convertC
     return commands;
 }
 
-std::unique_ptr<QWidget> ComponentSystemAdapter::convertCommandHierarchy(std::shared_ptr<UI::BaseUICommand> rootCommand) {
+std::unique_ptr<QWidget> ComponentSystemAdapter::convertCommandHierarchy(
+    std::shared_ptr<UI::BaseUICommand> rootCommand) {
     if (!rootCommand) {
         return nullptr;
     }
 
     // Create widget from command
-    auto widget = DeclarativeUI::Command::UI::WidgetMapper::instance().createWidget(rootCommand.get());
+    auto widget =
+        DeclarativeUI::Command::UI::WidgetMapper::instance().createWidget(
+            rootCommand.get());
     if (!widget) {
         return nullptr;
     }
@@ -139,7 +153,8 @@ std::unique_ptr<QWidget> ComponentSystemAdapter::convertCommandHierarchy(std::sh
     return widget;
 }
 
-void ComponentSystemAdapter::migrateComponentToCommand(QWidget* component, std::shared_ptr<UI::BaseUICommand> command) {
+void ComponentSystemAdapter::migrateComponentToCommand(
+    QWidget* component, std::shared_ptr<UI::BaseUICommand> command) {
     if (!component || !command) {
         return;
     }
@@ -156,7 +171,8 @@ void ComponentSystemAdapter::migrateComponentToCommand(QWidget* component, std::
     }
 }
 
-void ComponentSystemAdapter::migrateCommandToComponent(std::shared_ptr<UI::BaseUICommand> command, QWidget* component) {
+void ComponentSystemAdapter::migrateCommandToComponent(
+    std::shared_ptr<UI::BaseUICommand> command, QWidget* component) {
     if (!command || !component) {
         return;
     }
@@ -170,7 +186,8 @@ void ComponentSystemAdapter::migrateCommandToComponent(std::shared_ptr<UI::BaseU
         if (propIndex >= 0) {
             QMetaProperty prop = metaObj->property(propIndex);
             if (prop.isWritable()) {
-                QVariant value = command->getState()->getProperty<QVariant>(propName);
+                QVariant value =
+                    command->getState()->getProperty<QVariant>(propName);
                 prop.write(component, value);
             }
         }
@@ -181,8 +198,10 @@ bool ComponentSystemAdapter::hasConverter(const QString& componentType) const {
     return converters_.find(componentType) != converters_.end();
 }
 
-bool ComponentSystemAdapter::hasReverseConverter(const QString& commandType) const {
-    return command_to_component_map_.find(commandType) != command_to_component_map_.end();
+bool ComponentSystemAdapter::hasReverseConverter(
+    const QString& commandType) const {
+    return command_to_component_map_.find(commandType) !=
+           command_to_component_map_.end();
 }
 
 QStringList ComponentSystemAdapter::getSupportedComponentTypes() const {
@@ -204,24 +223,32 @@ QStringList ComponentSystemAdapter::getSupportedCommandTypes() const {
 void ComponentSystemAdapter::setupBuiltinConverters() {
     // Register built-in converters
     // Note: Component commands are now in ComponentCommands namespace
-    // registerConverter<Components::Button, ComponentCommands::ButtonCommand>();
-    // registerConverter<Components::Widget, ComponentCommands::ContainerCommand>();
+    // registerConverter<Components::Button,
+    // ComponentCommands::ButtonCommand>();
+    // registerConverter<Components::Widget,
+    // ComponentCommands::ContainerCommand>();
 
-    qDebug() << "🔧 Built-in converters registered (component commands available)";
+    qDebug()
+        << "🔧 Built-in converters registered (component commands available)";
 }
 
-void ComponentSystemAdapter::setupComponentToCommandSync(QObject* component, std::shared_ptr<UI::BaseUICommand> command, SyncInfo& syncInfo) {
+void ComponentSystemAdapter::setupComponentToCommandSync(
+    QObject* component, std::shared_ptr<UI::BaseUICommand> command,
+    SyncInfo& syncInfo) {
     // Connect component property changes to command updates
     const QMetaObject* metaObj = component->metaObject();
     for (int i = 0; i < metaObj->methodCount(); ++i) {
         QMetaMethod method = metaObj->method(i);
         if (method.methodType() == QMetaMethod::Signal) {
             QString signalName = method.name();
-            if (signalName.contains("Changed") || signalName.contains("Updated")) {
+            if (signalName.contains("Changed") ||
+                signalName.contains("Updated")) {
                 // Use signal name for connection
-                QString signalSignature = QString("2%1").arg(method.methodSignature());
-                auto connection = QObject::connect(component, signalSignature.toLocal8Bit().data(),
-                                                 this, SLOT(onComponentChanged()));
+                QString signalSignature =
+                    QString("2%1").arg(method.methodSignature());
+                auto connection = QObject::connect(
+                    component, signalSignature.toLocal8Bit().data(), this,
+                    SLOT(onComponentChanged()));
                 // Store the component and command for the slot to use
                 sync_context_[component] = command;
                 syncInfo.connections.push_back(connection);
@@ -230,12 +257,16 @@ void ComponentSystemAdapter::setupComponentToCommandSync(QObject* component, std
     }
 }
 
-void ComponentSystemAdapter::setupCommandToComponentSync(std::shared_ptr<UI::BaseUICommand> command, QObject* component, SyncInfo& syncInfo) {
+void ComponentSystemAdapter::setupCommandToComponentSync(
+    std::shared_ptr<UI::BaseUICommand> command, QObject* component,
+    SyncInfo& syncInfo) {
     // Connect command state changes to component updates
-    auto connection = connect(command.get(), &UI::BaseUICommand::stateChanged, this,
-                             [this, command, component]() {
-                                 migrateCommandToComponent(command, qobject_cast<QWidget*>(component));
-                             });
+    auto connection =
+        connect(command.get(), &UI::BaseUICommand::stateChanged, this,
+                [this, command, component]() {
+                    migrateCommandToComponent(
+                        command, qobject_cast<QWidget*>(component));
+                });
     syncInfo.connections.push_back(connection);
 }
 
@@ -246,7 +277,8 @@ void ComponentSystemAdapter::cleanupSync(SyncInfo& syncInfo) {
     syncInfo.connections.clear();
 }
 
-std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::createCommandFromComponent(QObject* component) {
+std::shared_ptr<UI::BaseUICommand>
+ComponentSystemAdapter::createCommandFromComponent(QObject* component) {
     if (!component) {
         return nullptr;
     }
@@ -259,11 +291,13 @@ std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::createCommandFromComp
         return command;
     }
 
-    handleConversionError(QString("No converter found for component type: %1").arg(componentType));
+    handleConversionError(QString("No converter found for component type: %1")
+                              .arg(componentType));
     return nullptr;
 }
 
-std::unique_ptr<QObject> ComponentSystemAdapter::createComponentFromCommand(std::shared_ptr<UI::BaseUICommand> command) {
+std::unique_ptr<QObject> ComponentSystemAdapter::createComponentFromCommand(
+    std::shared_ptr<UI::BaseUICommand> command) {
     if (!command) {
         return nullptr;
     }
@@ -280,7 +314,8 @@ std::unique_ptr<QObject> ComponentSystemAdapter::createComponentFromCommand(std:
         }
     }
 
-    handleConversionError(QString("No converter found for command type: %1").arg(commandType));
+    handleConversionError(
+        QString("No converter found for command type: %1").arg(commandType));
     return nullptr;
 }
 
@@ -298,11 +333,13 @@ void ComponentSystemAdapter::onComponentChanged() {
 }
 
 // **HybridContainer implementation**
-ComponentSystemAdapter::HybridContainer::HybridContainer(QObject* parent) : QObject(parent) {
+ComponentSystemAdapter::HybridContainer::HybridContainer(QObject* parent)
+    : QObject(parent) {
     qDebug() << "🏗️ HybridContainer created";
 }
 
-void ComponentSystemAdapter::HybridContainer::addComponent(std::unique_ptr<QObject> component) {
+void ComponentSystemAdapter::HybridContainer::addComponent(
+    std::unique_ptr<QObject> component) {
     if (component) {
         items_.emplace_back(component.release());
         setupItemConnections(items_.back());
@@ -314,7 +351,8 @@ void ComponentSystemAdapter::HybridContainer::addComponent(std::unique_ptr<QObje
     }
 }
 
-void ComponentSystemAdapter::HybridContainer::addCommand(std::shared_ptr<UI::BaseUICommand> command) {
+void ComponentSystemAdapter::HybridContainer::addCommand(
+    std::shared_ptr<UI::BaseUICommand> command) {
     if (command) {
         items_.emplace_back(command);
         setupItemConnections(items_.back());
@@ -326,7 +364,8 @@ void ComponentSystemAdapter::HybridContainer::addCommand(std::shared_ptr<UI::Bas
     }
 }
 
-void ComponentSystemAdapter::HybridContainer::addWidget(std::unique_ptr<QWidget> widget) {
+void ComponentSystemAdapter::HybridContainer::addWidget(
+    std::unique_ptr<QWidget> widget) {
     if (widget) {
         items_.emplace_back(widget.release());
         setupItemConnections(items_.back());
@@ -338,11 +377,12 @@ void ComponentSystemAdapter::HybridContainer::addWidget(std::unique_ptr<QWidget>
     }
 }
 
-void ComponentSystemAdapter::HybridContainer::removeComponent(QObject* component) {
+void ComponentSystemAdapter::HybridContainer::removeComponent(
+    QObject* component) {
     auto it = std::find_if(items_.begin(), items_.end(),
-                          [component](const HybridItem& item) {
-                              return item.component == component;
-                          });
+                           [component](const HybridItem& item) {
+                               return item.component == component;
+                           });
 
     if (it != items_.end()) {
         cleanupItemConnections(*it);
@@ -351,11 +391,11 @@ void ComponentSystemAdapter::HybridContainer::removeComponent(QObject* component
     }
 }
 
-void ComponentSystemAdapter::HybridContainer::removeCommand(std::shared_ptr<UI::BaseUICommand> command) {
-    auto it = std::find_if(items_.begin(), items_.end(),
-                          [command](const HybridItem& item) {
-                              return item.command == command;
-                          });
+void ComponentSystemAdapter::HybridContainer::removeCommand(
+    std::shared_ptr<UI::BaseUICommand> command) {
+    auto it = std::find_if(
+        items_.begin(), items_.end(),
+        [command](const HybridItem& item) { return item.command == command; });
 
     if (it != items_.end()) {
         cleanupItemConnections(*it);
@@ -378,7 +418,8 @@ void ComponentSystemAdapter::HybridContainer::clear() {
     items_.clear();
 }
 
-void ComponentSystemAdapter::HybridContainer::setLayout(const QString& layoutType) {
+void ComponentSystemAdapter::HybridContainer::setLayout(
+    const QString& layoutType) {
     if (layout_type_ != layoutType) {
         layout_type_ = layoutType;
         emit layoutChanged(layoutType);
@@ -390,15 +431,19 @@ void ComponentSystemAdapter::HybridContainer::setSpacing(int spacing) {
     qDebug() << "🔧 HybridContainer spacing set to:" << spacing;
 }
 
-void ComponentSystemAdapter::HybridContainer::setMargins(int left, int top, int right, int bottom) {
+void ComponentSystemAdapter::HybridContainer::setMargins(int left, int top,
+                                                         int right,
+                                                         int bottom) {
     margin_left_ = left;
     margin_top_ = top;
     margin_right_ = right;
     margin_bottom_ = bottom;
-    qDebug() << "🔧 HybridContainer margins set to:" << left << top << right << bottom;
+    qDebug() << "🔧 HybridContainer margins set to:" << left << top << right
+             << bottom;
 }
 
-std::vector<QObject*> ComponentSystemAdapter::HybridContainer::getComponents() const {
+std::vector<QObject*> ComponentSystemAdapter::HybridContainer::getComponents()
+    const {
     std::vector<QObject*> components;
     for (const auto& item : items_) {
         if (item.type == HybridItem::Component) {
@@ -408,7 +453,8 @@ std::vector<QObject*> ComponentSystemAdapter::HybridContainer::getComponents() c
     return components;
 }
 
-std::vector<std::shared_ptr<UI::BaseUICommand>> ComponentSystemAdapter::HybridContainer::getCommands() const {
+std::vector<std::shared_ptr<UI::BaseUICommand>>
+ComponentSystemAdapter::HybridContainer::getCommands() const {
     std::vector<std::shared_ptr<UI::BaseUICommand>> commands;
     for (const auto& item : items_) {
         if (item.type == HybridItem::Command) {
@@ -418,7 +464,8 @@ std::vector<std::shared_ptr<UI::BaseUICommand>> ComponentSystemAdapter::HybridCo
     return commands;
 }
 
-std::vector<QWidget*> ComponentSystemAdapter::HybridContainer::getWidgets() const {
+std::vector<QWidget*> ComponentSystemAdapter::HybridContainer::getWidgets()
+    const {
     std::vector<QWidget*> widgets;
     for (const auto& item : items_) {
         if (item.type == HybridItem::Widget) {
@@ -432,15 +479,16 @@ int ComponentSystemAdapter::HybridContainer::getItemCount() const {
     return static_cast<int>(items_.size());
 }
 
-std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::HybridContainer::toCommand() {
+std::shared_ptr<UI::BaseUICommand>
+ComponentSystemAdapter::HybridContainer::toCommand() {
     auto container = UI::CommandBuilder("Container")
-        .property("layout", layout_type_)
-        .property("spacing", spacing_)
-        .property("marginLeft", margin_left_)
-        .property("marginTop", margin_top_)
-        .property("marginRight", margin_right_)
-        .property("marginBottom", margin_bottom_)
-        .build();
+                         .property("layout", layout_type_)
+                         .property("spacing", spacing_)
+                         .property("marginLeft", margin_left_)
+                         .property("marginTop", margin_top_)
+                         .property("marginRight", margin_right_)
+                         .property("marginBottom", margin_bottom_)
+                         .build();
 
     // Add all items as children
     for (const auto& item : items_) {
@@ -449,10 +497,14 @@ std::shared_ptr<UI::BaseUICommand> ComponentSystemAdapter::HybridContainer::toCo
         if (item.type == HybridItem::Command) {
             childCommand = item.command;
         } else if (item.type == HybridItem::Component) {
-            childCommand = ComponentSystemAdapter::instance().createCommandFromComponent(item.component);
+            childCommand =
+                ComponentSystemAdapter::instance().createCommandFromComponent(
+                    item.component);
         } else if (item.type == HybridItem::Widget) {
             // Convert widget to command (simplified)
-            childCommand = ComponentSystemAdapter::instance().createCommandFromComponent(item.widget);
+            childCommand =
+                ComponentSystemAdapter::instance().createCommandFromComponent(
+                    item.widget);
         }
 
         if (childCommand) {
@@ -480,34 +532,38 @@ void ComponentSystemAdapter::HybridContainer::syncItem(HybridItem& item) {
     // Implementation would depend on specific item types
 }
 
-void ComponentSystemAdapter::HybridContainer::setupItemConnections(HybridItem& item) {
+void ComponentSystemAdapter::HybridContainer::setupItemConnections(
+    HybridItem& item) {
     // Set up connections for item synchronization
     Q_UNUSED(item)
     // Implementation would depend on specific item types
 }
 
-void ComponentSystemAdapter::HybridContainer::cleanupItemConnections(HybridItem& item) {
+void ComponentSystemAdapter::HybridContainer::cleanupItemConnections(
+    HybridItem& item) {
     // Clean up connections for item
     Q_UNUSED(item)
     // Implementation would depend on specific item types
 }
 
 // **ButtonAdapter implementation**
-std::shared_ptr<UI::BaseUICommand> ButtonAdapter::toCommand(Components::Button* button) {
+std::shared_ptr<UI::BaseUICommand> ButtonAdapter::toCommand(
+    Components::Button* button) {
     if (!button) {
         return nullptr;
     }
 
     auto command = UI::CommandBuilder("Button")
-        .text(std::get<QString>(button->getProperty("text")))
-        .enabled(std::get<bool>(button->getProperty("enabled")))
-        .build();
+                       .text(std::get<QString>(button->getProperty("text")))
+                       .enabled(std::get<bool>(button->getProperty("enabled")))
+                       .build();
 
     syncButtonToCommand(button, command);
     return command;
 }
 
-std::unique_ptr<Components::Button> ButtonAdapter::toComponent(std::shared_ptr<UI::BaseUICommand> command) {
+std::unique_ptr<Components::Button> ButtonAdapter::toComponent(
+    std::shared_ptr<UI::BaseUICommand> command) {
     if (!command) {
         return nullptr;
     }
@@ -517,21 +573,26 @@ std::unique_ptr<Components::Button> ButtonAdapter::toComponent(std::shared_ptr<U
     return button;
 }
 
-void ButtonAdapter::establishSync(Components::Button* button, std::shared_ptr<UI::BaseUICommand> command) {
+void ButtonAdapter::establishSync(Components::Button* button,
+                                  std::shared_ptr<UI::BaseUICommand> command) {
     setupButtonPropertySync(button, command);
     setupButtonEventSync(button, command);
 }
 
-void ButtonAdapter::syncButtonToCommand(Components::Button* button, std::shared_ptr<UI::BaseUICommand> command) {
+void ButtonAdapter::syncButtonToCommand(
+    Components::Button* button, std::shared_ptr<UI::BaseUICommand> command) {
     if (!button || !command) {
         return;
     }
 
-    command->getState()->setProperty("text", std::get<QString>(button->getProperty("text")));
-    command->getState()->setProperty("enabled", std::get<bool>(button->getProperty("enabled")));
+    command->getState()->setProperty(
+        "text", std::get<QString>(button->getProperty("text")));
+    command->getState()->setProperty(
+        "enabled", std::get<bool>(button->getProperty("enabled")));
 }
 
-void ButtonAdapter::syncCommandToButton(std::shared_ptr<UI::BaseUICommand> command, Components::Button* button) {
+void ButtonAdapter::syncCommandToButton(
+    std::shared_ptr<UI::BaseUICommand> command, Components::Button* button) {
     if (!command || !button) {
         return;
     }
@@ -540,14 +601,16 @@ void ButtonAdapter::syncCommandToButton(std::shared_ptr<UI::BaseUICommand> comma
     button->enabled(command->getState()->getProperty<bool>("enabled"));
 }
 
-void ButtonAdapter::setupButtonPropertySync(Components::Button* button, std::shared_ptr<UI::BaseUICommand> command) {
+void ButtonAdapter::setupButtonPropertySync(
+    Components::Button* button, std::shared_ptr<UI::BaseUICommand> command) {
     // Set up property synchronization
     Q_UNUSED(button)
     Q_UNUSED(command)
     // Implementation would connect button property changes to command updates
 }
 
-void ButtonAdapter::setupButtonEventSync(Components::Button* button, std::shared_ptr<UI::BaseUICommand> command) {
+void ButtonAdapter::setupButtonEventSync(
+    Components::Button* button, std::shared_ptr<UI::BaseUICommand> command) {
     // Set up event synchronization
     Q_UNUSED(button)
     Q_UNUSED(command)
@@ -555,7 +618,8 @@ void ButtonAdapter::setupButtonEventSync(Components::Button* button, std::shared
 }
 
 // **WidgetAdapter implementation**
-std::shared_ptr<UI::BaseUICommand> WidgetAdapter::toCommand(Components::Widget* widget) {
+std::shared_ptr<UI::BaseUICommand> WidgetAdapter::toCommand(
+    Components::Widget* widget) {
     if (!widget) {
         return nullptr;
     }
@@ -569,11 +633,11 @@ std::shared_ptr<UI::BaseUICommand> WidgetAdapter::toCommand(Components::Widget* 
         bool enabled = std::get<bool>(widget->getProperty("enabled"));
 
         command = UI::CommandBuilder("Container")
-            .size(size.width(), size.height())
-            .position(geometry.x(), geometry.y())
-            .visible(visible)
-            .enabled(enabled)
-            .build();
+                      .size(size.width(), size.height())
+                      .position(geometry.x(), geometry.y())
+                      .visible(visible)
+                      .enabled(enabled)
+                      .build();
     } catch (const std::bad_variant_access&) {
         // Fallback if properties don't exist or have wrong types
         command = UI::CommandBuilder("Container").build();
@@ -583,7 +647,8 @@ std::shared_ptr<UI::BaseUICommand> WidgetAdapter::toCommand(Components::Widget* 
     return command;
 }
 
-std::unique_ptr<Components::Widget> WidgetAdapter::toComponent(std::shared_ptr<UI::BaseUICommand> command) {
+std::unique_ptr<Components::Widget> WidgetAdapter::toComponent(
+    std::shared_ptr<UI::BaseUICommand> command) {
     if (!command) {
         return nullptr;
     }
@@ -593,12 +658,14 @@ std::unique_ptr<Components::Widget> WidgetAdapter::toComponent(std::shared_ptr<U
     return widget;
 }
 
-void WidgetAdapter::establishSync(Components::Widget* widget, std::shared_ptr<UI::BaseUICommand> command) {
+void WidgetAdapter::establishSync(Components::Widget* widget,
+                                  std::shared_ptr<UI::BaseUICommand> command) {
     setupWidgetPropertySync(widget, command);
     setupWidgetEventSync(widget, command);
 }
 
-void WidgetAdapter::syncWidgetToCommand(Components::Widget* widget, std::shared_ptr<UI::BaseUICommand> command) {
+void WidgetAdapter::syncWidgetToCommand(
+    Components::Widget* widget, std::shared_ptr<UI::BaseUICommand> command) {
     if (!widget || !command) {
         return;
     }
@@ -609,7 +676,8 @@ void WidgetAdapter::syncWidgetToCommand(Components::Widget* widget, std::shared_
     command->getState()->setProperty("enabled", widget->isEnabled());
 }
 
-void WidgetAdapter::syncCommandToWidget(std::shared_ptr<UI::BaseUICommand> command, Components::Widget* widget) {
+void WidgetAdapter::syncCommandToWidget(
+    std::shared_ptr<UI::BaseUICommand> command, Components::Widget* widget) {
     if (!command || !widget) {
         return;
     }
@@ -620,14 +688,16 @@ void WidgetAdapter::syncCommandToWidget(std::shared_ptr<UI::BaseUICommand> comma
     widget->enabled(command->getState()->getProperty<bool>("enabled"));
 }
 
-void WidgetAdapter::setupWidgetPropertySync(Components::Widget* widget, std::shared_ptr<UI::BaseUICommand> command) {
+void WidgetAdapter::setupWidgetPropertySync(
+    Components::Widget* widget, std::shared_ptr<UI::BaseUICommand> command) {
     // Set up property synchronization
     Q_UNUSED(widget)
     Q_UNUSED(command)
     // Implementation would connect widget property changes to command updates
 }
 
-void WidgetAdapter::setupWidgetEventSync(Components::Widget* widget, std::shared_ptr<UI::BaseUICommand> command) {
+void WidgetAdapter::setupWidgetEventSync(
+    Components::Widget* widget, std::shared_ptr<UI::BaseUICommand> command) {
     // Set up event synchronization
     Q_UNUSED(widget)
     Q_UNUSED(command)
@@ -635,7 +705,8 @@ void WidgetAdapter::setupWidgetEventSync(Components::Widget* widget, std::shared
 }
 
 // **LayoutAdapter implementation**
-std::shared_ptr<UI::BaseUICommand> LayoutAdapter::toCommand(Components::Layout* layout) {
+std::shared_ptr<UI::BaseUICommand> LayoutAdapter::toCommand(
+    Components::Layout* layout) {
     if (!layout) {
         return nullptr;
     }
@@ -643,7 +714,8 @@ std::shared_ptr<UI::BaseUICommand> LayoutAdapter::toCommand(Components::Layout* 
     return convertLayoutHierarchy(layout);
 }
 
-std::unique_ptr<Components::Layout> LayoutAdapter::toComponent(std::shared_ptr<UI::BaseUICommand> command) {
+std::unique_ptr<Components::Layout> LayoutAdapter::toComponent(
+    std::shared_ptr<UI::BaseUICommand> command) {
     if (!command) {
         return nullptr;
     }
@@ -651,9 +723,10 @@ std::unique_ptr<Components::Layout> LayoutAdapter::toComponent(std::shared_ptr<U
     return convertCommandHierarchy(command);
 }
 
-std::shared_ptr<UI::BaseUICommand> LayoutAdapter::convertLayoutHierarchy(Components::Layout* layout) {
+std::shared_ptr<UI::BaseUICommand> LayoutAdapter::convertLayoutHierarchy(
+    Components::Layout* layout) {
     // Convert layout type to string
-    QString layoutType = "VBox"; // Default
+    QString layoutType = "VBox";  // Default
     try {
         auto typeProperty = layout->getProperty("layoutType");
         if (std::holds_alternative<QString>(typeProperty)) {
@@ -663,9 +736,8 @@ std::shared_ptr<UI::BaseUICommand> LayoutAdapter::convertLayoutHierarchy(Compone
         // Use default if property doesn't exist
     }
 
-    auto command = UI::CommandBuilder("Container")
-        .property("layout", layoutType)
-        .build();
+    auto command =
+        UI::CommandBuilder("Container").property("layout", layoutType).build();
 
     convertLayoutProperties(layout, command);
     convertLayoutChildren(layout, command);
@@ -673,7 +745,8 @@ std::shared_ptr<UI::BaseUICommand> LayoutAdapter::convertLayoutHierarchy(Compone
     return command;
 }
 
-std::unique_ptr<Components::Layout> LayoutAdapter::convertCommandHierarchy(std::shared_ptr<UI::BaseUICommand> command) {
+std::unique_ptr<Components::Layout> LayoutAdapter::convertCommandHierarchy(
+    std::shared_ptr<UI::BaseUICommand> command) {
     auto layout = std::make_unique<Components::Layout>();
 
     convertCommandProperties(command, layout.get());
@@ -682,25 +755,29 @@ std::unique_ptr<Components::Layout> LayoutAdapter::convertCommandHierarchy(std::
     return layout;
 }
 
-void LayoutAdapter::convertLayoutProperties(Components::Layout* layout, std::shared_ptr<UI::BaseUICommand> command) {
+void LayoutAdapter::convertLayoutProperties(
+    Components::Layout* layout, std::shared_ptr<UI::BaseUICommand> command) {
     Q_UNUSED(layout)
     Q_UNUSED(command)
     // Implementation would copy layout properties to command
 }
 
-void LayoutAdapter::convertCommandProperties(std::shared_ptr<UI::BaseUICommand> command, Components::Layout* layout) {
+void LayoutAdapter::convertCommandProperties(
+    std::shared_ptr<UI::BaseUICommand> command, Components::Layout* layout) {
     Q_UNUSED(command)
     Q_UNUSED(layout)
     // Implementation would copy command properties to layout
 }
 
-void LayoutAdapter::convertLayoutChildren(Components::Layout* layout, std::shared_ptr<UI::BaseUICommand> command) {
+void LayoutAdapter::convertLayoutChildren(
+    Components::Layout* layout, std::shared_ptr<UI::BaseUICommand> command) {
     Q_UNUSED(layout)
     Q_UNUSED(command)
     // Implementation would convert layout children to command children
 }
 
-void LayoutAdapter::convertCommandChildren(std::shared_ptr<UI::BaseUICommand> command, Components::Layout* layout) {
+void LayoutAdapter::convertCommandChildren(
+    std::shared_ptr<UI::BaseUICommand> command, Components::Layout* layout) {
     Q_UNUSED(command)
     Q_UNUSED(layout)
     // Implementation would convert command children to layout children

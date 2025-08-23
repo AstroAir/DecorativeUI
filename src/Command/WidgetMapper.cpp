@@ -1,32 +1,32 @@
 #include "WidgetMapper.hpp"
+#include <QCalendarWidget>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QDateTimeEdit>
 #include <QDebug>
-#include <QMetaMethod>
-#include <QSignalMapper>
-#include <QPushButton>
+#include <QDial>
+#include <QDoubleSpinBox>
+#include <QFrame>
+#include <QGroupBox>
+#include <QLCDNumber>
 #include <QLabel>
 #include <QLineEdit>
-#include <QCheckBox>
-#include <QRadioButton>
-#include <QTextEdit>
-#include <QPlainTextEdit>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QSlider>
-#include <QProgressBar>
-#include <QComboBox>
 #include <QListView>
-#include <QTableView>
-#include <QTreeView>
-#include <QGroupBox>
-#include <QTabWidget>
+#include <QMetaMethod>
+#include <QPlainTextEdit>
+#include <QProgressBar>
+#include <QPushButton>
+#include <QRadioButton>
 #include <QScrollArea>
+#include <QSignalMapper>
+#include <QSlider>
+#include <QSpinBox>
 #include <QSplitter>
-#include <QDial>
-#include <QCalendarWidget>
-#include <QLCDNumber>
-#include <QFrame>
+#include <QTabWidget>
+#include <QTableView>
+#include <QTextEdit>
 #include <QToolButton>
-#include <QDateTimeEdit>
+#include <QTreeView>
 #include <algorithm>
 
 namespace DeclarativeUI::Command::UI {
@@ -41,9 +41,11 @@ WidgetMapper& WidgetMapper::instance() {
     return instance;
 }
 
-void WidgetMapper::registerMapping(const QString& command_type, const WidgetMappingConfig& config) {
+void WidgetMapper::registerMapping(const QString& command_type,
+                                   const WidgetMappingConfig& config) {
     mappings_[command_type] = config;
-    qDebug() << "📝 Registered mapping:" << command_type << "->" << config.widget_type;
+    qDebug() << "📝 Registered mapping:" << command_type << "->"
+             << config.widget_type;
 }
 
 std::unique_ptr<QWidget> WidgetMapper::createWidget(BaseUICommand* command) {
@@ -86,7 +88,8 @@ std::unique_ptr<QWidget> WidgetMapper::createWidget(BaseUICommand* command) {
         return widget;
 
     } catch (const std::exception& e) {
-        handleSyncError(command, QString("Widget creation failed: %1").arg(e.what()));
+        handleSyncError(command,
+                        QString("Widget creation failed: %1").arg(e.what()));
         return nullptr;
     }
 }
@@ -133,8 +136,8 @@ void WidgetMapper::establishBinding(BaseUICommand* command, QWidget* widget) {
     }
 
     // Connect to command property changes
-    auto connection = connect(command, &BaseUICommand::propertyChanged,
-                             this, &WidgetMapper::onCommandPropertyChanged);
+    auto connection = connect(command, &BaseUICommand::propertyChanged, this,
+                              &WidgetMapper::onCommandPropertyChanged);
     binding.connections.push_back(connection);
 
     // Store the binding
@@ -161,7 +164,8 @@ void WidgetMapper::removeBinding(BaseUICommand* command) {
     }
 }
 
-void WidgetMapper::syncCommandToWidget(BaseUICommand* command, const QString& property) {
+void WidgetMapper::syncCommandToWidget(BaseUICommand* command,
+                                       const QString& property) {
     auto it = active_bindings_.find(command);
     if (it == active_bindings_.end()) {
         return;
@@ -187,24 +191,29 @@ void WidgetMapper::syncCommandToWidget(BaseUICommand* command, const QString& pr
         }
 
         try {
-            QVariant command_value = command->getState()->getProperty<QVariant>(prop_config.command_property);
+            QVariant command_value = command->getState()->getProperty<QVariant>(
+                prop_config.command_property);
             QVariant widget_value = command_value;
 
             // Apply converter if available
             if (prop_config.command_to_widget_converter) {
-                widget_value = convertProperty(command_value, prop_config.command_to_widget_converter);
+                widget_value = convertProperty(
+                    command_value, prop_config.command_to_widget_converter);
             }
 
-            setWidgetProperty(widget, prop_config.widget_property, widget_value);
+            setWidgetProperty(widget, prop_config.widget_property,
+                              widget_value);
 
         } catch (const std::exception& e) {
-            handleSyncError(command, QString("Property sync failed for %1: %2")
-                          .arg(prop_config.command_property, e.what()));
+            handleSyncError(command,
+                            QString("Property sync failed for %1: %2")
+                                .arg(prop_config.command_property, e.what()));
         }
     }
 }
 
-void WidgetMapper::syncWidgetToCommand(QWidget* widget, BaseUICommand* command, const QString& property) {
+void WidgetMapper::syncWidgetToCommand(QWidget* widget, BaseUICommand* command,
+                                       const QString& property) {
     if (!widget || !command) {
         return;
     }
@@ -228,19 +237,23 @@ void WidgetMapper::syncWidgetToCommand(QWidget* widget, BaseUICommand* command, 
         }
 
         try {
-            QVariant widget_value = getWidgetProperty(widget, prop_config.widget_property);
+            QVariant widget_value =
+                getWidgetProperty(widget, prop_config.widget_property);
             QVariant command_value = widget_value;
 
             // Apply converter if available
             if (prop_config.widget_to_command_converter) {
-                command_value = convertProperty(widget_value, prop_config.widget_to_command_converter);
+                command_value = convertProperty(
+                    widget_value, prop_config.widget_to_command_converter);
             }
 
-            command->getState()->setProperty(prop_config.command_property, command_value);
+            command->getState()->setProperty(prop_config.command_property,
+                                             command_value);
 
         } catch (const std::exception& e) {
-            handleSyncError(command, QString("Widget to command sync failed for %1: %2")
-                          .arg(prop_config.widget_property, e.what()));
+            handleSyncError(command,
+                            QString("Widget to command sync failed for %1: %2")
+                                .arg(prop_config.widget_property, e.what()));
         }
     }
 }
@@ -281,7 +294,8 @@ QStringList WidgetMapper::getSupportedCommandTypes() const {
     return types;
 }
 
-void WidgetMapper::onCommandPropertyChanged(const QString& property, const QVariant& value) {
+void WidgetMapper::onCommandPropertyChanged(const QString& property,
+                                            const QVariant& value) {
     auto* command = qobject_cast<BaseUICommand*>(sender());
     if (command) {
         syncCommandToWidget(command, property);
@@ -302,56 +316,53 @@ void WidgetMapper::setupDefaultMappings() {
     // ========================================================================
 
     // QPushButton mapping
-    WidgetMappingConfig buttonConfig("QPushButton", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QPushButton>();
-    });
+    WidgetMappingConfig buttonConfig("QPushButton",
+                                     []() -> std::unique_ptr<QWidget> {
+                                         return std::make_unique<QPushButton>();
+                                     });
     buttonConfig.property_mappings = {
         PropertySyncConfig("text", "text"),
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
         PropertySyncConfig("checkable", "checkable"),
-        PropertySyncConfig("checked", "checked")
-    };
+        PropertySyncConfig("checked", "checked")};
     buttonConfig.event_mappings = {
         EventMappingConfig("clicked()", "clicked"),
         EventMappingConfig("pressed()", "pressed"),
         EventMappingConfig("released()", "released"),
-        EventMappingConfig("toggled(bool)", "toggled")
-    };
+        EventMappingConfig("toggled(bool)", "toggled")};
     registerMapping("ButtonCommand", buttonConfig);
 
     // QCheckBox mapping
-    WidgetMappingConfig checkBoxConfig("QCheckBox", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QCheckBox>();
-    });
+    WidgetMappingConfig checkBoxConfig("QCheckBox",
+                                       []() -> std::unique_ptr<QWidget> {
+                                           return std::make_unique<QCheckBox>();
+                                       });
     checkBoxConfig.property_mappings = {
         PropertySyncConfig("text", "text"),
         PropertySyncConfig("checked", "checked"),
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
-        PropertySyncConfig("tristate", "tristate")
-    };
+        PropertySyncConfig("tristate", "tristate")};
     checkBoxConfig.event_mappings = {
         EventMappingConfig("clicked()", "clicked"),
         EventMappingConfig("toggled(bool)", "toggled"),
-        EventMappingConfig("stateChanged(int)", "stateChanged")
-    };
+        EventMappingConfig("stateChanged(int)", "stateChanged")};
     registerMapping("CheckBoxCommand", checkBoxConfig);
 
     // QRadioButton mapping
-    WidgetMappingConfig radioButtonConfig("QRadioButton", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QRadioButton>();
-    });
+    WidgetMappingConfig radioButtonConfig(
+        "QRadioButton", []() -> std::unique_ptr<QWidget> {
+            return std::make_unique<QRadioButton>();
+        });
     radioButtonConfig.property_mappings = {
         PropertySyncConfig("text", "text"),
         PropertySyncConfig("checked", "checked"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     radioButtonConfig.event_mappings = {
         EventMappingConfig("clicked()", "clicked"),
-        EventMappingConfig("toggled(bool)", "toggled")
-    };
+        EventMappingConfig("toggled(bool)", "toggled")};
     registerMapping("RadioButtonCommand", radioButtonConfig);
 
     qDebug() << "✅ Button component mappings setup complete";
@@ -369,14 +380,14 @@ void WidgetMapper::setupDefaultMappings() {
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
         PropertySyncConfig("wordWrap", "wordWrap"),
-        PropertySyncConfig("alignment", "alignment")
-    };
+        PropertySyncConfig("alignment", "alignment")};
     registerMapping("LabelCommand", labelConfig);
 
     // QLineEdit mapping
-    WidgetMappingConfig lineEditConfig("QLineEdit", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QLineEdit>();
-    });
+    WidgetMappingConfig lineEditConfig("QLineEdit",
+                                       []() -> std::unique_ptr<QWidget> {
+                                           return std::make_unique<QLineEdit>();
+                                       });
     lineEditConfig.property_mappings = {
         PropertySyncConfig("text", "text"),
         PropertySyncConfig("placeholderText", "placeholderText"),
@@ -384,32 +395,29 @@ void WidgetMapper::setupDefaultMappings() {
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
         PropertySyncConfig("maxLength", "maxLength"),
-        PropertySyncConfig("echoMode", "echoMode")
-    };
+        PropertySyncConfig("echoMode", "echoMode")};
     lineEditConfig.event_mappings = {
         EventMappingConfig("textChanged(QString)", "textChanged"),
         EventMappingConfig("textEdited(QString)", "textEdited"),
         EventMappingConfig("returnPressed()", "returnPressed"),
-        EventMappingConfig("editingFinished()", "editingFinished")
-    };
+        EventMappingConfig("editingFinished()", "editingFinished")};
     registerMapping("LineEditCommand", lineEditConfig);
 
     // QTextEdit mapping
-    WidgetMappingConfig textEditConfig("QTextEdit", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QTextEdit>();
-    });
+    WidgetMappingConfig textEditConfig("QTextEdit",
+                                       []() -> std::unique_ptr<QWidget> {
+                                           return std::make_unique<QTextEdit>();
+                                       });
     textEditConfig.property_mappings = {
         PropertySyncConfig("plainText", "plainText"),
         PropertySyncConfig("html", "html"),
         PropertySyncConfig("readOnly", "readOnly"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     textEditConfig.event_mappings = {
         EventMappingConfig("textChanged()", "textChanged"),
         EventMappingConfig("selectionChanged()", "selectionChanged"),
-        EventMappingConfig("cursorPositionChanged()", "cursorPositionChanged")
-    };
+        EventMappingConfig("cursorPositionChanged()", "cursorPositionChanged")};
     registerMapping("TextEditCommand", textEditConfig);
 
     qDebug() << "✅ Text component mappings setup complete";
@@ -419,9 +427,10 @@ void WidgetMapper::setupDefaultMappings() {
     // ========================================================================
 
     // QSpinBox mapping
-    WidgetMappingConfig spinBoxConfig("QSpinBox", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QSpinBox>();
-    });
+    WidgetMappingConfig spinBoxConfig("QSpinBox",
+                                      []() -> std::unique_ptr<QWidget> {
+                                          return std::make_unique<QSpinBox>();
+                                      });
     spinBoxConfig.property_mappings = {
         PropertySyncConfig("value", "value"),
         PropertySyncConfig("minimum", "minimum"),
@@ -429,18 +438,17 @@ void WidgetMapper::setupDefaultMappings() {
         PropertySyncConfig("singleStep", "singleStep"),
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
-        PropertySyncConfig("readOnly", "readOnly")
-    };
+        PropertySyncConfig("readOnly", "readOnly")};
     spinBoxConfig.event_mappings = {
         EventMappingConfig("valueChanged(int)", "valueChanged"),
-        EventMappingConfig("editingFinished()", "editingFinished")
-    };
+        EventMappingConfig("editingFinished()", "editingFinished")};
     registerMapping("SpinBoxCommand", spinBoxConfig);
 
     // QSlider mapping
-    WidgetMappingConfig sliderConfig("QSlider", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QSlider>();
-    });
+    WidgetMappingConfig sliderConfig("QSlider",
+                                     []() -> std::unique_ptr<QWidget> {
+                                         return std::make_unique<QSlider>();
+                                     });
     sliderConfig.property_mappings = {
         PropertySyncConfig("value", "value"),
         PropertySyncConfig("minimum", "minimum"),
@@ -449,34 +457,31 @@ void WidgetMapper::setupDefaultMappings() {
         PropertySyncConfig("pageStep", "pageStep"),
         PropertySyncConfig("orientation", "orientation"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     sliderConfig.event_mappings = {
         EventMappingConfig("valueChanged(int)", "valueChanged"),
         EventMappingConfig("sliderPressed()", "sliderPressed"),
         EventMappingConfig("sliderReleased()", "sliderReleased"),
-        EventMappingConfig("sliderMoved(int)", "sliderMoved")
-    };
+        EventMappingConfig("sliderMoved(int)", "sliderMoved")};
     registerMapping("SliderCommand", sliderConfig);
 
     // QComboBox mapping
-    WidgetMappingConfig comboBoxConfig("QComboBox", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QComboBox>();
-    });
+    WidgetMappingConfig comboBoxConfig("QComboBox",
+                                       []() -> std::unique_ptr<QWidget> {
+                                           return std::make_unique<QComboBox>();
+                                       });
     comboBoxConfig.property_mappings = {
         PropertySyncConfig("currentIndex", "currentIndex"),
         PropertySyncConfig("currentText", "currentText"),
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
         PropertySyncConfig("editable", "editable"),
-        PropertySyncConfig("maxCount", "maxCount")
-    };
+        PropertySyncConfig("maxCount", "maxCount")};
     comboBoxConfig.event_mappings = {
         EventMappingConfig("currentIndexChanged(int)", "currentIndexChanged"),
         EventMappingConfig("currentTextChanged(QString)", "currentTextChanged"),
         EventMappingConfig("activated(int)", "activated"),
-        EventMappingConfig("highlighted(int)", "highlighted")
-    };
+        EventMappingConfig("highlighted(int)", "highlighted")};
     registerMapping("ComboBoxCommand", comboBoxConfig);
 
     qDebug() << "✅ Input component mappings setup complete";
@@ -486,9 +491,10 @@ void WidgetMapper::setupDefaultMappings() {
     // ========================================================================
 
     // QTabWidget mapping
-    WidgetMappingConfig tabWidgetConfig("QTabWidget", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QTabWidget>();
-    });
+    WidgetMappingConfig tabWidgetConfig(
+        "QTabWidget", []() -> std::unique_ptr<QWidget> {
+            return std::make_unique<QTabWidget>();
+        });
     tabWidgetConfig.property_mappings = {
         PropertySyncConfig("currentIndex", "currentIndex"),
         PropertySyncConfig("tabPosition", "tabPosition"),
@@ -496,45 +502,44 @@ void WidgetMapper::setupDefaultMappings() {
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
         PropertySyncConfig("tabsClosable", "tabsClosable"),
-        PropertySyncConfig("movable", "movable")
-    };
+        PropertySyncConfig("movable", "movable")};
     tabWidgetConfig.event_mappings = {
         EventMappingConfig("currentChanged(int)", "currentChanged"),
         EventMappingConfig("tabCloseRequested(int)", "tabCloseRequested"),
         EventMappingConfig("tabBarClicked(int)", "tabBarClicked"),
-        EventMappingConfig("tabBarDoubleClicked(int)", "tabBarDoubleClicked")
-    };
+        EventMappingConfig("tabBarDoubleClicked(int)", "tabBarDoubleClicked")};
     registerMapping("TabWidgetCommand", tabWidgetConfig);
 
     // QGroupBox mapping
-    WidgetMappingConfig groupBoxConfig("QGroupBox", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QGroupBox>();
-    });
+    WidgetMappingConfig groupBoxConfig("QGroupBox",
+                                       []() -> std::unique_ptr<QWidget> {
+                                           return std::make_unique<QGroupBox>();
+                                       });
     groupBoxConfig.property_mappings = {
         PropertySyncConfig("title", "title"),
         PropertySyncConfig("checkable", "checkable"),
         PropertySyncConfig("checked", "checked"),
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
-        PropertySyncConfig("alignment", "alignment")
-    };
+        PropertySyncConfig("alignment", "alignment")};
     groupBoxConfig.event_mappings = {
         EventMappingConfig("clicked(bool)", "clicked"),
-        EventMappingConfig("toggled(bool)", "toggled")
-    };
+        EventMappingConfig("toggled(bool)", "toggled")};
     registerMapping("GroupBoxCommand", groupBoxConfig);
 
     // QScrollArea mapping
-    WidgetMappingConfig scrollAreaConfig("QScrollArea", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QScrollArea>();
-    });
+    WidgetMappingConfig scrollAreaConfig(
+        "QScrollArea", []() -> std::unique_ptr<QWidget> {
+            return std::make_unique<QScrollArea>();
+        });
     scrollAreaConfig.property_mappings = {
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
         PropertySyncConfig("widgetResizable", "widgetResizable"),
-        PropertySyncConfig("horizontalScrollBarPolicy", "horizontalScrollBarPolicy"),
-        PropertySyncConfig("verticalScrollBarPolicy", "verticalScrollBarPolicy")
-    };
+        PropertySyncConfig("horizontalScrollBarPolicy",
+                           "horizontalScrollBarPolicy"),
+        PropertySyncConfig("verticalScrollBarPolicy",
+                           "verticalScrollBarPolicy")};
     registerMapping("ScrollAreaCommand", scrollAreaConfig);
 
     qDebug() << "✅ Container component mappings setup complete";
@@ -544,9 +549,10 @@ void WidgetMapper::setupDefaultMappings() {
     // ========================================================================
 
     // QDoubleSpinBox mapping
-    WidgetMappingConfig doubleSpinBoxConfig("QDoubleSpinBox", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QDoubleSpinBox>();
-    });
+    WidgetMappingConfig doubleSpinBoxConfig(
+        "QDoubleSpinBox", []() -> std::unique_ptr<QWidget> {
+            return std::make_unique<QDoubleSpinBox>();
+        });
     doubleSpinBoxConfig.property_mappings = {
         PropertySyncConfig("value", "value"),
         PropertySyncConfig("minimum", "minimum"),
@@ -555,12 +561,10 @@ void WidgetMapper::setupDefaultMappings() {
         PropertySyncConfig("decimals", "decimals"),
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
-        PropertySyncConfig("readOnly", "readOnly")
-    };
+        PropertySyncConfig("readOnly", "readOnly")};
     doubleSpinBoxConfig.event_mappings = {
         EventMappingConfig("valueChanged(double)", "valueChanged"),
-        EventMappingConfig("editingFinished()", "editingFinished")
-    };
+        EventMappingConfig("editingFinished()", "editingFinished")};
     registerMapping("DoubleSpinBoxCommand", doubleSpinBoxConfig);
 
     // QDial mapping
@@ -575,19 +579,18 @@ void WidgetMapper::setupDefaultMappings() {
         PropertySyncConfig("pageStep", "pageStep"),
         PropertySyncConfig("notchesVisible", "notchesVisible"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     dialConfig.event_mappings = {
         EventMappingConfig("valueChanged(int)", "valueChanged"),
         EventMappingConfig("sliderPressed()", "sliderPressed"),
-        EventMappingConfig("sliderReleased()", "sliderReleased")
-    };
+        EventMappingConfig("sliderReleased()", "sliderReleased")};
     registerMapping("DialCommand", dialConfig);
 
     // QDateTimeEdit mapping
-    WidgetMappingConfig dateTimeEditConfig("QDateTimeEdit", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QDateTimeEdit>();
-    });
+    WidgetMappingConfig dateTimeEditConfig(
+        "QDateTimeEdit", []() -> std::unique_ptr<QWidget> {
+            return std::make_unique<QDateTimeEdit>();
+        });
     dateTimeEditConfig.property_mappings = {
         PropertySyncConfig("dateTime", "dateTime"),
         PropertySyncConfig("date", "date"),
@@ -597,19 +600,18 @@ void WidgetMapper::setupDefaultMappings() {
         PropertySyncConfig("displayFormat", "displayFormat"),
         PropertySyncConfig("enabled", "enabled"),
         PropertySyncConfig("visible", "visible"),
-        PropertySyncConfig("readOnly", "readOnly")
-    };
+        PropertySyncConfig("readOnly", "readOnly")};
     dateTimeEditConfig.event_mappings = {
         EventMappingConfig("dateTimeChanged(QDateTime)", "dateTimeChanged"),
         EventMappingConfig("dateChanged(QDate)", "dateChanged"),
-        EventMappingConfig("timeChanged(QTime)", "timeChanged")
-    };
+        EventMappingConfig("timeChanged(QTime)", "timeChanged")};
     registerMapping("DateTimeEditCommand", dateTimeEditConfig);
 
     // QProgressBar mapping
-    WidgetMappingConfig progressBarConfig("QProgressBar", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QProgressBar>();
-    });
+    WidgetMappingConfig progressBarConfig(
+        "QProgressBar", []() -> std::unique_ptr<QWidget> {
+            return std::make_unique<QProgressBar>();
+        });
     progressBarConfig.property_mappings = {
         PropertySyncConfig("value", "value"),
         PropertySyncConfig("minimum", "minimum"),
@@ -618,11 +620,9 @@ void WidgetMapper::setupDefaultMappings() {
         PropertySyncConfig("textVisible", "textVisible"),
         PropertySyncConfig("orientation", "orientation"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     progressBarConfig.event_mappings = {
-        EventMappingConfig("valueChanged(int)", "valueChanged")
-    };
+        EventMappingConfig("valueChanged(int)", "valueChanged")};
     registerMapping("ProgressBarCommand", progressBarConfig);
 
     qDebug() << "✅ Priority 1 input component mappings setup complete";
@@ -632,36 +632,35 @@ void WidgetMapper::setupDefaultMappings() {
     // ========================================================================
 
     // QLCDNumber mapping
-    WidgetMappingConfig lcdNumberConfig("QLCDNumber", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QLCDNumber>();
-    });
+    WidgetMappingConfig lcdNumberConfig(
+        "QLCDNumber", []() -> std::unique_ptr<QWidget> {
+            return std::make_unique<QLCDNumber>();
+        });
     lcdNumberConfig.property_mappings = {
         PropertySyncConfig("value", "value"),
         PropertySyncConfig("digitCount", "digitCount"),
         PropertySyncConfig("mode", "mode"),
         PropertySyncConfig("segmentStyle", "segmentStyle"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     registerMapping("LCDNumberCommand", lcdNumberConfig);
 
     // QCalendarWidget mapping
-    WidgetMappingConfig calendarConfig("QCalendarWidget", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QCalendarWidget>();
-    });
+    WidgetMappingConfig calendarConfig(
+        "QCalendarWidget", []() -> std::unique_ptr<QWidget> {
+            return std::make_unique<QCalendarWidget>();
+        });
     calendarConfig.property_mappings = {
         PropertySyncConfig("selectedDate", "selectedDate"),
         PropertySyncConfig("minimumDate", "minimumDate"),
         PropertySyncConfig("maximumDate", "maximumDate"),
         PropertySyncConfig("gridVisible", "gridVisible"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     calendarConfig.event_mappings = {
         EventMappingConfig("clicked(QDate)", "clicked"),
         EventMappingConfig("selectionChanged()", "selectionChanged"),
-        EventMappingConfig("activated(QDate)", "activated")
-    };
+        EventMappingConfig("activated(QDate)", "activated")};
     registerMapping("CalendarCommand", calendarConfig);
 
     qDebug() << "✅ Priority 2 display component mappings setup complete";
@@ -671,86 +670,89 @@ void WidgetMapper::setupDefaultMappings() {
     // ========================================================================
 
     // QListView mapping
-    WidgetMappingConfig listViewConfig("QListView", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QListView>();
-    });
+    WidgetMappingConfig listViewConfig("QListView",
+                                       []() -> std::unique_ptr<QWidget> {
+                                           return std::make_unique<QListView>();
+                                       });
     listViewConfig.property_mappings = {
         PropertySyncConfig("currentIndex", "currentIndex"),
         PropertySyncConfig("selectionMode", "selectionMode"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     listViewConfig.event_mappings = {
         EventMappingConfig("clicked(QModelIndex)", "clicked"),
         EventMappingConfig("doubleClicked(QModelIndex)", "doubleClicked"),
-        EventMappingConfig("activated(QModelIndex)", "activated")
-    };
+        EventMappingConfig("activated(QModelIndex)", "activated")};
     registerMapping("ListViewCommand", listViewConfig);
 
     // QTableView mapping
-    WidgetMappingConfig tableViewConfig("QTableView", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QTableView>();
-    });
+    WidgetMappingConfig tableViewConfig(
+        "QTableView", []() -> std::unique_ptr<QWidget> {
+            return std::make_unique<QTableView>();
+        });
     tableViewConfig.property_mappings = {
         PropertySyncConfig("currentIndex", "currentIndex"),
         PropertySyncConfig("selectionMode", "selectionMode"),
         PropertySyncConfig("selectionBehavior", "selectionBehavior"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     tableViewConfig.event_mappings = {
         EventMappingConfig("clicked(QModelIndex)", "clicked"),
         EventMappingConfig("doubleClicked(QModelIndex)", "doubleClicked"),
-        EventMappingConfig("activated(QModelIndex)", "activated")
-    };
+        EventMappingConfig("activated(QModelIndex)", "activated")};
     registerMapping("TableViewCommand", tableViewConfig);
 
     // QTreeView mapping
-    WidgetMappingConfig treeViewConfig("QTreeView", []() -> std::unique_ptr<QWidget> {
-        return std::make_unique<QTreeView>();
-    });
+    WidgetMappingConfig treeViewConfig("QTreeView",
+                                       []() -> std::unique_ptr<QWidget> {
+                                           return std::make_unique<QTreeView>();
+                                       });
     treeViewConfig.property_mappings = {
         PropertySyncConfig("currentIndex", "currentIndex"),
         PropertySyncConfig("selectionMode", "selectionMode"),
         PropertySyncConfig("selectionBehavior", "selectionBehavior"),
         PropertySyncConfig("enabled", "enabled"),
-        PropertySyncConfig("visible", "visible")
-    };
+        PropertySyncConfig("visible", "visible")};
     treeViewConfig.event_mappings = {
         EventMappingConfig("clicked(QModelIndex)", "clicked"),
         EventMappingConfig("doubleClicked(QModelIndex)", "doubleClicked"),
         EventMappingConfig("expanded(QModelIndex)", "expanded"),
-        EventMappingConfig("collapsed(QModelIndex)", "collapsed")
-    };
+        EventMappingConfig("collapsed(QModelIndex)", "collapsed")};
     registerMapping("TreeViewCommand", treeViewConfig);
 
     qDebug() << "✅ Priority 3 view component mappings setup complete";
     qDebug() << "🎯 All default widget mappings setup complete";
 }
 
-void WidgetMapper::connectPropertySync(BaseUICommand* command, QWidget* widget, const PropertySyncConfig& config) {
-    // Property sync connections are handled in syncCommandToWidget/syncWidgetToCommand
+void WidgetMapper::connectPropertySync(BaseUICommand* command, QWidget* widget,
+                                       const PropertySyncConfig& config) {
+    // Property sync connections are handled in
+    // syncCommandToWidget/syncWidgetToCommand
     Q_UNUSED(command)
     Q_UNUSED(widget)
     Q_UNUSED(config)
 }
 
-void WidgetMapper::connectEventMapping(BaseUICommand* command, QWidget* widget, const EventMappingConfig& config) {
+void WidgetMapper::connectEventMapping(BaseUICommand* command, QWidget* widget,
+                                       const EventMappingConfig& config) {
     // Connect widget signal to command event
     const QMetaObject* meta = widget->metaObject();
-    int signal_index = meta->indexOfSignal(config.widget_signal.toUtf8().constData());
+    int signal_index =
+        meta->indexOfSignal(config.widget_signal.toUtf8().constData());
 
     if (signal_index >= 0) {
         // Create a lambda to handle the signal and forward to command
         QMetaObject::Connection connection;
         if (auto* button = qobject_cast<QPushButton*>(widget)) {
-            connection = connect(button, &QPushButton::clicked, [command, config]() {
-                QVariant eventData;
-                if (config.signal_to_event_converter) {
-                    eventData = config.signal_to_event_converter(QVariantList{});
-                }
-                command->handleEvent(config.command_event, eventData);
-            });
+            connection =
+                connect(button, &QPushButton::clicked, [command, config]() {
+                    QVariant eventData;
+                    if (config.signal_to_event_converter) {
+                        eventData =
+                            config.signal_to_event_converter(QVariantList{});
+                    }
+                    command->handleEvent(config.command_event, eventData);
+                });
         }
 
         // Store connection for later cleanup
@@ -761,27 +763,34 @@ void WidgetMapper::connectEventMapping(BaseUICommand* command, QWidget* widget, 
     }
 }
 
-QVariant WidgetMapper::convertProperty(const QVariant& value, const std::function<QVariant(const QVariant&)>& converter) {
+QVariant WidgetMapper::convertProperty(
+    const QVariant& value,
+    const std::function<QVariant(const QVariant&)>& converter) {
     if (converter) {
         return converter(value);
     }
     return value;
 }
 
-void WidgetMapper::handleSyncError(BaseUICommand* command, const QString& error) {
-    qWarning() << "Sync error for command" << command->getCommandType() << ":" << error;
+void WidgetMapper::handleSyncError(BaseUICommand* command,
+                                   const QString& error) {
+    qWarning() << "Sync error for command" << command->getCommandType() << ":"
+               << error;
     emit syncError(command, error);
 }
 
-bool WidgetMapper::setWidgetProperty(QWidget* widget, const QString& property, const QVariant& value) {
+bool WidgetMapper::setWidgetProperty(QWidget* widget, const QString& property,
+                                     const QVariant& value) {
     return widget->setProperty(property.toUtf8().constData(), value);
 }
 
-QVariant WidgetMapper::getWidgetProperty(QWidget* widget, const QString& property) {
+QVariant WidgetMapper::getWidgetProperty(QWidget* widget,
+                                         const QString& property) {
     return widget->property(property.toUtf8().constData());
 }
 
-bool WidgetMapper::connectToSignal(QWidget* widget, const QString& signal, QObject* receiver, const char* slot) {
+bool WidgetMapper::connectToSignal(QWidget* widget, const QString& signal,
+                                   QObject* receiver, const char* slot) {
     const QMetaObject* meta = widget->metaObject();
     int signal_index = meta->indexOfSignal(signal.toUtf8().constData());
     return signal_index >= 0;

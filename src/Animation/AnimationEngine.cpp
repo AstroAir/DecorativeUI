@@ -1,8 +1,8 @@
 #include "AnimationEngine.hpp"
 
 #include <QDebug>
-#include <QJsonArray>
 #include <QGraphicsOpacityEffect>
+#include <QJsonArray>
 #include <QPropertyAnimation>
 #include <algorithm>
 #include <cmath>
@@ -11,7 +11,7 @@
 namespace DeclarativeUI::Animation {
 
 // **Easing function implementations**
-template<typename T>
+template <typename T>
 double AnimationTimeline<T>::applyEasing(double t, EasingType easing) const {
     switch (easing) {
         case EasingType::Linear:
@@ -27,7 +27,8 @@ double AnimationTimeline<T>::applyEasing(double t, EasingType easing) const {
         case EasingType::CubicOut:
             return 1.0 - std::pow(1.0 - t, 3.0);
         case EasingType::CubicInOut:
-            return t < 0.5 ? 4.0 * t * t * t : 1.0 - 4.0 * std::pow(1.0 - t, 3.0);
+            return t < 0.5 ? 4.0 * t * t * t
+                           : 1.0 - 4.0 * std::pow(1.0 - t, 3.0);
         case EasingType::SineIn:
             return 1.0 - std::cos(t * M_PI / 2.0);
         case EasingType::SineOut:
@@ -55,9 +56,11 @@ double AnimationTimeline<T>::applyEasing(double t, EasingType easing) const {
     }
 }
 
-template<typename T>
-T AnimationTimeline<T>::interpolateValues(const T& from, const T& to, double ratio) const {
-    // Default linear interpolation - specializations can be provided for specific types
+template <typename T>
+T AnimationTimeline<T>::interpolateValues(const T& from, const T& to,
+                                          double ratio) const {
+    // Default linear interpolation - specializations can be provided for
+    // specific types
     if constexpr (std::is_arithmetic_v<T>) {
         return static_cast<T>(from + (to - from) * ratio);
     } else {
@@ -73,16 +76,15 @@ Animation::Animation(QObject* parent) : QObject(parent) {
     connect(timer_.get(), &QTimer::timeout, this, &Animation::onTimerUpdate);
 }
 
-Animation::~Animation() {
-    stop();
-}
+Animation::~Animation() { stop(); }
 
 void Animation::setTarget(QObject* object, const QString& property_name) {
     target_.object = object;
     target_.property_name = property_name;
 }
 
-void Animation::setValues(const QVariant& start_value, const QVariant& end_value) {
+void Animation::setValues(const QVariant& start_value,
+                          const QVariant& end_value) {
     target_.start_value = start_value;
     target_.end_value = end_value;
 }
@@ -96,7 +98,8 @@ void Animation::setCustomSetter(std::function<void(const QVariant&)> setter) {
 }
 
 void Animation::start() {
-    if (state_ == AnimationState::Running) return;
+    if (state_ == AnimationState::Running)
+        return;
     if (!target_.isValid()) {
         qWarning() << "🔥 Cannot start animation: invalid target";
         return;
@@ -117,7 +120,8 @@ void Animation::start() {
 }
 
 void Animation::stop() {
-    if (state_ == AnimationState::Stopped) return;
+    if (state_ == AnimationState::Stopped)
+        return;
 
     timer_->stop();
     state_ = AnimationState::Stopped;
@@ -128,7 +132,8 @@ void Animation::stop() {
 }
 
 void Animation::pause() {
-    if (state_ != AnimationState::Running) return;
+    if (state_ != AnimationState::Running)
+        return;
 
     timer_->stop();
     state_ = AnimationState::Paused;
@@ -139,7 +144,8 @@ void Animation::pause() {
 }
 
 void Animation::resume() {
-    if (state_ != AnimationState::Paused) return;
+    if (state_ != AnimationState::Paused)
+        return;
 
     // Adjust start time to account for pause duration
     auto pause_duration = std::chrono::steady_clock::now() - pause_time_;
@@ -158,10 +164,12 @@ void Animation::restart() {
 }
 
 int Animation::getCurrentTime() const {
-    if (state_ == AnimationState::Stopped) return 0;
+    if (state_ == AnimationState::Stopped)
+        return 0;
 
     auto now = std::chrono::steady_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time_);
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+        now - start_time_);
     return static_cast<int>(elapsed.count());
 }
 
@@ -177,13 +185,12 @@ void Animation::addProgressCallback(std::function<void(double)> callback) {
     progress_callbacks_.push_back(std::move(callback));
 }
 
-void Animation::onTimerUpdate() {
-    updateAnimation();
-}
+void Animation::onTimerUpdate() { updateAnimation(); }
 
 void Animation::updateAnimation() {
     auto now = std::chrono::steady_clock::now();
-    auto total_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time_);
+    auto total_elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+        now - start_time_);
 
     // Apply playback rate
     auto adjusted_elapsed = std::chrono::milliseconds(
@@ -194,12 +201,15 @@ void Animation::updateAnimation() {
         return;
     }
 
-    auto animation_elapsed = adjusted_elapsed - std::chrono::milliseconds(properties_.delay_ms);
-    double raw_progress = static_cast<double>(animation_elapsed.count()) / properties_.duration_ms;
+    auto animation_elapsed =
+        adjusted_elapsed - std::chrono::milliseconds(properties_.delay_ms);
+    double raw_progress = static_cast<double>(animation_elapsed.count()) /
+                          properties_.duration_ms;
 
     // Handle repetition and auto-reverse
     if (raw_progress >= 1.0) {
-        if (properties_.repeat_count == -1 || current_iteration_ < properties_.repeat_count - 1) {
+        if (properties_.repeat_count == -1 ||
+            current_iteration_ < properties_.repeat_count - 1) {
             current_iteration_++;
             start_time_ = now - std::chrono::milliseconds(properties_.delay_ms);
 
@@ -244,21 +254,28 @@ QVariant Animation::interpolateValue(double progress) const {
     const QVariant& end = target_.end_value;
 
     // Handle different QVariant types
-    if (start.typeId() == QMetaType::Double || start.typeId() == QMetaType::Int) {
+    if (start.typeId() == QMetaType::Double ||
+        start.typeId() == QMetaType::Int) {
         double start_val = start.toDouble();
         double end_val = end.toDouble();
         double result = start_val + (end_val - start_val) * progress;
-        return start.typeId() == QMetaType::Int ? QVariant(static_cast<int>(result)) : QVariant(result);
+        return start.typeId() == QMetaType::Int
+                   ? QVariant(static_cast<int>(result))
+                   : QVariant(result);
     }
 
     if (start.typeId() == QMetaType::QColor) {
         QColor start_color = start.value<QColor>();
         QColor end_color = end.value<QColor>();
 
-        int r = start_color.red() + (end_color.red() - start_color.red()) * progress;
-        int g = start_color.green() + (end_color.green() - start_color.green()) * progress;
-        int b = start_color.blue() + (end_color.blue() - start_color.blue()) * progress;
-        int a = start_color.alpha() + (end_color.alpha() - start_color.alpha()) * progress;
+        int r = start_color.red() +
+                (end_color.red() - start_color.red()) * progress;
+        int g = start_color.green() +
+                (end_color.green() - start_color.green()) * progress;
+        int b = start_color.blue() +
+                (end_color.blue() - start_color.blue()) * progress;
+        int a = start_color.alpha() +
+                (end_color.alpha() - start_color.alpha()) * progress;
 
         return QVariant(QColor(r, g, b, a));
     }
@@ -277,7 +294,8 @@ void Animation::applyValue(const QVariant& value) {
     if (target_.custom_setter) {
         target_.custom_setter(value);
     } else if (target_.object && !target_.property_name.isEmpty()) {
-        target_.object->setProperty(target_.property_name.toUtf8().constData(), value);
+        target_.object->setProperty(target_.property_name.toUtf8().constData(),
+                                    value);
     }
 }
 
@@ -308,7 +326,8 @@ std::shared_ptr<Animation> AnimationPool::acquire() {
 }
 
 void AnimationPool::release(std::shared_ptr<Animation> animation) {
-    if (!animation) return;
+    if (!animation)
+        return;
 
     std::unique_lock<std::shared_mutex> lock(mutex_);
 
@@ -347,7 +366,8 @@ size_t AnimationPool::getAllocatedCount() const {
 }
 
 void AnimationPool::expandPool() {
-    size_t expand_count = std::min(static_cast<size_t>(10), max_pool_size_ - available_animations_.size());
+    size_t expand_count = std::min(
+        static_cast<size_t>(10), max_pool_size_ - available_animations_.size());
 
     for (size_t i = 0; i < expand_count; ++i) {
         available_animations_.push_back(std::make_shared<Animation>());
@@ -364,13 +384,15 @@ AnimationEngine::AnimationEngine(QObject* parent) : QObject(parent) {
     // Setup global timer for animation updates
     global_timer_ = std::make_unique<QTimer>(this);
     global_timer_->setInterval(16);  // ~60 FPS
-    connect(global_timer_.get(), &QTimer::timeout, this, &AnimationEngine::onGlobalTimer);
+    connect(global_timer_.get(), &QTimer::timeout, this,
+            &AnimationEngine::onGlobalTimer);
     global_timer_->start();
 
     // Setup performance monitoring
     performance_timer_ = std::make_unique<QTimer>(this);
     performance_timer_->setInterval(5000);  // Check every 5 seconds
-    connect(performance_timer_.get(), &QTimer::timeout, this, &AnimationEngine::onPerformanceCheck);
+    connect(performance_timer_.get(), &QTimer::timeout, this,
+            &AnimationEngine::onPerformanceCheck);
     performance_timer_->start();
 
     qDebug() << "🔥 Animation Engine initialized";
@@ -396,9 +418,9 @@ std::shared_ptr<Animation> AnimationEngine::createAnimation() {
     return animation;
 }
 
-std::shared_ptr<Animation> AnimationEngine::animateProperty(QObject* object, const QString& property,
-                                                           const QVariant& start_value, const QVariant& end_value,
-                                                           int duration_ms, EasingType easing) {
+std::shared_ptr<Animation> AnimationEngine::animateProperty(
+    QObject* object, const QString& property, const QVariant& start_value,
+    const QVariant& end_value, int duration_ms, EasingType easing) {
     auto animation = createAnimation();
     animation->setTarget(object, property);
     animation->setValues(start_value, end_value);
@@ -413,33 +435,44 @@ std::shared_ptr<Animation> AnimationEngine::animateProperty(QObject* object, con
     return animation;
 }
 
-std::shared_ptr<Animation> AnimationEngine::fadeIn(QWidget* widget, int duration_ms) {
-    if (!widget) return nullptr;
+std::shared_ptr<Animation> AnimationEngine::fadeIn(QWidget* widget,
+                                                   int duration_ms) {
+    if (!widget)
+        return nullptr;
 
     // Ensure widget has an opacity effect
-    auto effect = qobject_cast<QGraphicsOpacityEffect*>(widget->graphicsEffect());
+    auto effect =
+        qobject_cast<QGraphicsOpacityEffect*>(widget->graphicsEffect());
     if (!effect) {
         effect = new QGraphicsOpacityEffect(widget);
         widget->setGraphicsEffect(effect);
     }
 
-    return animateProperty(effect, "opacity", 0.0, 1.0, duration_ms, EasingType::QuadOut);
+    return animateProperty(effect, "opacity", 0.0, 1.0, duration_ms,
+                           EasingType::QuadOut);
 }
 
-std::shared_ptr<Animation> AnimationEngine::fadeOut(QWidget* widget, int duration_ms) {
-    if (!widget) return nullptr;
+std::shared_ptr<Animation> AnimationEngine::fadeOut(QWidget* widget,
+                                                    int duration_ms) {
+    if (!widget)
+        return nullptr;
 
-    auto effect = qobject_cast<QGraphicsOpacityEffect*>(widget->graphicsEffect());
+    auto effect =
+        qobject_cast<QGraphicsOpacityEffect*>(widget->graphicsEffect());
     if (!effect) {
         effect = new QGraphicsOpacityEffect(widget);
         widget->setGraphicsEffect(effect);
     }
 
-    return animateProperty(effect, "opacity", 1.0, 0.0, duration_ms, EasingType::QuadIn);
+    return animateProperty(effect, "opacity", 1.0, 0.0, duration_ms,
+                           EasingType::QuadIn);
 }
 
-std::shared_ptr<Animation> AnimationEngine::slideIn(QWidget* widget, const QString& direction, int duration_ms) {
-    if (!widget) return nullptr;
+std::shared_ptr<Animation> AnimationEngine::slideIn(QWidget* widget,
+                                                    const QString& direction,
+                                                    int duration_ms) {
+    if (!widget)
+        return nullptr;
 
     QRect geometry = widget->geometry();
     QPoint start_pos, end_pos = geometry.topLeft();
@@ -448,11 +481,15 @@ std::shared_ptr<Animation> AnimationEngine::slideIn(QWidget* widget, const QStri
     if (direction.toLower() == "left") {
         start_pos = QPoint(-geometry.width(), geometry.y());
     } else if (direction.toLower() == "right") {
-        start_pos = QPoint(widget->parentWidget() ? widget->parentWidget()->width() : 800, geometry.y());
+        start_pos = QPoint(
+            widget->parentWidget() ? widget->parentWidget()->width() : 800,
+            geometry.y());
     } else if (direction.toLower() == "top") {
         start_pos = QPoint(geometry.x(), -geometry.height());
     } else if (direction.toLower() == "bottom") {
-        start_pos = QPoint(geometry.x(), widget->parentWidget() ? widget->parentWidget()->height() : 600);
+        start_pos = QPoint(geometry.x(), widget->parentWidget()
+                                             ? widget->parentWidget()->height()
+                                             : 600);
     } else {
         // Default to left
         start_pos = QPoint(-geometry.width(), geometry.y());
@@ -461,11 +498,15 @@ std::shared_ptr<Animation> AnimationEngine::slideIn(QWidget* widget, const QStri
     // Set initial position
     widget->move(start_pos);
 
-    return animateProperty(widget, "pos", start_pos, end_pos, duration_ms, EasingType::QuartOut);
+    return animateProperty(widget, "pos", start_pos, end_pos, duration_ms,
+                           EasingType::QuartOut);
 }
 
-std::shared_ptr<Animation> AnimationEngine::slideOut(QWidget* widget, const QString& direction, int duration_ms) {
-    if (!widget) return nullptr;
+std::shared_ptr<Animation> AnimationEngine::slideOut(QWidget* widget,
+                                                     const QString& direction,
+                                                     int duration_ms) {
+    if (!widget)
+        return nullptr;
 
     QRect geometry = widget->geometry();
     QPoint start_pos = geometry.topLeft();
@@ -475,17 +516,24 @@ std::shared_ptr<Animation> AnimationEngine::slideOut(QWidget* widget, const QStr
     if (direction.toLower() == "left") {
         end_pos = QPoint(-geometry.width(), geometry.y());
     } else if (direction.toLower() == "right") {
-        end_pos = QPoint(widget->parentWidget() ? widget->parentWidget()->width() : 800, geometry.y());
+        end_pos = QPoint(
+            widget->parentWidget() ? widget->parentWidget()->width() : 800,
+            geometry.y());
     } else if (direction.toLower() == "top") {
         end_pos = QPoint(geometry.x(), -geometry.height());
     } else if (direction.toLower() == "bottom") {
-        end_pos = QPoint(geometry.x(), widget->parentWidget() ? widget->parentWidget()->height() : 600);
+        end_pos = QPoint(geometry.x(), widget->parentWidget()
+                                           ? widget->parentWidget()->height()
+                                           : 600);
     } else {
         // Default to right
-        end_pos = QPoint(widget->parentWidget() ? widget->parentWidget()->width() : 800, geometry.y());
+        end_pos = QPoint(
+            widget->parentWidget() ? widget->parentWidget()->width() : 800,
+            geometry.y());
     }
 
-    return animateProperty(widget, "pos", start_pos, end_pos, duration_ms, EasingType::QuartIn);
+    return animateProperty(widget, "pos", start_pos, end_pos, duration_ms,
+                           EasingType::QuartIn);
 }
 
 void AnimationEngine::pauseAllAnimations() {
@@ -533,8 +581,10 @@ int AnimationEngine::getActiveAnimationCount() const {
 QJsonObject AnimationEngine::getPerformanceMetrics() const {
     QJsonObject metrics;
 
-    metrics["total_animations_created"] = static_cast<qint64>(total_animations_created_.load());
-    metrics["total_animations_completed"] = static_cast<qint64>(total_animations_completed_.load());
+    metrics["total_animations_created"] =
+        static_cast<qint64>(total_animations_created_.load());
+    metrics["total_animations_completed"] =
+        static_cast<qint64>(total_animations_completed_.load());
     metrics["active_animation_count"] = getActiveAnimationCount();
     metrics["average_frame_rate"] = getAverageFrameRate();
     metrics["global_gpu_acceleration"] = global_gpu_acceleration_.load();
@@ -542,8 +592,10 @@ QJsonObject AnimationEngine::getPerformanceMetrics() const {
     metrics["animation_pooling_enabled"] = animation_pooling_enabled_.load();
 
     if (animation_pooling_enabled_.load()) {
-        metrics["pool_available_count"] = static_cast<qint64>(AnimationPool::instance().getAvailableCount());
-        metrics["pool_allocated_count"] = static_cast<qint64>(AnimationPool::instance().getAllocatedCount());
+        metrics["pool_available_count"] =
+            static_cast<qint64>(AnimationPool::instance().getAvailableCount());
+        metrics["pool_allocated_count"] =
+            static_cast<qint64>(AnimationPool::instance().getAllocatedCount());
     }
 
     return metrics;
@@ -551,12 +603,14 @@ QJsonObject AnimationEngine::getPerformanceMetrics() const {
 
 double AnimationEngine::getAverageFrameRate() const {
     size_t frame_count = frame_count_.load();
-    return frame_count > 0 ? 1000.0 / (total_frame_time_.load() / frame_count) : 0.0;
+    return frame_count > 0 ? 1000.0 / (total_frame_time_.load() / frame_count)
+                           : 0.0;
 }
 
 void AnimationEngine::enableGlobalGPUAcceleration(bool enabled) {
     global_gpu_acceleration_.store(enabled);
-    qDebug() << "🔥 Global GPU acceleration" << (enabled ? "enabled" : "disabled");
+    qDebug() << "🔥 Global GPU acceleration"
+             << (enabled ? "enabled" : "disabled");
 }
 
 void AnimationEngine::setGlobalPlaybackRate(double rate) {
@@ -576,9 +630,11 @@ void AnimationEngine::onGlobalTimer() {
     updatePerformanceMetrics();
 
     auto end_time = std::chrono::steady_clock::now();
-    auto frame_time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+    auto frame_time = std::chrono::duration_cast<std::chrono::microseconds>(
+        end_time - start_time);
 
-    total_frame_time_.fetch_add(frame_time.count() / 1000.0);  // Convert to milliseconds
+    total_frame_time_.fetch_add(frame_time.count() /
+                                1000.0);  // Convert to milliseconds
     frame_count_.fetch_add(1);
 }
 
@@ -598,10 +654,12 @@ void AnimationEngine::registerAnimation(std::shared_ptr<Animation> animation) {
     });
 }
 
-void AnimationEngine::unregisterAnimation(std::shared_ptr<Animation> animation) {
+void AnimationEngine::unregisterAnimation(
+    std::shared_ptr<Animation> animation) {
     std::unique_lock<std::shared_mutex> lock(animations_mutex_);
 
-    auto it = std::find(active_animations_.begin(), active_animations_.end(), animation);
+    auto it = std::find(active_animations_.begin(), active_animations_.end(),
+                        animation);
     if (it != active_animations_.end()) {
         active_animations_.erase(it);
     }
@@ -618,10 +676,11 @@ void AnimationEngine::updatePerformanceMetrics() {
 
     active_animations_.erase(
         std::remove_if(active_animations_.begin(), active_animations_.end(),
-                      [](const std::weak_ptr<Animation>& weak_anim) {
-                          auto anim = weak_anim.lock();
-                          return !anim || anim->getState() == AnimationState::Finished;
-                      }),
+                       [](const std::weak_ptr<Animation>& weak_anim) {
+                           auto anim = weak_anim.lock();
+                           return !anim ||
+                                  anim->getState() == AnimationState::Finished;
+                       }),
         active_animations_.end());
 }
 
@@ -633,7 +692,8 @@ void AnimationEngine::checkPerformanceAlerts() {
 
     int active_count = getActiveAnimationCount();
     if (active_count > max_concurrent_animations_.load()) {
-        emit performanceAlert("active_animation_count", static_cast<double>(active_count));
+        emit performanceAlert("active_animation_count",
+                              static_cast<double>(active_count));
     }
 }
 
@@ -643,7 +703,8 @@ void AnimationEngine::optimizeAnimations() {
     int max_count = max_concurrent_animations_.load();
 
     if (active_count > max_count) {
-        qDebug() << "🔥 Too many active animations (" << active_count << "), optimizing...";
+        qDebug() << "🔥 Too many active animations (" << active_count
+                 << "), optimizing...";
 
         // In a real implementation, we might pause low-priority animations
         // or reduce animation quality
@@ -651,9 +712,7 @@ void AnimationEngine::optimizeAnimations() {
 }
 
 // **AnimationGroup implementation**
-AnimationGroup::~AnimationGroup() {
-    qDebug() << "AnimationGroup destroyed";
-}
+AnimationGroup::~AnimationGroup() { qDebug() << "AnimationGroup destroyed"; }
 
 // **Template instantiations**
 template class AnimationTimeline<double>;

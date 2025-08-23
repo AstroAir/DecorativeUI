@@ -15,24 +15,28 @@ This directory contains the core animation infrastructure:
 ## Key Features
 
 ### 🚀 **High Performance**
+
 - Object pooling for reduced memory allocation
 - GPU acceleration support (when available)
 - Optimized easing function implementations
 - Concurrent animation processing
 
 ### 🎯 **Flexible Animation Types**
+
 - Property-based animations
 - Timeline-based keyframe animations
 - Custom setter function support
 - Sequential and parallel animation groups
 
 ### ⚙️ **Advanced Configuration**
+
 - 20+ built-in easing functions
 - Configurable duration, delay, and repeat
 - Auto-reverse and infinite loop support
 - Variable playback rates
 
 ### 📊 **Performance Monitoring**
+
 - Real-time performance metrics
 - Frame rate monitoring
 - Memory usage tracking
@@ -45,12 +49,14 @@ This directory contains the core animation infrastructure:
 Central singleton managing all animations in the application.
 
 **Key Features:**
+
 - Animation creation and lifecycle management
 - Global performance optimization settings
 - Convenience methods for common animations
 - Performance monitoring and metrics
 
 **Core Methods:**
+
 ```cpp
 // Animation creation
 std::shared_ptr<Animation> createAnimation();
@@ -77,6 +83,7 @@ void setMaxConcurrentAnimations(int max_count);
 Individual animation instance with comprehensive configuration options.
 
 **Key Features:**
+
 - Property-based animation with automatic interpolation
 - Timeline support for complex keyframe animations
 - Custom setter functions for non-property animations
@@ -84,12 +91,14 @@ Individual animation instance with comprehensive configuration options.
 - Progress callbacks and event signals
 
 **Animation States:**
+
 - `Stopped`: Animation is not running
 - `Running`: Animation is actively playing
 - `Paused`: Animation is temporarily suspended
 - `Finished`: Animation has completed
 
 **Core Methods:**
+
 ```cpp
 // Configuration
 void setTarget(QObject* object, const QString& property_name);
@@ -113,10 +122,12 @@ int getDuration() const;
 Coordinates multiple animations for complex sequences.
 
 **Group Types:**
+
 - **Sequential**: Animations play one after another
 - **Parallel**: Animations play simultaneously
 
 **Key Features:**
+
 - Automatic progress calculation across all animations
 - Group-level control (start, stop, pause, resume)
 - Event signals for group lifecycle
@@ -164,7 +175,7 @@ auto& engine = AnimationEngine::instance();
 
 // Animate widget opacity
 auto animation = engine.animateProperty(
-    widget, "opacity", 
+    widget, "opacity",
     0.0, 1.0,           // From 0% to 100% opacity
     500,                // 500ms duration
     EasingType::CubicOut
@@ -216,9 +227,9 @@ animation->setCustomSetter([widget](const QVariant& value) {
     double progress = value.toDouble();
     // Custom logic for complex animations
     widget->setGeometry(
-        static_cast<int>(100 * progress), 
+        static_cast<int>(100 * progress),
         static_cast<int>(50 * progress),
-        widget->width(), 
+        widget->width(),
         widget->height()
     );
 });
@@ -272,6 +283,7 @@ auto props = config.toAnimationProperties();  // Converts to AnimationProperties
 ## Testing
 
 Comprehensive unit tests available in `tests/unit/`:
+
 - Animation lifecycle and state management
 - Easing function accuracy
 - Performance benchmarks

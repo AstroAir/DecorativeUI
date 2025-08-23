@@ -278,8 +278,8 @@ private slots:
         QCOMPARE(manager->getBindingCount(), 1);
 
         // Test enable/disable all bindings
-        manager->enableAllBindings();  // Should not crash
-        manager->disableAllBindings(); // Should not crash
+        manager->enableAllBindings();   // Should not crash
+        manager->disableAllBindings();  // Should not crash
 
         // Clean up
         manager->removeBinding(binding);
@@ -311,11 +311,12 @@ private slots:
         auto widget2Bindings = manager->getBindingsForWidget(widget2.get());
 
         // Note: The current implementation uses string matching which may not
-        // perfectly match widgets, but we can test that the method doesn't crash
-        // size() returns unsigned, so >= 0 is always true - just verify method works
+        // perfectly match widgets, but we can test that the method doesn't
+        // crash size() returns unsigned, so >= 0 is always true - just verify
+        // method works
         Q_UNUSED(widget1Bindings);
         Q_UNUSED(widget2Bindings);
-        QVERIFY(true); // Test that getBindingsForWidget doesn't crash
+        QVERIFY(true);  // Test that getBindingsForWidget doesn't crash
 
         // Clean up
         manager->removeBinding(binding1);
@@ -346,7 +347,8 @@ private slots:
         // Create multiple bindings
         std::vector<std::shared_ptr<IPropertyBinding>> bindings;
         for (int i = 0; i < 5; ++i) {
-            auto source = std::make_shared<ReactiveProperty<QString>>(QString("Value%1").arg(i));
+            auto source = std::make_shared<ReactiveProperty<QString>>(
+                QString("Value%1").arg(i));
             auto widget = std::make_unique<QLabel>();
             auto binding = std::make_shared<PropertyBinding<QString>>(
                 source, widget.get(), "text", BindingDirection::OneWay);

@@ -4,9 +4,9 @@ We are committed to fostering an open and welcoming community. We follow the
 Contributor Covenant Code of Conduct.
 
 - Contributor Covenant, Version 2.1
-- Homepage: https://www.contributor-covenant.org
-- Code of Conduct: https://www.contributor-covenant.org/version/2/1/code_of_conduct
-- FAQ: https://www.contributor-covenant.org/faq
+- Homepage: <https://www.contributor-covenant.org>
+- Code of Conduct: <https://www.contributor-covenant.org/version/2/1/code_of_conduct>
+- FAQ: <https://www.contributor-covenant.org/faq>
 
 ## Our Pledge
 
@@ -60,5 +60,4 @@ Enforcement guidelines will follow the
 
 This Code of Conduct is adapted from the Contributor Covenant,
 version 2.1, available at
-https://www.contributor-covenant.org/version/2/1/code_of_conduct.
-
+<https://www.contributor-covenant.org/version/2/1/code_of_conduct>.

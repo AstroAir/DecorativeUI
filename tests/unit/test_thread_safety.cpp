@@ -55,92 +55,239 @@ private slots:
     }
 
     // **StateManager Thread Safety**
+    /**
+     * @brief Test concurrent access to StateManager from multiple threads
+     *
+     * This test verifies thread safety of StateManager by running concurrent
+     * read and write operations. The test is broken down into smaller helper
+     * functions for better maintainability and readability.
+     */
     void testStateManagerConcurrentAccess() {
         auto& state_manager = StateManager::instance();
 
-        const int num_threads = 4;
-        const int operations_per_thread = 100;
+        // Test configuration
+        ConcurrentTestConfig config;
+        config.num_threads = 4;
+        config.operations_per_thread = 100;
+
+        // Run concurrent operations
+        auto results = runConcurrentStateOperations(state_manager, config);
+
+        // Validate results
+        validateConcurrentTestResults(results, config);
+    }
+
+private:
+    /**
+     * @brief Configuration structure for concurrent testing
+     */
+    struct ConcurrentTestConfig {
+        int num_threads = 4;
+        int operations_per_thread = 100;
+        double min_success_rate = 0.8;
+    };
+
+    /**
+     * @brief Results structure for concurrent testing
+     */
+    struct ConcurrentTestResults {
         std::atomic<int> read_success{0};
         std::atomic<int> write_success{0};
         std::atomic<int> errors{0};
 
+        // Delete copy constructor and assignment operator due to atomic members
+        ConcurrentTestResults() = default;
+        ConcurrentTestResults(const ConcurrentTestResults&) = delete;
+        ConcurrentTestResults& operator=(const ConcurrentTestResults&) = delete;
+
+        // Custom move constructor and assignment operator
+        ConcurrentTestResults(ConcurrentTestResults&& other) noexcept
+            : read_success(other.read_success.load()),
+              write_success(other.write_success.load()),
+              errors(other.errors.load()) {}
+
+        ConcurrentTestResults& operator=(
+            ConcurrentTestResults&& other) noexcept {
+            if (this != &other) {
+                read_success.store(other.read_success.load());
+                write_success.store(other.write_success.load());
+                errors.store(other.errors.load());
+            }
+            return *this;
+        }
+    };
+
+    /**
+     * @brief Run concurrent state operations with reader and writer threads
+     * @param state_manager Reference to the StateManager instance
+     * @param config Test configuration parameters
+     * @return Test results with success/error counts
+     */
+    ConcurrentTestResults runConcurrentStateOperations(
+        StateManager& state_manager, const ConcurrentTestConfig& config) {
+        ConcurrentTestResults results;
         QVector<QFuture<void>> futures;
 
         // Launch reader threads
-        for (int t = 0; t < num_threads / 2; ++t) {
-            auto future = QtConcurrent::run([&, t]() {
-                for (int i = 0; i < operations_per_thread; ++i) {
-                    try {
-                        QString key =
-                            QString("reader_test_%1_%2").arg(t).arg(i);
-
-                        // Set a value first
-                        state_manager.setState(
-                            key, QString("Reader Value %1").arg(i));
-
-                        // Then read it
-                        auto value = state_manager.getState<QString>(key);
-                        if (value && value->get().contains("Reader Value")) {
-                            read_success.fetch_add(1);
-                        }
-                    } catch (const std::exception& e) {
-                        errors.fetch_add(1);
-                        qWarning()
-                            << "Reader thread" << t << "error:" << e.what();
-                    }
-                }
-            });
-            futures.append(future);
-        }
+        launchReaderThreads(state_manager, config, results, futures);
 
         // Launch writer threads
-        for (int t = num_threads / 2; t < num_threads; ++t) {
+        launchWriterThreads(state_manager, config, results, futures);
+
+        // Wait for all threads to complete
+        waitForThreadCompletion(futures);
+
+        // Log results for debugging
+        logTestResults(results);
+
+        return results;
+    }
+
+    /**
+     * @brief Launch reader threads for concurrent testing
+     * @param state_manager StateManager instance
+     * @param config Test configuration
+     * @param results Results structure to update
+     * @param futures Vector to store thread futures
+     */
+    void launchReaderThreads(StateManager& state_manager,
+                             const ConcurrentTestConfig& config,
+                             ConcurrentTestResults& results,
+                             QVector<QFuture<void>>& futures) {
+        for (int t = 0; t < config.num_threads / 2; ++t) {
             auto future = QtConcurrent::run([&, t]() {
-                for (int i = 0; i < operations_per_thread; ++i) {
-                    try {
-                        QString key =
-                            QString("writer_test_%1_%2").arg(t).arg(i);
-                        QString value =
-                            QString("Writer Value %1_%2").arg(t).arg(i);
-
-                        state_manager.setState(key, value);
-
-                        // Verify the write
-                        auto retrieved = state_manager.getState<QString>(key);
-                        if (retrieved && retrieved->get() == value) {
-                            write_success.fetch_add(1);
-                        }
-                    } catch (const std::exception& e) {
-                        errors.fetch_add(1);
-                        qWarning()
-                            << "Writer thread" << t << "error:" << e.what();
-                    }
-                }
+                executeReaderOperations(state_manager, config, results, t);
             });
             futures.append(future);
         }
+    }
 
-        // Wait for all threads to complete
+    /**
+     * @brief Launch writer threads for concurrent testing
+     * @param state_manager StateManager instance
+     * @param config Test configuration
+     * @param results Results structure to update
+     * @param futures Vector to store thread futures
+     */
+    void launchWriterThreads(StateManager& state_manager,
+                             const ConcurrentTestConfig& config,
+                             ConcurrentTestResults& results,
+                             QVector<QFuture<void>>& futures) {
+        for (int t = config.num_threads / 2; t < config.num_threads; ++t) {
+            auto future = QtConcurrent::run([&, t]() {
+                executeWriterOperations(state_manager, config, results, t);
+            });
+            futures.append(future);
+        }
+    }
+
+    /**
+     * @brief Execute read operations for a single reader thread
+     * @param state_manager StateManager instance
+     * @param config Test configuration
+     * @param results Results structure to update
+     * @param thread_id Thread identifier
+     */
+    void executeReaderOperations(StateManager& state_manager,
+                                 const ConcurrentTestConfig& config,
+                                 ConcurrentTestResults& results,
+                                 int thread_id) {
+        for (int i = 0; i < config.operations_per_thread; ++i) {
+            try {
+                QString key =
+                    QString("reader_test_%1_%2").arg(thread_id).arg(i);
+
+                // Set a value first
+                state_manager.setState(key, QString("Reader Value %1").arg(i));
+
+                // Then read it
+                auto value = state_manager.getState<QString>(key);
+                if (value && value->get().contains("Reader Value")) {
+                    results.read_success.fetch_add(1);
+                }
+            } catch (const std::exception& e) {
+                results.errors.fetch_add(1);
+                qWarning() << "Reader thread" << thread_id
+                           << "error:" << e.what();
+            }
+        }
+    }
+
+    /**
+     * @brief Execute write operations for a single writer thread
+     * @param state_manager StateManager instance
+     * @param config Test configuration
+     * @param results Results structure to update
+     * @param thread_id Thread identifier
+     */
+    void executeWriterOperations(StateManager& state_manager,
+                                 const ConcurrentTestConfig& config,
+                                 ConcurrentTestResults& results,
+                                 int thread_id) {
+        for (int i = 0; i < config.operations_per_thread; ++i) {
+            try {
+                QString key =
+                    QString("writer_test_%1_%2").arg(thread_id).arg(i);
+                QString value =
+                    QString("Writer Value %1_%2").arg(thread_id).arg(i);
+
+                state_manager.setState(key, value);
+
+                // Verify the write
+                auto retrieved = state_manager.getState<QString>(key);
+                if (retrieved && retrieved->get() == value) {
+                    results.write_success.fetch_add(1);
+                }
+            } catch (const std::exception& e) {
+                results.errors.fetch_add(1);
+                qWarning() << "Writer thread" << thread_id
+                           << "error:" << e.what();
+            }
+        }
+    }
+
+    /**
+     * @brief Wait for all threads to complete execution
+     * @param futures Vector of thread futures to wait for
+     */
+    void waitForThreadCompletion(QVector<QFuture<void>>& futures) {
         for (auto& future : futures) {
             future.waitForFinished();
         }
+    }
 
-        qDebug() << "Read successes:" << read_success.load();
-        qDebug() << "Write successes:" << write_success.load();
-        qDebug() << "Errors:" << errors.load();
+    /**
+     * @brief Log test results for debugging purposes
+     * @param results Test results to log
+     */
+    void logTestResults(const ConcurrentTestResults& results) {
+        qDebug() << "Read successes:" << results.read_success.load();
+        qDebug() << "Write successes:" << results.write_success.load();
+        qDebug() << "Errors:" << results.errors.load();
+    }
 
-        // Allow for some race conditions in concurrent access
-        // The current StateManager implementation doesn't have full thread
-        // safety
-        QCOMPARE(errors.load(), 0);
+    /**
+     * @brief Validate concurrent test results against expected criteria
+     * @param results Test results to validate
+     * @param config Test configuration with expected values
+     */
+    void validateConcurrentTestResults(const ConcurrentTestResults& results,
+                                       const ConcurrentTestConfig& config) {
+        // No errors should occur during testing
+        QCOMPARE(results.errors.load(), 0);
 
-        // Expect at least 80% success rate for concurrent operations
+        // Calculate expected operation counts
+        int expected_reads =
+            (config.num_threads / 2) * config.operations_per_thread;
+        int expected_writes =
+            (config.num_threads / 2) * config.operations_per_thread;
+
+        // Expect at least the minimum success rate for concurrent operations
         // The current StateManager implementation has limited thread safety
-        int expected_reads = (num_threads / 2) * operations_per_thread;
-        int expected_writes = (num_threads / 2) * operations_per_thread;
-
-        QVERIFY(read_success.load() >= expected_reads * 0.8);
-        QVERIFY(write_success.load() >= expected_writes * 0.8);
+        QVERIFY(results.read_success.load() >=
+                expected_reads * config.min_success_rate);
+        QVERIFY(results.write_success.load() >=
+                expected_writes * config.min_success_rate);
     }
 
     void testStateManagerComputedStateThreadSafety() {

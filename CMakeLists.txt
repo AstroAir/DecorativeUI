@@ -6,6 +6,28 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# **Include platform configuration and advanced build options**
+include(cmake/PlatformConfig.cmake)
+include(cmake/AdvancedBuildOptions.cmake)
+
+# **Build Performance Optimizations**
+# Enable parallel compilation
+if(MSVC)
+    # Use all available cores for MSVC
+    add_compile_options(/MP)
+    # Enable faster PDB generation
+    add_compile_options(/Zi)
+    add_link_options(/DEBUG:FASTLINK)
+else()
+    # Enable parallel compilation for GCC/Clang
+    include(ProcessorCount)
+    ProcessorCount(N)
+    if(NOT N EQUAL 0)
+        set(CMAKE_BUILD_PARALLEL_LEVEL ${N})
+        message(STATUS "Parallel build enabled with ${N} cores")
+    endif()
+endif()
+
 # **Find Qt6 with required components**
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Test Concurrent)
 
@@ -17,17 +39,92 @@ option(BUILD_COMMAND_SYSTEM "Build Command-based UI system" ON)
 option(BUILD_ADAPTERS "Build integration adapters" ON)
 option(ENABLE_COMMAND_DEBUG "Enable Command system debug output" OFF)
 
+# **Performance and Optimization Options**
+option(ENABLE_LTO "Enable Link Time Optimization" OFF)
+option(ENABLE_UNITY_BUILD "Enable Unity/Jumbo builds for faster compilation" OFF)
+option(ENABLE_CCACHE "Enable ccache for faster rebuilds" ON)
+option(ENABLE_PRECOMPILED_HEADERS "Enable precompiled headers" ON)
+
+# **Enable CTest at top-level so tests in subdirectories are discoverable**
+enable_testing()
+
+# **Performance Optimization Setup**
+# Enable ccache if available and requested
+if(ENABLE_CCACHE)
+    find_program(CCACHE_PROGRAM ccache)
+    if(CCACHE_PROGRAM)
+        set(CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
+        message(STATUS "ccache found and enabled: ${CCACHE_PROGRAM}")
+    else()
+        message(STATUS "ccache requested but not found")
+    endif()
+endif()
+
+# **Link Time Optimization**
+if(ENABLE_LTO)
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT ipo_supported OUTPUT ipo_error)
+    if(ipo_supported)
+        set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+        message(STATUS "Link Time Optimization (LTO) enabled")
+    else()
+        message(WARNING "LTO requested but not supported: ${ipo_error}")
+    endif()
+endif()
+
 # **Compiler-specific optimizations**
 if(MSVC)
     add_compile_options(/W4 /permissive-)
     add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+
+    # MSVC-specific optimizations
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_compile_options(/O2 /Ob2 /DNDEBUG)
+        # Enable function-level linking for better optimization
+        add_compile_options(/Gy)
+        add_link_options(/OPT:REF /OPT:ICF)
+    endif()
+
+    # Architecture-specific optimizations
+    if(DECLARATIVE_UI_ARCH STREQUAL "x64")
+        add_compile_options(/favor:AMD64)
+    elseif(DECLARATIVE_UI_ARCH STREQUAL "arm64")
+        add_compile_options(/favor:ARM64)
+    endif()
 else()
     add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
+
+    # GCC/Clang-specific optimizations
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        add_compile_options(-O3 -DNDEBUG)
+        # Enable native architecture optimizations if not cross-compiling
+        if(NOT CMAKE_CROSSCOMPILING)
+            add_compile_options(-march=native -mtune=native)
+        endif()
+    endif()
+
+    # Architecture-specific optimizations
+    if(DECLARATIVE_UI_ARCH STREQUAL "arm64")
+        add_compile_options(-mcpu=native)
+    endif()
 endif()
 
 # **Debug/Release configurations**
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(DECLARATIVE_UI_DEBUG)
+    # Enable debug optimizations
+    if(MSVC)
+        add_compile_options(/Od /RTC1)
+    else()
+        add_compile_options(-Og -g3)
+    endif()
+elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+    add_compile_definitions(DECLARATIVE_UI_DEBUG)
+    if(MSVC)
+        add_compile_options(/O2 /Zi)
+    else()
+        add_compile_options(-O2 -g)
+    endif()
 endif()
 
 # **Create main library first**
@@ -99,6 +196,7 @@ add_library(DeclarativeUI STATIC
 
 # **Add subdirectories before main library linking**
 add_subdirectory(src/Animation)
+add_subdirectory(src/Binding)
 add_subdirectory(src/Core)
 add_subdirectory(src/Components)
 
@@ -120,6 +218,36 @@ set_target_properties(DeclarativeUI PROPERTIES
     AUTOMOC ON
     AUTORCC ON
 )
+
+# **Unity Build Configuration**
+if(ENABLE_UNITY_BUILD)
+    set_target_properties(DeclarativeUI PROPERTIES
+        UNITY_BUILD ON
+        UNITY_BUILD_BATCH_SIZE 16
+    )
+    message(STATUS "Unity build enabled for DeclarativeUI")
+endif()
+
+# **Precompiled Headers**
+if(ENABLE_PRECOMPILED_HEADERS)
+    target_precompile_headers(DeclarativeUI PRIVATE
+        <QtCore/QtCore>
+        <QtWidgets/QtWidgets>
+        <QtNetwork/QtNetwork>
+        <memory>
+        <vector>
+        <string>
+        <unordered_map>
+        <functional>
+    )
+    message(STATUS "Precompiled headers enabled for DeclarativeUI")
+endif()
+
+# **Apply platform-specific optimizations and advanced build options**
+configure_platform_optimizations(DeclarativeUI)
+configure_qt6_platform(DeclarativeUI)
+configure_performance_monitoring(DeclarativeUI)
+configure_advanced_build_options(DeclarativeUI)
 
 # **Command System Configuration**
 if(BUILD_COMMAND_SYSTEM)
@@ -153,4 +281,3 @@ endif()
 if(BUILD_TESTS)
     add_subdirectory(tests)
 endif()
-

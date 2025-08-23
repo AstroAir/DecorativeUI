@@ -11,10 +11,11 @@ void DoubleSpinBox::initialize() {
     if (!double_spin_box_widget_) {
         double_spin_box_widget_ = new QDoubleSpinBox();
         setWidget(double_spin_box_widget_);
-        
+
         // Connect signals
-        connect(double_spin_box_widget_, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-                this, [this](double value) {
+        connect(double_spin_box_widget_,
+                QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
+                [this](double value) {
                     if (value_changed_handler_) {
                         value_changed_handler_(value);
                     }
@@ -50,7 +51,8 @@ DoubleSpinBox& DoubleSpinBox::suffix(const QString& suffix) {
     return static_cast<DoubleSpinBox&>(setProperty("suffix", suffix));
 }
 
-DoubleSpinBox& DoubleSpinBox::onValueChanged(std::function<void(double)> handler) {
+DoubleSpinBox& DoubleSpinBox::onValueChanged(
+    std::function<void(double)> handler) {
     value_changed_handler_ = handler;
     return *this;
 }
@@ -68,7 +70,8 @@ double DoubleSpinBox::getMaximum() const {
 }
 
 double DoubleSpinBox::getSingleStep() const {
-    return double_spin_box_widget_ ? double_spin_box_widget_->singleStep() : 1.0;
+    return double_spin_box_widget_ ? double_spin_box_widget_->singleStep()
+                                   : 1.0;
 }
 
 int DoubleSpinBox::getDecimals() const {
@@ -76,11 +79,13 @@ int DoubleSpinBox::getDecimals() const {
 }
 
 QString DoubleSpinBox::getPrefix() const {
-    return double_spin_box_widget_ ? double_spin_box_widget_->prefix() : QString();
+    return double_spin_box_widget_ ? double_spin_box_widget_->prefix()
+                                   : QString();
 }
 
 QString DoubleSpinBox::getSuffix() const {
-    return double_spin_box_widget_ ? double_spin_box_widget_->suffix() : QString();
+    return double_spin_box_widget_ ? double_spin_box_widget_->suffix()
+                                   : QString();
 }
 
 }  // namespace DeclarativeUI::Components

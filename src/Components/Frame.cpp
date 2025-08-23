@@ -1,28 +1,35 @@
 // Components/Frame.cpp
 #include "Frame.hpp"
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QGridLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 namespace DeclarativeUI::Components {
 
 // **Implementation**
-Frame::Frame(QObject* parent)
-    : UIElement(parent), frame_widget_(nullptr) {}
+Frame::Frame(QObject* parent) : UIElement(parent), frame_widget_(nullptr) {}
 
 Frame& Frame::frameStyle(QFrame::Shape shape, QFrame::Shadow shadow) {
+    // Store as properties so they apply pre- and post-initialize
+    static_cast<Frame&>(setProperty("frameShape", static_cast<int>(shape)));
+    static_cast<Frame&>(setProperty("frameShadow", static_cast<int>(shadow)));
+
+    // If widget already exists, also set directly for immediate effect
     if (frame_widget_) {
-        frame_widget_->setFrameStyle(static_cast<int>(shape) | static_cast<int>(shadow));
+        frame_widget_->setFrameStyle(static_cast<int>(shape) |
+                                     static_cast<int>(shadow));
     }
     return *this;
 }
 
 Frame& Frame::frameShape(QFrame::Shape shape) {
-    return static_cast<Frame&>(setProperty("frameShape", static_cast<int>(shape)));
+    return static_cast<Frame&>(
+        setProperty("frameShape", static_cast<int>(shape)));
 }
 
 Frame& Frame::frameShadow(QFrame::Shadow shadow) {
-    return static_cast<Frame&>(setProperty("frameShadow", static_cast<int>(shadow)));
+    return static_cast<Frame&>(
+        setProperty("frameShadow", static_cast<int>(shadow)));
 }
 
 Frame& Frame::lineWidth(int width) {

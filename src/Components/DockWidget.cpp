@@ -20,11 +20,13 @@ DockWidget& DockWidget::widget(QWidget* widget) {
 }
 
 DockWidget& DockWidget::features(QDockWidget::DockWidgetFeatures features) {
-    return static_cast<DockWidget&>(setProperty("features", static_cast<int>(features)));
+    return static_cast<DockWidget&>(
+        setProperty("features", static_cast<int>(features)));
 }
 
 DockWidget& DockWidget::allowedAreas(Qt::DockWidgetAreas areas) {
-    return static_cast<DockWidget&>(setProperty("allowedAreas", static_cast<int>(areas)));
+    return static_cast<DockWidget&>(
+        setProperty("allowedAreas", static_cast<int>(areas)));
 }
 
 DockWidget& DockWidget::floating(bool floating) {
@@ -38,7 +40,8 @@ DockWidget& DockWidget::titleBarWidget(QWidget* widget) {
     return *this;
 }
 
-DockWidget& DockWidget::onFeaturesChanged(std::function<void(QDockWidget::DockWidgetFeatures)> handler) {
+DockWidget& DockWidget::onFeaturesChanged(
+    std::function<void(QDockWidget::DockWidgetFeatures)> handler) {
     features_changed_handler_ = std::move(handler);
     return *this;
 }
@@ -48,7 +51,8 @@ DockWidget& DockWidget::onTopLevelChanged(std::function<void(bool)> handler) {
     return *this;
 }
 
-DockWidget& DockWidget::onAllowedAreasChanged(std::function<void(Qt::DockWidgetAreas)> handler) {
+DockWidget& DockWidget::onAllowedAreasChanged(
+    std::function<void(Qt::DockWidgetAreas)> handler) {
     allowed_areas_changed_handler_ = std::move(handler);
     return *this;
 }
@@ -58,7 +62,8 @@ DockWidget& DockWidget::onVisibilityChanged(std::function<void(bool)> handler) {
     return *this;
 }
 
-DockWidget& DockWidget::onDockLocationChanged(std::function<void(Qt::DockWidgetArea)> handler) {
+DockWidget& DockWidget::onDockLocationChanged(
+    std::function<void(Qt::DockWidgetArea)> handler) {
     dock_location_changed_handler_ = std::move(handler);
     return *this;
 }
@@ -75,27 +80,36 @@ void DockWidget::initialize() {
         // Connect signals
         if (features_changed_handler_) {
             connect(dock_widget_, &QDockWidget::featuresChanged, this,
-                    [this](QDockWidget::DockWidgetFeatures features) { features_changed_handler_(features); });
+                    [this](QDockWidget::DockWidgetFeatures features) {
+                        features_changed_handler_(features);
+                    });
         }
 
         if (top_level_changed_handler_) {
             connect(dock_widget_, &QDockWidget::topLevelChanged, this,
-                    [this](bool topLevel) { top_level_changed_handler_(topLevel); });
+                    [this](bool topLevel) {
+                        top_level_changed_handler_(topLevel);
+                    });
         }
 
         if (allowed_areas_changed_handler_) {
             connect(dock_widget_, &QDockWidget::allowedAreasChanged, this,
-                    [this](Qt::DockWidgetAreas allowedAreas) { allowed_areas_changed_handler_(allowedAreas); });
+                    [this](Qt::DockWidgetAreas allowedAreas) {
+                        allowed_areas_changed_handler_(allowedAreas);
+                    });
         }
 
         if (visibility_changed_handler_) {
-            connect(dock_widget_, &QDockWidget::visibilityChanged, this,
-                    [this](bool visible) { visibility_changed_handler_(visible); });
+            connect(
+                dock_widget_, &QDockWidget::visibilityChanged, this,
+                [this](bool visible) { visibility_changed_handler_(visible); });
         }
 
         if (dock_location_changed_handler_) {
             connect(dock_widget_, &QDockWidget::dockLocationChanged, this,
-                    [this](Qt::DockWidgetArea area) { dock_location_changed_handler_(area); });
+                    [this](Qt::DockWidgetArea area) {
+                        dock_location_changed_handler_(area);
+                    });
         }
     }
 }
@@ -117,7 +131,8 @@ bool DockWidget::isFloating() const {
 Qt::DockWidgetArea DockWidget::getDockWidgetArea() const {
     if (dock_widget_) {
         // To get dock area, we need to check with the parent main window
-        if (auto main_window = qobject_cast<QMainWindow*>(dock_widget_->parent())) {
+        if (auto main_window =
+                qobject_cast<QMainWindow*>(dock_widget_->parent())) {
             return main_window->dockWidgetArea(dock_widget_);
         }
     }
@@ -125,7 +140,8 @@ Qt::DockWidgetArea DockWidget::getDockWidgetArea() const {
 }
 
 QDockWidget::DockWidgetFeatures DockWidget::getFeatures() const {
-    return dock_widget_ ? dock_widget_->features() : QDockWidget::DockWidgetClosable;
+    return dock_widget_ ? dock_widget_->features()
+                        : QDockWidget::DockWidgetClosable;
 }
 
 Qt::DockWidgetAreas DockWidget::getAllowedAreas() const {

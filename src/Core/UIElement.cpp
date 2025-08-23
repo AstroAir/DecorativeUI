@@ -1,5 +1,25 @@
-// Core/UIElement.cpp
+/**
+ * @file UIElement.cpp
+ * @brief Implementation of the core UIElement class for DeclarativeUI
+ *
+ * This file provides the foundation for all UI components in the DeclarativeUI
+ * framework, including:
+ * - Property management with type-safe storage and binding
+ * - Animation support with fluent interface
+ * - Theme configuration and styling
+ * - Performance monitoring and responsive design
+ * - Serialization and deserialization capabilities
+ * - Validation and error handling
+ *
+ * The implementation emphasizes maintainable code with low cyclomatic
+ * complexity by breaking down complex operations into focused helper functions.
+ *
+ * @author DeclarativeUI Team
+ * @version 1.0
+ */
+
 #include "UIElement.hpp"
+#include "Lifecycle.hpp"
 
 #include <QApplication>
 #include <QJsonDocument>
@@ -25,11 +45,16 @@ UIElement::UIElement(QObject *parent) : QObject(parent) {
         connect(this, &UIElement::propertyUpdated,
                 [timer]() { timer->start(); });
 
+        // **Initialize lifecycle management**
+        lifecycle_ = std::make_unique<ComponentLifecycle>(this);
+
     } catch (const std::exception &e) {
         throw Exceptions::UIException("Failed to initialize UIElement: " +
                                       std::string(e.what()));
     }
 }
+
+UIElement::~UIElement() = default;
 
 UIElement &UIElement::bindProperty(
     const QString &property, const std::function<PropertyValue()> &binding) {
@@ -77,11 +102,30 @@ PropertyValue UIElement::getProperty(const QString &name) const {
     return it->second;
 }
 
+bool UIElement::hasProperty(const QString &name) const {
+    return properties_.find(name) != properties_.end();
+}
+
+void UIElement::initialize() {
+    // Base implementation does minimal setup; subclasses may override.
+    // This keeps UIElement non-abstract for unit tests that instantiate it.
+}
+
 void UIElement::cleanup() noexcept {
     try {
+        // Trigger unmount lifecycle event before cleanup
+        if (lifecycle_) {
+            try {
+                lifecycle_->unmount();
+            } catch (const std::exception &e) {
+                qWarning() << "Lifecycle unmount failed:" << e.what();
+            }
+        }
+
         event_handlers_.clear();
         bindings_.clear();
         properties_.clear();
+        previous_properties_.clear();
         widget_.reset();
     } catch (...) {
         // **No-throw cleanup guarantee**
@@ -111,25 +155,17 @@ void UIElement::updateBoundProperties() {
 
 void UIElement::connectSignals() {
     // **Dynamic signal connection using Qt's meta-object system**
+    // Note: Derived classes should override this method to handle their
+    // specific signals This base implementation provides common signal
+    // connections
     if (!widget_)
         return;
 
-    const QMetaObject *metaObj = widget_->metaObject();
-
-    for (const auto &[event, handler] : event_handlers_) {
-        // **Find and connect signals dynamically**
-        for (int i = 0; i < metaObj->methodCount(); ++i) {
-            QMetaMethod method = metaObj->method(i);
-
-            if (method.methodType() == QMetaMethod::Signal &&
-                QString::fromUtf8(method.name()) == event) {
-                QMetaObject::invokeMethod(
-                    widget_.get(), method.name(), Qt::DirectConnection,
-                    Q_ARG(std::function<void()>, handler));
-                break;
-            }
-        }
-    }
+    // For now, let derived classes handle their own signal connections
+    // This avoids conflicts with specialized signal handling in components like
+    // Button
+    // TODO: Implement generic signal connection for basic widgets that don't
+    // override this
 }
 
 void UIElement::onPropertyChanged() { updateBoundProperties(); }
@@ -139,9 +175,28 @@ void UIElement::setWidget(QWidget *widget) {
         throw Exceptions::UIException("Widget cannot be null");
     }
 
+    // Store previous properties for lifecycle update detection
+    previous_properties_.clear();
+    for (const auto &[name, value] : properties_) {
+        std::visit(
+            [&](const auto &val) {
+                previous_properties_[name] = QVariant::fromValue(val);
+            },
+            value);
+    }
+
     widget_ = std::unique_ptr<QWidget>(widget);
     applyStoredProperties();
     connectSignals();
+
+    // Trigger mount lifecycle event
+    if (lifecycle_) {
+        try {
+            lifecycle_->mount(widget);
+        } catch (const std::exception &e) {
+            qWarning() << "Lifecycle mount failed:" << e.what();
+        }
+    }
 }
 
 void UIElement::applyStoredProperties() {
@@ -710,109 +765,28 @@ QJsonObject UIElement::serialize() const {
     return json;
 }
 
+/**
+ * @brief Deserializes UIElement from JSON object
+ * @param json The JSON object containing serialized data
+ * @return true if deserialization was successful, false otherwise
+ *
+ * This function coordinates the deserialization process by delegating
+ * to specialized helper functions for different data sections.
+ */
 bool UIElement::deserialize(const QJsonObject &json) {
     try {
-        // Check for serialization errors
-        if (json.contains("error")) {
-            qWarning() << "Cannot deserialize UIElement with error:"
-                       << json["error"].toString();
+        // **Check for serialization errors**
+        if (!validateDeserializationInput(json)) {
             return false;
         }
 
-        // Deserialize properties
-        if (json.contains("properties") && json["properties"].isObject()) {
-            QJsonObject properties_json = json["properties"].toObject();
+        // **Deserialize different sections**
+        deserializeProperties(json);
+        deserializeTheme(json);
+        deserializeConfiguration(json);
 
-            for (auto it = properties_json.begin(); it != properties_json.end();
-                 ++it) {
-                const QString &name = it.key();
-                const QJsonValue &value = it.value();
-
-                if (value.isString()) {
-                    properties_[name] = PropertyValue{value.toString()};
-                } else if (value.isDouble()) {
-                    // Handle both int and double
-                    double val = value.toDouble();
-                    if (val == static_cast<int>(val)) {
-                        properties_[name] =
-                            PropertyValue{static_cast<int>(val)};
-                    } else {
-                        properties_[name] = PropertyValue{val};
-                    }
-                } else if (value.isBool()) {
-                    properties_[name] = PropertyValue{value.toBool()};
-                } else if (value.isObject()) {
-                    QJsonObject obj = value.toObject();
-
-                    // Try to deserialize as QSize
-                    if (obj.contains("width") && obj.contains("height")) {
-                        QSize size(obj["width"].toInt(), obj["height"].toInt());
-                        properties_[name] = PropertyValue{size};
-                    }
-                    // Try to deserialize as QPoint
-                    else if (obj.contains("x") && obj.contains("y")) {
-                        QPoint point(obj["x"].toInt(), obj["y"].toInt());
-                        properties_[name] = PropertyValue{point};
-                    }
-                }
-            }
-        }
-
-        // Deserialize theme
-        if (json.contains("theme") && json["theme"].isObject()) {
-            QJsonObject theme_json = json["theme"].toObject();
-
-            if (theme_json.contains("primary_color")) {
-                theme_.primary_color = theme_json["primary_color"].toString();
-            }
-            if (theme_json.contains("secondary_color")) {
-                theme_.secondary_color =
-                    theme_json["secondary_color"].toString();
-            }
-            if (theme_json.contains("background_color")) {
-                theme_.background_color =
-                    theme_json["background_color"].toString();
-            }
-            if (theme_json.contains("text_color")) {
-                theme_.text_color = theme_json["text_color"].toString();
-            }
-            if (theme_json.contains("border_color")) {
-                theme_.border_color = theme_json["border_color"].toString();
-            }
-            if (theme_json.contains("font_family")) {
-                theme_.font_family = theme_json["font_family"].toString();
-            }
-            if (theme_json.contains("font_size")) {
-                theme_.font_size = theme_json["font_size"].toInt();
-            }
-            if (theme_json.contains("border_radius")) {
-                theme_.border_radius = theme_json["border_radius"].toInt();
-            }
-        }
-
-        // Deserialize configuration
-        if (json.contains("configuration") &&
-            json["configuration"].isObject()) {
-            QJsonObject config_json = json["configuration"].toObject();
-
-            if (config_json.contains("performance_monitoring_enabled")) {
-                performance_monitoring_enabled_ =
-                    config_json["performance_monitoring_enabled"].toBool();
-            }
-            if (config_json.contains("responsive_enabled")) {
-                responsive_enabled_ =
-                    config_json["responsive_enabled"].toBool();
-            }
-            if (config_json.contains("current_width")) {
-                current_width_ = config_json["current_width"].toInt();
-            }
-        }
-
-        // Apply deserialized properties to widget if it exists
-        if (widget_) {
-            applyStoredProperties();
-            applyTheme();
-        }
+        // **Apply deserialized data to widget**
+        applyDeserializedData();
 
         return true;
 
@@ -820,6 +794,189 @@ bool UIElement::deserialize(const QJsonObject &json) {
         qWarning() << "Failed to deserialize UIElement:" << e.what();
         return false;
     }
+}
+
+// **Deserialization helper method implementations**
+
+/**
+ * @brief Validates the input JSON object for deserialization
+ * @param json The JSON object to validate
+ * @return true if the input is valid, false otherwise
+ */
+bool UIElement::validateDeserializationInput(const QJsonObject &json) const {
+    if (json.contains("error")) {
+        qWarning() << "Cannot deserialize UIElement with error:"
+                   << json["error"].toString();
+        return false;
+    }
+    return true;
+}
+
+/**
+ * @brief Deserializes properties from JSON object
+ * @param json The JSON object containing properties data
+ */
+void UIElement::deserializeProperties(const QJsonObject &json) {
+    if (!json.contains("properties") || !json["properties"].isObject()) {
+        return;
+    }
+
+    QJsonObject properties_json = json["properties"].toObject();
+    for (auto it = properties_json.begin(); it != properties_json.end(); ++it) {
+        const QString &name = it.key();
+        const QJsonValue &value = it.value();
+        properties_[name] = parsePropertyValue(value);
+    }
+}
+
+/**
+ * @brief Deserializes theme configuration from JSON object
+ * @param json The JSON object containing theme data
+ */
+void UIElement::deserializeTheme(const QJsonObject &json) {
+    if (!json.contains("theme") || !json["theme"].isObject()) {
+        return;
+    }
+
+    QJsonObject theme_json = json["theme"].toObject();
+
+    // **Helper lambda to safely extract string values**
+    auto extractString = [&theme_json](const QString &key, QString &target) {
+        if (theme_json.contains(key)) {
+            target = theme_json[key].toString();
+        }
+    };
+
+    // **Helper lambda to safely extract integer values**
+    auto extractInt = [&theme_json](const QString &key, int &target) {
+        if (theme_json.contains(key)) {
+            target = theme_json[key].toInt();
+        }
+    };
+
+    // **Extract theme properties**
+    extractString("primary_color", theme_.primary_color);
+    extractString("secondary_color", theme_.secondary_color);
+    extractString("background_color", theme_.background_color);
+    extractString("text_color", theme_.text_color);
+    extractString("border_color", theme_.border_color);
+    extractString("font_family", theme_.font_family);
+    extractInt("font_size", theme_.font_size);
+    extractInt("border_radius", theme_.border_radius);
+}
+
+/**
+ * @brief Deserializes configuration settings from JSON object
+ * @param json The JSON object containing configuration data
+ */
+void UIElement::deserializeConfiguration(const QJsonObject &json) {
+    if (!json.contains("configuration") || !json["configuration"].isObject()) {
+        return;
+    }
+
+    QJsonObject config_json = json["configuration"].toObject();
+
+    if (config_json.contains("performance_monitoring_enabled")) {
+        performance_monitoring_enabled_ =
+            config_json["performance_monitoring_enabled"].toBool();
+    }
+    if (config_json.contains("responsive_enabled")) {
+        responsive_enabled_ = config_json["responsive_enabled"].toBool();
+    }
+    if (config_json.contains("current_width")) {
+        current_width_ = config_json["current_width"].toInt();
+    }
+}
+
+/**
+ * @brief Applies deserialized data to the widget
+ */
+void UIElement::applyDeserializedData() {
+    if (widget_) {
+        applyStoredProperties();
+        applyTheme();
+    }
+}
+
+/**
+ * @brief Parses a JSON value into a PropertyValue
+ * @param value The JSON value to parse
+ * @return Parsed PropertyValue
+ */
+PropertyValue UIElement::parsePropertyValue(const QJsonValue &value) const {
+    if (value.isString()) {
+        return PropertyValue{value.toString()};
+    } else if (value.isDouble()) {
+        double val = value.toDouble();
+        // **Handle both int and double**
+        if (val == static_cast<int>(val)) {
+            return PropertyValue{static_cast<int>(val)};
+        } else {
+            return PropertyValue{val};
+        }
+    } else if (value.isBool()) {
+        return PropertyValue{value.toBool()};
+    } else if (value.isObject()) {
+        QJsonObject obj = value.toObject();
+
+        // **Try to deserialize as QSize**
+        if (obj.contains("width") && obj.contains("height")) {
+            QSize size(obj["width"].toInt(), obj["height"].toInt());
+            return PropertyValue{size};
+        }
+        // **Try to deserialize as QPoint**
+        else if (obj.contains("x") && obj.contains("y")) {
+            QPoint point(obj["x"].toInt(), obj["y"].toInt());
+            return PropertyValue{point};
+        }
+    }
+
+    // **Return default PropertyValue for unsupported types**
+    return PropertyValue{QString("Unsupported type")};
+}
+
+// **Lifecycle management implementation**
+LifecycleBuilder &UIElement::lifecycle() {
+    static thread_local std::unique_ptr<LifecycleBuilder> builder;
+    builder = std::make_unique<LifecycleBuilder>(lifecycle_.get());
+    return *builder;
+}
+
+UIElement &UIElement::onMount(std::function<void()> hook) {
+    if (lifecycle_) {
+        lifecycle_->onMount([hook](const LifecycleContext &) { hook(); });
+    }
+    return *this;
+}
+
+UIElement &UIElement::onUnmount(std::function<void()> hook) {
+    if (lifecycle_) {
+        lifecycle_->onUnmount([hook](const LifecycleContext &) { hook(); });
+    }
+    return *this;
+}
+
+UIElement &UIElement::onUpdate(std::function<void()> hook) {
+    if (lifecycle_) {
+        lifecycle_->onUpdate([hook](const LifecycleContext &) { hook(); });
+    }
+    return *this;
+}
+
+UIElement &UIElement::onError(std::function<void(const QString &)> hook) {
+    if (lifecycle_) {
+        lifecycle_->onError(
+            [hook](const LifecycleContext &ctx) { hook(ctx.error_message); });
+    }
+    return *this;
+}
+
+UIElement &UIElement::useEffect(std::function<std::function<void()>()> effect,
+                                const std::vector<QVariant> &dependencies) {
+    if (lifecycle_) {
+        lifecycle_->useEffect(effect, dependencies);
+    }
+    return *this;
 }
 
 }  // namespace DeclarativeUI::Core

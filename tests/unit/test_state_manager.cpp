@@ -1,10 +1,10 @@
 #include <QApplication>
-#include <QSignalSpy>
-#include <QTest>
-#include <QTimer>
-#include <QTemporaryFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QSignalSpy>
+#include <QTemporaryFile>
+#include <QTest>
+#include <QTimer>
 
 #include "../../src/Binding/StateManager.hpp"
 
@@ -341,9 +341,8 @@ private slots:
         auto state = manager.createState<int>("validated_state_enhanced", 10);
 
         // Set validator that only allows positive values
-        manager.setValidator<int>("validated_state_enhanced", [](const int& value) {
-            return value > 0;
-        });
+        manager.setValidator<int>("validated_state_enhanced",
+                                  [](const int& value) { return value > 0; });
 
         // Valid value should work
         manager.setState("validated_state_enhanced", 20);
@@ -359,7 +358,8 @@ private slots:
 
         // Enable performance monitoring
         manager.enablePerformanceMonitoring(true);
-        QVERIFY(manager.getPerformanceReport().contains("Performance monitoring: ON"));
+        QVERIFY(manager.getPerformanceReport().contains(
+            "Performance monitoring: ON"));
 
         // Create and update state
         manager.setState("perf_test_enhanced", QString("initial"));
@@ -372,7 +372,8 @@ private slots:
 
         // Disable performance monitoring
         manager.enablePerformanceMonitoring(false);
-        QVERIFY(manager.getPerformanceReport().contains("Performance monitoring: OFF"));
+        QVERIFY(manager.getPerformanceReport().contains(
+            "Performance monitoring: OFF"));
     }
 
     void testDebugModeEnhanced() {

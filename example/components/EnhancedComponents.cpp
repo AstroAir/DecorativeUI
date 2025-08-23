@@ -4,29 +4,33 @@
  */
 
 #include "EnhancedComponents.hpp"
+#include <QDebug>
 #include <QGraphicsDropShadowEffect>
 #include <QPropertyAnimation>
-#include <QDebug>
 
-std::unique_ptr<NavigationBar> EnhancedComponents::createNavigationBar(QWidget* parent) {
+std::unique_ptr<NavigationBar> EnhancedComponents::createNavigationBar(
+    QWidget* parent) {
     auto nav_bar = std::make_unique<NavigationBar>(parent);
     applyModernStyling(nav_bar.get());
     return nav_bar;
 }
 
-std::unique_ptr<StatusIndicator> EnhancedComponents::createStatusIndicator(QWidget* parent) {
+std::unique_ptr<StatusIndicator> EnhancedComponents::createStatusIndicator(
+    QWidget* parent) {
     auto indicator = std::make_unique<StatusIndicator>(parent);
     applyModernStyling(indicator.get());
     return indicator;
 }
 
-std::unique_ptr<SearchBox> EnhancedComponents::createSearchBox(QWidget* parent) {
+std::unique_ptr<SearchBox> EnhancedComponents::createSearchBox(
+    QWidget* parent) {
     auto search_box = std::make_unique<SearchBox>(parent);
     applyModernStyling(search_box.get());
     return search_box;
 }
 
-std::unique_ptr<DataTable> EnhancedComponents::createDataTable(QWidget* parent) {
+std::unique_ptr<DataTable> EnhancedComponents::createDataTable(
+    QWidget* parent) {
     auto data_table = std::make_unique<DataTable>(parent);
     applyModernStyling(data_table.get());
     return data_table;
@@ -39,53 +43,53 @@ std::unique_ptr<Chart> EnhancedComponents::createChart(QWidget* parent) {
 }
 
 void EnhancedComponents::applyModernStyling(QWidget* widget) {
-    if (!widget) return;
-    
+    if (!widget)
+        return;
+
     // Apply modern flat design styling
-    widget->setStyleSheet(
-        widget->styleSheet() +
-        "QWidget {"
-        "    font-family: 'Segoe UI', Arial, sans-serif;"
-        "    font-size: 12px;"
-        "}"
-        "QPushButton {"
-        "    border: none;"
-        "    border-radius: 4px;"
-        "    padding: 8px 16px;"
-        "    background-color: #3498db;"
-        "    color: white;"
-        "    font-weight: 500;"
-        "}"
-        "QPushButton:hover {"
-        "    background-color: #2980b9;"
-        "}"
-        "QPushButton:pressed {"
-        "    background-color: #21618c;"
-        "}"
-        "QLineEdit {"
-        "    border: 2px solid #bdc3c7;"
-        "    border-radius: 4px;"
-        "    padding: 6px 12px;"
-        "    background-color: white;"
-        "}"
-        "QLineEdit:focus {"
-        "    border-color: #3498db;"
-        "}"
-        "QComboBox {"
-        "    border: 2px solid #bdc3c7;"
-        "    border-radius: 4px;"
-        "    padding: 6px 12px;"
-        "    background-color: white;"
-        "}"
-        "QComboBox:focus {"
-        "    border-color: #3498db;"
-        "}"
-    );
+    widget->setStyleSheet(widget->styleSheet() +
+                          "QWidget {"
+                          "    font-family: 'Segoe UI', Arial, sans-serif;"
+                          "    font-size: 12px;"
+                          "}"
+                          "QPushButton {"
+                          "    border: none;"
+                          "    border-radius: 4px;"
+                          "    padding: 8px 16px;"
+                          "    background-color: #3498db;"
+                          "    color: white;"
+                          "    font-weight: 500;"
+                          "}"
+                          "QPushButton:hover {"
+                          "    background-color: #2980b9;"
+                          "}"
+                          "QPushButton:pressed {"
+                          "    background-color: #21618c;"
+                          "}"
+                          "QLineEdit {"
+                          "    border: 2px solid #bdc3c7;"
+                          "    border-radius: 4px;"
+                          "    padding: 6px 12px;"
+                          "    background-color: white;"
+                          "}"
+                          "QLineEdit:focus {"
+                          "    border-color: #3498db;"
+                          "}"
+                          "QComboBox {"
+                          "    border: 2px solid #bdc3c7;"
+                          "    border-radius: 4px;"
+                          "    padding: 6px 12px;"
+                          "    background-color: white;"
+                          "}"
+                          "QComboBox:focus {"
+                          "    border-color: #3498db;"
+                          "}");
 }
 
 void EnhancedComponents::addDropShadow(QWidget* widget) {
-    if (!widget) return;
-    
+    if (!widget)
+        return;
+
     auto shadow = new QGraphicsDropShadowEffect();
     shadow->setBlurRadius(10);
     shadow->setColor(QColor(0, 0, 0, 80));
@@ -94,24 +98,25 @@ void EnhancedComponents::addDropShadow(QWidget* widget) {
 }
 
 void EnhancedComponents::addHoverEffect(QWidget* widget) {
-    if (!widget) return;
-    
+    if (!widget)
+        return;
+
     // Install event filter for hover effects
     widget->setAttribute(Qt::WA_Hover, true);
-    
+
     // This would typically involve installing an event filter
     // For now, we'll just apply hover-capable styling
     QString current_style = widget->styleSheet();
     if (!current_style.contains(":hover")) {
         widget->setStyleSheet(current_style +
-            "QWidget:hover {"
-            "    background-color: rgba(52, 152, 219, 0.1);"
-            "}"
-        );
+                              "QWidget:hover {"
+                              "    background-color: rgba(52, 152, 219, 0.1);"
+                              "}");
     }
 }
 
-QIcon EnhancedComponents::createColoredIcon(const QString& icon_name, const QColor& color) {
+QIcon EnhancedComponents::createColoredIcon(const QString& icon_name,
+                                            const QColor& color) {
     // In a real implementation, this would create a colored version of an icon
     // For now, return an empty icon
     Q_UNUSED(icon_name)
@@ -120,8 +125,9 @@ QIcon EnhancedComponents::createColoredIcon(const QString& icon_name, const QCol
 }
 
 void EnhancedComponents::applyLightTheme(QWidget* widget) {
-    if (!widget) return;
-    
+    if (!widget)
+        return;
+
     widget->setStyleSheet(
         "QWidget {"
         "    background-color: #ffffff;"
@@ -157,13 +163,13 @@ void EnhancedComponents::applyLightTheme(QWidget* widget) {
         "    subcontrol-origin: margin;"
         "    left: 10px;"
         "    padding: 0 5px 0 5px;"
-        "}"
-    );
+        "}");
 }
 
 void EnhancedComponents::applyDarkTheme(QWidget* widget) {
-    if (!widget) return;
-    
+    if (!widget)
+        return;
+
     widget->setStyleSheet(
         "QWidget {"
         "    background-color: #2c3e50;"
@@ -210,37 +216,39 @@ void EnhancedComponents::applyDarkTheme(QWidget* widget) {
         "    background-color: #34495e;"
         "    border: 1px solid #7f8c8d;"
         "    padding: 4px;"
-        "}"
-    );
+        "}");
 }
 
-void EnhancedComponents::applyCustomTheme(QWidget* widget, const QColor& primary, const QColor& secondary) {
-    if (!widget) return;
-    
-    widget->setStyleSheet(QString(
-        "QWidget {"
-        "    background-color: %2;"
-        "    color: #2c3e50;"
-        "}"
-        "QPushButton {"
-        "    background-color: %1;"
-        "    color: white;"
-        "    border: none;"
-        "    border-radius: 4px;"
-        "    padding: 8px 16px;"
-        "}"
-        "QPushButton:hover {"
-        "    background-color: %1;"
-        "    opacity: 0.8;"
-        "}"
-        "QLineEdit {"
-        "    background-color: white;"
-        "    border: 2px solid %1;"
-        "    border-radius: 4px;"
-        "    padding: 6px 12px;"
-        "}"
-        "QLineEdit:focus {"
-        "    border-color: %1;"
-        "}"
-    ).arg(primary.name()).arg(secondary.name()));
+void EnhancedComponents::applyCustomTheme(QWidget* widget,
+                                          const QColor& primary,
+                                          const QColor& secondary) {
+    if (!widget)
+        return;
+
+    widget->setStyleSheet(QString("QWidget {"
+                                  "    background-color: %2;"
+                                  "    color: #2c3e50;"
+                                  "}"
+                                  "QPushButton {"
+                                  "    background-color: %1;"
+                                  "    color: white;"
+                                  "    border: none;"
+                                  "    border-radius: 4px;"
+                                  "    padding: 8px 16px;"
+                                  "}"
+                                  "QPushButton:hover {"
+                                  "    background-color: %1;"
+                                  "    opacity: 0.8;"
+                                  "}"
+                                  "QLineEdit {"
+                                  "    background-color: white;"
+                                  "    border: 2px solid %1;"
+                                  "    border-radius: 4px;"
+                                  "    padding: 6px 12px;"
+                                  "}"
+                                  "QLineEdit:focus {"
+                                  "    border-color: %1;"
+                                  "}")
+                              .arg(primary.name())
+                              .arg(secondary.name()));
 }

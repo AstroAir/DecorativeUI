@@ -1,0 +1,60 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "declarativeui",
+  "version": "1.0.0",
+  "description": "A modern, declarative UI framework for Qt applications",
+  "homepage": "https://declarativeui.github.io/DeclarativeUI/",
+  "documentation": "https://declarativeui.github.io/DeclarativeUI/",
+  "supports": "!uwp",
+  "dependencies": [
+    {
+      "name": "qt6-base",
+      "features": [
+        "concurrent",
+        "network",
+        "widgets"
+      ]
+    },
+    {
+      "name": "qt6-tools",
+      "features": [
+        "tools"
+      ]
+    }
+  ],
+  "features": {
+    "testing": {
+      "description": "Enable testing dependencies",
+      "dependencies": [
+        {
+          "name": "qt6-base",
+          "features": [
+            "testlib"
+          ]
+        }
+      ]
+    },
+    "examples": {
+      "description": "Enable example applications",
+      "dependencies": []
+    },
+    "docs": {
+      "description": "Enable documentation generation",
+      "dependencies": []
+    },
+    "performance": {
+      "description": "Enable performance monitoring and profiling",
+      "dependencies": []
+    },
+    "hot-reload": {
+      "description": "Enable hot reload functionality",
+      "dependencies": []
+    }
+  },
+  "overrides": [
+    {
+      "name": "qt6-base",
+      "version": "6.5.0"
+    }
+  ]
+}

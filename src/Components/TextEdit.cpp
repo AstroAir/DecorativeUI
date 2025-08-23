@@ -49,8 +49,7 @@ TextEdit &TextEdit::cursorWidth(int width) {
     return static_cast<TextEdit &>(setProperty("cursorWidth", width));
 }
 
-TextEdit &TextEdit::textInteractionFlags(
-    Qt::TextInteractionFlags flags) {
+TextEdit &TextEdit::textInteractionFlags(Qt::TextInteractionFlags flags) {
     return static_cast<TextEdit &>(
         setProperty("textInteractionFlags", static_cast<int>(flags)));
 }
@@ -81,8 +80,7 @@ TextEdit &TextEdit::onSelectionChanged(std::function<void()> handler) {
     return *this;
 }
 
-TextEdit &TextEdit::onCursorPositionChanged(
-    std::function<void()> handler) {
+TextEdit &TextEdit::onCursorPositionChanged(std::function<void()> handler) {
     cursor_position_changed_handler_ = std::move(handler);
     return *this;
 }
@@ -181,7 +179,7 @@ void TextEdit::setCursor(const QTextCursor &cursor) {
 }
 
 void TextEdit::moveCursor(QTextCursor::MoveOperation operation,
-                         QTextCursor::MoveMode mode) {
+                          QTextCursor::MoveMode mode) {
     if (text_edit_widget_) {
         text_edit_widget_->moveCursor(operation, mode);
     }
@@ -271,8 +269,7 @@ bool TextEdit::canRedo() const {
 }
 
 // **Search operations**
-bool TextEdit::find(const QString &text,
-                   QTextDocument::FindFlags flags) {
+bool TextEdit::find(const QString &text, QTextDocument::FindFlags flags) {
     return text_edit_widget_ ? text_edit_widget_->find(text, flags) : false;
 }
 
@@ -332,7 +329,5 @@ int TextEdit::getTabStopWidth() const {
 int TextEdit::getCursorWidth() const {
     return text_edit_widget_ ? text_edit_widget_->cursorWidth() : 1;
 }
-
-
 
 }  // namespace DeclarativeUI::Components

@@ -14,24 +14,28 @@ This directory contains the core reactive programming infrastructure:
 ## Key Features
 
 ### 🔄 **Reactive State Management**
+
 - Centralized state store with automatic UI updates
 - Type-safe state access and modification
 - Computed properties with dependency tracking
 - Batch updates for performance optimization
 
 ### 🔗 **Property Binding System**
+
 - One-way, two-way, and computed bindings
 - Type conversion and validation support
 - Performance monitoring and optimization
 - Template-based type safety
 
 ### 📊 **Advanced Features**
+
 - Undo/redo history support
 - State persistence and restoration
 - Dependency graph analysis
 - Performance metrics and debugging
 
 ### 🛡️ **Thread Safety**
+
 - Thread-safe state operations
 - Recursive mutex protection
 - Atomic operations for counters
@@ -44,6 +48,7 @@ This directory contains the core reactive programming infrastructure:
 Central singleton managing all application state with reactive updates.
 
 **Key Features:**
+
 - Type-safe state registration and access
 - Computed properties with automatic dependency tracking
 - Undo/redo history with configurable depth
@@ -52,6 +57,7 @@ Central singleton managing all application state with reactive updates.
 - Performance monitoring and debugging
 
 **Core Methods:**
+
 ```cpp
 // State creation and access
 template<typename T>
@@ -63,7 +69,7 @@ std::shared_ptr<ReactiveProperty<T>> getState(const QString& key);
 // Computed properties
 template<typename T>
 std::shared_ptr<ReactiveProperty<T>> createComputed(
-    const QString& key, 
+    const QString& key,
     std::function<T()> computer,
     std::vector<QString> dependencies
 );
@@ -86,16 +92,19 @@ void loadState(const QString& filename);
 Infrastructure for binding properties between objects with automatic updates.
 
 **Binding Directions:**
+
 - **OneWay**: Source → Target only
 - **TwoWay**: Source ↔ Target bidirectional
 - **OneTime**: Single update, then disconnect
 
 **Update Modes:**
+
 - **Immediate**: Update immediately on change
 - **Deferred**: Batch updates for performance
 - **Manual**: Update only when explicitly requested
 
 **Key Features:**
+
 - Type conversion between different property types
 - Validation with custom validator functions
 - Performance monitoring and metrics
@@ -106,6 +115,7 @@ Infrastructure for binding properties between objects with automatic updates.
 Template-based binding system with advanced type safety and features.
 
 **Template Concepts:**
+
 ```cpp
 // Type constraints for bindable types
 template<typename T>
@@ -117,6 +127,7 @@ concept ComputeFunction = /* implementation */;
 ```
 
 **Advanced Features:**
+
 - Template-based type safety at compile time
 - Custom converter functions between types
 - Validation with predicate functions
@@ -128,6 +139,7 @@ concept ComputeFunction = /* implementation */;
 Individual reactive state container with change notifications.
 
 **Key Features:**
+
 - Type-safe value storage and access
 - Change notification signals
 - Computed property support with dependency tracking
@@ -135,6 +147,7 @@ Individual reactive state container with change notifications.
 - History tracking (when enabled)
 
 **Core Methods:**
+
 ```cpp
 template<typename T>
 class ReactiveProperty {
@@ -142,7 +155,7 @@ public:
     T get() const;
     void set(const T& value);
     void bind(std::function<T()> computer);
-    
+
     // Qt signals
     void valueChanged(const T& value);
 };
@@ -332,6 +345,7 @@ label->bindProperty("text", []() {
 ## Thread Safety
 
 All components are designed for thread-safe operation:
+
 - StateManager uses recursive mutexes for nested calls
 - ReactiveProperty operations are atomic where possible
 - Qt signals/slots handle cross-thread communication safely
@@ -345,6 +359,7 @@ All components are designed for thread-safe operation:
 ## Testing
 
 Comprehensive unit tests available in `tests/unit/`:
+
 - State management lifecycle
 - Property binding accuracy
 - Template concept validation
@@ -357,6 +372,10 @@ ctest -R Binding
 ```
 
 ## Future Enhancements
+
+## Recent stability changes
+
+- PropertyBindingTemplate: target widget pointer is now stored as QPointer to QWidget so it automatically becomes null when the widget is destroyed. This prevents use-after-free crashes during batch operations and teardown.
 
 - **Reactive Collections**: Observable arrays and maps
 - **Async State**: Support for asynchronous state updates

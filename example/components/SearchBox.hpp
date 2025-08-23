@@ -5,15 +5,15 @@
 
 #pragma once
 
-#include <QWidget>
-#include <QLineEdit>
-#include <QPushButton>
-#include <QListWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QCompleter>
+#include <QHBoxLayout>
+#include <QLineEdit>
+#include <QListWidget>
+#include <QPushButton>
 #include <QStringListModel>
 #include <QTimer>
+#include <QVBoxLayout>
+#include <QWidget>
 #include <memory>
 
 class SearchBox : public QWidget {
@@ -21,7 +21,7 @@ class SearchBox : public QWidget {
 
 public:
     explicit SearchBox(QWidget* parent = nullptr);
-    
+
     void setSearchData(const QStringList& data);
     void setPlaceholderText(const QString& text);
     void setSearchDelay(int ms);
@@ -43,7 +43,7 @@ private:
     QLineEdit* search_input_;
     QPushButton* search_button_;
     QListWidget* suggestions_;
-    
+
     QStringList search_data_;
     QTimer* search_timer_;
     std::unique_ptr<QCompleter> completer_;

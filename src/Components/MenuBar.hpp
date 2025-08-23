@@ -14,7 +14,6 @@
 #include <functional>
 #include <unordered_map>
 
-
 #include "../Core/UIElement.hpp"
 
 namespace DeclarativeUI::Components {

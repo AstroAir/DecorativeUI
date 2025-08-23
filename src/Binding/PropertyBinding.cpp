@@ -4,21 +4,20 @@
 namespace DeclarativeUI::Binding {
 
 PropertyBindingManager::PropertyBindingManager(QObject* parent)
-    : QObject(parent), m_performance_monitoring_enabled(false) {
-}
+    : QObject(parent), m_performance_monitoring_enabled(false) {}
 
-PropertyBindingManager::~PropertyBindingManager() {
-    removeAllBindings();
-}
+PropertyBindingManager::~PropertyBindingManager() { removeAllBindings(); }
 
-void PropertyBindingManager::addBinding(std::shared_ptr<IPropertyBinding> binding) {
+void PropertyBindingManager::addBinding(
+    std::shared_ptr<IPropertyBinding> binding) {
     if (binding) {
         m_bindings.push_back(binding);
         trackBinding(binding.get());
     }
 }
 
-void PropertyBindingManager::removeBinding(std::shared_ptr<IPropertyBinding> binding) {
+void PropertyBindingManager::removeBinding(
+    std::shared_ptr<IPropertyBinding> binding) {
     if (binding) {
         auto it = std::find(m_bindings.begin(), m_bindings.end(), binding);
         if (it != m_bindings.end()) {
@@ -48,14 +47,16 @@ void PropertyBindingManager::updateAllBindings() {
 void PropertyBindingManager::enableAllBindings() {
     for (auto& binding : m_bindings) {
         if (binding) {
-            // Check if the binding has an enable method (for template-based bindings)
-            // Since IPropertyBinding doesn't have enable/disable methods, we'll need to
-            // implement this through a different approach or extend the interface
-            // For now, we'll track enabled state internally
+            // Check if the binding has an enable method (for template-based
+            // bindings) Since IPropertyBinding doesn't have enable/disable
+            // methods, we'll need to implement this through a different
+            // approach or extend the interface For now, we'll track enabled
+            // state internally
 
-            // This is a basic implementation - in a real system you might want to
-            // extend IPropertyBinding to include enable/disable methods
-            qDebug() << "Enabling binding:" << binding->getSourcePath() << "->" << binding->getTargetPath();
+            // This is a basic implementation - in a real system you might want
+            // to extend IPropertyBinding to include enable/disable methods
+            qDebug() << "Enabling binding:" << binding->getSourcePath() << "->"
+                     << binding->getTargetPath();
         }
     }
     qDebug() << "All bindings enabled (" << m_bindings.size() << " bindings)";
@@ -64,9 +65,10 @@ void PropertyBindingManager::enableAllBindings() {
 void PropertyBindingManager::disableAllBindings() {
     for (auto& binding : m_bindings) {
         if (binding) {
-            // Similar to enableAllBindings, this would ideally call a disable method
-            // on each binding. For now, we'll just log the action.
-            qDebug() << "Disabling binding:" << binding->getSourcePath() << "->" << binding->getTargetPath();
+            // Similar to enableAllBindings, this would ideally call a disable
+            // method on each binding. For now, we'll just log the action.
+            qDebug() << "Disabling binding:" << binding->getSourcePath() << "->"
+                     << binding->getTargetPath();
         }
     }
     qDebug() << "All bindings disabled (" << m_bindings.size() << " bindings)";
@@ -76,11 +78,13 @@ int PropertyBindingManager::getBindingCount() const {
     return static_cast<int>(m_bindings.size());
 }
 
-std::vector<std::shared_ptr<IPropertyBinding>> PropertyBindingManager::getBindings() const {
+std::vector<std::shared_ptr<IPropertyBinding>>
+PropertyBindingManager::getBindings() const {
     return m_bindings;
 }
 
-std::vector<std::shared_ptr<IPropertyBinding>> PropertyBindingManager::getBindingsForWidget(QWidget* widget) const {
+std::vector<std::shared_ptr<IPropertyBinding>>
+PropertyBindingManager::getBindingsForWidget(QWidget* widget) const {
     std::vector<std::shared_ptr<IPropertyBinding>> result;
 
     if (!widget) {
@@ -93,22 +97,24 @@ std::vector<std::shared_ptr<IPropertyBinding>> PropertyBindingManager::getBindin
             QString targetPath = binding->getTargetPath();
 
             // The target path format is typically "ClassName::propertyName"
-            // We need to check if this binding is associated with the given widget
-            // This is a simplified implementation - in a real system, you might want to
-            // store widget references directly in the binding or use a more sophisticated
-            // matching mechanism
+            // We need to check if this binding is associated with the given
+            // widget This is a simplified implementation - in a real system,
+            // you might want to store widget references directly in the binding
+            // or use a more sophisticated matching mechanism
 
             // For now, we'll use a basic string matching approach
             QString widgetClassName = widget->metaObject()->className();
             if (targetPath.startsWith(widgetClassName + "::")) {
-                // Additional check: we could verify the widget pointer if we had access to it
-                // This is a limitation of the current IPropertyBinding interface
+                // Additional check: we could verify the widget pointer if we
+                // had access to it This is a limitation of the current
+                // IPropertyBinding interface
                 result.push_back(binding);
             }
         }
     }
 
-    qDebug() << "Found" << result.size() << "bindings for widget of type" << widget->metaObject()->className();
+    qDebug() << "Found" << result.size() << "bindings for widget of type"
+             << widget->metaObject()->className();
     return result;
 }
 
@@ -131,8 +137,8 @@ QString PropertyBindingManager::getPerformanceReport() const {
     for (const auto& binding : m_bindings) {
         if (binding) {
             report += QString("Binding: %1 -> %2\n")
-                     .arg(binding->getSourcePath())
-                     .arg(binding->getTargetPath());
+                          .arg(binding->getSourcePath())
+                          .arg(binding->getTargetPath());
         }
     }
 
@@ -163,4 +169,4 @@ PropertyBindingManager* getGlobalBindingManager() {
     return g_global_binding_manager;
 }
 
-} // namespace DeclarativeUI::Binding
+}  // namespace DeclarativeUI::Binding

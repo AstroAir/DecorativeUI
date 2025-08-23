@@ -14,7 +14,8 @@ using namespace DeclarativeUI::HotReload;
 using namespace DeclarativeUI::Exceptions;
 
 /**
- * @brief Comprehensive tests for newly implemented PerformanceMonitor functionality
+ * @brief Comprehensive tests for newly implemented PerformanceMonitor
+ * functionality
  *
  * This test suite focuses on testing all the newly implemented methods in
  * PerformanceMonitor that were previously missing or incomplete.
@@ -38,9 +39,7 @@ private slots:
         QVERIFY(temp_dir_->isValid());
     }
 
-    void cleanup() {
-        temp_dir_.reset();
-    }
+    void cleanup() { temp_dir_.reset(); }
 
     // **Test Monitoring Lifecycle Control**
     void testMonitoringLifecycle() {
@@ -97,15 +96,17 @@ private slots:
         monitor->setCPUWarningThreshold(20.0);
 
         // Set up signal spies
-        QSignalSpy memory_warning_spy(monitor.get(), &PerformanceMonitor::memoryWarning);
-        QSignalSpy cpu_warning_spy(monitor.get(), &PerformanceMonitor::cpuWarning);
+        QSignalSpy memory_warning_spy(monitor.get(),
+                                      &PerformanceMonitor::memoryWarning);
+        QSignalSpy cpu_warning_spy(monitor.get(),
+                                   &PerformanceMonitor::cpuWarning);
 
         // Trigger memory warning
-        monitor->recordMemoryUsage(100); // Above threshold of 50
+        monitor->recordMemoryUsage(100);  // Above threshold of 50
         QVERIFY(memory_warning_spy.count() >= 1);
 
         // Trigger CPU warning
-        monitor->recordCPUUsage(50.0); // Above threshold of 20.0
+        monitor->recordCPUUsage(50.0);  // Above threshold of 20.0
         QVERIFY(cpu_warning_spy.count() >= 1);
 
         monitor->stopMonitoring();
@@ -155,7 +156,7 @@ private slots:
         // Generate historical data for prediction
         AdvancedPerformanceMetrics metrics;
         for (int i = 0; i < 15; ++i) {
-            metrics.total_time_ms = 100 + i * 5; // Increasing trend
+            metrics.total_time_ms = 100 + i * 5;  // Increasing trend
             metrics.memory_peak_mb = 150 + i * 10;
             metrics.cpu_usage_percent = 20.0 + i * 2.0;
             metrics.file_path = "test.json";
@@ -194,19 +195,20 @@ private slots:
         monitor->setMemoryWarningThreshold(100);
 
         // Simulate high resource usage to trigger bottlenecks
-        monitor->recordCPUUsage(95.0); // High CPU usage
-        monitor->recordMemoryUsage(500); // High memory usage
+        monitor->recordCPUUsage(95.0);    // High CPU usage
+        monitor->recordMemoryUsage(500);  // High memory usage
 
         // Create metrics with slow I/O
         AdvancedPerformanceMetrics metrics;
-        metrics.file_load_time_ms = 1000; // Slow file loading
+        metrics.file_load_time_ms = 1000;  // Slow file loading
         metrics.total_time_ms = 1200;
         metrics.file_path = "slow_file.json";
         monitor->recordReloadMetrics("slow_file.json", metrics);
 
         // Test bottleneck detection
         auto bottlenecks = monitor->detectBottlenecks();
-        QVERIFY(bottlenecks.size() > 0); // Should detect at least one bottleneck
+        QVERIFY(bottlenecks.size() >
+                0);  // Should detect at least one bottleneck
 
         // Test most critical bottleneck
         auto critical_bottleneck = monitor->getMostCriticalBottleneck();
@@ -240,7 +242,7 @@ private slots:
         QVERIFY(memory_profile.contains("memory_snapshots"));
 
         // Test garbage collection
-        monitor->forceGarbageCollection(); // Should not crash
+        monitor->forceGarbageCollection();  // Should not crash
 
         monitor->stopMonitoring();
     }
@@ -252,10 +254,11 @@ private slots:
 
         // Test optimization recommendations
         QStringList recommendations = monitor->getOptimizationRecommendations();
-        QVERIFY(recommendations.size() >= 0); // Should return a list (may be empty)
+        QVERIFY(recommendations.size() >=
+                0);  // Should return a list (may be empty)
 
         // Test performance optimization
-        monitor->optimizePerformance(); // Should not crash
+        monitor->optimizePerformance();  // Should not crash
 
         // Test automatic optimizations
         monitor->applyAutomaticOptimizations(true);
@@ -359,7 +362,8 @@ private slots:
 
         // Simulate memory growth pattern
         for (int i = 0; i < 15; ++i) {
-            monitor->recordMemoryUsage(100 + i * 20); // Steadily increasing memory
+            monitor->recordMemoryUsage(100 +
+                                       i * 20);  // Steadily increasing memory
         }
 
         // Test that memory profiling data is captured

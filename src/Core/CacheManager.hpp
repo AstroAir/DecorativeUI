@@ -372,6 +372,19 @@ private:
      * @return Best-effort size in bytes.
      */
     size_t calculateMemorySize(const Value& value) const;
+
+    /**
+     * @brief Helper functions for cache retrieval operations
+     * These functions break down the complex get() operation into smaller,
+     * more manageable pieces for better maintainability and testing.
+     */
+    std::optional<Value> handleExpiredEntry(
+        const Key& key, std::shared_lock<std::shared_mutex>& lock);
+    std::optional<Value> updateAccessAndReturn(
+        const Key& key, std::shared_lock<std::shared_mutex>& lock);
+    void removeExpiredEntry(
+        const Key& key, typename std::unordered_map<
+                            Key, std::shared_ptr<CacheEntryType>>::iterator it);
 };
 
 /**

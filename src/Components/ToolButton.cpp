@@ -20,11 +20,13 @@ ToolButton& ToolButton::iconSize(const QSize& size) {
 }
 
 ToolButton& ToolButton::toolButtonStyle(Qt::ToolButtonStyle style) {
-    return static_cast<ToolButton&>(setProperty("toolButtonStyle", static_cast<int>(style)));
+    return static_cast<ToolButton&>(
+        setProperty("toolButtonStyle", static_cast<int>(style)));
 }
 
 ToolButton& ToolButton::popupMode(QToolButton::ToolButtonPopupMode mode) {
-    return static_cast<ToolButton&>(setProperty("popupMode", static_cast<int>(mode)));
+    return static_cast<ToolButton&>(
+        setProperty("popupMode", static_cast<int>(mode)));
 }
 
 ToolButton& ToolButton::menu(QMenu* menu) {
@@ -54,7 +56,8 @@ ToolButton& ToolButton::autoRaise(bool autoRaise) {
 }
 
 ToolButton& ToolButton::arrowType(Qt::ArrowType type) {
-    return static_cast<ToolButton&>(setProperty("arrowType", static_cast<int>(type)));
+    return static_cast<ToolButton&>(
+        setProperty("arrowType", static_cast<int>(type)));
 }
 
 ToolButton& ToolButton::onClicked(std::function<void()> handler) {

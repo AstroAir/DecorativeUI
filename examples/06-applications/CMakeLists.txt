@@ -82,4 +82,3 @@ set_target_properties(DashboardExample PROPERTIES
 )
 
 message(STATUS "Application examples configured")
-

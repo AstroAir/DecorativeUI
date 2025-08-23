@@ -4,18 +4,18 @@
  */
 
 #include <QApplication>
-#include <QDebug>
-#include <QMainWindow>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QWidget>
-#include <QPushButton>
-#include <QLineEdit>
-#include <QLabel>
 #include <QCheckBox>
+#include <QDebug>
 #include <QGroupBox>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QLineEdit>
+#include <QMainWindow>
 #include <QMenuBar>
+#include <QPushButton>
 #include <QStatusBar>
+#include <QVBoxLayout>
+#include <QWidget>
 
 #ifdef DECLARATIVE_UI_COMMAND_SYSTEM_ENABLED
 
@@ -41,7 +41,6 @@ public:
     }
 
 private:
-
     void setupUI() {
         try {
             // Create UI demonstrating command-based construction concepts
@@ -54,11 +53,14 @@ private:
 
             // Title
             auto* title = new QLabel("Command-Based UI Construction");
-            title->setStyleSheet("font-weight: bold; font-size: 18px; color: #2c3e50;");
+            title->setStyleSheet(
+                "font-weight: bold; font-size: 18px; color: #2c3e50;");
             layout->addWidget(title);
 
             // Description
-            auto* desc = new QLabel("This demonstrates UI construction patterns using the Command system");
+            auto* desc = new QLabel(
+                "This demonstrates UI construction patterns using the Command "
+                "system");
             desc->setStyleSheet("color: #666; margin-bottom: 20px;");
             desc->setWordWrap(true);
             layout->addWidget(desc);
@@ -69,11 +71,13 @@ private:
             button_layout->setSpacing(10);
 
             auto* button1 = new QPushButton("Command Button 1");
-            connect(button1, &QPushButton::clicked, this, &CommandUIExample::onCommandButton1Clicked);
+            connect(button1, &QPushButton::clicked, this,
+                    &CommandUIExample::onCommandButton1Clicked);
             button_layout->addWidget(button1);
 
             auto* button2 = new QPushButton("Command Button 2");
-            connect(button2, &QPushButton::clicked, this, &CommandUIExample::onCommandButton2Clicked);
+            connect(button2, &QPushButton::clicked, this,
+                    &CommandUIExample::onCommandButton2Clicked);
             button_layout->addWidget(button2);
 
             layout->addWidget(button_group);
@@ -84,7 +88,8 @@ private:
 
             input_ = new QLineEdit();
             input_->setPlaceholderText("Enter text via Command pattern...");
-            connect(input_, &QLineEdit::textChanged, this, &CommandUIExample::onTextChanged);
+            connect(input_, &QLineEdit::textChanged, this,
+                    &CommandUIExample::onTextChanged);
             input_layout->addWidget(input_);
 
             layout->addWidget(input_group);
@@ -96,11 +101,13 @@ private:
 
             auto* checkbox1 = new QCheckBox("Command CheckBox 1");
             checkbox1->setChecked(true);
-            connect(checkbox1, &QCheckBox::toggled, this, &CommandUIExample::onCheckBox1Toggled);
+            connect(checkbox1, &QCheckBox::toggled, this,
+                    &CommandUIExample::onCheckBox1Toggled);
             check_layout->addWidget(checkbox1);
 
             auto* checkbox2 = new QCheckBox("Command CheckBox 2");
-            connect(checkbox2, &QCheckBox::toggled, this, &CommandUIExample::onCheckBox2Toggled);
+            connect(checkbox2, &QCheckBox::toggled, this,
+                    &CommandUIExample::onCheckBox2Toggled);
             check_layout->addWidget(checkbox2);
 
             layout->addWidget(check_group);
@@ -120,9 +127,7 @@ private:
         qDebug() << "🔧 Commands configured";
     }
 
-    void setupEventHandling() {
-        qDebug() << "⚡ Event handling configured";
-    }
+    void setupEventHandling() { qDebug() << "⚡ Event handling configured"; }
 
     void createMenuBar() {
         auto* file_menu = menuBar()->addMenu("&File");
@@ -156,17 +161,22 @@ private slots:
 
     void onTextChanged(const QString& text) {
         qDebug() << "📝 Command input changed:" << text;
-        statusBar()->showMessage(QString("Text length = %1 characters").arg(text.length()), 1000);
+        statusBar()->showMessage(
+            QString("Text length = %1 characters").arg(text.length()), 1000);
     }
 
     void onCheckBox1Toggled(bool checked) {
         qDebug() << "☑️ Command CheckBox 1 toggled:" << checked;
-        statusBar()->showMessage(QString("CheckBox 1 is %1").arg(checked ? "checked" : "unchecked"), 2000);
+        statusBar()->showMessage(
+            QString("CheckBox 1 is %1").arg(checked ? "checked" : "unchecked"),
+            2000);
     }
 
     void onCheckBox2Toggled(bool checked) {
         qDebug() << "☑️ Command CheckBox 2 toggled:" << checked;
-        statusBar()->showMessage(QString("CheckBox 2 is %1").arg(checked ? "checked" : "unchecked"), 2000);
+        statusBar()->showMessage(
+            QString("CheckBox 2 is %1").arg(checked ? "checked" : "unchecked"),
+            2000);
     }
 
 private:
@@ -195,9 +205,10 @@ int main(int argc, char* argv[]) {
     QWidget window;
     window.setWindowTitle("Command System Not Available");
     auto* layout = new QVBoxLayout(&window);
-    auto* label = new QLabel("The Command System is not enabled in this build.\n\n"
-                            "To enable it, build with:\n"
-                            "cmake -DBUILD_COMMAND_SYSTEM=ON ..");
+    auto* label = new QLabel(
+        "The Command System is not enabled in this build.\n\n"
+        "To enable it, build with:\n"
+        "cmake -DBUILD_COMMAND_SYSTEM=ON ..");
     label->setAlignment(Qt::AlignCenter);
     label->setStyleSheet("padding: 20px; font-size: 14px;");
     layout->addWidget(label);
