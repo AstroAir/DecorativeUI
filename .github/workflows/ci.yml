@@ -12,7 +12,7 @@ env:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }} with ${{ matrix.compiler }}
+    name: Test on ${{ matrix.os }} with ${{ matrix.compiler }} (${{ matrix.arch }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -23,18 +23,42 @@ jobs:
             compiler: msvc
             qt_arch: win64_msvc2019_64
             cmake_preset: default
+            arch: x64
+
+          # Windows ARM64 builds (if runner available)
+          # - os: windows-latest
+          #   compiler: msvc
+          #   qt_arch: win64_msvc2019_arm64
+          #   cmake_preset: arm64-windows
+          #   arch: arm64
 
           # Linux builds
           - os: ubuntu-latest
             compiler: gcc
             qt_arch: gcc_64
             cmake_preset: default
+            arch: x64
 
-          # macOS builds
-          - os: macos-latest
+          # Linux ARM64 builds (using cross-compilation)
+          - os: ubuntu-latest
+            compiler: gcc-aarch64
+            qt_arch: gcc_64
+            cmake_preset: arm64-linux
+            arch: arm64
+
+          # macOS Intel builds
+          - os: macos-13
             compiler: clang
             qt_arch: clang_64
             cmake_preset: default
+            arch: x64
+
+          # macOS Apple Silicon builds
+          - os: macos-latest
+            compiler: clang
+            qt_arch: clang_64
+            cmake_preset: arm64-macos
+            arch: arm64
 
     steps:
     - name: Checkout code
@@ -56,6 +80,12 @@ jobs:
     - name: Setup Ninja (Windows)
       if: runner.os == 'Windows'
       uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Setup ARM64 cross-compilation (Linux)
+      if: matrix.arch == 'arm64' && runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
     - name: Setup Ninja (Linux/macOS)
       if: runner.os != 'Windows'

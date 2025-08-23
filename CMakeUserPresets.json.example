@@ -1,0 +1,153 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "user-debug",
+      "displayName": "User Debug Build",
+      "description": "Personal debug configuration - copy and customize",
+      "inherits": "debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "ON",
+        "ENABLE_COMMAND_DEBUG": "ON",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      },
+      "environment": {
+        "VCPKG_ROOT": "$env{VCPKG_ROOT}",
+        "Qt6_DIR": "$env{Qt6_DIR}"
+      }
+    },
+    {
+      "name": "user-release",
+      "displayName": "User Release Build",
+      "description": "Personal release configuration - copy and customize",
+      "inherits": "release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "OFF",
+        "ENABLE_LTO": "ON"
+      },
+      "environment": {
+        "VCPKG_ROOT": "$env{VCPKG_ROOT}",
+        "Qt6_DIR": "$env{Qt6_DIR}"
+      }
+    },
+    {
+      "name": "user-dev-fast",
+      "displayName": "Fast Development Build",
+      "description": "Optimized for fast compilation during development",
+      "inherits": "debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "BUILD_EXAMPLES": "OFF",
+        "BUILD_TESTS": "OFF",
+        "ENABLE_UNITY_BUILD": "ON",
+        "ENABLE_PRECOMPILED_HEADERS": "ON",
+        "ENABLE_CCACHE": "ON"
+      },
+      "environment": {
+        "CCACHE_DIR": "$env{HOME}/.ccache"
+      }
+    },
+    {
+      "name": "user-vcpkg",
+      "displayName": "User Build with vcpkg",
+      "description": "Build using vcpkg for dependency management",
+      "inherits": "default",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "ON"
+      },
+      "environment": {
+        "VCPKG_ROOT": "$env{VCPKG_ROOT}"
+      }
+    },
+    {
+      "name": "user-custom-qt",
+      "displayName": "Custom Qt Installation",
+      "description": "Use custom Qt installation path",
+      "inherits": "default",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_PREFIX_PATH": "/path/to/your/qt6/installation",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "user-sanitizer",
+      "displayName": "Debug with Sanitizers",
+      "description": "Debug build with AddressSanitizer and UBSan",
+      "inherits": "debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer",
+        "CMAKE_EXE_LINKER_FLAGS": "-fsanitize=address -fsanitize=undefined",
+        "BUILD_EXAMPLES": "ON",
+        "BUILD_TESTS": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "user-debug",
+      "configurePreset": "user-debug",
+      "jobs": 0
+    },
+    {
+      "name": "user-release",
+      "configurePreset": "user-release",
+      "jobs": 0
+    },
+    {
+      "name": "user-dev-fast",
+      "configurePreset": "user-dev-fast",
+      "jobs": 0
+    },
+    {
+      "name": "user-vcpkg",
+      "configurePreset": "user-vcpkg",
+      "jobs": 0
+    },
+    {
+      "name": "user-custom-qt",
+      "configurePreset": "user-custom-qt",
+      "jobs": 0
+    },
+    {
+      "name": "user-sanitizer",
+      "configurePreset": "user-sanitizer",
+      "jobs": 0
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "user-debug",
+      "configurePreset": "user-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "user-sanitizer",
+      "configurePreset": "user-sanitizer",
+      "output": {
+        "outputOnFailure": true
+      },
+      "environment": {
+        "ASAN_OPTIONS": "detect_leaks=1:abort_on_error=1",
+        "UBSAN_OPTIONS": "print_stacktrace=1:abort_on_error=1"
+      }
+    }
+  ]
+}

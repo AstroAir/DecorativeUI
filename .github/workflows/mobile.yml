@@ -1,0 +1,164 @@
+name: Mobile Platforms
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  QT_VERSION: 6.5.0
+  CMAKE_VERSION: 3.20
+
+jobs:
+  ios:
+    name: iOS Build
+    runs-on: macos-latest
+    if: false  # Disabled by default - enable when Qt6 for iOS is available
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+
+    - name: Install Qt for iOS
+      # Note: This step would need to be configured with actual Qt6 iOS installation
+      run: |
+        echo "Qt6 for iOS installation would go here"
+        echo "This requires Qt6 built for iOS platform"
+
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: ${{ env.CMAKE_VERSION }}
+
+    - name: Configure CMake for iOS
+      run: |
+        cmake --preset ios
+
+    - name: Build for iOS
+      run: |
+        cmake --build --preset ios
+
+    - name: Upload iOS artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-build
+        path: |
+          build-ios/
+        retention-days: 7
+
+  android:
+    name: Android Build (${{ matrix.abi }})
+    runs-on: ubuntu-latest
+    if: false  # Disabled by default - enable when Qt6 for Android is available
+    strategy:
+      matrix:
+        abi: [arm64-v8a, x86_64]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: Setup Android NDK
+      uses: nttld/setup-ndk@v1
+      with:
+        ndk-version: r25c
+
+    - name: Install Qt for Android
+      # Note: This step would need to be configured with actual Qt6 Android installation
+      run: |
+        echo "Qt6 for Android installation would go here"
+        echo "This requires Qt6 built for Android platform"
+
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: ${{ env.CMAKE_VERSION }}
+
+    - name: Setup Ninja
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y ninja-build
+
+    - name: Configure CMake for Android
+      env:
+        ANDROID_NDK: ${{ env.ANDROID_NDK_ROOT }}
+      run: |
+        if [[ "${{ matrix.abi }}" == "arm64-v8a" ]]; then
+          cmake --preset android-arm64
+        else
+          cmake --preset android-x86_64
+        fi
+
+    - name: Build for Android
+      run: |
+        if [[ "${{ matrix.abi }}" == "arm64-v8a" ]]; then
+          cmake --build --preset android-arm64
+        else
+          cmake --build --preset android-x86_64
+        fi
+
+    - name: Upload Android artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-${{ matrix.abi }}-build
+        path: |
+          build-android-*/
+        retention-days: 7
+
+  cross-compile-test:
+    name: Cross-compilation Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install cross-compilation tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          gcc-aarch64-linux-gnu \
+          g++-aarch64-linux-gnu \
+          gcc-arm-linux-gnueabihf \
+          g++-arm-linux-gnueabihf
+
+    - name: Install Qt6
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: ${{ env.QT_VERSION }}
+        cache: true
+
+    - name: Setup CMake
+      uses: jwlawson/actions-setup-cmake@v1.14
+      with:
+        cmake-version: ${{ env.CMAKE_VERSION }}
+
+    - name: Setup Ninja
+      run: |
+        sudo apt-get install -y ninja-build
+
+    - name: Test ARM64 Linux cross-compilation
+      run: |
+        cmake --preset arm64-linux
+        cmake --build --preset arm64-linux --target DeclarativeUI
+
+    - name: Upload cross-compilation artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: cross-compile-test
+        path: |
+          build-arm64-linux/
+        retention-days: 7
