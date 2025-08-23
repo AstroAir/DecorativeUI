@@ -31,6 +31,7 @@ private slots:
     void init() {
         // Set up for each test
         widget_ = std::make_unique<BottleneckDetectorWidget>();
+        widget_->show();  // Show the widget to make it visible for tests
     }
 
     void cleanup() {

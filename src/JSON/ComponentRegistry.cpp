@@ -221,19 +221,32 @@ void ComponentRegistry::registerContainerWidgets() {
 // Property configuration helper methods implementation
 void ComponentRegistry::configureLabelProperties(std::unique_ptr<QLabel>& label,
                                                  const QJsonObject& config) {
-    if (!config.contains("properties"))
-        return;
+    // Handle properties in nested "properties" object
+    if (config.contains("properties")) {
+        QJsonObject props = config["properties"].toObject();
+        if (props.contains("text")) {
+            label->setText(props["text"].toString());
+        }
+        if (props.contains("wordWrap")) {
+            label->setWordWrap(props["wordWrap"].toBool());
+        }
+        if (props.contains("alignment")) {
+            label->setAlignment(
+                static_cast<Qt::Alignment>(props["alignment"].toInt()));
+        }
+    }
 
-    QJsonObject props = config["properties"].toObject();
-    if (props.contains("text")) {
-        label->setText(props["text"].toString());
+    // Also handle properties directly in config object (for backward
+    // compatibility)
+    if (config.contains("text")) {
+        label->setText(config["text"].toString());
     }
-    if (props.contains("wordWrap")) {
-        label->setWordWrap(props["wordWrap"].toBool());
+    if (config.contains("wordWrap")) {
+        label->setWordWrap(config["wordWrap"].toBool());
     }
-    if (props.contains("alignment")) {
+    if (config.contains("alignment")) {
         label->setAlignment(
-            static_cast<Qt::Alignment>(props["alignment"].toInt()));
+            static_cast<Qt::Alignment>(config["alignment"].toInt()));
     }
 }
 

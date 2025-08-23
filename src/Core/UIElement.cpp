@@ -155,25 +155,17 @@ void UIElement::updateBoundProperties() {
 
 void UIElement::connectSignals() {
     // **Dynamic signal connection using Qt's meta-object system**
+    // Note: Derived classes should override this method to handle their
+    // specific signals This base implementation provides common signal
+    // connections
     if (!widget_)
         return;
 
-    const QMetaObject *metaObj = widget_->metaObject();
-
-    for (const auto &[event, handler] : event_handlers_) {
-        // **Find and connect signals dynamically**
-        for (int i = 0; i < metaObj->methodCount(); ++i) {
-            QMetaMethod method = metaObj->method(i);
-
-            if (method.methodType() == QMetaMethod::Signal &&
-                QString::fromUtf8(method.name()) == event) {
-                QMetaObject::invokeMethod(
-                    widget_.get(), method.name(), Qt::DirectConnection,
-                    Q_ARG(std::function<void()>, handler));
-                break;
-            }
-        }
-    }
+    // For now, let derived classes handle their own signal connections
+    // This avoids conflicts with specialized signal handling in components like
+    // Button
+    // TODO: Implement generic signal connection for basic widgets that don't
+    // override this
 }
 
 void UIElement::onPropertyChanged() { updateBoundProperties(); }

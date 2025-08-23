@@ -62,20 +62,18 @@ void DebuggingConsole::appendLogLine(const QString& text) {
             all_log_lines_.removeFirst();
         }
 
-        // Only rebuild display if we removed a significant number of lines
-        if (linesToRemove > 50) {
-            QString currentFilter = filter_combo_->currentText();
-            log_display_->clear();
-            for (const QString& line : all_log_lines_) {
-                if (shouldShowLogLine(line, currentFilter)) {
-                    log_display_->append(line);
-                }
+        // Always rebuild display when lines are removed to ensure consistency
+        QString currentFilter = filter_combo_->currentText();
+        log_display_->clear();
+        for (const QString& line : all_log_lines_) {
+            if (shouldShowLogLine(line, currentFilter)) {
+                log_display_->append(line);
             }
-
-            // Auto-scroll to bottom after rebuild
-            QScrollBar* scrollBar = log_display_->verticalScrollBar();
-            scrollBar->setValue(scrollBar->maximum());
         }
+
+        // Auto-scroll to bottom after rebuild
+        QScrollBar* scrollBar = log_display_->verticalScrollBar();
+        scrollBar->setValue(scrollBar->maximum());
     }
 }
 

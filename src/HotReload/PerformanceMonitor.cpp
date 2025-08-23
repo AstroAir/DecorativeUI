@@ -429,6 +429,15 @@ QJsonObject PerformanceMonitor::getAnalyticsDashboard() const {
         static_cast<qint64>(peak_memory_usage_.load());
     dashboard["peak_cpu_usage"] = peak_cpu_usage_.load();
 
+    // Add analytics configuration status
+    dashboard["real_time_analytics_enabled"] =
+        real_time_analytics_enabled_.load();
+    dashboard["predictive_modeling_enabled"] =
+        predictive_modeling_enabled_.load();
+    dashboard["bottleneck_detection_enabled"] =
+        bottleneck_detection_enabled_.load();
+    dashboard["memory_profiling_enabled"] = memory_profiling_enabled_.load();
+
     // Calculate success rate
     double success_rate =
         total_operations_.load() > 0

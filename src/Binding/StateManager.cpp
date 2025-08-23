@@ -427,7 +427,21 @@ void StateManager::loadStateData(const QJsonObject& statesObject) {
         QString key = it.key();
         QJsonObject stateEntry = it.value().toObject();
         QVariant value = parseStateValue(stateEntry);
-        state_data_[key] = value;
+        QString type = stateEntry["type"].toString();
+
+        // Create the appropriate ReactiveProperty based on the type
+        if (type == "QString") {
+            createState<QString>(key, value.toString());
+        } else if (type == "int") {
+            createState<int>(key, value.toInt());
+        } else if (type == "double") {
+            createState<double>(key, value.toDouble());
+        } else if (type == "bool") {
+            createState<bool>(key, value.toBool());
+        } else {
+            qWarning() << "Unknown state type during load:" << type
+                       << "for key:" << key;
+        }
     }
 }
 
@@ -542,7 +556,7 @@ void StateManager::measurePerformance(const QString& key,
 // ============================================================================
 
 QVariant StateManager::getCurrentStateValue(
-    const std::shared_ptr<ReactivePropertyBase>& state) {
+    const std::shared_ptr<ReactivePropertyBase>& state) const {
     if (!state) {
         return QVariant();
     }
@@ -837,9 +851,17 @@ void StateManager::updateManualDependents(const QString& key) {
 QJsonObject StateManager::createStateDataJson() const {
     QJsonObject statesObject;
 
-    // Save state data
-    for (const auto& [key, value] : state_data_) {
-        statesObject[key] = convertVariantToJson(value);
+    // Save state data from the actual ReactiveProperty objects
+    for (const auto& [key, stateInfo] : states_) {
+        // Cast QObject to ReactivePropertyBase
+        auto reactiveState =
+            std::dynamic_pointer_cast<ReactivePropertyBase>(stateInfo.state);
+        if (reactiveState) {
+            QVariant currentValue = getCurrentStateValue(reactiveState);
+            if (currentValue.isValid()) {
+                statesObject[key] = convertVariantToJson(currentValue);
+            }
+        }
     }
 
     return statesObject;

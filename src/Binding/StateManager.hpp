@@ -493,7 +493,7 @@ private:
      * @return QVariant containing the current value
      */
     QVariant getCurrentStateValue(
-        const std::shared_ptr<ReactivePropertyBase>& state);
+        const std::shared_ptr<ReactivePropertyBase>& state) const;
 
     /**
      * @brief Helper function to apply a value to a reactive state.

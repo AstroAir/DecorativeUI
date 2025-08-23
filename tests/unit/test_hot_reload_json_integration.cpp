@@ -311,10 +311,16 @@ private slots:
         };
 
         // Test error handling through public API
-        error_function();  // Execute the error function
+        bool error_caught = false;
+        try {
+            error_function();  // Execute the error function
+        } catch (const std::runtime_error& e) {
+            error_caught = true;
+            qDebug() << "Expected error caught:" << e.what();
+        }
 
         // Test that error handling works
-        QVERIFY(true);
+        QVERIFY(error_caught);
 
         // Test that monitoring continues after errors
         QVERIFY(monitor->isMonitoring());
